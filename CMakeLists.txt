@@ -6,15 +6,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 add_executable(simple-vulkan-renderer
-        main.cpp
-        app.h
-        app.cpp
+        src/main.cpp
+        src/app.h
+        src/app.cpp
         )
 
 # Windows
 # ---------------------------------------
-set(Vulkan_LIBRARY_DIR "C:/VulkanSDK/1.2.182.0/Lib")
-set(Vulkan_INCLUDE_DIR "C:/VulkanSDK/1.2.182.0/Include")
+set(Vulkan_LIBRARY_DIR "C:/VulkanSDK/1.2.198.1/Lib")
+set(Vulkan_INCLUDE_DIR "C:/VulkanSDK/1.2.198.1/Include")
 
 set(GLFW_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/external/inc")
 set(GLFW_LIBRARY_DIR "${CMAKE_CURRENT_LIST_DIR}/external/lib/lib-vc2019")

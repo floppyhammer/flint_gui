@@ -10,8 +10,8 @@ const bool enableValidationLayers = true;
 #endif
 
 #define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include "GLFW/glfw3.h"
+#include "glm/glm.hpp"
 #include <vector>
 #include <optional>
 #include <iostream>
