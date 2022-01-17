@@ -67,6 +67,12 @@ const std::vector<uint16_t> indices = {
         0, 1, 2, 2, 3, 0
 };
 
+struct UniformBufferObject {
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 proj;
+};
+
 // How many frames should be processed concurrently
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -137,6 +143,7 @@ private:
     std::vector<VkFramebuffer> swapChainFramebuffers;
 
     VkRenderPass renderPass;
+    VkDescriptorSetLayout descriptorSetLayout;
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
 
@@ -150,6 +157,13 @@ private:
     // Index buffer.
     VkBuffer indexBuffer;
     VkDeviceMemory indexBufferMemory;
+
+    // We have a uniform buffer per swap chain image.
+    std::vector<VkBuffer> uniformBuffers;
+    std::vector<VkDeviceMemory> uniformBuffersMemory;
+
+    VkDescriptorPool descriptorPool;
+    std::vector<VkDescriptorSet> descriptorSets;
 
     // Each frame should have its own set of semaphores, so a list is used.
     std::vector<VkSemaphore> imageAvailableSemaphores;
@@ -172,6 +186,10 @@ private:
     void initVulkan();
 
     void mainLoop();
+
+    void updateUniformBuffer(uint32_t currentImage);
+
+    void recreateSwapChain();
 
     void cleanupSwapChain();
 
@@ -205,6 +223,12 @@ private:
 
     void createIndexBuffer();
 
+    void createUniformBuffers();
+
+    void createDescriptorPool();
+
+    void createDescriptorSets();
+
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
     void createCommandBuffers();
@@ -217,6 +241,9 @@ private:
 
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
                       VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+
+    // Create UBO descriptor.
+    void createDescriptorSetLayout();
 
     void createTextureImage();
     void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
