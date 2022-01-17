@@ -2,6 +2,7 @@
 
 #include <algorithm> // Necessary for std::min/std::max
 #include <set>
+#include <cstdint>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -56,6 +57,7 @@ void App::initVulkan() {
     createFramebuffers();
     createCommandPool();
     createVertexBuffer();
+    createIndexBuffer();
     createCommandBuffers();
     createSyncObjects();
 }
@@ -90,9 +92,13 @@ void App::cleanupSwapChain() {
 void App::cleanup() {
     cleanupSwapChain();
 
-    // Clean up vertex buffer
-    vkDestroyBuffer(device, vertexBuffer, nullptr);
-    vkFreeMemory(device, vertexBufferMemory, nullptr);
+    // Clean up index buffer.
+    vkDestroyBuffer(device, indexBuffer, nullptr);
+    vkFreeMemory(device, indexBufferMemory, nullptr);
+
+    // Clean up vertex buffer.
+    vkDestroyBuffer(device, vertexBuffer, nullptr); // GPU memory
+    vkFreeMemory(device, vertexBufferMemory, nullptr); // CPU memory
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
@@ -118,10 +124,10 @@ void App::cleanup() {
 
 void App::createInstance() {
     if (enableValidationLayers && !checkValidationLayerSupport()) {
-        throw std::runtime_error("validation layers requested, but not available!");
+        throw std::runtime_error("Validation layers requested, but not available!");
     }
 
-    VkApplicationInfo appInfo{};
+    VkApplicationInfo appInfo;
     appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     appInfo.pApplicationName = "Hello Triangle";
     appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -129,7 +135,7 @@ void App::createInstance() {
     appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
     appInfo.apiVersion = VK_API_VERSION_1_0;
 
-    VkInstanceCreateInfo createInfo{};
+    VkInstanceCreateInfo createInfo;
     createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     createInfo.pApplicationInfo = &appInfo;
 
@@ -151,7 +157,7 @@ void App::createInstance() {
     }
 
     if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create instance!");
+        throw std::runtime_error("Failed to create instance!");
     }
 }
 
@@ -170,13 +176,13 @@ void App::setupDebugMessenger() {
     populateDebugMessengerCreateInfo(createInfo);
 
     if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
-        throw std::runtime_error("failed to set up debug messenger!");
+        throw std::runtime_error("Failed to set up debug messenger!");
     }
 }
 
 void App::createSurface() {
     if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create window surface!");
+        throw std::runtime_error("Failed to create window surface!");
     }
 }
 
@@ -191,9 +197,9 @@ void App::pickPhysicalDevice() {
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
-    for (const auto& device : devices) {
-        if (isDeviceSuitable(device)) {
-            physicalDevice = device;
+    for (const auto& d : devices) {
+        if (isDeviceSuitable(d)) {
+            physicalDevice = d;
             break;
         }
     }
@@ -367,9 +373,11 @@ void App::createRenderPass() {
     }
 }
 
+
+
 void App::createGraphicsPipeline() {
-    auto vertShaderCode = readFile("../shaders/simple_shader.vert.spv");
-    auto fragShaderCode = readFile("../shaders/simple_shader.frag.spv");
+    auto vertShaderCode = readFile("../src/shaders/simple_shader.vert.spv");
+    auto fragShaderCode = readFile("../src/shaders/simple_shader.frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -539,27 +547,53 @@ void App::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryProp
 void App::createVertexBuffer() {
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
-    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+    VkBuffer stagingBuffer; // In GPU
+    VkDeviceMemory stagingBufferMemory; // In CPU
+
+    // Create the GPU buffer and link it with the CPU memory.
+    createBuffer(bufferSize,
+                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                  VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                  stagingBuffer,
                  stagingBufferMemory);
 
+    // Copy data to the CPU memory.
     void* data;
     vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, vertices.data(), (size_t) bufferSize);
     vkUnmapMemory(device, stagingBufferMemory);
 
+    // Create the GPU vertex buffer and link it with the vertex CPU memory.
     createBuffer(bufferSize,
                  VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                  vertexBuffer,
                  vertexBufferMemory);
 
+    // Copy buffer in GPU.
     copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
 
-    // Clean up.
+    // Clean up staging buffer and memory.
+    vkDestroyBuffer(device, stagingBuffer, nullptr);
+    vkFreeMemory(device, stagingBufferMemory, nullptr);
+}
+
+void App::createIndexBuffer() {
+    VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+    void* data;
+    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, indices.data(), (size_t) bufferSize);
+    vkUnmapMemory(device, stagingBufferMemory);
+
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
+
+    copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+
     vkDestroyBuffer(device, stagingBuffer, nullptr);
     vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
@@ -665,7 +699,11 @@ void App::createCommandBuffers() {
         VkDeviceSize offsets[] = {0};
         vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
 
-        vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+        vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+        // We draw with an index buffer now.
+        //vkCmdDraw(commandBuffers[i], static_cast<uint32_t>(vertices.size()), 1, 0, 0);
+        vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 
         vkCmdEndRenderPass(commandBuffers[i]);
 

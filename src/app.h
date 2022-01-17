@@ -12,6 +12,7 @@ const bool enableValidationLayers = true;
 #define GLFW_INCLUDE_VULKAN
 #include "GLFW/glfw3.h"
 #include "glm/glm.hpp"
+
 #include <vector>
 #include <optional>
 #include <iostream>
@@ -19,8 +20,6 @@ const bool enableValidationLayers = true;
 #include <array>
 
 #include <cstring>
-//#include <cstdlib>
-//#include <cstdint> // Necessary for UINT32_MAX
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -57,9 +56,15 @@ struct Vertex {
 };
 
 const std::vector<Vertex> vertices = {
-        {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+};
+
+// For index buffer.
+const std::vector<uint16_t> indices = {
+        0, 1, 2, 2, 3, 0
 };
 
 // How many frames should be processed concurrently
@@ -105,18 +110,30 @@ private:
     VkDebugUtilsMessengerEXT debugMessenger;
     VkSurfaceKHR surface;
 
-    // The graphics card that we'll end up selecting will be stored in a VkPhysicalDevice handle
+    // The graphics card that we'll end up selecting will be stored in a VkPhysicalDevice handle.
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    VkDevice device; // Logical device
+
+    // Logical device.
+    VkDevice device;
 
     VkQueue graphicsQueue;
     VkQueue presentQueue;
 
     VkSwapchainKHR swapChain;
+
+    // VkImage defines which VkMemory is used and a format of the texel.
     std::vector<VkImage> swapChainImages;
-    VkFormat swapChainImageFormat; // Store the format and extent we've chosen for the swap chain images
+
+    // Store the format and extent we've chosen for the swap chain images.
+    VkFormat swapChainImageFormat;
     VkExtent2D swapChainExtent;
-    std::vector<VkImageView> swapChainImageViews; // Store the image views
+
+    // VkImageView defines which part of VkImage to use.
+    std::vector<VkImageView> swapChainImageViews;
+
+    // VkFramebuffer + VkRenderPass defines the render target.
+    // Render pass defines which attachment will be written with colors.
+    // VkFramebuffer defines which VkImageView is to be which attachment.
     std::vector<VkFramebuffer> swapChainFramebuffers;
 
     VkRenderPass renderPass;
@@ -125,10 +142,16 @@ private:
 
     VkCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;
+
+    // Vertex buffer.
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
 
-    // Each frame should have its own set of semaphores, so a list is used
+    // Index buffer.
+    VkBuffer indexBuffer;
+    VkDeviceMemory indexBufferMemory;
+
+    // Each frame should have its own set of semaphores, so a list is used.
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
 
@@ -179,6 +202,8 @@ private:
     void createCommandPool();
 
     void createVertexBuffer();
+
+    void createIndexBuffer();
 
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
