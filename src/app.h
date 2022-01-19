@@ -1,5 +1,5 @@
-#ifndef VULKAN_TEST_APP_H
-#define VULKAN_TEST_APP_H
+#ifndef VULKAN_DEMO_APP_H
+#define VULKAN_DEMO_APP_H
 
 //#define NDEBUG
 
@@ -67,6 +67,7 @@ const std::vector<uint16_t> indices = {
         0, 1, 2, 2, 3, 0
 };
 
+// MVP, which will be sent to vertex shaders.
 struct UniformBufferObject {
     glm::mat4 model;
     glm::mat4 view;
@@ -86,9 +87,14 @@ const std::vector<const char*> deviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
+VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
+                                      const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
+                                      const VkAllocationCallbacks* pAllocator,
+                                      VkDebugUtilsMessengerEXT* pDebugMessenger);
 
-void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
+void DestroyDebugUtilsMessengerEXT(VkInstance instance,
+                                   VkDebugUtilsMessengerEXT debugMessenger,
+                                   const VkAllocationCallbacks* pAllocator);
 
 struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
@@ -169,7 +175,7 @@ private:
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
 
-    // To perform CPU-GPU synchronization using fences
+    // To perform CPU-GPU synchronization using fences.
     std::vector<VkFence> inFlightFences;
     std::vector<VkFence> imagesInFlight;
 
@@ -328,11 +334,14 @@ private:
         return buffer;
     }
 
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
-        std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+                                                        VkDebugUtilsMessageTypeFlagsEXT messageType,
+                                                        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+                                                        void* pUserData) {
+        std::cerr << "Validation layer: " << pCallbackData->pMessage << std::endl;
 
         return VK_FALSE;
     }
 };
 
-#endif //VULKAN_TEST_APP_H
+#endif //VULKAN_DEMO_APP_H
