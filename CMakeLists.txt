@@ -13,8 +13,8 @@ add_executable(vulkan-demo-app
 
 # Windows
 # ---------------------------------------
-set(Vulkan_LIBRARY_DIR "C:/VulkanSDK/1.2.182.0/Lib")
-set(Vulkan_INCLUDE_DIR "C:/VulkanSDK/1.2.182.0/Include")
+set(Vulkan_LIBRARY_DIR "C:/VulkanSDK/1.2.198.1/Lib")
+set(Vulkan_INCLUDE_DIR "C:/VulkanSDK/1.2.198.1/Include")
 
 set(GLFW_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/external/inc")
 set(GLFW_LIBRARY_DIR "${CMAKE_CURRENT_LIST_DIR}/external/lib/lib-vc2019")
