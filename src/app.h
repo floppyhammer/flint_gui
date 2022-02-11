@@ -30,15 +30,17 @@ struct Vertex {
     glm::vec3 color;
     glm::vec2 texCoord;
 
+    /// Binding info.
     static VkVertexInputBindingDescription getBindingDescription() {
         VkVertexInputBindingDescription bindingDescription{};
         bindingDescription.binding = 0;
         bindingDescription.stride = sizeof(Vertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; // Specify rate at which vertex attributes are pulled from buffers.
 
         return bindingDescription;
     }
 
+    /// Attributes info.
     static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
         std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
 
@@ -80,15 +82,15 @@ struct UniformBufferObject {
     glm::mat4 proj;
 };
 
-// How many frames should be processed concurrently
+// How many frames should be processed concurrently.
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
-// List of required validation layers
+// List of required validation layers.
 const std::vector<const char *> validationLayers = {
         "VK_LAYER_KHRONOS_validation"
 };
 
-// List of required device extensions
+// List of required device extensions.
 const std::vector<const char *> deviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
@@ -106,7 +108,7 @@ struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
     std::optional<uint32_t> presentFamily;
 
-    bool isComplete() {
+    [[nodiscard]] bool isComplete() const {
         return graphicsFamily.has_value() && presentFamily.has_value();
     }
 };
@@ -221,14 +223,41 @@ private:
 
     void createLogicalDevice();
 
+    /**
+     * Vulkan does not use the idea of a "back buffer". So, we need a place to render into
+     * before moving an image to viewing. This place is called the Swap Chain.
+     *
+     * In essence, the Swap Chain manages one or more image objects that
+     * form a sequence of images that can be drawn into and then given to
+     * the Surface to be presented to the user for viewing.
+     */
     void createSwapChain();
 
+    /**
+     * An image view is a reference to a VkImage.
+     * Unlike VkImage, it does not need to be allocated on GPU memory,
+     * so you create them directly from the Vulkan API.
+     * @param image
+     * @param format
+     * @return
+     */
     VkImageView createImageView(VkImage image, VkFormat format);
 
     void createImageViews();
 
+    /**
+     * We need to tell Vulkan about the framebuffer attachments that
+     * will be used while rendering. We need to specify how many
+     * color and depth buffers there will be, how many samples to
+     * use for each of them and how their contents should be
+     * handled throughout the rendering operations. All of this
+     * information is wrapped in a render pass object.
+     */
     void createRenderPass();
 
+    /**
+     * Set up shaders, viewport, blend state, etc.
+     */
     void createGraphicsPipeline();
 
     void createFramebuffers();
@@ -256,10 +285,18 @@ private:
 
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
+    /**
+     * Create GPU buffer and CPU buffer memory and bind them.
+     * @param size
+     * @param usage
+     * @param properties
+     * @param buffer
+     * @param bufferMemory
+     */
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
                       VkBuffer &buffer, VkDeviceMemory &bufferMemory);
 
-    // Create UBO descriptor.
+    /// Create UBO descriptor.
     void createDescriptorSetLayout();
 
     /// Load a texture from directory.
