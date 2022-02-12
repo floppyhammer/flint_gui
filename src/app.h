@@ -26,7 +26,7 @@ const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 
 struct Vertex {
-    glm::vec2 pos;
+    glm::vec3 pos;
     glm::vec3 color;
     glm::vec2 texCoord;
 
@@ -46,7 +46,7 @@ struct Vertex {
 
         attributeDescriptions[0].binding = 0;
         attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
         attributeDescriptions[0].offset = offsetof(Vertex, pos);
 
         attributeDescriptions[1].binding = 0;
@@ -64,15 +64,21 @@ struct Vertex {
 };
 
 const std::vector<Vertex> vertices = {
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+        {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+        {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+        {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+        {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+
+        {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+        {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+        {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+        {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
 };
 
 // For index buffer.
 const std::vector<uint16_t> indices = {
-        0, 1, 2, 2, 3, 0
+        0, 1, 2, 2, 3, 0,
+        4, 5, 6, 6, 7, 4
 };
 
 // MVP, which will be sent to vertex shaders.
@@ -146,6 +152,11 @@ private:
     // VkImage defines which VkMemory is used and a format of the texel.
     std::vector<VkImage> swapChainImages;
 
+    // We only need a single depth image, because only one draw operation is running at once.
+    VkImage depthImage;
+    VkDeviceMemory depthImageMemory;
+    VkImageView depthImageView;
+
     // Store the format and extent we've chosen for the swap chain images.
     VkFormat swapChainImageFormat;
     VkExtent2D swapChainExtent;
@@ -210,6 +221,10 @@ private:
 
     void mainLoop();
 
+    /**
+     * Update MVP.
+     * @param currentImage Current image.
+     */
     void updateUniformBuffer(uint32_t currentImage);
 
     void recreateSwapChain();
@@ -246,11 +261,14 @@ private:
      * so you create them directly from the Vulkan API.
      * @param image
      * @param format
+     * @param aspectFlags If for color or depth attachment.
      * @return
      */
-    VkImageView createImageView(VkImage image, VkFormat format);
+    VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
     void createImageViews();
+
+    void createDepthResources();
 
     /**
      * We need to tell Vulkan about the framebuffer attachments that
@@ -277,6 +295,9 @@ private:
 
     void createUniformBuffers();
 
+    /**
+     * A descriptor pool is used to allocate descriptor sets of some layout for use in a shader.
+     */
     void createDescriptorPool();
 
     void createDescriptorSets();
@@ -408,6 +429,13 @@ private:
 
         return VK_FALSE;
     }
+
+    VkFormat
+    findSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+
+    VkFormat findDepthFormat();
+
+    bool hasStencilComponent(VkFormat format);
 };
 
 #endif //VULKAN_DEMO_APP_H
