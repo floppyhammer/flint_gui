@@ -123,6 +123,8 @@ class App {
 public:
     void run();
 
+    bool framebufferResized = false;
+
 private:
     GLFWwindow *window;
 
@@ -198,6 +200,11 @@ private:
     VkSampler textureSampler;
 
     void initWindow();
+
+    static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+        auto app = reinterpret_cast<App*>(glfwGetWindowUserPointer(window));
+        app->framebufferResized = true;
+    }
 
     void initVulkan();
 

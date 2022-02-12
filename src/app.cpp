@@ -49,11 +49,12 @@ void App::initWindow() {
     // To not create an OpenGL context (as we're using Vulkan)
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-    // Because handling resized windows takes special care that we'll look into later,
-    // disable it for now with another window hint call:
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    // Enable window resizing. This needs us to recreate the swap chain.
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
     window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+    glfwSetWindowUserPointer(window, this);
+    glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
 void App::initVulkan() {
@@ -136,10 +137,29 @@ void App::updateUniformBuffer(uint32_t currentImage) {
 }
 
 void App::recreateSwapChain() {
+    // Handling window minimization.
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(window, &width, &height);
+    while (width == 0 || height == 0) {
+        glfwGetFramebufferSize(window, &width, &height);
+        glfwWaitEvents();
+    }
+
+    vkDeviceWaitIdle(device);
+
+    cleanupSwapChain();
+
+    createSwapChain();
+    createImageViews();
+    createRenderPass();
+    createGraphicsPipeline();
     createFramebuffers();
     createUniformBuffers();
     createDescriptorPool();
+    createDescriptorSets();
     createCommandBuffers();
+
+    imagesInFlight.resize(swapChainImages.size(), VK_NULL_HANDLE);
 }
 
 void App::cleanupSwapChain() {
@@ -168,6 +188,7 @@ void App::cleanupSwapChain() {
 }
 
 void App::cleanup() {
+    // Clean up swap chain related resources.
     cleanupSwapChain();
 
     // Clean up image.
@@ -175,6 +196,7 @@ void App::cleanup() {
     vkDestroySampler(device, textureSampler, nullptr);
     // Right before destroying the image itself.
     vkDestroyImageView(device, textureImageView, nullptr);
+
     vkDestroyImage(device, textureImage, nullptr);
     vkFreeMemory(device, textureImageMemory, nullptr);
     // ---------------------------
@@ -958,15 +980,22 @@ void App::drawFrame() {
     vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
-    vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE,
+    VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE,
                           &imageIndex);
+
+    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        recreateSwapChain();
+        return;
+    } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+        throw std::runtime_error("Failed to acquire swap chain image!");
+    }
+
+    updateUniformBuffer(imageIndex);
 
     if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
         vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
     }
     imagesInFlight[imageIndex] = inFlightFences[currentFrame];
-
-    updateUniformBuffer(imageIndex);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -1002,7 +1031,14 @@ void App::drawFrame() {
 
     presentInfo.pImageIndices = &imageIndex;
 
-    vkQueuePresentKHR(presentQueue, &presentInfo);
+    result = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+        framebufferResized = false;
+        recreateSwapChain();
+    } else if (result != VK_SUCCESS) {
+        throw std::runtime_error("Failed to present swap chain image!");
+    }
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
