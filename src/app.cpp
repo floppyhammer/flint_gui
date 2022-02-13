@@ -185,8 +185,8 @@ void App::createSwapChain() {
     SwapChainSupportDetails swapChainSupport = RS::getSingleton().querySwapChainSupport(
             RS::getSingleton().physicalDevice);
 
-    VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
-    VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
+    VkSurfaceFormatKHR surfaceFormat = RS::chooseSwapSurfaceFormat(swapChainSupport.formats);
+    VkPresentModeKHR presentMode = RS::chooseSwapPresentMode(swapChainSupport.presentModes);
     VkExtent2D extent = RS::getSingleton().chooseSwapExtent(swapChainSupport.capabilities);
 
     uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
@@ -248,33 +248,8 @@ void App::createImageViews() {
     }
 }
 
-VkFormat App::findDepthFormat() {
-    return findSupportedFormat(
-            {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
-            VK_IMAGE_TILING_OPTIMAL,
-            VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
-    );
-}
-
-VkFormat App::findSupportedFormat(const std::vector<VkFormat> &candidates,
-                                  VkImageTiling tiling,
-                                  VkFormatFeatureFlags features) {
-    for (VkFormat format: candidates) {
-        VkFormatProperties props;
-        vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
-
-        if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
-            return format;
-        } else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
-            return format;
-        }
-    }
-
-    throw std::runtime_error("Failed to find supported format!");
-}
-
 void App::createDepthResources() {
-    VkFormat depthFormat = findDepthFormat();
+    VkFormat depthFormat = RS::getSingleton().findDepthFormat();
     RS::getSingleton().createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL,
                                    VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                    depthImage,
@@ -306,7 +281,7 @@ void App::createRenderPass() {
     // Depth attachment.
     // ----------------------------------------
     VkAttachmentDescription depthAttachment{};
-    depthAttachment.format = findDepthFormat();
+    depthAttachment.format = RS::getSingleton().findDepthFormat();
     depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -860,25 +835,4 @@ void App::drawFrame() {
     }
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-}
-
-VkSurfaceFormatKHR App::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats) {
-    for (const auto &availableFormat: availableFormats) {
-        if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
-            availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
-            return availableFormat;
-        }
-    }
-
-    return availableFormats[0];
-}
-
-VkPresentModeKHR App::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
-    for (const auto &availablePresentMode: availablePresentModes) {
-        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-            return availablePresentMode;
-        }
-    }
-
-    return VK_PRESENT_MODE_FIFO_KHR;
 }

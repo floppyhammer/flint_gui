@@ -171,15 +171,6 @@ private:
     /// Create UBO descriptor.
     void createDescriptorSetLayout();
 
-    static VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
-
-    static VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
-
-    VkFormat
-    findSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-
-    VkFormat findDepthFormat();
-
     void loadModel();
 };
 

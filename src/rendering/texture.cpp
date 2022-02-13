@@ -22,7 +22,7 @@ Texture::Texture(const std::string &filePath) {
     }
 
     // Create image and image memory.
-    createTextureImage(pixels, texWidth, texHeight);
+    createImageFromBytes(pixels, texWidth, texHeight);
 
     // Clean up the original pixel array.
     stbi_image_free(pixels);
@@ -36,7 +36,7 @@ Texture::Texture(const std::string &filePath) {
     RS::getSingleton().createTextureSampler(sampler);
 }
 
-void Texture::createTextureImage(void *pixels, int texWidth, int texHeight) {
+void Texture::createImageFromBytes(void *pixels, int texWidth, int texHeight) {
     width = texWidth;
     height = texHeight;
 
@@ -86,10 +86,13 @@ void Texture::createTextureImage(void *pixels, int texWidth, int texHeight) {
 }
 
 void Texture::cleanup() const {
-    vkDestroySampler(RS::getSingleton().device, sampler, nullptr);
-    // Right before destroying the image itself.
-    vkDestroyImageView(RS::getSingleton().device, imageView, nullptr);
+    auto device = RS::getSingleton().device;
 
-    vkDestroyImage(RS::getSingleton().device, image, nullptr);
-    vkFreeMemory(RS::getSingleton().device, imageMemory, nullptr);
+    vkDestroySampler(device, sampler, nullptr);
+
+    // Should be right before destroying the image itself.
+    vkDestroyImageView(device, imageView, nullptr);
+
+    vkDestroyImage(device, image, nullptr);
+    vkFreeMemory(device, imageMemory, nullptr);
 }

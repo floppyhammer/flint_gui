@@ -55,8 +55,6 @@ public:
 
     [[nodiscard]] uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 
-    VkDevice getDevice() const;
-
     static std::vector<const char *> getRequiredExtensions() {
         uint32_t glfwExtensionCount = 0;
         const char **glfwExtensions;
@@ -168,7 +166,7 @@ public:
 
     [[nodiscard]] VkShaderModule createShaderModule(const std::vector<char> &code) const;
 
-    VkCommandBuffer beginSingleTimeCommands() const;
+    [[nodiscard]] VkCommandBuffer beginSingleTimeCommands() const;
 
     void endSingleTimeCommands(VkCommandBuffer commandBuffer) const;
 
@@ -202,7 +200,10 @@ public:
      * @param buffer
      * @param bufferMemory
      */
-    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer,
+    void createBuffer(VkDeviceSize size,
+                      VkBufferUsageFlags usage,
+                      VkMemoryPropertyFlags properties,
+                      VkBuffer &buffer,
                       VkDeviceMemory &bufferMemory) const;
 
     /**
@@ -214,6 +215,16 @@ public:
     void copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize) const;
 
     void createTextureSampler(VkSampler &textureSampler) const;
+
+    VkFormat findDepthFormat();
+
+    [[nodiscard]] VkFormat findSupportedFormat(const std::vector<VkFormat> &candidates,
+                                               VkImageTiling tiling,
+                                               VkFormatFeatureFlags features) const;
+
+    static VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
+
+    static VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
 };
 
 typedef RenderingServer RS;

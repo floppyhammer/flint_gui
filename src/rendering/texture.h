@@ -16,21 +16,19 @@
 class Texture {
 public:
     /// Load a texture from directory.
-    explicit Texture(const std::string& filePath);
+    explicit Texture(const std::string &filePath);
 
-    uint32_t width, height;
-    VkFormat format;
+    uint32_t width = 0;
+    uint32_t height = 0;
 
-    VkImageTiling tiling;
-    VkImageUsageFlags usage;
-    VkMemoryPropertyFlags properties;
+    VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
 
-    VkImage image;
-    VkDeviceMemory imageMemory;
+    VkImage image{};
+    VkDeviceMemory imageMemory{};
     VkImageView imageView;
-    VkSampler sampler;
+    VkSampler sampler{};
 
-    void createTextureImage(void *pixels, int texWidth, int texHeight);
+    void createImageFromBytes(void *pixels, int texWidth, int texHeight);
 
     void cleanup() const;
 };
