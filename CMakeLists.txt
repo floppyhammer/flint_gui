@@ -11,7 +11,7 @@ add_executable(vulkan-demo-app
         src/main.cpp
         src/app.h
         src/app.cpp
-        )
+        src/rendering/texture.cpp src/rendering/texture.h src/rendering/rendering_server.cpp src/rendering/rendering_server.h src/rendering/mesh.cpp src/rendering/mesh.h src/common/io.h)
 
 set(GLFW_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/inc")
 set(GLM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party")

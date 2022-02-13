@@ -1,23 +1,11 @@
 #ifndef VULKAN_DEMO_APP_H
 #define VULKAN_DEMO_APP_H
 
-//#define NDEBUG
-
-#ifdef NDEBUG
-const bool enableValidationLayers = false;
-#else
-const bool enableValidationLayers = true;
-#endif
-
 #define GLFW_INCLUDE_VULKAN
 
 #include "GLFW/glfw3.h"
 
 #include "glm/glm.hpp"
-
-#define GLM_ENABLE_EXPERIMENTAL
-
-#include <glm/gtx/hash.hpp>
 
 #include <vector>
 #include <optional>
@@ -27,64 +15,7 @@ const bool enableValidationLayers = true;
 
 #include <cstring>
 
-const uint32_t WIDTH = 800;
-const uint32_t HEIGHT = 600;
-
-const std::string MODEL_PATH = "../res/viking_room.obj";
-const std::string TEXTURE_PATH = "../res/viking_room.png";
-
-struct Vertex {
-    glm::vec3 pos;
-    glm::vec3 color;
-    glm::vec2 texCoord;
-
-    bool operator==(const Vertex &other) const {
-        return pos == other.pos && color == other.color && texCoord == other.texCoord;
-    }
-
-    /// Binding info.
-    static VkVertexInputBindingDescription getBindingDescription() {
-        VkVertexInputBindingDescription bindingDescription{};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(Vertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; // Specify rate at which vertex attributes are pulled from buffers.
-
-        return bindingDescription;
-    }
-
-    /// Attributes info.
-    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
-        std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
-
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-        attributeDescriptions[2].binding = 0;
-        attributeDescriptions[2].location = 2;
-        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
-
-        return attributeDescriptions;
-    }
-};
-
-namespace std {
-    template<>
-    struct hash<Vertex> {
-        size_t operator()(Vertex const &vertex) const {
-            return ((hash<glm::vec3>()(vertex.pos) ^
-                     (hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
-                   (hash<glm::vec2>()(vertex.texCoord) << 1);
-        }
-    };
-}
+#include "rendering/mesh.h"
 
 // MVP, which will be sent to vertex shaders.
 struct UniformBufferObject {
@@ -93,64 +24,18 @@ struct UniformBufferObject {
     glm::mat4 proj;
 };
 
-// How many frames should be processed concurrently.
-const int MAX_FRAMES_IN_FLIGHT = 2;
-
-// List of required validation layers.
-const std::vector<const char *> validationLayers = {
-        "VK_LAYER_KHRONOS_validation"
-};
-
-// List of required device extensions.
-const std::vector<const char *> deviceExtensions = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME
-};
-
-VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
-                                      const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
-                                      const VkAllocationCallbacks *pAllocator,
-                                      VkDebugUtilsMessengerEXT *pDebugMessenger);
-
-void DestroyDebugUtilsMessengerEXT(VkInstance instance,
-                                   VkDebugUtilsMessengerEXT debugMessenger,
-                                   const VkAllocationCallbacks *pAllocator);
-
-struct QueueFamilyIndices {
-    std::optional<uint32_t> graphicsFamily;
-    std::optional<uint32_t> presentFamily;
-
-    [[nodiscard]] bool isComplete() const {
-        return graphicsFamily.has_value() && presentFamily.has_value();
-    }
-};
-
-struct SwapChainSupportDetails {
-    VkSurfaceCapabilitiesKHR capabilities;
-    std::vector<VkSurfaceFormatKHR> formats;
-    std::vector<VkPresentModeKHR> presentModes;
-};
-
 class App {
 public:
     void run();
 
-    bool framebufferResized = false;
-
 private:
-    GLFWwindow *window;
-
-    VkInstance instance;
-    VkDebugUtilsMessengerEXT debugMessenger;
     VkSurfaceKHR surface;
 
     // The graphics card that we'll end up selecting will be stored in a VkPhysicalDevice handle.
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 
     // Logical device.
-    VkDevice device;
-
-    VkQueue graphicsQueue;
-    VkQueue presentQueue;
+    VkDevice device{};
 
     VkSwapchainKHR swapChain;
 
@@ -179,11 +64,10 @@ private:
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
 
-    VkCommandPool commandPool;
     std::vector<VkCommandBuffer> commandBuffers;
 
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
+    // Contains vertices and indices data.
+    Mesh mesh;
 
     // Vertex buffer.
     VkBuffer vertexBuffer;
@@ -213,17 +97,11 @@ private:
     // We will use a frame index for that purpose:
     size_t currentFrame = 0;
 
+    // For model texture.
     VkImage textureImage;
     VkDeviceMemory textureImageMemory;
     VkImageView textureImageView;
     VkSampler textureSampler;
-
-    void initWindow();
-
-    static void framebufferResizeCallback(GLFWwindow *window, int width, int height) {
-        auto app = reinterpret_cast<App *>(glfwGetWindowUserPointer(window));
-        app->framebufferResized = true;
-    }
 
     void initVulkan();
 
@@ -241,18 +119,6 @@ private:
 
     void cleanup();
 
-    void createInstance();
-
-    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
-
-    void setupDebugMessenger();
-
-    void createSurface();
-
-    void pickPhysicalDevice();
-
-    void createLogicalDevice();
-
     /**
      * Vulkan does not use the idea of a "back buffer". So, we need a place to render into
      * before moving an image to viewing. This place is called the Swap Chain.
@@ -262,17 +128,6 @@ private:
      * the Surface to be presented to the user for viewing.
      */
     void createSwapChain();
-
-    /**
-     * An image view is a reference to a VkImage.
-     * Unlike VkImage, it does not need to be allocated on GPU memory,
-     * so you create them directly from the Vulkan API.
-     * @param image
-     * @param format
-     * @param aspectFlags If for color or depth attachment.
-     * @return
-     */
-    VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
     void createImageViews();
 
@@ -295,8 +150,6 @@ private:
 
     void createFramebuffers();
 
-    void createCommandPool();
-
     void createVertexBuffer();
 
     void createIndexBuffer();
@@ -310,27 +163,12 @@ private:
 
     void createDescriptorSets();
 
-    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-
     // Set up command queues.
     void createCommandBuffers();
 
     void createSyncObjects();
 
     void drawFrame();
-
-    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-
-    /**
-     * Create GPU buffer and CPU buffer memory and bind them.
-     * @param size
-     * @param usage
-     * @param properties
-     * @param buffer
-     * @param bufferMemory
-     */
-    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties,
-                      VkBuffer &buffer, VkDeviceMemory &bufferMemory);
 
     /// Create UBO descriptor.
     void createDescriptorSetLayout();
@@ -342,108 +180,14 @@ private:
 
     void createTextureSampler();
 
-    void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
-                     VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage &image,
-                     VkDeviceMemory &imageMemory);
+    static VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
 
-    void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-
-    VkCommandBuffer beginSingleTimeCommands();
-
-    void endSingleTimeCommands(VkCommandBuffer commandBuffer);
-
-    VkShaderModule createShaderModule(const std::vector<char> &code);
-
-    VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
-
-    VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
-
-    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
-
-    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
-
-    bool isDeviceSuitable(VkPhysicalDevice device);
-
-    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-
-    void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-
-    static std::vector<const char *> getRequiredExtensions() {
-        uint32_t glfwExtensionCount = 0;
-        const char **glfwExtensions;
-        glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-        std::vector<const char *> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
-        if (enableValidationLayers) {
-            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-        }
-
-        return extensions;
-    }
-
-    static bool checkValidationLayerSupport() {
-        uint32_t layerCount;
-        vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-        std::vector<VkLayerProperties> availableLayers(layerCount);
-        vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-        for (const char *layerName: validationLayers) {
-            bool layerFound = false;
-
-            for (const auto &layerProperties: availableLayers) {
-                if (strcmp(layerName, layerProperties.layerName) == 0) {
-                    layerFound = true;
-                    break;
-                }
-            }
-
-            if (!layerFound) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    static std::vector<char> readFile(const std::string &filename) {
-        std::ifstream file(filename, std::ios::ate | std::ios::binary);
-
-        if (!file.is_open()) {
-            throw std::runtime_error("failed to open file!");
-        }
-
-        // The advantage of starting to read at the end of the file is that
-        // we can use the read position to determine the size of the file and allocate a buffer
-        size_t fileSize = (size_t) file.tellg();
-        std::vector<char> buffer(fileSize);
-
-        file.seekg(0);
-        file.read(buffer.data(), fileSize);
-
-        file.close();
-
-        return buffer;
-    }
-
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-                                                        VkDebugUtilsMessageTypeFlagsEXT messageType,
-                                                        const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
-                                                        void *pUserData) {
-        std::cerr << "Validation layer: " << pCallbackData->pMessage << std::endl;
-
-        return VK_FALSE;
-    }
+    static VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
 
     VkFormat
     findSupportedFormat(const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
     VkFormat findDepthFormat();
-
-    bool hasStencilComponent(VkFormat format);
 
     void loadModel();
 };
