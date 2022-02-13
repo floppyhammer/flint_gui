@@ -320,10 +320,6 @@ VkExtent2D RenderingServer::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &cap
     }
 }
 
-VkDevice RenderingServer::getDevice() const {
-    return device;
-}
-
 uint32_t RenderingServer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const {
     VkPhysicalDeviceMemoryProperties memProperties;
     // Reports memory information for the specified physical device.
@@ -645,4 +641,46 @@ void RenderingServer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
 
     // Bind GPU buffer and CPU buffer memory.
     vkBindBufferMemory(device, buffer, bufferMemory, 0);
+}
+
+void RenderingServer::copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize) const {
+    void *data;
+    vkMapMemory(device, bufferMemory, 0, dataSize, 0, &data);
+    memcpy(data, src, dataSize);
+    vkUnmapMemory(device, bufferMemory);
+}
+
+void RenderingServer::createTextureSampler(VkSampler& textureSampler) const {
+    VkSamplerCreateInfo samplerInfo{};
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.magFilter = VK_FILTER_LINEAR;
+    samplerInfo.minFilter = VK_FILTER_LINEAR;
+
+    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+
+    VkPhysicalDeviceProperties properties{};
+    vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+
+    samplerInfo.anisotropyEnable = VK_TRUE;
+    samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+
+    // The borderColor field specifies which color is returned when sampling beyond the image with clamp to border addressing mode.
+    samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+
+    samplerInfo.unnormalizedCoordinates = VK_FALSE;
+
+    samplerInfo.compareEnable = VK_FALSE;
+    samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+
+    // All of these fields apply to mipmapping.
+    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.mipLodBias = 0.0f;
+    samplerInfo.minLod = 0.0f;
+    samplerInfo.maxLod = 0.0f;
+
+    if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to create texture sampler!");
+    }
 }

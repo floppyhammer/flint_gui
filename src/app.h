@@ -16,6 +16,7 @@
 #include <cstring>
 
 #include "rendering/mesh.h"
+#include "rendering//texture.h"
 
 // MVP, which will be sent to vertex shaders.
 struct UniformBufferObject {
@@ -98,10 +99,7 @@ private:
     size_t currentFrame = 0;
 
     // For model texture.
-    VkImage textureImage;
-    VkDeviceMemory textureImageMemory;
-    VkImageView textureImageView;
-    VkSampler textureSampler;
+    std::shared_ptr<Texture> texture;
 
     void initVulkan();
 
@@ -172,13 +170,6 @@ private:
 
     /// Create UBO descriptor.
     void createDescriptorSetLayout();
-
-    /// Load a texture from directory.
-    void createTextureImage();
-
-    void createTextureImageView();
-
-    void createTextureSampler();
 
     static VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
 

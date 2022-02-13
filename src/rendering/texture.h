@@ -9,8 +9,15 @@
 
 #include "GLFW/glfw3.h"
 
+#include "rendering_server.h"
+
+#include <memory>
+
 class Texture {
 public:
+    /// Load a texture from directory.
+    explicit Texture(const std::string& filePath);
+
     uint32_t width, height;
     VkFormat format;
 
@@ -21,8 +28,11 @@ public:
     VkImage image;
     VkDeviceMemory imageMemory;
     VkImageView imageView;
+    VkSampler sampler;
 
-    void createImage();
+    void createTextureImage(void *pixels, int texWidth, int texHeight);
+
+    void cleanup() const;
 };
 
 #endif //VULKAN_DEMO_APP_TEXTURE_H

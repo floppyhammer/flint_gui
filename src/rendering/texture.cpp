@@ -5,43 +5,91 @@
 #include <stdexcept>
 
 #include "texture.h"
-#include "rendering_server.h"
 
-void Texture::createImage() {
-    VkImageCreateInfo imageInfo{};
-    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageInfo.extent.width = width;
-    imageInfo.extent.height = height;
-    imageInfo.extent.depth = 1;
-    imageInfo.mipLevels = 1;
-    imageInfo.arrayLayers = 1;
-    imageInfo.format = format;
-    imageInfo.tiling = tiling;
-    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    imageInfo.usage = usage;
-    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+#define STB_IMAGE_IMPLEMENTATION
 
-    if (vkCreateImage(RS::getSingleton().getDevice(), &imageInfo, nullptr, &image) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create image!");
+#include "stb_image.h"
+
+Texture::Texture(const std::string &filePath) {
+    int texWidth, texHeight, texChannels;
+
+    // The STBI_rgb_alpha value forces the image to be loaded with an alpha channel,
+    // even if it doesn't have one, which is nice for consistency with other textures in the future.
+    stbi_uc *pixels = stbi_load(filePath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+
+    if (!pixels) {
+        throw std::runtime_error("Failed to load texture image!");
     }
 
-    // Allocating memory for an image.
-    // -------------------------------------
-    VkMemoryRequirements memRequirements;
-    // Returns the memory requirements for specified Vulkan object.
-    vkGetImageMemoryRequirements(RS::getSingleton().getDevice(), image, &memRequirements);
+    // Create image and image memory.
+    createTextureImage(pixels, texWidth, texHeight);
 
-    VkMemoryAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = RS::getSingleton().findMemoryType(memRequirements.memoryTypeBits, properties);
+    // Clean up the original pixel array.
+    stbi_image_free(pixels);
 
-    if (vkAllocateMemory(RS::getSingleton().getDevice(), &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to allocate image memory!");
-    }
+    // Create image view.
+    imageView = RS::getSingleton().createImageView(image,
+                                                   VK_FORMAT_R8G8B8A8_SRGB,
+                                                   VK_IMAGE_ASPECT_COLOR_BIT);
 
-    vkBindImageMemory(RS::getSingleton().getDevice(), image, imageMemory, 0);
-    // -------------------------------------
+    // Create sampler.
+    RS::getSingleton().createTextureSampler(sampler);
+}
+
+void Texture::createTextureImage(void *pixels, int texWidth, int texHeight) {
+    width = texWidth;
+    height = texHeight;
+
+    // In bytes. 4 bytes per pixel.
+    VkDeviceSize imageSize = texWidth * texHeight * 4;
+
+    // Temporary buffer and CPU memory.
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+
+    RS::getSingleton().createBuffer(imageSize,
+                                    VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                    stagingBuffer,
+                                    stagingBufferMemory);
+
+    // Copy the pixel values that we got from the image loading library to the buffer.
+    RS::getSingleton().copyDataToMemory(pixels, stagingBufferMemory, imageSize);
+
+    RS::getSingleton().createImage(texWidth, texHeight,
+                                   VK_FORMAT_R8G8B8A8_SRGB,
+                                   VK_IMAGE_TILING_OPTIMAL,
+                                   VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                                   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                   image,
+                                   imageMemory);
+
+    // Transition the texture image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL.
+    RS::getSingleton().transitionImageLayout(image,
+                                             VK_FORMAT_R8G8B8A8_SRGB,
+                                             VK_IMAGE_LAYOUT_UNDEFINED,
+                                             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+    // Execute the buffer to image copy operation.
+    RS::getSingleton().copyBufferToImage(stagingBuffer, image, static_cast<uint32_t>(texWidth),
+                                         static_cast<uint32_t>(texHeight));
+
+    // To be able to start sampling from the texture image in the shader, we need one last transition to prepare it for shader access.
+    RS::getSingleton().transitionImageLayout(image,
+                                             VK_FORMAT_R8G8B8A8_SRGB,
+                                             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+    // Clean up staging stuff.
+    vkDestroyBuffer(RS::getSingleton().device, stagingBuffer, nullptr);
+    vkFreeMemory(RS::getSingleton().device, stagingBufferMemory, nullptr);
+}
+
+void Texture::cleanup() const {
+    vkDestroySampler(RS::getSingleton().device, sampler, nullptr);
+    // Right before destroying the image itself.
+    vkDestroyImageView(RS::getSingleton().device, imageView, nullptr);
+
+    vkDestroyImage(RS::getSingleton().device, image, nullptr);
+    vkFreeMemory(RS::getSingleton().device, imageMemory, nullptr);
 }

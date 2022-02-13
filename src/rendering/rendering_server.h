@@ -204,6 +204,16 @@ public:
      */
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer,
                       VkDeviceMemory &bufferMemory) const;
+
+    /**
+     * Copy data to device memory.
+     * @param src Source data pointer.
+     * @param bufferMemory Device memory.
+     * @param dataSize Data size in bytes.
+     */
+    void copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize) const;
+
+    void createTextureSampler(VkSampler &textureSampler) const;
 };
 
 typedef RenderingServer RS;

@@ -6,10 +6,6 @@
 #include <chrono>
 #include <unordered_map>
 
-#define STB_IMAGE_IMPLEMENTATION
-
-#include "stb_image.h"
-
 #define GLM_FORCE_RADIANS
 
 #define GLM_FORCE_RADIANS
@@ -25,7 +21,7 @@
 
 void App::run() {
     auto rs = RS::getSingleton();
-    device = rs.getDevice();
+    device = rs.device;
     physicalDevice = rs.physicalDevice;
     surface = rs.surface;
 
@@ -53,9 +49,7 @@ void App::initVulkan() {
     createDepthResources();
     createFramebuffers();
 
-    createTextureImage();
-    createTextureImageView();
-    createTextureSampler();
+    texture = std::make_shared<Texture>(TEXTURE_PATH);
 
     loadModel();
 
@@ -86,6 +80,7 @@ void App::updateUniformBuffer(uint32_t currentImage) {
     auto currentTime = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
+    // Prepare UBO data.
     UniformBufferObject ubo{};
     ubo.model = glm::rotate(glm::mat4(1.0f),
                             time * glm::radians(90.0f),
@@ -101,11 +96,8 @@ void App::updateUniformBuffer(uint32_t currentImage) {
     // where the Y coordinate of the clip coordinates is inverted.
     ubo.proj[1][1] *= -1;
 
-    // Copy the data in the uniform buffer object to the current uniform buffer.
-    void *data;
-    vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
-    memcpy(data, &ubo, sizeof(ubo));
-    vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
+    // Copy the UBO data to the current uniform buffer.
+    RS::getSingleton().copyDataToMemory(&ubo, uniformBuffersMemory[currentImage], sizeof(ubo));
 }
 
 void App::recreateSwapChain() {
@@ -145,7 +137,8 @@ void App::cleanupSwapChain() {
         vkDestroyFramebuffer(device, framebuffer, nullptr);
     }
 
-    vkFreeCommandBuffers(device, RS::getSingleton().commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+    vkFreeCommandBuffers(device, RS::getSingleton().commandPool, static_cast<uint32_t>(commandBuffers.size()),
+                         commandBuffers.data());
 
     vkDestroyPipeline(device, graphicsPipeline, nullptr);
     vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
@@ -169,15 +162,7 @@ void App::cleanup() {
     // Clean up swap chain related resources.
     cleanupSwapChain();
 
-    // Clean up image.
-    // ---------------------------
-    vkDestroySampler(device, textureSampler, nullptr);
-    // Right before destroying the image itself.
-    vkDestroyImageView(device, textureImageView, nullptr);
-
-    vkDestroyImage(device, textureImage, nullptr);
-    vkFreeMemory(device, textureImageMemory, nullptr);
-    // ---------------------------
+    texture->cleanup();
 
     vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
@@ -197,7 +182,8 @@ void App::cleanup() {
 }
 
 void App::createSwapChain() {
-    SwapChainSupportDetails swapChainSupport = RS::getSingleton().querySwapChainSupport(RS::getSingleton().physicalDevice);
+    SwapChainSupportDetails swapChainSupport = RS::getSingleton().querySwapChainSupport(
+            RS::getSingleton().physicalDevice);
 
     VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
     VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
@@ -257,7 +243,8 @@ void App::createImageViews() {
     swapChainImageViews.resize(swapChainImages.size());
 
     for (uint32_t i = 0; i < swapChainImages.size(); i++) {
-        swapChainImageViews[i] = RS::getSingleton().createImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+        swapChainImageViews[i] = RS::getSingleton().createImageView(swapChainImages[i], swapChainImageFormat,
+                                                                    VK_IMAGE_ASPECT_COLOR_BIT);
     }
 }
 
@@ -289,12 +276,13 @@ VkFormat App::findSupportedFormat(const std::vector<VkFormat> &candidates,
 void App::createDepthResources() {
     VkFormat depthFormat = findDepthFormat();
     RS::getSingleton().createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL,
-                VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage,
-                depthImageMemory);
+                                   VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                   depthImage,
+                                   depthImageMemory);
     depthImageView = RS::getSingleton().createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 
     RS::getSingleton().transitionImageLayout(depthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED,
-                          VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+                                             VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 }
 
 void App::createRenderPass() {
@@ -545,23 +533,20 @@ void App::createVertexBuffer() {
 
     // Create the GPU buffer and link it with the CPU memory.
     RS::getSingleton().createBuffer(bufferSize,
-                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                 stagingBuffer,
-                 stagingBufferMemory);
+                                    VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                    stagingBuffer,
+                                    stagingBufferMemory);
 
     // Copy data to the CPU memory.
-    void *data;
-    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, mesh.vertices.data(), (size_t) bufferSize);
-    vkUnmapMemory(device, stagingBufferMemory);
+    RS::getSingleton().copyDataToMemory(mesh.vertices.data(), stagingBufferMemory, bufferSize);
 
     // Create the vertex buffer (GPU) and bind it to the vertex memory (CPU).
     RS::getSingleton().createBuffer(bufferSize,
-                 VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                 vertexBuffer,
-                 vertexBufferMemory);
+                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                    vertexBuffer,
+                                    vertexBufferMemory);
 
     // Copy buffer (GPU).
     RS::getSingleton().copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
@@ -576,21 +561,23 @@ void App::createIndexBuffer() {
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
-    RS::getSingleton().createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
-                 stagingBufferMemory);
+    RS::getSingleton().createBuffer(bufferSize,
+                                    VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                    stagingBuffer,
+                                    stagingBufferMemory);
 
-    void *data;
-    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, mesh.indices.data(), (size_t) bufferSize);
-    vkUnmapMemory(device, stagingBufferMemory);
+    RS::getSingleton().copyDataToMemory(mesh.indices.data(),
+                                        stagingBufferMemory,
+                                        bufferSize);
 
     RS::getSingleton().createBuffer(bufferSize,
-                 VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                 indexBuffer,
-                 indexBufferMemory);
+                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                    indexBuffer,
+                                    indexBufferMemory);
 
+    // Copy data from staging buffer to index buffer.
     RS::getSingleton().copyBuffer(stagingBuffer, indexBuffer, bufferSize);
 
     vkDestroyBuffer(device, stagingBuffer, nullptr);
@@ -604,9 +591,11 @@ void App::createUniformBuffers() {
     uniformBuffersMemory.resize(swapChainImages.size());
 
     for (size_t i = 0; i < swapChainImages.size(); i++) {
-        RS::getSingleton().createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i],
-                     uniformBuffersMemory[i]);
+        RS::getSingleton().createBuffer(bufferSize,
+                                        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                        uniformBuffers[i],
+                                        uniformBuffersMemory[i]);
     }
 }
 
@@ -638,7 +627,7 @@ void App::createDescriptorSets() {
 
     descriptorSets.resize(swapChainImages.size());
     if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate descriptor sets!");
+        throw std::runtime_error("Failed to allocate descriptor sets!");
     }
 
     for (size_t i = 0; i < swapChainImages.size(); i++) {
@@ -649,8 +638,8 @@ void App::createDescriptorSets() {
 
         VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = textureImageView;
-        imageInfo.sampler = textureSampler;
+        imageInfo.imageView = texture->imageView;
+        imageInfo.sampler = texture->sampler;
 
         std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
 
@@ -802,11 +791,14 @@ void App::createSyncObjects() {
 }
 
 void App::drawFrame() {
-    // Wait for the frame to be finished
+    // Wait for the frame to be finished.
     vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
-    VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame],
+    VkResult result = vkAcquireNextImageKHR(device,
+                                            swapChain,
+                                            UINT64_MAX,
+                                            imageAvailableSemaphores[currentFrame],
                                             VK_NULL_HANDLE,
                                             &imageIndex);
 
@@ -889,104 +881,4 @@ VkPresentModeKHR App::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> 
     }
 
     return VK_PRESENT_MODE_FIFO_KHR;
-}
-
-void App::createTextureImage() {
-    int texWidth, texHeight, texChannels;
-
-    // The STBI_rgb_alpha value forces the image to be loaded with an alpha channel,
-    // even if it doesn't have one, which is nice for consistency with other textures in the future.
-    stbi_uc *pixels = stbi_load(TEXTURE_PATH.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-
-    // Multiply by 4 because of 4 channels. 4 bytes per pixel.
-    VkDeviceSize imageSize = texWidth * texHeight * 4;
-
-    if (!pixels) {
-        throw std::runtime_error("Failed to load texture image!");
-    }
-
-    // Temporary buffer and CPU memory.
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
-
-    RS::getSingleton().createBuffer(imageSize,
-                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                 stagingBuffer,
-                 stagingBufferMemory);
-
-    // Copy the pixel values that we got from the image loading library to the buffer.
-    void *data;
-    vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
-    memcpy(data, pixels, static_cast<size_t>(imageSize));
-    vkUnmapMemory(device, stagingBufferMemory);
-
-    // Clean up the original pixel array.
-    stbi_image_free(pixels);
-
-    RS::getSingleton().createImage(texWidth, texHeight,
-                VK_FORMAT_R8G8B8A8_SRGB,
-                VK_IMAGE_TILING_OPTIMAL,
-                VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                textureImage,
-                textureImageMemory);
-
-    // Transition the texture image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL.
-    RS::getSingleton().transitionImageLayout(textureImage,
-                          VK_FORMAT_R8G8B8A8_SRGB,
-                          VK_IMAGE_LAYOUT_UNDEFINED,
-                          VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
-    // Execute the buffer to image copy operation.
-    RS::getSingleton().copyBufferToImage(stagingBuffer, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
-
-    // To be able to start sampling from the texture image in the shader, we need one last transition to prepare it for shader access.
-    RS::getSingleton().transitionImageLayout(textureImage,
-                          VK_FORMAT_R8G8B8A8_SRGB,
-                          VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                          VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-    // Clean up staging stuff.
-    vkDestroyBuffer(device, stagingBuffer, nullptr);
-    vkFreeMemory(device, stagingBufferMemory, nullptr);
-}
-
-void App::createTextureImageView() {
-    textureImageView = RS::getSingleton().createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
-}
-
-void App::createTextureSampler() {
-    VkSamplerCreateInfo samplerInfo{};
-    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    samplerInfo.magFilter = VK_FILTER_LINEAR;
-    samplerInfo.minFilter = VK_FILTER_LINEAR;
-
-    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-
-    VkPhysicalDeviceProperties properties{};
-    vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-
-    samplerInfo.anisotropyEnable = VK_TRUE;
-    samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
-
-    // The borderColor field specifies which color is returned when sampling beyond the image with clamp to border addressing mode.
-    samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
-
-    samplerInfo.unnormalizedCoordinates = VK_FALSE;
-
-    samplerInfo.compareEnable = VK_FALSE;
-    samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-
-    // All of these fields apply to mipmapping.
-    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-    samplerInfo.mipLodBias = 0.0f;
-    samplerInfo.minLod = 0.0f;
-    samplerInfo.maxLod = 0.0f;
-
-    if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create texture sampler!");
-    }
 }
