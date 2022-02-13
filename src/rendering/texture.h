@@ -16,7 +16,7 @@
 class Texture {
 public:
     /// Load a texture from directory.
-    explicit Texture(const std::string &filePath);
+    explicit Texture(const std::string &filename);
 
     uint32_t width = 0;
     uint32_t height = 0;

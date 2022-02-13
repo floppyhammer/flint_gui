@@ -10,12 +10,12 @@
 
 #include "stb_image.h"
 
-Texture::Texture(const std::string &filePath) {
+Texture::Texture(const std::string &filename) {
     int texWidth, texHeight, texChannels;
 
     // The STBI_rgb_alpha value forces the image to be loaded with an alpha channel,
     // even if it doesn't have one, which is nice for consistency with other textures in the future.
-    stbi_uc *pixels = stbi_load(filePath.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    stbi_uc *pixels = stbi_load(filename.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 
     if (!pixels) {
         throw std::runtime_error("Failed to load texture image!");

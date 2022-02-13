@@ -11,23 +11,14 @@
 #include <fstream>
 
 static std::vector<char> readFile(const std::string &filename) {
-    std::ifstream file(filename, std::ios::ate | std::ios::binary);
+    std::ifstream input(filename, std::ios::binary);
 
-    if (!file.is_open()) {
-        throw std::runtime_error("Failed to open file!");
-    }
+    std::vector<char> bytes((std::istreambuf_iterator<char>(input)),
+                            (std::istreambuf_iterator<char>()));
 
-    // The advantage of starting to read at the end of the file is that
-    // we can use the read position to determine the size of the file and allocate a buffer
-    size_t fileSize = (size_t) file.tellg();
-    std::vector<char> buffer(fileSize);
+    input.close();
 
-    file.seekg(0);
-    file.read(buffer.data(), fileSize);
-
-    file.close();
-
-    return buffer;
+    return bytes;
 }
 
 #endif //VULKAN_DEMO_APP_IO_H
