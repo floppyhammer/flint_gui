@@ -7,11 +7,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 find_package(Vulkan REQUIRED FATAL_ERROR)
 
-add_executable(vulkan-demo-app
-        src/main.cpp
-        src/app.h
-        src/app.cpp
-        src/rendering/texture.cpp src/rendering/texture.h src/rendering/rendering_server.cpp src/rendering/rendering_server.h src/rendering/mesh.cpp src/rendering/mesh.h src/common/io.h)
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp src/*.h)
+
+add_executable(vulkan-demo-app ${SOURCE_FILES})
 
 set(GLFW_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/inc")
 set(GLM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party")
