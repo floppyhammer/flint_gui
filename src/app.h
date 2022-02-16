@@ -138,6 +138,7 @@ private:
 
     /**
      * Set up shaders, viewport, blend state, etc.
+     * @note We only need one pipeline for a specific rendering process despite of the existence of multiple swap chains.
      */
     void createGraphicsPipeline();
 
