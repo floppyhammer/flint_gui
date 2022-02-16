@@ -1,7 +1,3 @@
-//
-// Created by chy on 6/7/2021.
-//
-
 #ifndef VULKAN_DEMO_APP_TEXTURE_RECT_H
 #define VULKAN_DEMO_APP_TEXTURE_RECT_H
 

@@ -1,6 +1,8 @@
 #ifndef VULKAN_DEMO_APP_CONTROL_H
 #define VULKAN_DEMO_APP_CONTROL_H
 
+#include <vector>
+
 #include "node.h"
 #include "../common/vec2.h"
 
