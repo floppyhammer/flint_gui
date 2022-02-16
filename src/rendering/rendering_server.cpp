@@ -203,7 +203,7 @@ bool RenderingServer::checkDeviceExtensionSupport(VkPhysicalDevice pPhysicalDevi
     return requiredExtensions.empty();
 }
 
-bool RenderingServer::isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) {
+bool RenderingServer::isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const {
     QueueFamilyIndices indices = findQueueFamilies(pPhysicalDevice);
 
     bool extensionsSupported = checkDeviceExtensionSupport(pPhysicalDevice);
@@ -389,6 +389,7 @@ VkShaderModule RenderingServer::createShaderModule(const std::vector<char> &code
 
 VkCommandBuffer RenderingServer::beginSingleTimeCommands() const {
     // Allocate a command buffer.
+    // ----------------------------------------
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -397,13 +398,16 @@ VkCommandBuffer RenderingServer::beginSingleTimeCommands() const {
 
     VkCommandBuffer commandBuffer;
     vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+    // ----------------------------------------
 
     // Start recording the command buffer.
+    // ----------------------------------------
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
     beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
     vkBeginCommandBuffer(commandBuffer, &beginInfo);
+    // ----------------------------------------
 
     return commandBuffer;
 }
@@ -412,7 +416,8 @@ void RenderingServer::endSingleTimeCommands(VkCommandBuffer commandBuffer) const
     // End recording the command buffer.
     vkEndCommandBuffer(commandBuffer);
 
-    // Submit the command buffer.
+    // Submit the command buffer to the graphics queue.
+    // ----------------------------------------
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.commandBufferCount = 1;
@@ -420,6 +425,7 @@ void RenderingServer::endSingleTimeCommands(VkCommandBuffer commandBuffer) const
 
     vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
     vkQueueWaitIdle(graphicsQueue);
+    // ----------------------------------------
 
     // Free the command buffer.
     vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
@@ -512,8 +518,7 @@ void RenderingServer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t
     region.imageSubresource.baseArrayLayer = 0;
     region.imageSubresource.layerCount = 1;
 
-    region.imageOffset = {0, 0,
-                          0}; // Selects the initial x, y, z offsets in texels of the sub-region of the source or destination image data.
+    region.imageOffset = {0, 0, 0}; // Selects the initial x, y, z offsets in texels of the sub-region of the source or destination image data.
     region.imageExtent = {width, height, 1}; // Size in texels of the image to copy in width, height and depth.
 
     // Copy data from a buffer into an image.
@@ -685,7 +690,7 @@ void RenderingServer::createTextureSampler(VkSampler &textureSampler) const {
     }
 }
 
-VkFormat RenderingServer::findDepthFormat() {
+VkFormat RenderingServer::findDepthFormat() const {
     return findSupportedFormat(
             {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
             VK_IMAGE_TILING_OPTIMAL,

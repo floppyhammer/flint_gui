@@ -16,14 +16,7 @@
 #include <cstring>
 
 #include "rendering/mesh.h"
-#include "rendering//texture.h"
-
-// MVP, which will be sent to vertex shaders.
-struct UniformBufferObject {
-    glm::mat4 model;
-    glm::mat4 view;
-    glm::mat4 proj;
-};
+#include "rendering/texture.h"
 
 class App {
 public:
@@ -32,32 +25,32 @@ public:
 private:
     VkSurfaceKHR surface;
 
-    // The graphics card that we'll end up selecting will be stored in a VkPhysicalDevice handle.
+    /// The graphics card that we'll end up selecting will be stored in a VkPhysicalDevice handle.
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 
-    // Logical device.
+    /// Logical device.
     VkDevice device{};
 
     VkSwapchainKHR swapChain;
 
-    // VkImage defines which VkMemory is used and a format of the texel.
+    /// VkImage defines which VkMemory is used and a format of the texel.
     std::vector<VkImage> swapChainImages;
 
-    // We only need a single depth image, because only one draw operation is running at once.
+    /// We only need a single depth image unlike the swap chain images, because only one draw operation is running at once.
     VkImage depthImage;
     VkDeviceMemory depthImageMemory;
     VkImageView depthImageView;
 
-    // Store the format and extent we've chosen for the swap chain images.
+    /// Store the format and extent we've chosen for the swap chain images.
     VkFormat swapChainImageFormat;
-    VkExtent2D swapChainExtent;
+    VkExtent2D swapChainExtent; // 2D size.
 
-    // VkImageView defines which part of VkImage to use.
+    /// VkImageView defines which part of VkImage to use.
     std::vector<VkImageView> swapChainImageViews;
 
-    // VkFramebuffer + VkRenderPass defines the render target.
-    // Render pass defines which attachment will be written with colors.
-    // VkFramebuffer defines which VkImageView is to be which attachment.
+    /// VkFramebuffer + VkRenderPass defines the render target.
+    /// Render pass defines which attachment will be written with colors.
+    /// VkFramebuffer defines which VkImageView is to be which attachment.
     std::vector<VkFramebuffer> swapChainFramebuffers;
 
     VkRenderPass renderPass;
@@ -67,38 +60,40 @@ private:
 
     std::vector<VkCommandBuffer> commandBuffers;
 
-    // Contains vertices and indices data.
+    /// Contains vertices and indices data.
     Mesh mesh;
 
-    // Vertex buffer.
+    /// Vertex buffer.
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
 
-    // Index buffer.
+    /// Index buffer.
     VkBuffer indexBuffer;
     VkDeviceMemory indexBufferMemory;
 
-    // We have a uniform buffer per swap chain image.
+    /// We have a uniform buffer per swap chain image.
     std::vector<VkBuffer> uniformBuffers;
     std::vector<VkDeviceMemory> uniformBuffersMemory;
 
+    /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
     VkDescriptorPool descriptorPool;
+
+    /// Descriptor sets are allocated from descriptor pool objects.
     std::vector<VkDescriptorSet> descriptorSets;
 
-    // Each frame should have its own set of semaphores, so a list is used.
+    /// Each frame should have its own set of semaphores, so a list is used.
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
 
-    // To perform CPU-GPU synchronization using fences.
+    /// To perform CPU-GPU synchronization using fences.
     std::vector<VkFence> inFlightFences;
     std::vector<VkFence> imagesInFlight;
 
-    // To use the right pair of semaphores every time,
-    // we need to keep track of the current frame.
-    // We will use a frame index for that purpose:
+    /// To use the right pair of semaphores every time,
+    /// we need to keep track of the current frame.
     size_t currentFrame = 0;
 
-    // For model texture.
+    /// For model texture.
     std::shared_ptr<Texture> texture;
 
     void initVulkan();
@@ -107,7 +102,7 @@ private:
 
     /**
      * Update MVP.
-     * @param currentImage Current image.
+     * @param currentImage Current image, which has different meaning from `current frame`.
      */
     void updateUniformBuffer(uint32_t currentImage);
 
@@ -161,7 +156,7 @@ private:
 
     void createDescriptorSets();
 
-    // Set up command queues.
+    /// Set up command queues.
     void createCommandBuffers();
 
     void createSyncObjects();

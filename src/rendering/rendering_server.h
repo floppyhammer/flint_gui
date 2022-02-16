@@ -7,24 +7,24 @@
 
 #define GLFW_INCLUDE_VULKAN
 
+#include "GLFW/glfw3.h"
+
 #include <vector>
 #include <iostream>
 #include <optional>
 
-#include "GLFW/glfw3.h"
-
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 
-// How many frames should be processed concurrently.
+/// How many frames should be processed concurrently.
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
-// List of required validation layers.
+/// List of required validation layers.
 const std::vector<const char *> validationLayers = {
         "VK_LAYER_KHRONOS_validation"
 };
 
-// List of required device extensions.
+/// List of required device extensions.
 const std::vector<const char *> deviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
@@ -124,7 +124,7 @@ public:
 public:
     void createInstance();
 
-    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+    static void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
 
     void createSurface();
 
@@ -152,7 +152,7 @@ public:
      * @param pPhysicalDevice
      * @return
      */
-    bool isDeviceSuitable(VkPhysicalDevice pPhysicalDevice);
+    bool isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const;
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice pPhysicalDevice) const;
 
@@ -164,18 +164,42 @@ public:
 
     void createCommandPool();
 
+    /**
+     * Create a shader module, but the shader stage is not specified yet.
+     * @return Shader module.
+     */
     [[nodiscard]] VkShaderModule createShaderModule(const std::vector<char> &code) const;
 
+    /**
+     * Create a command buffer in the command pool, and start recording.
+     * @return Command buffer.
+     */
     [[nodiscard]] VkCommandBuffer beginSingleTimeCommands() const;
 
+    /**
+     * End recording, submit the command buffer to a queue, then free the command buffer in the command pool.
+     */
     void endSingleTimeCommands(VkCommandBuffer commandBuffer) const;
 
     void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) const;
 
+    /**
+     * Copy data from VkBuffer to VkImage.
+     * @param buffer Src buffer.
+     * @param image Dst image.
+     * @param width Image width.
+     * @param height Image height.
+     */
     void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) const;
 
     static bool hasStencilComponent(VkFormat format);
 
+    /**
+     * Copy data from VkBuffer to VkBuffer.
+     * @param srcBuffer Src buffer.
+     * @param dstBuffer Dst buffer.
+     * @param VkDeviceSize Data size in bytes.
+     */
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const;
 
     void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
@@ -216,7 +240,7 @@ public:
 
     void createTextureSampler(VkSampler &textureSampler) const;
 
-    VkFormat findDepthFormat();
+    [[nodiscard]] VkFormat findDepthFormat() const;
 
     [[nodiscard]] VkFormat findSupportedFormat(const std::vector<VkFormat> &candidates,
                                                VkImageTiling tiling,

@@ -1,7 +1,5 @@
 #include "app.h"
 
-#include <algorithm>
-#include <set>
 #include <cstdint>
 #include <chrono>
 #include <unordered_map>
@@ -18,6 +16,16 @@
 
 #include "rendering/rendering_server.h"
 #include "common/io.h"
+
+const std::string MODEL_PATH = "../res/viking_room.obj";
+const std::string TEXTURE_PATH = "../res/viking_room.png";
+
+// MVP, which will be sent to vertex shaders.
+struct UniformBufferObject {
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 proj;
+};
 
 void App::run() {
     auto rs = RS::getSingleton();
@@ -162,7 +170,8 @@ void App::cleanup() {
     // Clean up swap chain related resources.
     cleanupSwapChain();
 
-    texture->cleanup();
+    // Release texture resources.
+    texture.reset();
 
     vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
@@ -497,7 +506,7 @@ void App::createFramebuffers() {
 }
 
 void App::loadModel() {
-    mesh.loadFile();
+    mesh.loadFile(MODEL_PATH);
 }
 
 void App::createVertexBuffer() {

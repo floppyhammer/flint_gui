@@ -11,10 +11,9 @@
 #include "stb_image.h"
 
 Texture::Texture(const std::string &filename) {
-    int texWidth, texHeight, texChannels;
-
     // The STBI_rgb_alpha value forces the image to be loaded with an alpha channel,
     // even if it doesn't have one, which is nice for consistency with other textures in the future.
+    int texWidth, texHeight, texChannels;
     stbi_uc *pixels = stbi_load(filename.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 
     if (!pixels) {
@@ -34,6 +33,10 @@ Texture::Texture(const std::string &filename) {
 
     // Create sampler.
     RS::getSingleton().createTextureSampler(sampler);
+}
+
+Texture::~Texture() {
+    cleanup();
 }
 
 void Texture::createImageFromBytes(void *pixels, int texWidth, int texHeight) {
@@ -93,6 +96,9 @@ void Texture::cleanup() const {
     // Should be right before destroying the image itself.
     vkDestroyImageView(device, imageView, nullptr);
 
+    // Release GPU memory.
     vkDestroyImage(device, image, nullptr);
+
+    // Release CPU memory.
     vkFreeMemory(device, imageMemory, nullptr);
 }

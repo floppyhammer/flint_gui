@@ -23,13 +23,13 @@ namespace std {
     };
 }
 
-void Mesh::loadFile() {
+void Mesh::loadFile(const std::string &filename) {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
 
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, MODEL_PATH.c_str())) {
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str())) {
         throw std::runtime_error(warn + err);
     }
 
@@ -37,8 +37,8 @@ void Mesh::loadFile() {
     std::unordered_map<Vertex, uint32_t> uniqueVertices{};
 
     // Iterate over the vertices and dump them straight into our vertices vector.
-    for (const auto& shape : shapes) {
-        for (const auto& index : shape.mesh.indices) {
+    for (const auto &shape: shapes) {
+        for (const auto &index: shape.mesh.indices) {
             Vertex vertex{};
 
             vertex.pos = {

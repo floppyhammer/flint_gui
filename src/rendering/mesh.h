@@ -15,9 +15,6 @@
 
 #include "glm/glm.hpp"
 
-const std::string MODEL_PATH = "../res/viking_room.obj";
-const std::string TEXTURE_PATH = "../res/viking_room.png";
-
 struct Vertex {
     glm::vec3 pos;
     glm::vec3 color;
@@ -65,7 +62,7 @@ public:
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
 
-    void loadFile();
+    void loadFile(const std::string &filename);
 };
 
 #endif //VULKAN_DEMO_APP_MESH_H
