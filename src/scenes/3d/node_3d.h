@@ -18,7 +18,7 @@ namespace Flint {
         // ------------------------------------------
 
     private:
-        UniformBufferObject mvp;
+        UniformBufferObject mvp[MAX_FRAMES_IN_FLIGHT];
 
         void update_uniform_buffer();
     };
