@@ -1,14 +1,10 @@
-//
-// Created by chy on 2/16/2022.
-//
-
-#ifndef VULKAN_DEMO_APP_VEC2_H
-#define VULKAN_DEMO_APP_VEC2_H
+#ifndef FLINT_VEC2_H
+#define FLINT_VEC2_H
 
 #include <iostream>
 #include <cmath>
 
-namespace SimpleVulkanRenderer {
+namespace Flint {
     template<typename T>
     struct Vec2 {
         T x = 0;
@@ -161,4 +157,4 @@ namespace SimpleVulkanRenderer {
     }
 }
 
-#endif //VULKAN_DEMO_APP_VEC2_H
+#endif //FLINT_VEC2_H

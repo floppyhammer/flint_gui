@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16.1)
-project(vulkan-demo-app)
+project(flint)
 
 # Has to be above 17.
 set(CMAKE_CXX_STANDARD 17)
@@ -9,7 +9,7 @@ find_package(Vulkan REQUIRED FATAL_ERROR)
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp src/*.h)
 
-add_executable(vulkan-demo-app ${SOURCE_FILES})
+add_executable(flint ${SOURCE_FILES})
 
 set(GLFW_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/inc")
 set(GLM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party")
@@ -23,7 +23,7 @@ include_directories(
 if(WIN32)
 set(GLFW_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/lib-vc2019")
 
-target_link_libraries(vulkan-demo-app
+target_link_libraries(flint
         Vulkan::Vulkan
         ${GLFW_LIBRARY_DIR}/glfw3.lib
         )

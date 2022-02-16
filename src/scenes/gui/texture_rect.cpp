@@ -1,10 +1,6 @@
-//
-// Created by chy on 6/7/2021.
-//
-
 #include "texture_rect.h"
 
-namespace SimpleVulkanRenderer {
+namespace Flint {
     TextureRect::TextureRect(float viewport_width, float viewport_height) {
         rect_size.x = viewport_width;
         rect_size.y = viewport_height;
@@ -35,6 +31,7 @@ namespace SimpleVulkanRenderer {
         return texture;
     }
 
-    void TextureRect::draw() {
+    void TextureRect::self_draw() {
+
     }
 }

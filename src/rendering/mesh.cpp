@@ -1,7 +1,3 @@
-//
-// Created by tannh on 2/13/2022.
-//
-
 #include "mesh.h"
 
 #define GLM_ENABLE_EXPERIMENTAL

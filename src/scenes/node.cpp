@@ -1,29 +1,47 @@
-//
-// Created by chy on 2/16/2022.
-//
-
 #include "node.h"
 
-void SimpleVulkanRenderer::Node::update() {
-    self_update();
+namespace Flint {
+    void Node::update() {
+        self_update();
 
-    for (auto& child : children) {
-        child.update();
+        for (auto& child : children) {
+            child.update();
+        }
     }
-}
 
-void SimpleVulkanRenderer::Node::draw() {
-    self_draw();
+    void Node::draw() {
+        self_draw();
 
-    for (auto& child : children) {
-        child.draw();
+        for (auto& child : children) {
+            child.draw();
+        }
     }
-}
 
-void SimpleVulkanRenderer::Node::self_update() {
+    void Node::self_update() {
 
-}
+    }
 
-void SimpleVulkanRenderer::Node::self_draw() {
+    void Node::self_draw() {
 
+    }
+
+    std::shared_ptr<SubViewport> Node::get_viewport() {
+        if (get_parent() != nullptr) {
+            return get_parent()->get_viewport();
+        } else {
+            return {};
+        }
+    }
+
+    std::shared_ptr<Node> Node::get_parent() {
+        return parent;
+    }
+
+    std::shared_ptr<Node> Node::get_root() {
+        if (parent != nullptr) {
+            return parent->get_parent();
+        } else {
+            return std::shared_ptr<Node>(this);
+        }
+    }
 }

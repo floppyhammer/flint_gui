@@ -1,13 +1,10 @@
-//
-// Created by tannh on 2/13/2022.
-//
-
-#ifndef VULKAN_DEMO_APP_RENDERING_SERVER_H
-#define VULKAN_DEMO_APP_RENDERING_SERVER_H
+#ifndef FLINT_RENDERING_SERVER_H
+#define FLINT_RENDERING_SERVER_H
 
 #define GLFW_INCLUDE_VULKAN
 
 #include "GLFW/glfw3.h"
+#include <glm/glm.hpp>
 
 #include <vector>
 #include <iostream>
@@ -42,6 +39,13 @@ struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
+};
+
+/// MVP, which will be sent to vertex shaders.
+struct UniformBufferObject {
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 proj;
 };
 
 class RenderingServer {
@@ -253,4 +257,4 @@ public:
 
 typedef RenderingServer RS;
 
-#endif //VULKAN_DEMO_APP_RENDERING_SERVER_H
+#endif //FLINT_RENDERING_SERVER_H

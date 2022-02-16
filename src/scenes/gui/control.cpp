@@ -1,6 +1,6 @@
 #include "control.h"
 
-namespace SimpleVulkanRenderer {
+namespace Flint {
     void Control::set_rect_position(float x, float y) {
         rect_position.x = x;
         rect_position.y = y;

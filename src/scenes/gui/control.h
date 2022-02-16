@@ -1,12 +1,12 @@
-#ifndef VULKAN_DEMO_APP_CONTROL_H
-#define VULKAN_DEMO_APP_CONTROL_H
+#ifndef FLINT_CONTROL_H
+#define FLINT_CONTROL_H
 
 #include <vector>
 
-#include "node.h"
-#include "../common/vec2.h"
+#include "../node.h"
+#include "../../common/vec2.h"
 
-namespace SimpleVulkanRenderer {
+namespace Flint {
     class Control : public Node {
     public:
         Vec2<float> rect_position = Vec2<float>(0);
@@ -31,4 +31,4 @@ namespace SimpleVulkanRenderer {
     };
 }
 
-#endif //VULKAN_DEMO_APP_CONTROL_H
+#endif //FLINT_CONTROL_H

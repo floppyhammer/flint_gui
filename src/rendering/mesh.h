@@ -1,9 +1,5 @@
-//
-// Created by tannh on 2/13/2022.
-//
-
-#ifndef VULKAN_DEMO_APP_MESH_H
-#define VULKAN_DEMO_APP_MESH_H
+#ifndef FLINT_MESH_H
+#define FLINT_MESH_H
 
 #include <string>
 #include <vector>
@@ -65,4 +61,4 @@ public:
     void loadFile(const std::string &filename);
 };
 
-#endif //VULKAN_DEMO_APP_MESH_H
+#endif //FLINT_MESH_H

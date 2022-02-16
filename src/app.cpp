@@ -20,13 +20,6 @@
 const std::string MODEL_PATH = "../res/viking_room.obj";
 const std::string TEXTURE_PATH = "../res/viking_room.png";
 
-// MVP, which will be sent to vertex shaders.
-struct UniformBufferObject {
-    glm::mat4 model;
-    glm::mat4 view;
-    glm::mat4 proj;
-};
-
 void App::run() {
     auto rs = RS::getSingleton();
     device = rs.device;
@@ -778,6 +771,7 @@ void App::drawFrame() {
     // Wait for the frame to be finished.
     vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
+    // Retrieve the index of the next available presentable image.
     uint32_t imageIndex;
     VkResult result = vkAcquireNextImageKHR(device,
                                             swapChain,

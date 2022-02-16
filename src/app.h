@@ -1,5 +1,5 @@
-#ifndef VULKAN_DEMO_APP_H
-#define VULKAN_DEMO_APP_H
+#ifndef FLINT_H
+#define FLINT_H
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -169,4 +169,4 @@ private:
     void loadModel();
 };
 
-#endif //VULKAN_DEMO_APP_H
+#endif //FLINT_H

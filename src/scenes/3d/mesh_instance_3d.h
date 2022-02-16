@@ -1,19 +1,21 @@
-//
-// Created by chy on 2/16/2022.
-//
+#ifndef FLINT_MESH_INSTANCE_3D_H
+#define FLINT_MESH_INSTANCE_3D_H
 
-#ifndef VULKAN_DEMO_APP_MESH_INSTANCE_3D_H
-#define VULKAN_DEMO_APP_MESH_INSTANCE_3D_H
-
+#include "node_3d.h"
 #include "../../rendering/mesh.h"
 
-class MeshInstance3D {
-public:
-    void set_mesh(const Mesh &p_mesh);
-    Mesh get_mesh() const;
+namespace Flint {
+    class MeshInstance3D : public Node3D {
+    public:
+        void set_mesh(const Mesh &p_mesh);
 
-private:
-    Mesh mesh;
-};
+        Mesh get_mesh() const;
 
-#endif //VULKAN_DEMO_APP_MESH_INSTANCE_3D_H
+        void self_draw() override;
+
+    private:
+        Mesh mesh;
+    };
+}
+
+#endif //FLINT_MESH_INSTANCE_3D_H

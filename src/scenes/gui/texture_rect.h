@@ -1,12 +1,12 @@
-#ifndef VULKAN_DEMO_APP_TEXTURE_RECT_H
-#define VULKAN_DEMO_APP_TEXTURE_RECT_H
+#ifndef FLINT_TEXTURE_RECT_H
+#define FLINT_TEXTURE_RECT_H
 
 #include "control.h"
-#include "../rendering/texture.h"
+#include "../../rendering/texture.h"
 
 #include <memory>
 
-namespace SimpleVulkanRenderer {
+namespace Flint {
     class TextureRect : public Control {
     public:
         TextureRect(float viewport_width, float viewport_height);
@@ -17,7 +17,7 @@ namespace SimpleVulkanRenderer {
 
         std::shared_ptr<Texture> get_texture() const;
 
-        void draw();
+        void self_draw() override;
 
     private:
         std::shared_ptr<Texture> texture;
@@ -27,4 +27,4 @@ namespace SimpleVulkanRenderer {
     };
 }
 
-#endif //VULKAN_DEMO_APP_TEXTURE_RECT_H
+#endif //FLINT_TEXTURE_RECT_H

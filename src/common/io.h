@@ -1,9 +1,5 @@
-//
-// Created by tannh on 2/13/2022.
-//
-
-#ifndef VULKAN_DEMO_APP_IO_H
-#define VULKAN_DEMO_APP_IO_H
+#ifndef FLINT_IO_H
+#define FLINT_IO_H
 
 #include <vector>
 #include <string>
@@ -21,4 +17,4 @@ static std::vector<char> readFile(const std::string &filename) {
     return bytes;
 }
 
-#endif //VULKAN_DEMO_APP_IO_H
+#endif //FLINT_IO_H

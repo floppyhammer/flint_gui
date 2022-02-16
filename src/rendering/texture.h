@@ -1,9 +1,5 @@
-//
-// Created by tannh on 2/13/2022.
-//
-
-#ifndef VULKAN_DEMO_APP_TEXTURE_H
-#define VULKAN_DEMO_APP_TEXTURE_H
+#ifndef FLINT_TEXTURE_H
+#define FLINT_TEXTURE_H
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -41,4 +37,4 @@ public:
     void cleanup() const;
 };
 
-#endif //VULKAN_DEMO_APP_TEXTURE_H
+#endif //FLINT_TEXTURE_H
