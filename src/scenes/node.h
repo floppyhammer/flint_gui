@@ -8,7 +8,7 @@
 
 namespace Flint {
     class Node {
-    private:
+    protected:
         std::vector<Node> children;
 
         std::shared_ptr<Node> parent;

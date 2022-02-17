@@ -20,16 +20,16 @@ include_directories(
 )
 
 # Windows
-if(WIN32)
-set(GLFW_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/lib-vc2019")
+if (WIN32)
+    set(GLFW_LIBRARY_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/lib/lib-vc2019")
 
-target_link_libraries(flint
-        Vulkan::Vulkan
-        ${GLFW_LIBRARY_DIR}/glfw3.lib
-        )
-else() # Linux
-## sudo apt install libglfw3-dev
-## sudo apt install libvulkan-dev
-## sudo apt install libvulkan1 mesa-vulkan-drivers vulkan-utils
-target_link_libraries(vulkan-demo-app -lglfw -lvulkan)
-endif()
+    target_link_libraries(flint
+            Vulkan::Vulkan
+            ${GLFW_LIBRARY_DIR}/glfw3.lib
+            )
+else () # Linux
+    ## sudo apt install libglfw3-dev
+    ## sudo apt install libvulkan-dev
+    ## sudo apt install libvulkan1 mesa-vulkan-drivers vulkan-utils
+    target_link_libraries(vulkan-demo-app -lglfw -lvulkan)
+endif ()

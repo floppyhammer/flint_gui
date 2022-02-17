@@ -7,6 +7,11 @@ namespace Flint {
     class SubViewport {
     public:
         Vec2<int> size = {512, 512};
+
+        float fov = 45.0;
+
+        float z_near = 0.1;
+        float z_far = 10.0;
     };
 }
 

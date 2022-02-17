@@ -7,14 +7,11 @@
 namespace Flint {
     class MeshInstance3D : public Node3D {
     public:
-        void set_mesh(const Mesh &p_mesh);
+        void set_mesh(std::shared_ptr<Mesh> p_mesh);
 
-        Mesh get_mesh() const;
+        std::shared_ptr<Mesh> get_mesh() const;
 
         void self_draw() override;
-
-    private:
-        Mesh mesh;
     };
 }
 

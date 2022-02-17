@@ -712,7 +712,7 @@ void App::createCommandBuffers() {
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = renderPass;
-        renderPassInfo.framebuffer = swapChainFramebuffers[i];
+        renderPassInfo.framebuffer = swapChainFramebuffers[i]; // Set target framebuffer.
         renderPassInfo.renderArea.offset = {0, 0};
         renderPassInfo.renderArea.extent = swapChainExtent;
 
@@ -734,18 +734,29 @@ void App::createCommandBuffers() {
                           VK_PIPELINE_BIND_POINT_GRAPHICS,
                           graphicsPipeline);
 
-        // Bind buffers.
+        // Bind vertex and index buffers.
         VkBuffer vertexBuffers[] = {vertexBuffer};
         VkDeviceSize offsets[] = {0};
-        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1,
-                               vertexBuffers, offsets);
+        vkCmdBindVertexBuffers(commandBuffers[i],
+                               0,
+                               1,
+                               vertexBuffers,
+                               offsets);
 
-        vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer,
-                             0, VK_INDEX_TYPE_UINT32);
+        vkCmdBindIndexBuffer(commandBuffers[i],
+                             indexBuffer,
+                             0,
+                             VK_INDEX_TYPE_UINT32);
 
-        vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                pipelineLayout, 0, 1,
-                                &descriptorSets[i], 0, nullptr);
+        // Bind uniform buffers and samplers.
+        vkCmdBindDescriptorSets(commandBuffers[i],
+                                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                pipelineLayout,
+                                0,
+                                1,
+                                &descriptorSets[i],
+                                0,
+                                nullptr);
 
         // Draw call.
         vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(mesh.indices.size()),

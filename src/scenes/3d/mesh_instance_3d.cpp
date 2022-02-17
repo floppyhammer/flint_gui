@@ -1,11 +1,17 @@
 #include "mesh_instance_3d.h"
 
+#include <utility>
+
 namespace Flint {
-    void MeshInstance3D::set_mesh(const Mesh &p_mesh) {
-        mesh = p_mesh;
+    void MeshInstance3D::set_mesh(std::shared_ptr<Mesh> p_mesh) {
+        mesh = std::move(p_mesh);
+
+        createIndexBuffer();
+        createUniformBuffers();
+        createVertexBuffer();
     }
 
-    Mesh MeshInstance3D::get_mesh() const {
+    std::shared_ptr<Mesh> MeshInstance3D::get_mesh() const {
         return mesh;
     }
 

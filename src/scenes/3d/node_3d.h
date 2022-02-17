@@ -4,6 +4,7 @@
 #include "../node.h"
 #include "../../common/vec3.h"
 #include "../../rendering/rendering_server.h"
+#include "../../rendering/mesh.h"
 
 namespace Flint {
     class Node3D : public Node {
@@ -17,10 +18,45 @@ namespace Flint {
         Vec3<float> scale = Vec3<float>(1);
         // ------------------------------------------
 
-    private:
+    protected:
+        void self_update() override;
+
+        void self_draw() override;
+
         UniformBufferObject mvp[MAX_FRAMES_IN_FLIGHT];
 
         void update_uniform_buffer();
+
+        void createVertexBuffer();
+        void createIndexBuffer();
+        void createUniformBuffers();
+
+        std::shared_ptr<Mesh> mesh;
+
+        /// Vertex buffer.
+        VkBuffer vertexBuffer;
+        VkDeviceMemory vertexBufferMemory;
+
+        /// Index buffer.
+        VkBuffer indexBuffer;
+        VkDeviceMemory indexBufferMemory;
+
+        /// We have a uniform buffer per swap chain image.
+        std::vector<VkBuffer> uniformBuffers;
+        std::vector<VkDeviceMemory> uniformBuffersMemory;
+
+        void createGraphicsPipeline();
+
+        /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
+        VkDescriptorPool descriptorPool;
+
+        /// Descriptor sets are allocated from descriptor pool objects.
+        std::vector<VkDescriptorSet> descriptorSets;
+
+        VkRenderPass renderPass;
+        VkDescriptorSetLayout descriptorSetLayout;
+        VkPipelineLayout pipelineLayout;
+        VkPipeline graphicsPipeline;
     };
 }
 
