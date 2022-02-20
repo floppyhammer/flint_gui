@@ -731,3 +731,7 @@ VkPresentModeKHR RenderingServer::chooseSwapPresentMode(const std::vector<VkPres
 
     return VK_PRESENT_MODE_FIFO_KHR;
 }
+
+void RenderingServer::draw_canvas_item() {
+
+}

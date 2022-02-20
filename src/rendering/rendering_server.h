@@ -256,6 +256,11 @@ public:
     static VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
 
     static VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes);
+
+public:
+    void draw_canvas_item();
+
+    void draw_mesh();
 };
 
 typedef RenderingServer RS;

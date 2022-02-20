@@ -7,7 +7,7 @@
 #include <chrono>
 
 namespace Flint {
-    void Node3D::self_update() {
+    void Node3D::self_update(double delta) {
         update_uniform_buffer();
     }
 

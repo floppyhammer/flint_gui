@@ -61,7 +61,7 @@ private:
     std::vector<VkCommandBuffer> commandBuffers;
 
     /// Contains vertices and indices data.
-    Mesh mesh;
+    std::shared_ptr<Mesh> mesh;
 
     /// Vertex buffer.
     VkBuffer vertexBuffer;
@@ -139,35 +139,63 @@ private:
     /**
      * Set up shaders, viewport, blend state, etc.
      * @note We only need one pipeline for a specific rendering process despite of the existence of multiple swap chains.
+     * @dependency Descriptor set layout, swap chain extent.
      */
     void createGraphicsPipeline();
 
+    /**
+     *
+     * @dependency Swap chain extent, render pass, swap chain image views.
+     */
     void createFramebuffers();
 
+    /**
+     *
+     * @dependency None.
+     */
     void createVertexBuffer();
 
+    /**
+     *
+     * @dependency None.
+     */
     void createIndexBuffer();
 
+    /**
+     *
+     * @dependency Swap chain count.
+     */
     void createUniformBuffers();
 
     /**
      * A descriptor pool is used to allocate descriptor sets of some layout for use in a shader.
+     * @dependency None.
      */
     void createDescriptorPool();
 
+    /**
+     * Allocate descriptor sets in the pool.
+     * @dependency Descriptor pool, descriptor set layout, and actual resources (uniform buffers, images, image views).
+     */
     void createDescriptorSets();
 
-    /// Set up command queues.
+    /**
+     * Create UBO descriptor.
+     * @dependency None.
+     */
+    void createDescriptorSetLayout();
+
+    /**
+     * Set up command queues.
+     * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline layout.
+     */
     void createCommandBuffers();
 
     void createSyncObjects();
 
     void drawFrame();
 
-    /// Create UBO descriptor.
-    void createDescriptorSetLayout();
-
-    void loadModel();
+    void createSwapChainRelatedResources();
 };
 
 #endif //FLINT_H

@@ -3,6 +3,7 @@
 
 #include "node_3d.h"
 #include "../../rendering/mesh.h"
+#include "../../rendering/texture.h"
 
 namespace Flint {
     class MeshInstance3D : public Node3D {
@@ -12,6 +13,11 @@ namespace Flint {
         std::shared_ptr<Mesh> get_mesh() const;
 
         void self_draw() override;
+
+        void cleanup() override;
+
+    private:
+        std::shared_ptr<Texture> texture;
     };
 }
 

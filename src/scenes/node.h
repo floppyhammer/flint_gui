@@ -9,16 +9,20 @@
 namespace Flint {
     class Node {
     protected:
+        //~Node();
+
         std::vector<Node> children;
 
         std::shared_ptr<Node> parent;
 
-        void update();
+        void update(double delta);
 
         void draw();
 
+        virtual void cleanup();
+
     public:
-        virtual void self_update();
+        virtual void self_update(double delta);
 
         virtual void self_draw();
 

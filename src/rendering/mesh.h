@@ -2,6 +2,7 @@
 #define FLINT_MESH_H
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <array>
 
@@ -57,6 +58,10 @@ class Mesh {
 public:
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
+
+    Mesh() = default;
+    Mesh(std::vector<Vertex> p_vertices, std::vector<uint32_t> p_indices)
+            : vertices(std::move(p_vertices)), indices(std::move(p_indices)) {}
 
     void loadFile(const std::string &filename);
 };

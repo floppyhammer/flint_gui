@@ -19,7 +19,7 @@ namespace Flint {
         // ------------------------------------------
 
     protected:
-        void self_update() override;
+        void self_update(double delta) override;
 
         void self_draw() override;
 

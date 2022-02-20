@@ -9,7 +9,7 @@ find_package(Vulkan REQUIRED FATAL_ERROR)
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp src/*.h)
 
-add_executable(flint ${SOURCE_FILES})
+add_executable(flint ${SOURCE_FILES} src/core/engine.cpp src/core/engine.h)
 
 set(GLFW_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external/inc")
 set(GLM_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/third_party")

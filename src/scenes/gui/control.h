@@ -5,6 +5,7 @@
 
 #include "../node.h"
 #include "../../common/vec2.h"
+#include "../../rendering/rendering_server.h"
 
 namespace Flint {
     class Control : public Node {
@@ -28,6 +29,12 @@ namespace Flint {
         void set_rect_rotation(float r);
 
         void set_rect_pivot_offset(float x, float y);
+
+    protected:
+        UniformBufferObject ubo{};
+
+        std::vector<VkBuffer> uniform_buffers;
+        std::vector<VkDeviceMemory> uniform_buffers_memory;
     };
 }
 

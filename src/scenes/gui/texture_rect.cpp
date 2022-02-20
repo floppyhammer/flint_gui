@@ -1,23 +1,33 @@
 #include "texture_rect.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "../../core/engine.h"
+
+#include <memory>
+#include <chrono>
+
 namespace Flint {
-    TextureRect::TextureRect(float viewport_width, float viewport_height) {
-        rect_size.x = viewport_width;
-        rect_size.y = viewport_height;
+    const std::vector<Vertex> vertices = {
+            {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+    };
 
-        // Set VAO&VBO.
-        // ---------------------------
-        // Set up vertex data (and buffer(s)) and configure vertex attributes.
-        float vertices[] = {
-                // Positions, colors, UVs.
-                -1.0, -1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-                1.0, -1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
-                1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
+    // For index buffer.
+    const std::vector<uint32_t> indices = {
+            0, 1, 2, 2, 3, 0
+    };
 
-                -1.0, -1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
-                1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0,
-                -1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0
-        };
+    TextureRect::TextureRect() {
+        mesh = std::make_shared<Mesh>(vertices, indices);
+
+        // Pipeline should be built on the rendering server, as all texture rects use the same pipeline but with
+        // different uniform buffers.
+
+
     }
 
     TextureRect::~TextureRect() {
@@ -32,6 +42,27 @@ namespace Flint {
     }
 
     void TextureRect::self_draw() {
+        // Should get this from RS.
+        uint32_t current_image = 0;
 
+        // Copy the data in the uniform buffer object to the current uniform buffer.
+        void* data;
+        vkMapMemory(RS::getSingleton().device, uniform_buffers_memory[current_image], 0, sizeof(ubo), 0, &data);
+        memcpy(data, &ubo, sizeof(ubo));
+        vkUnmapMemory(RS::getSingleton().device, uniform_buffers_memory[current_image]);
+    }
+
+    void TextureRect::self_update(double delta) {
+        ubo.model = glm::rotate(glm::mat4(1.0f), (float) Engine::getSingleton().elapsed * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        auto viewport = get_viewport();
+        if (viewport == nullptr) return;
+
+        ubo.proj = glm::perspective(glm::radians(45.0f), (float) viewport->size.x / (float) viewport->size.y, 0.1f, 10.0f);
+
+        // GLM was originally designed for OpenGL,
+        // where the Y coordinate of the clip coordinates is inverted.
+        ubo.proj[1][1] *= -1;
     }
 }

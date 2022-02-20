@@ -1,11 +1,11 @@
 #include "node.h"
 
 namespace Flint {
-    void Node::update() {
-        self_update();
+    void Node::update(double delta) {
+        self_update(delta);
 
         for (auto& child : children) {
-            child.update();
+            child.update(delta);
         }
     }
 
@@ -17,7 +17,7 @@ namespace Flint {
         }
     }
 
-    void Node::self_update() {
+    void Node::self_update(double delta) {
 
     }
 
@@ -44,4 +44,12 @@ namespace Flint {
             return std::shared_ptr<Node>(this);
         }
     }
+
+    void Node::cleanup() {
+
+    }
+//
+//    Node::~Node() {
+//        cleanup();
+//    }
 }

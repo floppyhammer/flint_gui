@@ -3,27 +3,28 @@
 
 #include "control.h"
 #include "../../rendering/texture.h"
+#include "../../rendering/mesh.h"
 
 #include <memory>
 
 namespace Flint {
     class TextureRect : public Control {
     public:
-        TextureRect(float viewport_width, float viewport_height);
+        TextureRect();
 
         ~TextureRect();
 
         void set_texture(std::shared_ptr<Texture> p_texture);
-
         std::shared_ptr<Texture> get_texture() const;
 
         void self_draw() override;
 
+        void self_update(double delta) override;
+
     private:
         std::shared_ptr<Texture> texture;
 
-        unsigned int vao = 0;
-        unsigned int vbo = 0;
+        std::shared_ptr<Mesh> mesh;
     };
 }
 

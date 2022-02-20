@@ -31,6 +31,25 @@ void App::run() {
 }
 
 void App::initVulkan() {
+    // Load mesh.
+    mesh = std::make_shared<Mesh>();
+    mesh->loadFile(MODEL_PATH);
+
+    // Load mesh texture.
+    texture = std::make_shared<Texture>(TEXTURE_PATH);
+
+    // Should be created before creating command buffers.
+    createVertexBuffer();
+    createIndexBuffer();
+
+    createDescriptorSetLayout();
+
+    createSwapChainRelatedResources();
+
+    createSyncObjects();
+}
+
+void App::createSwapChainRelatedResources() {
     // Create a swap chain and corresponding swap chain images.
     createSwapChain();
 
@@ -39,29 +58,21 @@ void App::initVulkan() {
 
     createRenderPass();
 
-    createDescriptorSetLayout();
+    createDepthResources();
 
     // Set up pipeline.
     createGraphicsPipeline();
 
-    createDepthResources();
-
     createFramebuffers();
 
-    texture = std::make_shared<Texture>(TEXTURE_PATH);
-
-    loadModel();
-
-    createVertexBuffer();
-    createIndexBuffer();
     createUniformBuffers();
 
+    // Create descriptor pool before creating descriptor sets.
     createDescriptorPool();
+
     createDescriptorSets();
 
     createCommandBuffers();
-
-    createSyncObjects();
 }
 
 void App::mainLoop() {
@@ -112,16 +123,7 @@ void App::recreateSwapChain() {
 
     cleanupSwapChain();
 
-    createSwapChain();
-    createImageViews();
-    createRenderPass();
-    createGraphicsPipeline();
-    createDepthResources();
-    createFramebuffers();
-    createUniformBuffers();
-    createDescriptorPool();
-    createDescriptorSets();
-    createCommandBuffers();
+    createSwapChainRelatedResources();
 
     imagesInFlight.resize(swapChainImages.size(), VK_NULL_HANDLE);
 }
@@ -132,15 +134,19 @@ void App::cleanupSwapChain() {
     vkDestroyImage(device, depthImage, nullptr);
     vkFreeMemory(device, depthImageMemory, nullptr);
 
+    // Framebuffers.
     for (auto framebuffer: swapChainFramebuffers) {
         vkDestroyFramebuffer(device, framebuffer, nullptr);
     }
 
+    // Command buffers contain swap chain related info, so we also need to free them.
     vkFreeCommandBuffers(device, RS::getSingleton().commandPool, static_cast<uint32_t>(commandBuffers.size()),
                          commandBuffers.data());
 
+    // Graphics pipeline resources.
     vkDestroyPipeline(device, graphicsPipeline, nullptr);
     vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+
     vkDestroyRenderPass(device, renderPass, nullptr);
 
     for (auto imageView: swapChainImageViews) {
@@ -149,12 +155,14 @@ void App::cleanupSwapChain() {
 
     vkDestroySwapchainKHR(device, swapChain, nullptr);
 
+    // When we destroy the pool, the sets inside are destroyed as well.
+    vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+
+    // Clean up uniform buffers.
     for (size_t i = 0; i < swapChainImages.size(); i++) {
         vkDestroyBuffer(device, uniformBuffers[i], nullptr);
         vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
     }
-
-    vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 }
 
 void App::cleanup() {
@@ -174,6 +182,7 @@ void App::cleanup() {
     vkDestroyBuffer(device, vertexBuffer, nullptr); // GPU memory
     vkFreeMemory(device, vertexBufferMemory, nullptr); // CPU memory
 
+    // Clean up sync objects.
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
         vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
@@ -496,12 +505,8 @@ void App::createFramebuffers() {
     }
 }
 
-void App::loadModel() {
-    mesh.loadFile(MODEL_PATH);
-}
-
 void App::createVertexBuffer() {
-    VkDeviceSize bufferSize = sizeof(mesh.vertices[0]) * mesh.vertices.size();
+    VkDeviceSize bufferSize = sizeof(mesh->vertices[0]) * mesh->vertices.size();
 
     VkBuffer stagingBuffer; // In GPU
     VkDeviceMemory stagingBufferMemory; // In CPU
@@ -514,7 +519,7 @@ void App::createVertexBuffer() {
                                     stagingBufferMemory);
 
     // Copy data to the CPU memory.
-    RS::getSingleton().copyDataToMemory(mesh.vertices.data(), stagingBufferMemory, bufferSize);
+    RS::getSingleton().copyDataToMemory(mesh->vertices.data(), stagingBufferMemory, bufferSize);
 
     // Create the vertex buffer (GPU) and bind it to the vertex memory (CPU).
     RS::getSingleton().createBuffer(bufferSize,
@@ -532,7 +537,7 @@ void App::createVertexBuffer() {
 }
 
 void App::createIndexBuffer() {
-    VkDeviceSize bufferSize = sizeof(mesh.indices[0]) * mesh.indices.size();
+    VkDeviceSize bufferSize = sizeof(mesh->indices[0]) * mesh->indices.size();
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -542,7 +547,7 @@ void App::createIndexBuffer() {
                                     stagingBuffer,
                                     stagingBufferMemory);
 
-    RS::getSingleton().copyDataToMemory(mesh.indices.data(),
+    RS::getSingleton().copyDataToMemory(mesh->indices.data(),
                                         stagingBufferMemory,
                                         bufferSize);
 
@@ -759,7 +764,7 @@ void App::createCommandBuffers() {
                                 nullptr);
 
         // Draw call.
-        vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(mesh.indices.size()),
+        vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(mesh->indices.size()),
                          1, 0, 0, 0);
 
         // End render pass.
@@ -807,6 +812,7 @@ void App::drawFrame() {
                                             VK_NULL_HANDLE,
                                             &imageIndex);
 
+    // Recreate swap chains if necessary.
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         recreateSwapChain();
         return;
@@ -814,6 +820,7 @@ void App::drawFrame() {
         throw std::runtime_error("Failed to acquire swap chain image!");
     }
 
+    // Update UBOs simply by memory mapping.
     updateUniformBuffer(imageIndex);
 
     if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
