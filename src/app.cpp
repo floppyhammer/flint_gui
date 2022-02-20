@@ -60,6 +60,8 @@ void App::createSwapChainRelatedResources() {
 
     createDepthResources();
 
+    // Render object specific resources.
+    // ------------------------------------
     // Set up pipeline.
     createGraphicsPipeline();
 
@@ -73,6 +75,9 @@ void App::createSwapChainRelatedResources() {
     createDescriptorSets();
 
     createCommandBuffers();
+
+    recordCommands();
+    // ------------------------------------
 }
 
 void App::mainLoop() {
@@ -701,7 +706,44 @@ void App::createCommandBuffers() {
     if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate command buffers!");
     }
+}
 
+void App::drawObject(const VkCommandBuffer& commandBuffer, const VkDescriptorSet& descriptorSet) {
+    // Bind pipeline.
+    vkCmdBindPipeline(commandBuffer,
+                      VK_PIPELINE_BIND_POINT_GRAPHICS,
+                      graphicsPipeline);
+
+    // Bind vertex and index buffers.
+    VkBuffer vertexBuffers[] = {vertexBuffer};
+    VkDeviceSize offsets[] = {0};
+    vkCmdBindVertexBuffers(commandBuffer,
+                           0,
+                           1,
+                           vertexBuffers,
+                           offsets);
+
+    vkCmdBindIndexBuffer(commandBuffer,
+                         indexBuffer,
+                         0,
+                         VK_INDEX_TYPE_UINT32);
+
+    // Bind uniform buffers and samplers.
+    vkCmdBindDescriptorSets(commandBuffer,
+                            VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            pipelineLayout,
+                            0,
+                            1,
+                            &descriptorSet,
+                            0,
+                            nullptr);
+
+    // Draw call.
+    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(mesh->indices.size()),
+                     1, 0, 0, 0);
+}
+
+void App::recordCommands() {
     // Record each command buffer.
     for (size_t i = 0; i < commandBuffers.size(); i++) {
         // Begin recording.
@@ -734,38 +776,10 @@ void App::createCommandBuffers() {
                              VK_SUBPASS_CONTENTS_INLINE);
         // ----------------------------------------------
 
-        // Bind pipeline.
-        vkCmdBindPipeline(commandBuffers[i],
-                          VK_PIPELINE_BIND_POINT_GRAPHICS,
-                          graphicsPipeline);
-
-        // Bind vertex and index buffers.
-        VkBuffer vertexBuffers[] = {vertexBuffer};
-        VkDeviceSize offsets[] = {0};
-        vkCmdBindVertexBuffers(commandBuffers[i],
-                               0,
-                               1,
-                               vertexBuffers,
-                               offsets);
-
-        vkCmdBindIndexBuffer(commandBuffers[i],
-                             indexBuffer,
-                             0,
-                             VK_INDEX_TYPE_UINT32);
-
-        // Bind uniform buffers and samplers.
-        vkCmdBindDescriptorSets(commandBuffers[i],
-                                VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                pipelineLayout,
-                                0,
-                                1,
-                                &descriptorSets[i],
-                                0,
-                                nullptr);
-
-        // Draw call.
-        vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(mesh->indices.size()),
-                         1, 0, 0, 0);
+        // Rendering object specific.
+        // ---------------------------------------------
+        drawObject(commandBuffers[i], descriptorSets[i]);
+        // ---------------------------------------------
 
         // End render pass.
         vkCmdEndRenderPass(commandBuffers[i]);
@@ -828,6 +842,8 @@ void App::drawFrame() {
     }
     imagesInFlight[imageIndex] = inFlightFences[currentFrame];
 
+    // Submit command buffer.
+    // -------------------------------------
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -840,6 +856,7 @@ void App::drawFrame() {
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
 
+    // The semaphores to signal after all commands in the buffer are finished.
     VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[currentFrame]};
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
@@ -849,10 +866,14 @@ void App::drawFrame() {
     if (vkQueueSubmit(RS::getSingleton().graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("Failed to submit draw command buffer!");
     }
+    // -------------------------------------
 
+    // Queue an image for presentation after queueing all rendering commands and transitioning the image to the correct layout.
+    // -------------------------------------
     VkPresentInfoKHR presentInfo{};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
+    // Specifies the semaphores to wait for before issuing the present request.
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = signalSemaphores;
 
@@ -860,9 +881,11 @@ void App::drawFrame() {
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
 
+    // Array of each swap chain’s presentable images.
     presentInfo.pImageIndices = &imageIndex;
 
     result = vkQueuePresentKHR(RS::getSingleton().presentQueue, &presentInfo);
+    // -------------------------------------
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || RS::getSingleton().framebufferResized) {
         RS::getSingleton().framebufferResized = false;

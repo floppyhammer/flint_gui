@@ -21,6 +21,9 @@ namespace Flint {
 
         virtual void cleanup();
 
+        /// Do this every time something changes in the scene tree.
+        virtual void record_commands() = 0;
+
     public:
         virtual void self_update(double delta);
 

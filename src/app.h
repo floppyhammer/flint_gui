@@ -108,6 +108,9 @@ private:
 
     void recreateSwapChain();
 
+    /**
+     * What have been created in createSwapChainRelatedResources() have to be destroyed in here.
+     */
     void cleanupSwapChain();
 
     void cleanup();
@@ -196,6 +199,10 @@ private:
     void drawFrame();
 
     void createSwapChainRelatedResources();
+
+    void recordCommands();
+
+    void drawObject(const VkCommandBuffer& commandBuffer, const VkDescriptorSet& descriptorSet);
 };
 
 #endif //FLINT_H
