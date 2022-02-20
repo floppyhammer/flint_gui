@@ -16,8 +16,14 @@ namespace Flint {
 
         void cleanup() override;
 
-    private:
+    protected:
         std::shared_ptr<Texture> texture;
+
+        VkDescriptorSetLayout descriptorSetLayout;
+        VkPipelineLayout pipelineLayout;
+        VkPipeline graphicsPipeline;
+
+        void createGraphicsPipeline();
     };
 }
 

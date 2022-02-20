@@ -23,6 +23,16 @@ void App::run() {
     physicalDevice = rs.physicalDevice;
     surface = rs.surface;
 
+    // Load mesh resources.
+    // --------------------------------
+    // Load mesh.
+    mesh = std::make_shared<Mesh>();
+    mesh->loadFile(MODEL_PATH);
+
+    // Load mesh texture.
+    texture = std::make_shared<Texture>(TEXTURE_PATH);
+    // --------------------------------
+
     initVulkan();
     mainLoop();
     cleanup();
@@ -31,13 +41,6 @@ void App::run() {
 }
 
 void App::initVulkan() {
-    // Load mesh.
-    mesh = std::make_shared<Mesh>();
-    mesh->loadFile(MODEL_PATH);
-
-    // Load mesh texture.
-    texture = std::make_shared<Texture>(TEXTURE_PATH);
-
     // Should be created before creating command buffers.
     createVertexBuffer();
     createIndexBuffer();
@@ -60,12 +63,12 @@ void App::createSwapChainRelatedResources() {
 
     createDepthResources();
 
+    createFramebuffers();
+
     // Render object specific resources.
     // ------------------------------------
     // Set up pipeline.
     createGraphicsPipeline();
-
-    createFramebuffers();
 
     createUniformBuffers();
 
@@ -342,8 +345,8 @@ void App::createRenderPass() {
 }
 
 void App::createGraphicsPipeline() {
-    auto vertShaderCode = readFile("../src/shaders/simple_shader.vert.spv");
-    auto fragShaderCode = readFile("../src/shaders/simple_shader.frag.spv");
+    auto vertShaderCode = readFile("../src/shaders/mesh_instance.vert.spv");
+    auto fragShaderCode = readFile("../src/shaders/mesh_instance.frag.spv");
 
     VkShaderModule vertShaderModule = RS::getSingleton().createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = RS::getSingleton().createShaderModule(fragShaderCode);
@@ -708,7 +711,7 @@ void App::createCommandBuffers() {
     }
 }
 
-void App::drawObject(const VkCommandBuffer& commandBuffer, const VkDescriptorSet& descriptorSet) {
+void App::drawObject(const VkCommandBuffer &commandBuffer, const VkDescriptorSet &descriptorSet) {
     // Bind pipeline.
     vkCmdBindPipeline(commandBuffer,
                       VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -813,12 +816,11 @@ void App::createSyncObjects() {
     }
 }
 
-void App::drawFrame() {
+bool App::acquireImage(uint32_t &imageIndex) {
     // Wait for the frame to be finished.
     vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     // Retrieve the index of the next available presentable image.
-    uint32_t imageIndex;
     VkResult result = vkAcquireNextImageKHR(device,
                                             swapChain,
                                             UINT64_MAX,
@@ -829,14 +831,15 @@ void App::drawFrame() {
     // Recreate swap chains if necessary.
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         recreateSwapChain();
-        return;
+        return false;
     } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
         throw std::runtime_error("Failed to acquire swap chain image!");
     }
 
-    // Update UBOs simply by memory mapping.
-    updateUniformBuffer(imageIndex);
+    return true;
+}
 
+void App::submit(uint32_t imageIndex) {
     if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
         vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
     }
@@ -884,7 +887,7 @@ void App::drawFrame() {
     // Array of each swap chain’s presentable images.
     presentInfo.pImageIndices = &imageIndex;
 
-    result = vkQueuePresentKHR(RS::getSingleton().presentQueue, &presentInfo);
+    VkResult result = vkQueuePresentKHR(RS::getSingleton().presentQueue, &presentInfo);
     // -------------------------------------
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || RS::getSingleton().framebufferResized) {
@@ -895,4 +898,16 @@ void App::drawFrame() {
     }
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+}
+
+void App::drawFrame() {
+    uint32_t imageIndex;
+    if (!acquireImage(imageIndex)) return;
+
+    // ---------------------------------------------
+    // Update UBOs simply by memory mapping.
+    updateUniformBuffer(imageIndex);
+    // ---------------------------------------------
+
+    submit(imageIndex);
 }

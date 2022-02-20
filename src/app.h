@@ -17,23 +17,24 @@
 
 #include "rendering/mesh.h"
 #include "rendering/texture.h"
+#include "scenes/3d/mesh_instance_3d.h"
 
 class App {
 public:
     void run();
 
+    std::shared_ptr<Flint::MeshInstance3D> mesh_instance;
+
 private:
+    // Shortcuts to RS members.
     VkSurfaceKHR surface;
-
-    /// The graphics card that we'll end up selecting will be stored in a VkPhysicalDevice handle.
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-
-    /// Logical device.
     VkDevice device{};
 
     VkSwapchainKHR swapChain;
 
     /// VkImage defines which VkMemory is used and a format of the texel.
+    /// Number of images doesn't necessarily equal to MAX_FRAMES_IN_FLIGHT (One is expected, the other is what we actually get considering device capacity).
     std::vector<VkImage> swapChainImages;
 
     /// We only need a single depth image unlike the swap chain images, because only one draw operation is running at once.
@@ -54,6 +55,7 @@ private:
     std::vector<VkFramebuffer> swapChainFramebuffers;
 
     VkRenderPass renderPass;
+
     VkDescriptorSetLayout descriptorSetLayout;
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
@@ -190,7 +192,7 @@ private:
 
     /**
      * Set up command queues.
-     * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline layout.
+     * @dependency None.
      */
     void createCommandBuffers();
 
@@ -200,9 +202,17 @@ private:
 
     void createSwapChainRelatedResources();
 
+    /**
+     * Record commands.
+     * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline layout.
+     */
     void recordCommands();
 
     void drawObject(const VkCommandBuffer& commandBuffer, const VkDescriptorSet& descriptorSet);
+
+    bool acquireImage(uint32_t& imageIndex);
+
+    void submit(uint32_t imageIndex);
 };
 
 #endif //FLINT_H

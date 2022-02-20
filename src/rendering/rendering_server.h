@@ -113,12 +113,13 @@ public:
 
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
+
     VkSurfaceKHR surface;
 
-    // The graphics card that we'll end up selecting will be stored in a VkPhysicalDevice handle.
+    /// The graphics card that we'll end up selecting will be stored in a VkPhysicalDevice handle.
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 
-    // Logical device.
+    /// Logical device.
     VkDevice device{};
 
     static const bool enableValidationLayers = true;
