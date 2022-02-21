@@ -2,32 +2,21 @@
 #define FLINT_NODE_H
 
 #include "sub_viewport.h"
+#include "../core/engine.h"
 
 #include <vector>
 #include <memory>
 
 namespace Flint {
     class Node {
-    protected:
-        //~Node();
-
-        std::vector<Node> children;
-
-        std::shared_ptr<Node> parent;
-
-        void update(double delta);
-
-        void draw();
-
-        virtual void cleanup();
-
-        /// Do this every time something changes in the scene tree.
-        virtual void record_commands() = 0;
-
     public:
-        virtual void self_update(double delta);
+        virtual void update(double delta);
 
-        virtual void self_draw();
+        virtual void draw();
+
+        virtual void notify(Signal signal);
+
+        void add_child(const std::shared_ptr<Node>& p_child);
 
         /**
          * Get the viewport this node belongs to.
@@ -37,7 +26,12 @@ namespace Flint {
 
         std::shared_ptr<Node> get_parent();
 
-        std::shared_ptr<Node> get_root();
+        std::vector<std::shared_ptr<Node>> get_children();
+
+    protected:
+        std::vector<std::shared_ptr<Node>> children;
+
+        std::shared_ptr<Node> parent;
     };
 }
 

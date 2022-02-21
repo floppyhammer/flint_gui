@@ -6,8 +6,11 @@
 #define FLINT_PLATFORM_H
 
 
-class platform {
-
+class Platform {
+    static Platform &getSingleton() {
+        static Platform singleton;
+        return singleton;
+    }
 };
 
 

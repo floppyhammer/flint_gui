@@ -18,19 +18,42 @@ namespace Flint {
         Vec3<float> scale = Vec3<float>(1);
         // ------------------------------------------
 
+        ~Node3D();
+
+        void notify(Signal signal) override;
+
     protected:
-        void self_update(double delta) override;
+        void update(double delta) override;
 
-        void self_draw() override;
+        void draw() override;
 
-        UniformBufferObject mvp[MAX_FRAMES_IN_FLIGHT];
+        void whenSwapChainChanged();
 
-        void update_uniform_buffer();
+        /**
+         * Update MVP. Update UBOs simply by memory mapping.
+         * @param currentImage Current image, which has different meaning from `current frame`.
+         */
+        void updateUniformBuffer();
 
+        /**
+         *
+         * @dependency None.
+         */
         void createVertexBuffer();
+
+        /**
+         *
+         * @dependency None.
+         */
         void createIndexBuffer();
+
+        /**
+         *
+         * @dependency Swap chain count.
+         */
         void createUniformBuffers();
 
+        /// Contains vertices and indices data.
         std::shared_ptr<Mesh> mesh;
 
         /// Vertex buffer.
@@ -45,18 +68,13 @@ namespace Flint {
         std::vector<VkBuffer> uniformBuffers;
         std::vector<VkDeviceMemory> uniformBuffersMemory;
 
-        void createGraphicsPipeline();
+        VkDescriptorSetLayout descriptorSetLayout;
 
         /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
         VkDescriptorPool descriptorPool;
 
         /// Descriptor sets are allocated from descriptor pool objects.
         std::vector<VkDescriptorSet> descriptorSets;
-
-        VkRenderPass renderPass;
-        VkDescriptorSetLayout descriptorSetLayout;
-        VkPipelineLayout pipelineLayout;
-        VkPipeline graphicsPipeline;
     };
 }
 

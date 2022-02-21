@@ -8,22 +8,33 @@
 namespace Flint {
     class MeshInstance3D : public Node3D {
     public:
+        MeshInstance3D();
+
         void set_mesh(std::shared_ptr<Mesh> p_mesh);
+        [[nodiscard]] std::shared_ptr<Mesh> get_mesh() const;
 
-        std::shared_ptr<Mesh> get_mesh() const;
-
-        void self_draw() override;
-
-        void cleanup() override;
+        void set_texture(std::shared_ptr<Texture> p_texture);
 
     protected:
         std::shared_ptr<Texture> texture;
 
-        VkDescriptorSetLayout descriptorSetLayout;
-        VkPipelineLayout pipelineLayout;
-        VkPipeline graphicsPipeline;
+        void draw() override;
+        void update(double delta) override;
 
-        void createGraphicsPipeline();
+        /**
+         * A descriptor pool is used to allocate descriptor sets of some layout for use in a shader.
+         * @dependency None.
+         */
+        void createDescriptorPool();
+
+        /**
+         * Allocate descriptor sets in the pool.
+         * @dependency Descriptor pool, descriptor set layout, and actual resources (uniform buffers, images, image views).
+         */
+        void createDescriptorSets();
+
+        // Should be recalled once texture is changed.
+        void updateDescriptorSets();
     };
 }
 

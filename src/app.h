@@ -18,19 +18,15 @@
 #include "rendering/mesh.h"
 #include "rendering/texture.h"
 #include "scenes/3d/mesh_instance_3d.h"
+#include "core/scene_tree.h"
 
 class App {
 public:
     void run();
 
-    std::shared_ptr<Flint::MeshInstance3D> mesh_instance;
+    Flint::SceneTree tree;
 
 private:
-    // Shortcuts to RS members.
-    VkSurfaceKHR surface;
-    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    VkDevice device{};
-
     VkSwapchainKHR swapChain;
 
     /// VkImage defines which VkMemory is used and a format of the texel.
@@ -44,7 +40,7 @@ private:
 
     /// Store the format and extent we've chosen for the swap chain images.
     VkFormat swapChainImageFormat;
-    VkExtent2D swapChainExtent; // 2D size.
+    VkExtent2D swapChainExtent;
 
     /// VkImageView defines which part of VkImage to use.
     std::vector<VkImageView> swapChainImageViews;
@@ -56,32 +52,7 @@ private:
 
     VkRenderPass renderPass;
 
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkPipelineLayout pipelineLayout;
-    VkPipeline graphicsPipeline;
-
     std::vector<VkCommandBuffer> commandBuffers;
-
-    /// Contains vertices and indices data.
-    std::shared_ptr<Mesh> mesh;
-
-    /// Vertex buffer.
-    VkBuffer vertexBuffer;
-    VkDeviceMemory vertexBufferMemory;
-
-    /// Index buffer.
-    VkBuffer indexBuffer;
-    VkDeviceMemory indexBufferMemory;
-
-    /// We have a uniform buffer per swap chain image.
-    std::vector<VkBuffer> uniformBuffers;
-    std::vector<VkDeviceMemory> uniformBuffersMemory;
-
-    /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
-    VkDescriptorPool descriptorPool;
-
-    /// Descriptor sets are allocated from descriptor pool objects.
-    std::vector<VkDescriptorSet> descriptorSets;
 
     /// Each frame should have its own set of semaphores, so a list is used.
     std::vector<VkSemaphore> imageAvailableSemaphores;
@@ -95,18 +66,9 @@ private:
     /// we need to keep track of the current frame.
     size_t currentFrame = 0;
 
-    /// For model texture.
-    std::shared_ptr<Texture> texture;
-
     void initVulkan();
 
     void mainLoop();
-
-    /**
-     * Update MVP.
-     * @param currentImage Current image, which has different meaning from `current frame`.
-     */
-    void updateUniformBuffer(uint32_t currentImage);
 
     void recreateSwapChain();
 
@@ -142,53 +104,10 @@ private:
     void createRenderPass();
 
     /**
-     * Set up shaders, viewport, blend state, etc.
-     * @note We only need one pipeline for a specific rendering process despite of the existence of multiple swap chains.
-     * @dependency Descriptor set layout, swap chain extent.
-     */
-    void createGraphicsPipeline();
-
-    /**
      *
      * @dependency Swap chain extent, render pass, swap chain image views.
      */
     void createFramebuffers();
-
-    /**
-     *
-     * @dependency None.
-     */
-    void createVertexBuffer();
-
-    /**
-     *
-     * @dependency None.
-     */
-    void createIndexBuffer();
-
-    /**
-     *
-     * @dependency Swap chain count.
-     */
-    void createUniformBuffers();
-
-    /**
-     * A descriptor pool is used to allocate descriptor sets of some layout for use in a shader.
-     * @dependency None.
-     */
-    void createDescriptorPool();
-
-    /**
-     * Allocate descriptor sets in the pool.
-     * @dependency Descriptor pool, descriptor set layout, and actual resources (uniform buffers, images, image views).
-     */
-    void createDescriptorSets();
-
-    /**
-     * Create UBO descriptor.
-     * @dependency None.
-     */
-    void createDescriptorSetLayout();
 
     /**
      * Set up command queues.
@@ -208,9 +127,7 @@ private:
      */
     void recordCommands();
 
-    void drawObject(const VkCommandBuffer& commandBuffer, const VkDescriptorSet& descriptorSet);
-
-    bool acquireImage(uint32_t& imageIndex);
+    bool acquireSwapChainImage(uint32_t& imageIndex);
 
     void submit(uint32_t imageIndex);
 };
