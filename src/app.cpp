@@ -14,24 +14,11 @@
 #include "rendering/rendering_server.h"
 #include "common/io.h"
 
-const std::string MODEL_PATH = "../res/viking_room.obj";
-const std::string TEXTURE_PATH = "../res/viking_room.png";
-
 void App::run() {
     auto rs = RS::getSingleton();
     device = rs.device;
     physicalDevice = rs.physicalDevice;
     surface = rs.surface;
-
-    // Load mesh resources.
-    // --------------------------------
-    // Load mesh.
-    mesh = std::make_shared<Mesh>();
-    mesh->loadFile(MODEL_PATH);
-
-    // Load mesh texture.
-    texture = std::make_shared<Texture>(TEXTURE_PATH);
-    // --------------------------------
 
     initVulkan();
     mainLoop();
@@ -92,32 +79,6 @@ void App::mainLoop() {
     vkDeviceWaitIdle(device);
 }
 
-void App::updateUniformBuffer(uint32_t currentImage) {
-    static auto startTime = std::chrono::high_resolution_clock::now();
-
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-    // Prepare UBO data.
-    UniformBufferObject ubo{};
-    ubo.model = glm::rotate(glm::mat4(1.0f),
-                            time * glm::radians(90.0f),
-                            glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
-                           glm::vec3(0.0f, 0.0f, 0.0f),
-                           glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.proj = glm::perspective(glm::radians(45.0f),
-                                (float) swapChainExtent.width / (float) swapChainExtent.height,
-                                0.1f, 10.0f);
-
-    // GLM was originally designed for OpenGL,
-    // where the Y coordinate of the clip coordinates is inverted.
-    ubo.proj[1][1] *= -1;
-
-    // Copy the UBO data to the current uniform buffer.
-    RS::getSingleton().copyDataToMemory(&ubo, uniformBuffersMemory[currentImage], sizeof(ubo));
-}
-
 void App::recreateSwapChain() {
     // Handling window minimization.
     int width = 0, height = 0;
@@ -151,9 +112,9 @@ void App::cleanupSwapChain() {
     vkFreeCommandBuffers(device, RS::getSingleton().commandPool, static_cast<uint32_t>(commandBuffers.size()),
                          commandBuffers.data());
 
-    // Graphics pipeline resources.
-    vkDestroyPipeline(device, graphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+//    // Graphics pipeline resources.
+//    vkDestroyPipeline(device, graphicsPipeline, nullptr);
+//    vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 
     vkDestroyRenderPass(device, renderPass, nullptr);
 
@@ -166,29 +127,16 @@ void App::cleanupSwapChain() {
     // When we destroy the pool, the sets inside are destroyed as well.
     vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
-    // Clean up uniform buffers.
-    for (size_t i = 0; i < swapChainImages.size(); i++) {
-        vkDestroyBuffer(device, uniformBuffers[i], nullptr);
-        vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
-    }
+//    // Clean up uniform buffers.
+//    for (size_t i = 0; i < swapChainImages.size(); i++) {
+//        vkDestroyBuffer(device, uniformBuffers[i], nullptr);
+//        vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
+//    }
 }
 
 void App::cleanup() {
     // Clean up swap chain related resources.
     cleanupSwapChain();
-
-    // Release texture resources.
-    texture.reset();
-
-    vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-
-    // Clean up index buffer.
-    vkDestroyBuffer(device, indexBuffer, nullptr);
-    vkFreeMemory(device, indexBufferMemory, nullptr);
-
-    // Clean up vertex buffer.
-    vkDestroyBuffer(device, vertexBuffer, nullptr); // GPU memory
-    vkFreeMemory(device, vertexBufferMemory, nullptr); // CPU memory
 
     // Clean up sync objects.
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
@@ -344,151 +292,6 @@ void App::createRenderPass() {
     }
 }
 
-void App::createGraphicsPipeline() {
-    auto vertShaderCode = readFile("../src/shaders/mesh_instance.vert.spv");
-    auto fragShaderCode = readFile("../src/shaders/mesh_instance.frag.spv");
-
-    VkShaderModule vertShaderModule = RS::getSingleton().createShaderModule(vertShaderCode);
-    VkShaderModule fragShaderModule = RS::getSingleton().createShaderModule(fragShaderCode);
-
-    // Specify shader stages.
-    VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
-    vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vertShaderStageInfo.module = vertShaderModule;
-    vertShaderStageInfo.pName = "main"; // Specifying the entry point name of the shader for this stage.
-
-    VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
-    fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    fragShaderStageInfo.module = fragShaderModule;
-    fragShaderStageInfo.pName = "main";
-
-    VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
-
-    // Set up how to accept vertex data.
-    // -----------------------------------------------------
-    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-
-    auto bindingDescription = Vertex::getBindingDescription();
-    auto attributeDescriptions = Vertex::getAttributeDescriptions();
-
-    vertexInputInfo.vertexBindingDescriptionCount = 1;
-    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
-    // -----------------------------------------------------
-
-    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
-    inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-    inputAssembly.primitiveRestartEnable = VK_FALSE;
-
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float) swapChainExtent.width;
-    viewport.height = (float) swapChainExtent.height;
-    viewport.minDepth = 0.0f; // The depth range for the viewport.
-    viewport.maxDepth = 1.0f;
-
-    VkRect2D scissor{};
-    scissor.offset = {0, 0};
-    scissor.extent = swapChainExtent;
-
-    VkPipelineViewportStateCreateInfo viewportState{};
-    viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    viewportState.viewportCount = 1;
-    viewportState.pViewports = &viewport;
-    viewportState.scissorCount = 1;
-    viewportState.pScissors = &scissor;
-
-    VkPipelineRasterizationStateCreateInfo rasterizer{};
-    rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    rasterizer.depthClampEnable = VK_FALSE;
-    rasterizer.rasterizerDiscardEnable = VK_FALSE;
-    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
-    rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-    rasterizer.depthBiasEnable = VK_FALSE;
-
-    VkPipelineMultisampleStateCreateInfo multisampling{};
-    multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    multisampling.sampleShadingEnable = VK_FALSE;
-    multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
-
-    VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-    colorBlendAttachment.colorWriteMask =
-            VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    colorBlendAttachment.blendEnable = VK_FALSE;
-
-    VkPipelineColorBlendStateCreateInfo colorBlending{};
-    colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    colorBlending.logicOpEnable = VK_FALSE;
-    colorBlending.logicOp = VK_LOGIC_OP_COPY;
-    colorBlending.attachmentCount = 1;
-    colorBlending.pAttachments = &colorBlendAttachment;
-    colorBlending.blendConstants[0] = 0.0f;
-    colorBlending.blendConstants[1] = 0.0f;
-    colorBlending.blendConstants[2] = 0.0f;
-    colorBlending.blendConstants[3] = 0.0f;
-
-    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 1;
-    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
-    pipelineLayoutInfo.pushConstantRangeCount = 0;
-
-    // Create pipeline layout.
-    if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create pipeline layout!");
-    }
-
-    VkPipelineDepthStencilStateCreateInfo depthStencil{};
-    depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    depthStencil.depthTestEnable = VK_TRUE;
-    depthStencil.depthWriteEnable = VK_TRUE;
-    depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
-    depthStencil.depthBoundsTestEnable = VK_FALSE;
-    depthStencil.minDepthBounds = 0.0f; // Optional
-    depthStencil.maxDepthBounds = 1.0f; // Optional
-    depthStencil.stencilTestEnable = VK_FALSE;
-    depthStencil.front = {}; // Optional
-    depthStencil.back = {}; // Optional
-
-    VkGraphicsPipelineCreateInfo pipelineInfo{};
-    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    pipelineInfo.stageCount = 2;
-    pipelineInfo.pStages = shaderStages;
-    pipelineInfo.pVertexInputState = &vertexInputInfo;
-    pipelineInfo.pInputAssemblyState = &inputAssembly;
-    pipelineInfo.pViewportState = &viewportState;
-    pipelineInfo.pRasterizationState = &rasterizer;
-    pipelineInfo.pMultisampleState = &multisampling;
-    pipelineInfo.pColorBlendState = &colorBlending;
-    pipelineInfo.layout = pipelineLayout;
-    pipelineInfo.renderPass = renderPass;
-    pipelineInfo.subpass = 0;
-    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-    pipelineInfo.pDepthStencilState = &depthStencil;
-
-    // Create pipeline.
-    if (vkCreateGraphicsPipelines(device,
-                                  VK_NULL_HANDLE,
-                                  1,
-                                  &pipelineInfo,
-                                  nullptr,
-                                  &graphicsPipeline) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create graphics pipeline!");
-    }
-
-    // Clean up shader modules.
-    vkDestroyShaderModule(device, fragShaderModule, nullptr);
-    vkDestroyShaderModule(device, vertShaderModule, nullptr);
-}
-
 void App::createFramebuffers() {
     swapChainFramebuffers.resize(swapChainImageViews.size());
 
@@ -513,189 +316,6 @@ void App::createFramebuffers() {
     }
 }
 
-void App::createVertexBuffer() {
-    VkDeviceSize bufferSize = sizeof(mesh->vertices[0]) * mesh->vertices.size();
-
-    VkBuffer stagingBuffer; // In GPU
-    VkDeviceMemory stagingBufferMemory; // In CPU
-
-    // Create the GPU buffer and link it with the CPU memory.
-    RS::getSingleton().createBuffer(bufferSize,
-                                    VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                    stagingBuffer,
-                                    stagingBufferMemory);
-
-    // Copy data to the CPU memory.
-    RS::getSingleton().copyDataToMemory(mesh->vertices.data(), stagingBufferMemory, bufferSize);
-
-    // Create the vertex buffer (GPU) and bind it to the vertex memory (CPU).
-    RS::getSingleton().createBuffer(bufferSize,
-                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                    vertexBuffer,
-                                    vertexBufferMemory);
-
-    // Copy buffer (GPU).
-    RS::getSingleton().copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-
-    // Clean up staging buffer and memory.
-    vkDestroyBuffer(device, stagingBuffer, nullptr);
-    vkFreeMemory(device, stagingBufferMemory, nullptr);
-}
-
-void App::createIndexBuffer() {
-    VkDeviceSize bufferSize = sizeof(mesh->indices[0]) * mesh->indices.size();
-
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory;
-    RS::getSingleton().createBuffer(bufferSize,
-                                    VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                    stagingBuffer,
-                                    stagingBufferMemory);
-
-    RS::getSingleton().copyDataToMemory(mesh->indices.data(),
-                                        stagingBufferMemory,
-                                        bufferSize);
-
-    RS::getSingleton().createBuffer(bufferSize,
-                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                    indexBuffer,
-                                    indexBufferMemory);
-
-    // Copy data from staging buffer to index buffer.
-    RS::getSingleton().copyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-    vkDestroyBuffer(device, stagingBuffer, nullptr);
-    vkFreeMemory(device, stagingBufferMemory, nullptr);
-}
-
-void App::createUniformBuffers() {
-    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
-
-    uniformBuffers.resize(swapChainImages.size());
-    uniformBuffersMemory.resize(swapChainImages.size());
-
-    for (size_t i = 0; i < swapChainImages.size(); i++) {
-        RS::getSingleton().createBuffer(bufferSize,
-                                        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                        uniformBuffers[i],
-                                        uniformBuffersMemory[i]);
-    }
-}
-
-void App::createDescriptorPool() {
-    std::array<VkDescriptorPoolSize, 2> poolSizes{};
-    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
-    poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
-
-    VkDescriptorPoolCreateInfo poolInfo{};
-    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-    poolInfo.pPoolSizes = poolSizes.data();
-    poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
-
-    if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create descriptor pool!");
-    }
-}
-
-void App::createDescriptorSets() {
-    std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
-    VkDescriptorSetAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    allocInfo.descriptorPool = descriptorPool;
-    allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
-    allocInfo.pSetLayouts = layouts.data();
-
-    descriptorSets.resize(swapChainImages.size());
-    if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to allocate descriptor sets!");
-    }
-
-    for (size_t i = 0; i < swapChainImages.size(); i++) {
-        VkDescriptorBufferInfo bufferInfo{};
-        bufferInfo.buffer = uniformBuffers[i];
-        bufferInfo.offset = 0;
-        bufferInfo.range = sizeof(UniformBufferObject);
-
-        VkDescriptorImageInfo imageInfo{};
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = texture->imageView;
-        imageInfo.sampler = texture->sampler;
-
-        std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
-
-        descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrites[0].dstSet = descriptorSets[i];
-        descriptorWrites[0].dstBinding = 0;
-        descriptorWrites[0].dstArrayElement = 0;
-        descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        descriptorWrites[0].descriptorCount = 1;
-        descriptorWrites[0].pBufferInfo = &bufferInfo;
-
-        descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrites[1].dstSet = descriptorSets[i];
-        descriptorWrites[1].dstBinding = 1;
-        descriptorWrites[1].dstArrayElement = 0;
-        descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        descriptorWrites[1].descriptorCount = 1;
-        descriptorWrites[1].pImageInfo = &imageInfo;
-
-        // Update the contents of a descriptor set object.
-        vkUpdateDescriptorSets(device,
-                               static_cast<uint32_t>(descriptorWrites.size()),
-                               descriptorWrites.data(),
-                               0,
-                               nullptr);
-    }
-}
-
-void App::createDescriptorSetLayout() {
-    // MVP uniform binding.
-    // ------------------------------
-    VkDescriptorSetLayoutBinding uboLayoutBinding{};
-    uboLayoutBinding.binding = 0;
-    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-
-    // It is possible for the shader variable to represent an array of uniform buffer objects,
-    // and descriptorCount specifies the number of values in the array.
-    // This could be used to specify a transformation for each of the bones
-    // in a skeleton for skeletal animation, for example.
-    uboLayoutBinding.descriptorCount = 1;
-
-    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-    // The pImmutableSamplers field is only relevant for image sampling related descriptors.
-    uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
-    // ------------------------------
-
-    // Image sampler uniform binding.
-    // ------------------------------
-    VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-    samplerLayoutBinding.binding = 1;
-    samplerLayoutBinding.descriptorCount = 1;
-    samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    samplerLayoutBinding.pImmutableSamplers = nullptr;
-    samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    // ------------------------------
-
-    std::array<VkDescriptorSetLayoutBinding, 2> bindings = {uboLayoutBinding, samplerLayoutBinding};
-    VkDescriptorSetLayoutCreateInfo layoutInfo{};
-    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-    layoutInfo.pBindings = bindings.data();
-
-    if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create descriptor set layout!");
-    }
-}
-
 void App::createCommandBuffers() {
     commandBuffers.resize(swapChainFramebuffers.size());
 
@@ -709,41 +329,6 @@ void App::createCommandBuffers() {
     if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate command buffers!");
     }
-}
-
-void App::drawObject(const VkCommandBuffer &commandBuffer, const VkDescriptorSet &descriptorSet) {
-    // Bind pipeline.
-    vkCmdBindPipeline(commandBuffer,
-                      VK_PIPELINE_BIND_POINT_GRAPHICS,
-                      graphicsPipeline);
-
-    // Bind vertex and index buffers.
-    VkBuffer vertexBuffers[] = {vertexBuffer};
-    VkDeviceSize offsets[] = {0};
-    vkCmdBindVertexBuffers(commandBuffer,
-                           0,
-                           1,
-                           vertexBuffers,
-                           offsets);
-
-    vkCmdBindIndexBuffer(commandBuffer,
-                         indexBuffer,
-                         0,
-                         VK_INDEX_TYPE_UINT32);
-
-    // Bind uniform buffers and samplers.
-    vkCmdBindDescriptorSets(commandBuffer,
-                            VK_PIPELINE_BIND_POINT_GRAPHICS,
-                            pipelineLayout,
-                            0,
-                            1,
-                            &descriptorSet,
-                            0,
-                            nullptr);
-
-    // Draw call.
-    vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(mesh->indices.size()),
-                     1, 0, 0, 0);
 }
 
 void App::recordCommands() {
@@ -781,7 +366,7 @@ void App::recordCommands() {
 
         // Rendering object specific.
         // ---------------------------------------------
-        drawObject(commandBuffers[i], descriptorSets[i]);
+        tree.record_commands(commandBuffers[i]);
         // ---------------------------------------------
 
         // End render pass.
@@ -905,8 +490,7 @@ void App::drawFrame() {
     if (!acquireImage(imageIndex)) return;
 
     // ---------------------------------------------
-    // Update UBOs simply by memory mapping.
-    updateUniformBuffer(imageIndex);
+    tree.update_tree();
     // ---------------------------------------------
 
     submit(imageIndex);

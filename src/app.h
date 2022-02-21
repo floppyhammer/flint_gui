@@ -18,12 +18,13 @@
 #include "rendering/mesh.h"
 #include "rendering/texture.h"
 #include "scenes/3d/mesh_instance_3d.h"
+#include "core/scene_tree.h"
 
 class App {
 public:
     void run();
 
-    std::shared_ptr<Flint::MeshInstance3D> mesh_instance;
+    Flint::SceneTree tree;
 
 private:
     // Shortcuts to RS members.
@@ -56,26 +57,7 @@ private:
 
     VkRenderPass renderPass;
 
-    VkDescriptorSetLayout descriptorSetLayout;
-    VkPipelineLayout pipelineLayout;
-    VkPipeline graphicsPipeline;
-
     std::vector<VkCommandBuffer> commandBuffers;
-
-    /// Contains vertices and indices data.
-    std::shared_ptr<Mesh> mesh;
-
-    /// Vertex buffer.
-    VkBuffer vertexBuffer;
-    VkDeviceMemory vertexBufferMemory;
-
-    /// Index buffer.
-    VkBuffer indexBuffer;
-    VkDeviceMemory indexBufferMemory;
-
-    /// We have a uniform buffer per swap chain image.
-    std::vector<VkBuffer> uniformBuffers;
-    std::vector<VkDeviceMemory> uniformBuffersMemory;
 
     /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
     VkDescriptorPool descriptorPool;
@@ -94,9 +76,6 @@ private:
     /// To use the right pair of semaphores every time,
     /// we need to keep track of the current frame.
     size_t currentFrame = 0;
-
-    /// For model texture.
-    std::shared_ptr<Texture> texture;
 
     void initVulkan();
 

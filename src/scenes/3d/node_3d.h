@@ -23,14 +23,14 @@ namespace Flint {
 
         void self_draw() override;
 
-        UniformBufferObject mvp[MAX_FRAMES_IN_FLIGHT];
-
+        /// Update UBOs simply by memory mapping.
         void update_uniform_buffer();
 
         void createVertexBuffer();
         void createIndexBuffer();
         void createUniformBuffers();
 
+        /// Contains vertices and indices data.
         std::shared_ptr<Mesh> mesh;
 
         /// Vertex buffer.
@@ -44,8 +44,6 @@ namespace Flint {
         /// We have a uniform buffer per swap chain image.
         std::vector<VkBuffer> uniformBuffers;
         std::vector<VkDeviceMemory> uniformBuffersMemory;
-
-        void createGraphicsPipeline();
 
         /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
         VkDescriptorPool descriptorPool;

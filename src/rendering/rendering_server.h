@@ -262,6 +262,30 @@ public:
     void draw_canvas_item();
 
     void draw_mesh();
+
+public:
+    // Texture rect.
+    // --------------------------------------------------
+
+    // --------------------------------------------------
+
+    // Mesh instance 3D.
+    // --------------------------------------------------
+    // These should be shared by all mesh instances.
+    VkDescriptorSetLayout meshInstance3dDescriptorSetLayout;
+    VkPipelineLayout meshInstance3dPipelineLayout;
+    VkPipeline meshInstance3dGraphicsPipeline;
+
+    // Only run once.
+    void createMeshInstance3dDescriptorSetLayout();
+
+    void createMeshInstance3dGraphicsPipeline();
+
+    void draw_mesh_instance(VkCommandBuffer const &commandBuffer,
+                            VkDescriptorSet const &descriptorSet,
+                            VkBuffer *vertexBuffers,
+                            VkBuffer indexBuffer, uint32_t indexCount);
+    // --------------------------------------------------
 };
 
 typedef RenderingServer RS;

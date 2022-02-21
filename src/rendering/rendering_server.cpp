@@ -514,7 +514,8 @@ void RenderingServer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t
     region.imageSubresource.baseArrayLayer = 0;
     region.imageSubresource.layerCount = 1;
 
-    region.imageOffset = {0, 0, 0}; // Selects the initial x, y, z offsets in texels of the sub-region of the source or destination image data.
+    region.imageOffset = {0, 0,
+                          0}; // Selects the initial x, y, z offsets in texels of the sub-region of the source or destination image data.
     region.imageExtent = {width, height, 1}; // Size in texels of the image to copy in width, height and depth.
 
     // Copy data from a buffer into an image.
@@ -734,4 +735,41 @@ VkPresentModeKHR RenderingServer::chooseSwapPresentMode(const std::vector<VkPres
 
 void RenderingServer::draw_canvas_item() {
 
+}
+
+void RenderingServer::draw_mesh_instance(const VkCommandBuffer &commandBuffer,
+                                         const VkDescriptorSet &descriptorSet,
+                                         VkBuffer vertexBuffers[],
+                                         VkBuffer indexBuffer,
+                                         uint32_t indexCount) {
+    // Bind pipeline.
+    vkCmdBindPipeline(commandBuffer,
+                      VK_PIPELINE_BIND_POINT_GRAPHICS,
+                      meshInstance3dGraphicsPipeline);
+
+    // Bind vertex and index buffers.
+    VkDeviceSize offsets[] = {0};
+    vkCmdBindVertexBuffers(commandBuffer,
+                           0,
+                           1,
+                           vertexBuffers,
+                           offsets);
+
+    vkCmdBindIndexBuffer(commandBuffer,
+                         indexBuffer,
+                         0,
+                         VK_INDEX_TYPE_UINT32);
+
+    // Bind uniform buffers and samplers.
+    vkCmdBindDescriptorSets(commandBuffer,
+                            VK_PIPELINE_BIND_POINT_GRAPHICS,
+                            meshInstance3dPipelineLayout,
+                            0,
+                            1,
+                            &descriptorSet,
+                            0,
+                            nullptr);
+
+    // Draw call.
+    vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 }

@@ -5,7 +5,7 @@ namespace Flint {
         self_update(delta);
 
         for (auto& child : children) {
-            child.update(delta);
+            child->update(delta);
         }
     }
 
@@ -13,7 +13,7 @@ namespace Flint {
         self_draw();
 
         for (auto& child : children) {
-            child.draw();
+            child->draw();
         }
     }
 
@@ -47,6 +47,10 @@ namespace Flint {
 
     void Node::cleanup() {
 
+    }
+
+    std::vector<std::shared_ptr<Node>> Node::get_children() {
+        return children;
     }
 //
 //    Node::~Node() {

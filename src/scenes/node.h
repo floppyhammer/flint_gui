@@ -11,13 +11,9 @@ namespace Flint {
     protected:
         //~Node();
 
-        std::vector<Node> children;
+        std::vector<std::shared_ptr<Node>> children;
 
         std::shared_ptr<Node> parent;
-
-        void update(double delta);
-
-        void draw();
 
         virtual void cleanup();
 
@@ -25,6 +21,10 @@ namespace Flint {
         virtual void record_commands() = 0;
 
     public:
+        void update(double delta);
+
+        void draw();
+
         virtual void self_update(double delta);
 
         virtual void self_draw();
@@ -36,6 +36,8 @@ namespace Flint {
         virtual std::shared_ptr<SubViewport> get_viewport();
 
         std::shared_ptr<Node> get_parent();
+
+        std::vector<std::shared_ptr<Node>> get_children();
 
         std::shared_ptr<Node> get_root();
     };
