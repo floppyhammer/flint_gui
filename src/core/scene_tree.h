@@ -12,7 +12,7 @@ namespace Flint {
     public:
         SceneTree() = default;
 
-        void update_tree(double delta) const;
+        void update(double delta) const;
 
         void record_commands() const;
 

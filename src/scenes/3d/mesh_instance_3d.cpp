@@ -26,6 +26,10 @@ namespace Flint {
         // --------------------------------
     }
 
+    MeshInstance3D::~MeshInstance3D() {
+
+    }
+
     void MeshInstance3D::set_mesh(std::shared_ptr<Mesh> p_mesh) {
         // Clean previous data.
         if (mesh != nullptr) {
@@ -37,6 +41,8 @@ namespace Flint {
         createVertexBuffer();
         createIndexBuffer();
         createUniformBuffers();
+
+        vkResourcesAllocated = true;
     }
 
     std::shared_ptr<Mesh> MeshInstance3D::get_mesh() const {
@@ -60,7 +66,7 @@ namespace Flint {
         if (mesh == nullptr || texture == nullptr) return;
 
         VkBuffer vertexBuffers[] = {vertexBuffer};
-        RS::getSingleton().draw_mesh_instance(descriptorSets[RS::getSingleton().p_whichBuffer],
+        RS::getSingleton().draw_mesh_instance(descriptorSets[RS::getSingleton().p_currentImage],
                                               vertexBuffers,
                                               indexBuffer,
                                               mesh->indices.size());

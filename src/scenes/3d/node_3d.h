@@ -18,7 +18,7 @@ namespace Flint {
         Vec3<float> scale = Vec3<float>(1);
         // ------------------------------------------
 
-        ~Node3D();
+        //Node3D();
 
         void notify(Signal signal) override;
 
@@ -68,13 +68,13 @@ namespace Flint {
         std::vector<VkBuffer> uniformBuffers;
         std::vector<VkDeviceMemory> uniformBuffersMemory;
 
-        VkDescriptorSetLayout descriptorSetLayout;
-
         /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
         VkDescriptorPool descriptorPool;
 
         /// Descriptor sets are allocated from descriptor pool objects.
         std::vector<VkDescriptorSet> descriptorSets;
+
+        bool vkResourcesAllocated = false;
     };
 }
 

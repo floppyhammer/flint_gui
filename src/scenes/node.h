@@ -28,6 +28,8 @@ namespace Flint {
 
         std::vector<std::shared_ptr<Node>> get_children();
 
+        void remove_child(size_t index);
+
     protected:
         std::vector<std::shared_ptr<Node>> children;
 

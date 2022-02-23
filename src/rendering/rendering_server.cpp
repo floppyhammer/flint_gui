@@ -167,6 +167,15 @@ void RenderingServer::runAfterSwapchainCreation(VkRenderPass renderPass, VkExten
     createMeshInstance3dGraphicsPipeline(renderPass, swapChainExtent);
 }
 
+void RenderingServer::cleanipNodeResources() {
+    // Descriptor set layouts.
+    vkDestroyDescriptorSetLayout(device, meshInstance3dDescriptorSetLayout, nullptr);
+
+    // Graphics pipeline resources.
+    vkDestroyPipeline(device, meshInstance3dGraphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(device, meshInstance3dPipelineLayout, nullptr);
+}
+
 void RenderingServer::cleanup() {
     vkDestroyCommandPool(device, commandPool, nullptr);
 
@@ -370,6 +379,7 @@ void RenderingServer::createCommandPool() {
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = qfIndices.graphicsFamily.value();
+    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // So we can reset command buffers.
 
     if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create command pool!");

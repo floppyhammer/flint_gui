@@ -9,6 +9,7 @@ namespace Flint {
     class MeshInstance3D : public Node3D {
     public:
         MeshInstance3D();
+        ~MeshInstance3D();
 
         void set_mesh(std::shared_ptr<Mesh> p_mesh);
         [[nodiscard]] std::shared_ptr<Mesh> get_mesh() const;

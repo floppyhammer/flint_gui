@@ -56,16 +56,18 @@ void App::createSwapChainRelatedResources() {
     // -----------------------------------
     auto node = std::make_shared<Flint::Node>();
     auto node_3d = std::make_shared<Flint::Node3D>();
-    auto mesh_instance = std::make_shared<Flint::MeshInstance3D>();
+    auto mesh_instance_0 = std::make_shared<Flint::MeshInstance3D>();
+    auto mesh_instance_1 = std::make_shared<Flint::MeshInstance3D>();
 
     node->add_child(node_3d);
-    node_3d->add_child(mesh_instance);
+    node_3d->add_child(mesh_instance_0);
+    node_3d->add_child(mesh_instance_1);
+    mesh_instance_0->position.x = 1;
+    mesh_instance_1->position.x = -1;
     tree.set_root(node);
     // -----------------------------------
 
     createCommandBuffers();
-
-    recordCommands();
     // ------------------------------------
 }
 
@@ -113,9 +115,7 @@ void App::cleanupSwapChain() {
     vkFreeCommandBuffers(device, RS::getSingleton().commandPool, static_cast<uint32_t>(commandBuffers.size()),
                          commandBuffers.data());
 
-//    // Graphics pipeline resources.
-//    vkDestroyPipeline(device, graphicsPipeline, nullptr);
-//    vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
+    RS::getSingleton().cleanipNodeResources();
 
     vkDestroyRenderPass(device, renderPass, nullptr);
 
@@ -124,15 +124,6 @@ void App::cleanupSwapChain() {
     }
 
     vkDestroySwapchainKHR(device, swapChain, nullptr);
-
-    // When we destroy the pool, the sets inside are destroyed as well.
-    //vkDestroyDescriptorPool(device, descriptorPool, nullptr);
-
-//    // Clean up uniform buffers.
-//    for (size_t i = 0; i < swapChainImages.size(); i++) {
-//        vkDestroyBuffer(device, uniformBuffers[i], nullptr);
-//        vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
-//    }
 }
 
 void App::cleanup() {
@@ -336,53 +327,53 @@ void App::createCommandBuffers() {
     }
 }
 
-void App::recordCommands() {
-    // Record each command buffer.
-    for (size_t i = 0; i < commandBuffers.size(); i++) {
-        // Begin recording.
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+void App::recordCommands(uint32_t imageIndex) {
+    // Reset command buffer.
+    vkResetCommandBuffer(commandBuffers[imageIndex], 0);
 
-        if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("Failed to begin recording command buffer!");
-        }
+    // Begin recording.
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        // Begin render pass.
-        // ----------------------------------------------
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = renderPass;
-        renderPassInfo.framebuffer = swapChainFramebuffers[i]; // Set target framebuffer.
-        renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = swapChainExtent;
+    if (vkBeginCommandBuffer(commandBuffers[imageIndex], &beginInfo) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to begin recording command buffer!");
+    }
 
-        // Clear color.
-        std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
-        clearValues[1].depthStencil = {1.0f, 0};
+    // Begin render pass.
+    // ----------------------------------------------
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = renderPass;
+    renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex]; // Set target framebuffer.
+    renderPassInfo.renderArea.offset = {0, 0};
+    renderPassInfo.renderArea.extent = swapChainExtent;
 
-        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        renderPassInfo.pClearValues = clearValues.data();
+    // Clear color.
+    std::array<VkClearValue, 2> clearValues{};
+    clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
+    clearValues[1].depthStencil = {1.0f, 0};
 
-        vkCmdBeginRenderPass(commandBuffers[i],
-                             &renderPassInfo,
-                             VK_SUBPASS_CONTENTS_INLINE);
-        // ----------------------------------------------
+    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+    renderPassInfo.pClearValues = clearValues.data();
 
-        // Rendering object specific.
-        // ---------------------------------------------
-        RS::getSingleton().p_commandBuffer = commandBuffers[i];
-        RS::getSingleton().p_whichBuffer = i;
-        tree.record_commands();
-        // ---------------------------------------------
+    vkCmdBeginRenderPass(commandBuffers[imageIndex],
+                         &renderPassInfo,
+                         VK_SUBPASS_CONTENTS_INLINE);
+    // ----------------------------------------------
 
-        // End render pass.
-        vkCmdEndRenderPass(commandBuffers[i]);
+    // Record commands from the scene tree.
+    // ---------------------------------------------
+    RS::getSingleton().p_commandBuffer = commandBuffers[imageIndex];
+    RS::getSingleton().p_currentImage = imageIndex;
+    tree.record_commands();
+    // ---------------------------------------------
 
-        // End recording.
-        if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
-            throw std::runtime_error("Failed to record command buffer!");
-        }
+    // End render pass.
+    vkCmdEndRenderPass(commandBuffers[imageIndex]);
+
+    // End recording.
+    if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to record command buffer!");
     }
 }
 
@@ -435,7 +426,7 @@ bool App::acquireSwapChainImage(uint32_t &imageIndex) {
     return true;
 }
 
-void App::submit(uint32_t imageIndex) {
+void App::flush(uint32_t imageIndex) {
     auto device = RS::getSingleton().device;
 
     if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
@@ -499,16 +490,16 @@ void App::submit(uint32_t imageIndex) {
 }
 
 void App::drawFrame() {
+    // Engine processing.
     Flint::Engine::getSingleton().tick();
 
     uint32_t imageIndex;
     if (!acquireSwapChainImage(imageIndex)) return;
 
-    RS::getSingleton().currentImage = imageIndex;
+    // Update the scene tree.
+    tree.update(Flint::Engine::getSingleton().get_delta());
 
-    // ---------------------------------------------
-    tree.update_tree(Flint::Engine::getSingleton().get_delta());
-    // ---------------------------------------------
+    recordCommands(imageIndex);
 
-    submit(imageIndex);
+    flush(imageIndex);
 }

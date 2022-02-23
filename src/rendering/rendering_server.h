@@ -60,10 +60,9 @@ public:
 
     // -----------------
     VkCommandBuffer p_commandBuffer;
-    uint8_t p_whichBuffer;
+    uint32_t p_currentImage;
     std::vector<VkImage> *p_swapChainImages;
     VkExtent2D p_swapChainExtent;
-    uint32_t currentImage;
     // -----------------
 
     RenderingServer();
@@ -302,6 +301,7 @@ public:
                             VkBuffer indexBuffer,
                             uint32_t indexCount) const;
     // --------------------------------------------------
+    void cleanipNodeResources();
 };
 
 typedef RenderingServer RS;

@@ -7,29 +7,29 @@
 #include <chrono>
 
 namespace Flint {
-    Node3D::~Node3D() {
-        auto device = RS::getSingleton().device;
-        auto swapChainImages = RS::getSingleton().p_swapChainImages;
-
-        // When we destroy the pool, the sets inside are destroyed as well.
-        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
-
-        // Clean up uniform buffers.
-        for (size_t i = 0; i < swapChainImages->size(); i++) {
-            vkDestroyBuffer(device, uniformBuffers[i], nullptr);
-            vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
-        }
-
-        vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-
-        // Clean up index buffer.
-        vkDestroyBuffer(device, indexBuffer, nullptr);
-        vkFreeMemory(device, indexBufferMemory, nullptr);
-
-        // Clean up vertex buffer.
-        vkDestroyBuffer(device, vertexBuffer, nullptr); // GPU memory
-        vkFreeMemory(device, vertexBufferMemory, nullptr); // CPU memory
-    }
+//    Node3D::~Node3D() {
+//        auto device = RS::getSingleton().device;
+//        auto swapChainImages = RS::getSingleton().p_swapChainImages;
+//
+//        if (!vkResourcesAllocated) return;
+//
+//        // When we destroy the pool, the sets inside are destroyed as well.
+//        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+//
+//        // Clean up uniform buffers.
+//        for (size_t i = 0; i < swapChainImages->size(); i++) {
+//            vkDestroyBuffer(device, uniformBuffers[i], nullptr);
+//            vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
+//        }
+//
+//        // Clean up index buffer.
+//        vkDestroyBuffer(device, indexBuffer, nullptr);
+//        vkFreeMemory(device, indexBufferMemory, nullptr);
+//
+//        // Clean up vertex buffer.
+//        vkDestroyBuffer(device, vertexBuffer, nullptr); // GPU memory
+//        vkFreeMemory(device, vertexBufferMemory, nullptr); // CPU memory
+//    }
 
     void Node3D::update(double delta) {
         Node::update(delta);
@@ -129,7 +129,8 @@ namespace Flint {
         UniformBufferObject ubo{};
 
         // Determined by model transform.
-        ubo.model = glm::rotate(glm::mat4(1.0f), (float) Engine::getSingleton().get_elapsed() * glm::radians(90.0f),
+        ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, position.z));
+        ubo.model = glm::rotate(ubo.model, (float) Engine::getSingleton().get_elapsed() * glm::radians(90.0f),
                                 glm::vec3(0.0f, 0.0f, 1.0f));
 
         // Determined by camera.
@@ -155,7 +156,7 @@ namespace Flint {
 
             // Copy the UBO data to the current uniform buffer.
             RS::getSingleton().copyDataToMemory(&ubo,
-                                                uniformBuffersMemory[RS::getSingleton().currentImage],
+                                                uniformBuffersMemory[RS::getSingleton().p_currentImage],
                                                 sizeof(ubo));
         } else {
             // Do nothing if no viewport is provided.

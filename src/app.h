@@ -122,14 +122,14 @@ private:
     void createSwapChainRelatedResources();
 
     /**
-     * Record commands.
+     * Record commands into the current command buffer.
      * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline layout.
      */
-    void recordCommands();
+    void recordCommands(uint32_t imageIndex);
 
     bool acquireSwapChainImage(uint32_t& imageIndex);
 
-    void submit(uint32_t imageIndex);
+    void flush(uint32_t imageIndex);
 };
 
 #endif //FLINT_H

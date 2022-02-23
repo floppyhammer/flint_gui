@@ -41,4 +41,9 @@ namespace Flint {
 
         children.push_back(p_child);
     }
+
+    void Node::remove_child(size_t index) {
+        if (index < 0 || index >= children.size()) return;
+        children.erase(children.begin() + index);
+    }
 }
