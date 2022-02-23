@@ -67,7 +67,7 @@ public:
 
     RenderingServer();
 
-    void runAfterSwapchainCreation(VkRenderPass renderPass, VkExtent2D swapChainExtent);
+    void createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent);
 
     [[nodiscard]] uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 
@@ -301,7 +301,7 @@ public:
                             VkBuffer indexBuffer,
                             uint32_t indexCount) const;
     // --------------------------------------------------
-    void cleanipNodeResources();
+    void cleanupSwapChainRelatedResources();
 };
 
 typedef RenderingServer RS;

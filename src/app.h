@@ -66,7 +66,7 @@ private:
     /// we need to keep track of the current frame.
     size_t currentFrame = 0;
 
-    void initVulkan();
+    void initSwapChain();
 
     void mainLoop();
 
@@ -100,6 +100,7 @@ private:
      * use for each of them and how their contents should be
      * handled throughout the rendering operations. All of this
      * information is wrapped in a render pass object.
+     * @dependency Swap chain image format.
      */
     void createRenderPass();
 

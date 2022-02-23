@@ -16,7 +16,7 @@ namespace Flint {
 
         virtual void notify(Signal signal);
 
-        void add_child(const std::shared_ptr<Node>& p_child);
+        void add_child(const std::shared_ptr<Node> &p_child);
 
         /**
          * Get the viewport this node belongs to.
@@ -24,7 +24,7 @@ namespace Flint {
          */
         virtual std::shared_ptr<SubViewport> get_viewport();
 
-        std::shared_ptr<Node> get_parent();
+        Node *get_parent();
 
         std::vector<std::shared_ptr<Node>> get_children();
 
@@ -33,7 +33,8 @@ namespace Flint {
     protected:
         std::vector<std::shared_ptr<Node>> children;
 
-        std::shared_ptr<Node> parent;
+        // Don't use a shared pointer as it causes circular references.
+        Node *parent;
     };
 }
 

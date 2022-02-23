@@ -9,6 +9,8 @@
 namespace Flint {
     class Node3D : public Node {
     public:
+        ~Node3D();
+
         // Transform.
         // ------------------------------------------
         Vec3<float> position = Vec3<float>(0);
@@ -18,16 +20,12 @@ namespace Flint {
         Vec3<float> scale = Vec3<float>(1);
         // ------------------------------------------
 
-        //Node3D();
-
         void notify(Signal signal) override;
 
     protected:
         void update(double delta) override;
 
         void draw() override;
-
-        void whenSwapChainChanged();
 
         /**
          * Update MVP. Update UBOs simply by memory mapping.
@@ -36,19 +34,19 @@ namespace Flint {
         void updateUniformBuffer();
 
         /**
-         *
+         * Create buffer for vertex data.
          * @dependency None.
          */
         void createVertexBuffer();
 
         /**
-         *
+         * Create buffer for index data.
          * @dependency None.
          */
         void createIndexBuffer();
 
         /**
-         *
+         * Create buffer for uniform data.
          * @dependency Swap chain count.
          */
         void createUniformBuffers();

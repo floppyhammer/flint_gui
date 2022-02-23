@@ -2,19 +2,19 @@
 
 namespace Flint {
     void Node::update(double delta) {
-        for (auto& child : children) {
+        for (auto &child: children) {
             child->update(delta);
         }
     }
 
     void Node::draw() {
-        for (auto& child : children) {
+        for (auto &child: children) {
             child->draw();
         }
     }
 
     void Node::notify(Signal signal) {
-        for (auto& child : children) {
+        for (auto &child: children) {
             notify(signal);
         }
     }
@@ -27,7 +27,7 @@ namespace Flint {
         }
     }
 
-    std::shared_ptr<Node> Node::get_parent() {
+    Node *Node::get_parent() {
         return parent;
     }
 
@@ -35,9 +35,9 @@ namespace Flint {
         return children;
     }
 
-    void Node::add_child(const std::shared_ptr<Node>& p_child) {
+    void Node::add_child(const std::shared_ptr<Node> &p_child) {
         // Set self as parent of the new node.
-        p_child->parent = std::shared_ptr<Node>(this);
+        p_child->parent = this;
 
         children.push_back(p_child);
     }

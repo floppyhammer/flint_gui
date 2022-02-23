@@ -160,23 +160,24 @@ RenderingServer::RenderingServer() {
     createLogicalDevice();
 
     createCommandPool();
+
+    createMeshInstance3dDescriptorSetLayout();
 }
 
-void RenderingServer::runAfterSwapchainCreation(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
-    createMeshInstance3dDescriptorSetLayout();
+void RenderingServer::createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
     createMeshInstance3dGraphicsPipeline(renderPass, swapChainExtent);
 }
 
-void RenderingServer::cleanipNodeResources() {
-    // Descriptor set layouts.
-    vkDestroyDescriptorSetLayout(device, meshInstance3dDescriptorSetLayout, nullptr);
-
+void RenderingServer::cleanupSwapChainRelatedResources() {
     // Graphics pipeline resources.
     vkDestroyPipeline(device, meshInstance3dGraphicsPipeline, nullptr);
     vkDestroyPipelineLayout(device, meshInstance3dPipelineLayout, nullptr);
 }
 
 void RenderingServer::cleanup() {
+    // Descriptor set layouts.
+    vkDestroyDescriptorSetLayout(device, meshInstance3dDescriptorSetLayout, nullptr);
+
     vkDestroyCommandPool(device, commandPool, nullptr);
 
     vkDestroyDevice(device, nullptr);
