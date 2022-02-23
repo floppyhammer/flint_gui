@@ -46,4 +46,10 @@ namespace Flint {
         if (index < 0 || index >= children.size()) return;
         children.erase(children.begin() + index);
     }
+
+    void Node::cleanup() {
+        for (auto &child: children) {
+            child->cleanup();
+        }
+    }
 }

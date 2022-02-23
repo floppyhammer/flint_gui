@@ -12,19 +12,21 @@ void App::run() {
 
     initSwapChain();
 
-    // Build scene tree.
+    // Build scene tree. Use a block, so we don't increase ref counts for the nodes.
     // -----------------------------------
-    auto node = std::make_shared<Flint::Node>();
-    auto node_3d = std::make_shared<Flint::Node3D>();
-    auto mesh_instance_0 = std::make_shared<Flint::MeshInstance3D>();
-    auto mesh_instance_1 = std::make_shared<Flint::MeshInstance3D>();
+    {
+        auto node = std::make_shared<Flint::Node>();
+        auto node_3d = std::make_shared<Flint::Node3D>();
+        auto mesh_instance_0 = std::make_shared<Flint::MeshInstance3D>();
+        auto mesh_instance_1 = std::make_shared<Flint::MeshInstance3D>();
 
-    node->add_child(node_3d);
-    node_3d->add_child(mesh_instance_0);
-    node_3d->add_child(mesh_instance_1);
-    mesh_instance_0->position.x = 1;
-    mesh_instance_1->position.x = -1;
-    tree.set_root(node);
+        node->add_child(node_3d);
+        node_3d->add_child(mesh_instance_0);
+        node_3d->add_child(mesh_instance_1);
+        mesh_instance_0->position.x = 1;
+        mesh_instance_1->position.x = -1;
+        tree.set_root(node);
+    }
     // -----------------------------------
 
     mainLoop();
