@@ -10,14 +10,19 @@
 namespace Flint {
     class SceneTree {
     public:
-        std::shared_ptr<Node> root;
+        SceneTree() = default;
 
-        void update_tree();
+        void update(double delta) const;
 
-        void record_commands(VkCommandBuffer command_buffer) const;
+        void record_commands() const;
+
+        void set_root(std::shared_ptr<Node>);
+        std::shared_ptr<Node> get_root();
 
     private:
         bool tree_changed = false;
+
+        std::shared_ptr<Node> root;
     };
 }
 

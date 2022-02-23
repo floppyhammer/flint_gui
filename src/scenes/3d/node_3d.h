@@ -9,6 +9,8 @@
 namespace Flint {
     class Node3D : public Node {
     public:
+        ~Node3D();
+
         // Transform.
         // ------------------------------------------
         Vec3<float> position = Vec3<float>(0);
@@ -18,16 +20,35 @@ namespace Flint {
         Vec3<float> scale = Vec3<float>(1);
         // ------------------------------------------
 
+        void notify(Signal signal) override;
+
     protected:
-        void self_update(double delta) override;
+        void update(double delta) override;
 
-        void self_draw() override;
+        void draw() override;
 
-        /// Update UBOs simply by memory mapping.
-        void update_uniform_buffer();
+        /**
+         * Update MVP. Update UBOs simply by memory mapping.
+         * @param currentImage Current image, which has different meaning from `current frame`.
+         */
+        void updateUniformBuffer();
 
+        /**
+         * Create buffer for vertex data.
+         * @dependency None.
+         */
         void createVertexBuffer();
+
+        /**
+         * Create buffer for index data.
+         * @dependency None.
+         */
         void createIndexBuffer();
+
+        /**
+         * Create buffer for uniform data.
+         * @dependency Swap chain count.
+         */
         void createUniformBuffers();
 
         /// Contains vertices and indices data.
@@ -51,10 +72,7 @@ namespace Flint {
         /// Descriptor sets are allocated from descriptor pool objects.
         std::vector<VkDescriptorSet> descriptorSets;
 
-        VkRenderPass renderPass;
-        VkDescriptorSetLayout descriptorSetLayout;
-        VkPipelineLayout pipelineLayout;
-        VkPipeline graphicsPipeline;
+        bool vkResourcesAllocated = false;
     };
 }
 

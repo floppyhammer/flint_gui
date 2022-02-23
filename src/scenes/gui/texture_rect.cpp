@@ -41,7 +41,9 @@ namespace Flint {
         return texture;
     }
 
-    void TextureRect::self_draw() {
+    void TextureRect::draw() {
+        Control::draw();
+
         // Should get this from RS.
         uint32_t current_image = 0;
 
@@ -52,8 +54,8 @@ namespace Flint {
         vkUnmapMemory(RS::getSingleton().device, uniform_buffers_memory[current_image]);
     }
 
-    void TextureRect::self_update(double delta) {
-        ubo.model = glm::rotate(glm::mat4(1.0f), (float) Engine::getSingleton().elapsed * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    void TextureRect::update(double delta) {
+        ubo.model = glm::rotate(glm::mat4(1.0f), (float) Engine::getSingleton().get_elapsed() * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
         auto viewport = get_viewport();
@@ -64,5 +66,7 @@ namespace Flint {
         // GLM was originally designed for OpenGL,
         // where the Y coordinate of the clip coordinates is inverted.
         ubo.proj[1][1] *= -1;
+
+
     }
 }

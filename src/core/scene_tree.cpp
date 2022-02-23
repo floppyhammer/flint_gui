@@ -3,19 +3,24 @@
 #include "../rendering/rendering_server.h"
 
 #include <array>
+#include <utility>
 
 namespace Flint {
-    void SceneTree::update_tree() {
-        // Check tree status. Record commands if necessary.
-//        if (tree_changed) {
-//            record_commands();
-//        }
-
-        root->update(0.001);
+    void SceneTree::set_root(std::shared_ptr<Node> p_node) {
+        root = std::move(p_node);
     }
 
-    void SceneTree::record_commands(VkCommandBuffer command_buffer) const {
-        // Every time tree structure changes, we need to rebuild the persistent command queue.
+    std::shared_ptr<Node> SceneTree::get_root() {
+        return root;
+    }
+
+    void SceneTree::record_commands() const {
+        if (root == nullptr) return;
         root->draw();
+    }
+
+    void SceneTree::update(double delta) const {
+        if (root == nullptr) return;
+        root->update(delta);
     }
 }

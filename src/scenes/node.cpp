@@ -2,27 +2,21 @@
 
 namespace Flint {
     void Node::update(double delta) {
-        self_update(delta);
-
-        for (auto& child : children) {
+        for (auto &child: children) {
             child->update(delta);
         }
     }
 
     void Node::draw() {
-        self_draw();
-
-        for (auto& child : children) {
+        for (auto &child: children) {
             child->draw();
         }
     }
 
-    void Node::self_update(double delta) {
-
-    }
-
-    void Node::self_draw() {
-
+    void Node::notify(Signal signal) {
+        for (auto &child: children) {
+            notify(signal);
+        }
     }
 
     std::shared_ptr<SubViewport> Node::get_viewport() {
@@ -33,27 +27,29 @@ namespace Flint {
         }
     }
 
-    std::shared_ptr<Node> Node::get_parent() {
+    Node *Node::get_parent() {
         return parent;
-    }
-
-    std::shared_ptr<Node> Node::get_root() {
-        if (parent != nullptr) {
-            return parent->get_parent();
-        } else {
-            return std::shared_ptr<Node>(this);
-        }
-    }
-
-    void Node::cleanup() {
-
     }
 
     std::vector<std::shared_ptr<Node>> Node::get_children() {
         return children;
     }
-//
-//    Node::~Node() {
-//        cleanup();
-//    }
+
+    void Node::add_child(const std::shared_ptr<Node> &p_child) {
+        // Set self as parent of the new node.
+        p_child->parent = this;
+
+        children.push_back(p_child);
+    }
+
+    void Node::remove_child(size_t index) {
+        if (index < 0 || index >= children.size()) return;
+        children.erase(children.begin() + index);
+    }
+
+    void Node::cleanup() {
+        for (auto &child: children) {
+            child->cleanup();
+        }
+    }
 }

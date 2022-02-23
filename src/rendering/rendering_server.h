@@ -58,7 +58,16 @@ public:
         return singleton;
     }
 
+    // -----------------
+    VkCommandBuffer p_commandBuffer;
+    uint32_t p_currentImage;
+    std::vector<VkImage> *p_swapChainImages;
+    VkExtent2D p_swapChainExtent;
+    // -----------------
+
     RenderingServer();
+
+    void createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent);
 
     [[nodiscard]] uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 
@@ -261,8 +270,6 @@ public:
 public:
     void draw_canvas_item();
 
-    void draw_mesh();
-
 public:
     // Texture rect.
     // --------------------------------------------------
@@ -276,16 +283,25 @@ public:
     VkPipelineLayout meshInstance3dPipelineLayout;
     VkPipeline meshInstance3dGraphicsPipeline;
 
-    // Only run once.
+    /**
+     * Create UBO descriptor.
+     * @dependency None.
+     */
     void createMeshInstance3dDescriptorSetLayout();
 
-    void createMeshInstance3dGraphicsPipeline();
+    /**
+     * Set up shaders, viewport, blend state, etc.
+     * @note We only need one pipeline for a specific rendering process despite of the existence of multiple swap chains.
+     * @dependency Descriptor set layout, swap chain extent.
+     */
+    void createMeshInstance3dGraphicsPipeline(VkRenderPass renderPass, VkExtent2D swapChainExtent);
 
-    void draw_mesh_instance(VkCommandBuffer const &commandBuffer,
-                            VkDescriptorSet const &descriptorSet,
+    void draw_mesh_instance(VkDescriptorSet const &descriptorSet,
                             VkBuffer *vertexBuffers,
-                            VkBuffer indexBuffer, uint32_t indexCount);
+                            VkBuffer indexBuffer,
+                            uint32_t indexCount) const;
     // --------------------------------------------------
+    void cleanupSwapChainRelatedResources();
 };
 
 typedef RenderingServer RS;

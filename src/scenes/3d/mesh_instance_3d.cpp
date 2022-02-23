@@ -9,23 +9,31 @@ namespace Flint {
     const std::string TEXTURE_PATH = "../res/viking_room.png";
 
     MeshInstance3D::MeshInstance3D() {
+        createDescriptorPool();
+
+        createDescriptorSets();
+
         // Load mesh resources.
         // --------------------------------
         // Load mesh.
-        mesh = std::make_shared<Mesh>();
-        mesh->loadFile(MODEL_PATH);
+        auto p_mesh = std::make_shared<Mesh>();
+        p_mesh->loadFile(MODEL_PATH);
+        set_mesh(p_mesh);
 
         // Load mesh texture.
-        texture = std::make_shared<Texture>(TEXTURE_PATH);
+        auto p_texture = std::make_shared<Texture>(TEXTURE_PATH);
+        set_texture(p_texture);
         // --------------------------------
+    }
 
-        createDescriptorSets();
+    MeshInstance3D::~MeshInstance3D() {
+
     }
 
     void MeshInstance3D::set_mesh(std::shared_ptr<Mesh> p_mesh) {
         // Clean previous data.
         if (mesh != nullptr) {
-            cleanup();
+
         }
 
         mesh = std::move(p_mesh);
@@ -33,6 +41,8 @@ namespace Flint {
         createVertexBuffer();
         createIndexBuffer();
         createUniformBuffers();
+
+        vkResourcesAllocated = true;
     }
 
     std::shared_ptr<Mesh> MeshInstance3D::get_mesh() const {
@@ -45,78 +55,68 @@ namespace Flint {
         updateDescriptorSets();
     }
 
-    void MeshInstance3D::self_update(double delta) {
-        update_uniform_buffer();
+    void MeshInstance3D::update(double delta) {
+        Node3D::update(delta);
     }
 
     // This will be called by the scene tree.
-    void MeshInstance3D::self_draw() {
+    void MeshInstance3D::draw() {
+        Node3D::draw();
+
         if (mesh == nullptr || texture == nullptr) return;
 
-        RS::getSingleton().draw_mesh_instance();
-    }
-
-    void MeshInstance3D::cleanup() {
-        auto device = RS::getSingleton().device;
-
-        // Clean up index buffer.
-        vkDestroyBuffer(device, indexBuffer, nullptr);
-        vkFreeMemory(device, indexBufferMemory, nullptr);
-
-        // Clean up vertex buffer.
-        vkDestroyBuffer(device, vertexBuffer, nullptr);
-        vkFreeMemory(device, vertexBufferMemory, nullptr);
-
-        // Clean up uniform buffers.
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            vkDestroyBuffer(device, uniformBuffers[i], nullptr);
-            vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
-        }
+        VkBuffer vertexBuffers[] = {vertexBuffer};
+        RS::getSingleton().draw_mesh_instance(descriptorSets[RS::getSingleton().p_currentImage],
+                                              vertexBuffers,
+                                              indexBuffer,
+                                              mesh->indices.size());
     }
 
     // Create descriptor pool before creating descriptor sets.
     void MeshInstance3D::createDescriptorPool() {
+        auto swapChainImages = RS::getSingleton().p_swapChainImages;
+
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+        poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages->size());
         poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+        poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages->size());
 
         VkDescriptorPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
         poolInfo.pPoolSizes = poolSizes.data();
-        poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
+        poolInfo.maxSets = static_cast<uint32_t>(swapChainImages->size());
 
-        if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+        if (vkCreateDescriptorPool(RS::getSingleton().device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor pool!");
         }
     }
 
     void MeshInstance3D::createDescriptorSets() {
-        auto &swapChainImages = RS::getSingleton().swapChainImages;
+        auto swapChainImages = RS::getSingleton().p_swapChainImages;
         auto &descriptorSetLayout = RS::getSingleton().meshInstance3dDescriptorSetLayout;
         auto device = RS::getSingleton().device;
 
-        std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
+        std::vector<VkDescriptorSetLayout> layouts(swapChainImages->size(), descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         allocInfo.descriptorPool = descriptorPool;
-        allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
+        allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages->size());
         allocInfo.pSetLayouts = layouts.data();
 
-        descriptorSets.resize(swapChainImages.size());
+        descriptorSets.resize(swapChainImages->size());
         if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
             throw std::runtime_error("Failed to allocate descriptor sets!");
         }
     }
 
     void MeshInstance3D::updateDescriptorSets() {
-        auto &swapChainImages = RS::getSingleton().swapChainImages;
+        auto swapChainImages = RS::getSingleton().p_swapChainImages;
         auto &descriptorSetLayout = RS::getSingleton().meshInstance3dDescriptorSetLayout;
         auto device = RS::getSingleton().device;
 
-        for (size_t i = 0; i < swapChainImages.size(); i++) {
+        for (size_t i = 0; i < swapChainImages->size(); i++) {
             VkDescriptorBufferInfo bufferInfo{};
             bufferInfo.buffer = uniformBuffers[i];
             bufferInfo.offset = 0;

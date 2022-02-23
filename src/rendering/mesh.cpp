@@ -8,6 +8,8 @@
 
 #include "tiny_obj_loader.h"
 
+#include <unordered_map>
+
 namespace std {
     template<>
     struct hash<Vertex> {
