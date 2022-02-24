@@ -13,7 +13,7 @@
 
 namespace Flint {
     Node3D::~Node3D() {
-        auto device = RS::getSingleton().device;
+        auto device = Device::getSingleton().device;
         auto swapChainImages = RS::getSingleton().p_swapChainImages;
 
         if (!vkResourcesAllocated) return;
@@ -79,8 +79,8 @@ namespace Flint {
         RS::getSingleton().copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
 
         // Clean up staging buffer and memory.
-        vkDestroyBuffer(RS::getSingleton().device, stagingBuffer, nullptr);
-        vkFreeMemory(RS::getSingleton().device, stagingBufferMemory, nullptr);
+        vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
+        vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
     }
 
     void Node3D::createIndexBuffer() {
@@ -109,8 +109,8 @@ namespace Flint {
         // Copy data from staging buffer to index buffer.
         RS::getSingleton().copyBuffer(stagingBuffer, indexBuffer, bufferSize);
 
-        vkDestroyBuffer(RS::getSingleton().device, stagingBuffer, nullptr);
-        vkFreeMemory(RS::getSingleton().device, stagingBufferMemory, nullptr);
+        vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
+        vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
     }
 
     void Node3D::createUniformBuffers() {

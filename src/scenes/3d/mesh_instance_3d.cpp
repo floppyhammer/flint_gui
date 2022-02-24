@@ -88,7 +88,7 @@ namespace Flint {
         poolInfo.pPoolSizes = poolSizes.data();
         poolInfo.maxSets = static_cast<uint32_t>(swapChainImages->size());
 
-        if (vkCreateDescriptorPool(RS::getSingleton().device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+        if (vkCreateDescriptorPool(Device::getSingleton().device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor pool!");
         }
     }
@@ -96,7 +96,7 @@ namespace Flint {
     void MeshInstance3D::createDescriptorSets() {
         auto swapChainImages = RS::getSingleton().p_swapChainImages;
         auto &descriptorSetLayout = RS::getSingleton().meshInstance3dDescriptorSetLayout;
-        auto device = RS::getSingleton().device;
+        auto device = Device::getSingleton().device;
 
         std::vector<VkDescriptorSetLayout> layouts(swapChainImages->size(), descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
@@ -114,7 +114,7 @@ namespace Flint {
     void MeshInstance3D::updateDescriptorSets() {
         auto swapChainImages = RS::getSingleton().p_swapChainImages;
         auto &descriptorSetLayout = RS::getSingleton().meshInstance3dDescriptorSetLayout;
-        auto device = RS::getSingleton().device;
+        auto device = Device::getSingleton().device;
 
         for (size_t i = 0; i < swapChainImages->size(); i++) {
             VkDescriptorBufferInfo bufferInfo{};

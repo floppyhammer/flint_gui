@@ -31,8 +31,6 @@ namespace Flint {
         void set_rect_pivot_offset(float x, float y);
 
     protected:
-        UniformBufferObject ubo{};
-
         std::vector<VkBuffer> uniform_buffers;
         std::vector<VkDeviceMemory> uniform_buffers_memory;
     };

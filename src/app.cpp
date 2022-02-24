@@ -1,5 +1,6 @@
 #include "app.h"
 
+#include "rendering/device.h"
 #include "rendering/rendering_server.h"
 #include "core/engine.h"
 
@@ -7,6 +8,8 @@
 #include <memory>
 
 void App::run() {
+    auto device = Device::getSingleton();
+
     // Initialize rendering server.
     auto rs = RS::getSingleton();
 
@@ -38,6 +41,8 @@ void App::run() {
 
     // Cleanup rendering server.
     rs.cleanup();
+
+    device.cleanup();
 }
 
 void App::initSwapChain() {
@@ -69,25 +74,25 @@ void App::createSwapChainRelatedResources() {
 }
 
 void App::mainLoop() {
-    while (!glfwWindowShouldClose(RS::getSingleton().window)) {
+    while (!glfwWindowShouldClose(Device::getSingleton().window)) {
         glfwPollEvents();
         drawFrame();
     }
 
     // Wait on the host for the completion of outstanding queue operations for all queues on a given logical device.
-    vkDeviceWaitIdle(RS::getSingleton().device);
+    vkDeviceWaitIdle(Device::getSingleton().device);
 }
 
 void App::recreateSwapChain() {
     // Handling window minimization.
     int width = 0, height = 0;
-    glfwGetFramebufferSize(RS::getSingleton().window, &width, &height);
+    glfwGetFramebufferSize(Device::getSingleton().window, &width, &height);
     while (width == 0 || height == 0) {
-        glfwGetFramebufferSize(RS::getSingleton().window, &width, &height);
+        glfwGetFramebufferSize(Device::getSingleton().window, &width, &height);
         glfwWaitEvents();
     }
 
-    vkDeviceWaitIdle(RS::getSingleton().device);
+    vkDeviceWaitIdle(Device::getSingleton().device);
 
     cleanupSwapChain();
 
@@ -97,7 +102,7 @@ void App::recreateSwapChain() {
 }
 
 void App::cleanupSwapChain() {
-    auto device = RS::getSingleton().device;
+    auto device = Device::getSingleton().device;
 
     // Depth resources.
     vkDestroyImageView(device, depthImageView, nullptr);
@@ -125,7 +130,7 @@ void App::cleanupSwapChain() {
 }
 
 void App::cleanup() {
-    auto device = RS::getSingleton().device;
+    auto device = Device::getSingleton().device;
 
     // Clean up swap chain related resources.
     cleanupSwapChain();
@@ -139,14 +144,14 @@ void App::cleanup() {
 }
 
 void App::createSwapChain() {
-    auto device = RS::getSingleton().device;
+    auto device = Device::getSingleton().device;
 
-    SwapChainSupportDetails swapChainSupport = RS::getSingleton().querySwapChainSupport(
-            RS::getSingleton().physicalDevice);
+    SwapChainSupportDetails swapChainSupport = Device::getSingleton().querySwapChainSupport(
+            Device::getSingleton().physicalDevice);
 
-    VkSurfaceFormatKHR surfaceFormat = RS::chooseSwapSurfaceFormat(swapChainSupport.formats);
-    VkPresentModeKHR presentMode = RS::chooseSwapPresentMode(swapChainSupport.presentModes);
-    VkExtent2D extent = RS::getSingleton().chooseSwapExtent(swapChainSupport.capabilities);
+    VkSurfaceFormatKHR surfaceFormat = Device::getSingleton().chooseSwapSurfaceFormat(swapChainSupport.formats);
+    VkPresentModeKHR presentMode = Device::getSingleton().chooseSwapPresentMode(swapChainSupport.presentModes);
+    VkExtent2D extent = Device::getSingleton().chooseSwapExtent(swapChainSupport.capabilities);
 
     uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
     if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
@@ -155,7 +160,7 @@ void App::createSwapChain() {
 
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    createInfo.surface = RS::getSingleton().surface;
+    createInfo.surface = Device::getSingleton().surface;
 
     createInfo.minImageCount = imageCount;
     createInfo.imageFormat = surfaceFormat.format;
@@ -164,7 +169,7 @@ void App::createSwapChain() {
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    QueueFamilyIndices qfIndices = RS::getSingleton().findQueueFamilies(RS::getSingleton().physicalDevice);
+    QueueFamilyIndices qfIndices = Device::getSingleton().findQueueFamilies(Device::getSingleton().physicalDevice);
     uint32_t queueFamilyIndices[] = {qfIndices.graphicsFamily.value(), qfIndices.presentFamily.value()};
 
     if (qfIndices.graphicsFamily != qfIndices.presentFamily) {
@@ -208,7 +213,7 @@ void App::createImageViews() {
 }
 
 void App::createDepthResources() {
-    VkFormat depthFormat = RS::getSingleton().findDepthFormat();
+    VkFormat depthFormat = Device::getSingleton().findDepthFormat();
     RS::getSingleton().createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL,
                                    VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                    depthImage,
@@ -240,7 +245,7 @@ void App::createRenderPass() {
     // Depth attachment.
     // ----------------------------------------
     VkAttachmentDescription depthAttachment{};
-    depthAttachment.format = RS::getSingleton().findDepthFormat();
+    depthAttachment.format = Device::getSingleton().findDepthFormat();
     depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -281,7 +286,7 @@ void App::createRenderPass() {
     renderPassInfo.dependencyCount = 1;
     renderPassInfo.pDependencies = &dependency;
 
-    if (vkCreateRenderPass(RS::getSingleton().device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(Device::getSingleton().device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create render pass!");
     }
 }
@@ -304,7 +309,7 @@ void App::createFramebuffers() {
         framebufferInfo.height = swapChainExtent.height;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(RS::getSingleton().device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
+        if (vkCreateFramebuffer(Device::getSingleton().device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create framebuffer!");
         }
     }
@@ -320,7 +325,7 @@ void App::createCommandBuffers() {
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = (uint32_t) commandBuffers.size();
 
-    if (vkAllocateCommandBuffers(RS::getSingleton().device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(Device::getSingleton().device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate command buffers!");
     }
 }
@@ -376,7 +381,7 @@ void App::recordCommands(uint32_t imageIndex) {
 }
 
 void App::createSyncObjects() {
-    auto device = RS::getSingleton().device;
+    auto device = Device::getSingleton().device;
 
     imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -400,7 +405,7 @@ void App::createSyncObjects() {
 }
 
 bool App::acquireSwapChainImage(uint32_t &imageIndex) {
-    auto device = RS::getSingleton().device;
+    auto device = Device::getSingleton().device;
 
     // Wait for the frame to be finished.
     vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
@@ -425,7 +430,7 @@ bool App::acquireSwapChainImage(uint32_t &imageIndex) {
 }
 
 void App::flush(uint32_t imageIndex) {
-    auto device = RS::getSingleton().device;
+    auto device = Device::getSingleton().device;
 
     if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {
         vkWaitForFences(device, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
@@ -453,7 +458,7 @@ void App::flush(uint32_t imageIndex) {
 
     vkResetFences(device, 1, &inFlightFences[currentFrame]);
 
-    if (vkQueueSubmit(RS::getSingleton().graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
+    if (vkQueueSubmit(Device::getSingleton().graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS) {
         throw std::runtime_error("Failed to submit draw command buffer!");
     }
     // -------------------------------------
@@ -474,11 +479,11 @@ void App::flush(uint32_t imageIndex) {
     // Array of each swap chain’s presentable images.
     presentInfo.pImageIndices = &imageIndex;
 
-    VkResult result = vkQueuePresentKHR(RS::getSingleton().presentQueue, &presentInfo);
+    VkResult result = vkQueuePresentKHR(Device::getSingleton().presentQueue, &presentInfo);
     // -------------------------------------
 
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || RS::getSingleton().framebufferResized) {
-        RS::getSingleton().framebufferResized = false;
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || Device::getSingleton().framebufferResized) {
+        Device::getSingleton().framebufferResized = false;
         recreateSwapChain();
     } else if (result != VK_SUCCESS) {
         throw std::runtime_error("Failed to present swap chain image!");
