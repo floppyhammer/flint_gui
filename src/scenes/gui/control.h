@@ -8,6 +8,12 @@
 #include "../../rendering/rendering_server.h"
 
 namespace Flint {
+    struct Mvp2d {
+        glm::mat3 model;
+        glm::mat3 view;
+        glm::mat3 proj;
+    };
+
     class Control : public Node {
     public:
         Vec2<float> rect_position = Vec2<float>(0);
