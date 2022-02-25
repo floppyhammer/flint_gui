@@ -80,12 +80,12 @@ void Texture::createImageFromBytes(void *pixels, int texWidth, int texHeight) {
                                              VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     // Clean up staging stuff.
-    vkDestroyBuffer(RS::getSingleton().device, stagingBuffer, nullptr);
-    vkFreeMemory(RS::getSingleton().device, stagingBufferMemory, nullptr);
+    vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
+    vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
 }
 
 void Texture::cleanup() const {
-    auto device = RS::getSingleton().device;
+    auto device = Device::getSingleton().device;
 
     vkDestroySampler(device, sampler, nullptr);
 

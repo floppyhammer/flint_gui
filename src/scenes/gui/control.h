@@ -8,6 +8,12 @@
 #include "../../rendering/rendering_server.h"
 
 namespace Flint {
+    struct Mvp2d {
+        glm::mat3 model;
+        glm::mat3 view;
+        glm::mat3 proj;
+    };
+
     class Control : public Node {
     public:
         Vec2<float> rect_position = Vec2<float>(0);
@@ -31,8 +37,6 @@ namespace Flint {
         void set_rect_pivot_offset(float x, float y);
 
     protected:
-        UniformBufferObject ubo{};
-
         std::vector<VkBuffer> uniform_buffers;
         std::vector<VkDeviceMemory> uniform_buffers_memory;
     };
