@@ -12,6 +12,7 @@
 #include <array>
 
 SwapChain::SwapChain() {
+    // Swap chain related resources.
     initSwapChain();
 
     createSyncObjects();
@@ -29,6 +30,11 @@ void SwapChain::initSwapChain() {
     createDepthResources();
 
     createFramebuffers();
+
+    // Create a command buffer for each swap chain image.
+    createCommandBuffers();
+
+    RS::getSingleton().createSwapChainRelatedResources(renderPass, swapChainExtent);
 }
 
 void SwapChain::recreateSwapChain() {
@@ -52,6 +58,9 @@ void SwapChain::recreateSwapChain() {
 void SwapChain::cleanupSwapChain() {
     auto device = Device::getSingleton().device;
 
+    // Command buffers contain swap chain related info, so we also need to free them here.
+    RS::getSingleton().cleanupSwapChainRelatedResources();
+
     // Depth resources.
     vkDestroyImageView(device, depthImageView, nullptr);
     vkDestroyImage(device, depthImage, nullptr);
@@ -62,12 +71,11 @@ void SwapChain::cleanupSwapChain() {
         vkDestroyFramebuffer(device, framebuffer, nullptr);
     }
 
-    // FIXME: Cleanup chain isn't clear.
-    // Command buffers contain swap chain related info, so we also need to free them here.
-//    vkFreeCommandBuffers(device, RS::getSingleton().commandPool, static_cast<uint32_t>(commandBuffers.size()),
-//                         commandBuffers.data());
-
-    //RS::getSingleton().cleanupSwapChainRelatedResources();
+    // Only command buffers are freed but not the pool.
+    vkFreeCommandBuffers(device,
+                         RS::getSingleton().commandPool,
+                         static_cast<uint32_t>(commandBuffers.size()),
+                         commandBuffers.data());
 
     vkDestroyRenderPass(device, renderPass, nullptr);
 
@@ -302,6 +310,8 @@ bool SwapChain::acquireSwapChainImage(uint32_t &imageIndex) {
                                             VK_NULL_HANDLE,
                                             &imageIndex);
 
+    currentImage = imageIndex;
+
     // Recreate swap chains if necessary.
     if (result == VK_ERROR_OUT_OF_DATE_KHR) {
         recreateSwapChain();
@@ -313,7 +323,22 @@ bool SwapChain::acquireSwapChainImage(uint32_t &imageIndex) {
     return true;
 }
 
-void SwapChain::flush(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex) {
+void SwapChain::createCommandBuffers() {
+    commandBuffers.resize(swapChainFramebuffers.size());
+
+    // Allocate command buffers.
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = RS::getSingleton().commandPool;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = (uint32_t) commandBuffers.size();
+
+    if (vkAllocateCommandBuffers(Device::getSingleton().device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to allocate command buffers!");
+    }
+}
+
+void SwapChain::flush(uint32_t imageIndex) {
     auto device = Device::getSingleton().device;
 
     if (imagesInFlight[imageIndex] != VK_NULL_HANDLE) {

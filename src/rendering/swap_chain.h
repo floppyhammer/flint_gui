@@ -41,7 +41,7 @@ public:
 
     VkRenderPass renderPass;
 
-    //std::vector<VkCommandBuffer> commandBuffers;
+    std::vector<VkCommandBuffer> commandBuffers;
 
     /// Each frame should have its own set of semaphores, so a list is used.
     std::vector<VkSemaphore> imageAvailableSemaphores;
@@ -54,6 +54,8 @@ public:
     /// To use the right pair of semaphores every time,
     /// we need to keep track of the current frame.
     size_t currentFrame = 0;
+
+    uint32_t currentImage = 0;
 
     void initSwapChain();
 
@@ -97,11 +99,15 @@ public:
 
     void createSyncObjects();
 
-    void createSwapChainRelatedResources();
-
     bool acquireSwapChainImage(uint32_t& imageIndex);
 
-    void flush(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex);
+    /**
+     * Set up command queues.
+     * @dependency None.
+     */
+    void createCommandBuffers();
+
+    void flush(uint32_t imageIndex);
 
     void cleanup();
 };

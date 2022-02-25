@@ -8,13 +8,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "../../common/io.h"
+#include "../../rendering/swap_chain.h"
 
 #include <chrono>
 
 namespace Flint {
     Node3D::~Node3D() {
         auto device = Device::getSingleton().device;
-        auto swapChainImages = RS::getSingleton().p_swapChainImages;
+        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
 
         if (!vkResourcesAllocated) return;
 
@@ -22,7 +23,7 @@ namespace Flint {
         vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
         // Clean up uniform buffers.
-        for (size_t i = 0; i < swapChainImages->size(); i++) {
+        for (size_t i = 0; i < swapChainImages.size(); i++) {
             vkDestroyBuffer(device, uniformBuffers[i], nullptr);
             vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
         }
@@ -114,14 +115,14 @@ namespace Flint {
     }
 
     void Node3D::createUniformBuffers() {
-        auto &swapChainImages = RS::getSingleton().p_swapChainImages;
+        auto &swapChainImages = SwapChain::getSingleton().swapChainImages;
 
         VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
-        uniformBuffers.resize(swapChainImages->size());
-        uniformBuffersMemory.resize(swapChainImages->size());
+        uniformBuffers.resize(swapChainImages.size());
+        uniformBuffersMemory.resize(swapChainImages.size());
 
-        for (size_t i = 0; i < swapChainImages->size(); i++) {
+        for (size_t i = 0; i < swapChainImages.size(); i++) {
             RS::getSingleton().createBuffer(bufferSize,
                                             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -148,8 +149,8 @@ namespace Flint {
 
         //auto viewport = get_viewport();
         auto viewport = std::make_shared<SubViewport>();
-        viewport->size = Vec2<int>(RS::getSingleton().p_swapChainExtent.width,
-                                   RS::getSingleton().p_swapChainExtent.height);
+        viewport->size = Vec2<int>(SwapChain::getSingleton().swapChainExtent.width,
+                                   SwapChain::getSingleton().swapChainExtent.height);
 
         if (viewport != nullptr) {
             // Set projection matrix. Determined by viewport.
@@ -164,7 +165,7 @@ namespace Flint {
 
             // Copy the UBO data to the current uniform buffer.
             RS::getSingleton().copyDataToMemory(&ubo,
-                                                uniformBuffersMemory[RS::getSingleton().p_currentImage],
+                                                uniformBuffersMemory[SwapChain::getSingleton().currentImage],
                                                 sizeof(ubo));
         } else {
             // Do nothing if no viewport is provided.

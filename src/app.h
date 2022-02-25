@@ -31,19 +31,11 @@ private:
 
     void drawFrame();
 
-    std::vector<VkCommandBuffer> commandBuffers;
-
-    /**
-     * Set up command queues.
-     * @dependency None.
-     */
-    void createCommandBuffers();
-
     /**
      * Record commands into the current command buffer.
      * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline layout.
      */
-    void recordCommands(uint32_t imageIndex);
+    void recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex);
 };
 
 #endif //FLINT_APP_H

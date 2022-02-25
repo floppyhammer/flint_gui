@@ -29,13 +29,6 @@ public:
         return singleton;
     }
 
-    // -----------------
-    VkCommandBuffer p_commandBuffer;
-    uint32_t p_currentImage;
-    std::vector<VkImage> *p_swapChainImages;
-    VkExtent2D p_swapChainExtent;
-    // -----------------
-
     RenderingServer();
 
     void createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent);
@@ -43,18 +36,13 @@ public:
     [[nodiscard]] uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 
 public:
-    VkCommandPool commandPool;
-
-public:
     void cleanup();
-
-    void createCommandPool();
 
     /**
      * Create a shader module, but the shader stage is not specified yet.
      * @return Shader module.
      */
-    [[nodiscard]] VkShaderModule createShaderModule(const std::vector<char> &code) const;
+    [[nodiscard]] static VkShaderModule createShaderModule(const std::vector<char> &code) ;
 
     /**
      * Create a command buffer in the command pool, and start recording.
@@ -155,12 +143,17 @@ public:
      */
     void createMeshInstance3dGraphicsPipeline(VkRenderPass renderPass, VkExtent2D swapChainExtent);
 
-    void draw_mesh_instance(VkDescriptorSet const &descriptorSet,
+    void draw_mesh_instance(VkCommandBuffer commandBuffer,
+                            VkDescriptorSet const &descriptorSet,
                             VkBuffer *vertexBuffers,
                             VkBuffer indexBuffer,
                             uint32_t indexCount) const;
     // --------------------------------------------------
     void cleanupSwapChainRelatedResources() const;
+
+    void createCommandPool();
+
+    VkCommandPool commandPool;
 };
 
 typedef RenderingServer RS;

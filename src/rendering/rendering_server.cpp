@@ -2,12 +2,11 @@
 #include <set>
 
 #include "rendering_server.h"
-#include "../common/io.h"
 #include "mesh.h"
+#include "../common/io.h"
 
 RenderingServer::RenderingServer() {
     createCommandPool();
-
     createMeshInstance3dDescriptorSetLayout();
 }
 
@@ -30,8 +29,6 @@ void RenderingServer::cleanup() {
     vkDestroyDescriptorSetLayout(device, meshInstance3dDescriptorSetLayout, nullptr);
 
     vkDestroyCommandPool(device, commandPool, nullptr);
-
-    // Cleanup device.
 }
 
 uint32_t RenderingServer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const {
@@ -48,20 +45,7 @@ uint32_t RenderingServer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFl
     throw std::runtime_error("Failed to find suitable memory type!");
 }
 
-void RenderingServer::createCommandPool() {
-    QueueFamilyIndices qfIndices = Device::getSingleton().findQueueFamilies(Device::getSingleton().physicalDevice);
-
-    VkCommandPoolCreateInfo poolInfo{};
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.queueFamilyIndex = qfIndices.graphicsFamily.value();
-    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // So we can reset command buffers.
-
-    if (vkCreateCommandPool(Device::getSingleton().device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create command pool!");
-    }
-}
-
-VkShaderModule RenderingServer::createShaderModule(const std::vector<char> &code) const {
+VkShaderModule RenderingServer::createShaderModule(const std::vector<char> &code) {
     VkShaderModuleCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.codeSize = code.size();
@@ -73,6 +57,19 @@ VkShaderModule RenderingServer::createShaderModule(const std::vector<char> &code
     }
 
     return shaderModule;
+}
+
+void RenderingServer::createCommandPool() {
+    QueueFamilyIndices qfIndices = Device::getSingleton().findQueueFamilies(Device::getSingleton().physicalDevice);
+
+    VkCommandPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.queueFamilyIndex = qfIndices.graphicsFamily.value();
+    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // So we can reset command buffers.
+
+    if (vkCreateCommandPool(Device::getSingleton().device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to create command pool!");
+    }
 }
 
 VkCommandBuffer RenderingServer::beginSingleTimeCommands() const {
@@ -393,12 +390,11 @@ void RenderingServer::draw_canvas_item() {
 
 }
 
-void RenderingServer::draw_mesh_instance(const VkDescriptorSet &descriptorSet,
+void RenderingServer::draw_mesh_instance(VkCommandBuffer commandBuffer,
+                                         const VkDescriptorSet &descriptorSet,
                                          VkBuffer vertexBuffers[],
                                          VkBuffer indexBuffer,
                                          uint32_t indexCount) const {
-    auto commandBuffer = p_commandBuffer;
-
     // Bind pipeline.
     vkCmdBindPipeline(commandBuffer,
                       VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -475,8 +471,8 @@ void RenderingServer::createMeshInstance3dGraphicsPipeline(VkRenderPass renderPa
     auto vertShaderCode = readFile("../src/shaders/mesh_instance.vert.spv");
     auto fragShaderCode = readFile("../src/shaders/mesh_instance.frag.spv");
 
-    VkShaderModule vertShaderModule = RS::getSingleton().createShaderModule(vertShaderCode);
-    VkShaderModule fragShaderModule = RS::getSingleton().createShaderModule(fragShaderCode);
+    VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
+    VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
 
     // Specify shader stages.
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
