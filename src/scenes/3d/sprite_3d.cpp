@@ -1,68 +1,53 @@
-#include "mesh_instance_3d.h"
+#include "sprite_3d.h"
 
-#include "../../common/io.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "../../core/engine.h"
 #include "../../rendering/swap_chain.h"
 
-#include <utility>
+#include <memory>
+#include <chrono>
+#include <vector>
 
 namespace Flint {
-    const std::string MODEL_PATH = "../res/viking_room.obj";
-    const std::string TEXTURE_PATH = "../res/viking_room.png";
+    const std::vector<Vertex> vertices = {
+            {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+    };
 
-    MeshInstance3D::MeshInstance3D() {
+    // For index buffer.
+    const std::vector<uint32_t> indices = {
+            0, 1, 2, 2, 3, 0
+    };
+
+    Sprite3D::Sprite3D() {
         createDescriptorPool();
 
         createDescriptorSets();
 
         createUniformBuffers();
 
-        // Load mesh resources.
-        // --------------------------------
-        // Load mesh.
-        auto p_mesh = std::make_shared<Mesh>();
-        p_mesh->loadFile(MODEL_PATH);
-        set_mesh(p_mesh);
-
-        // Load texture.
-        auto p_texture = std::make_shared<Texture>(TEXTURE_PATH);
-        set_texture(p_texture);
-        // --------------------------------
-    }
-
-    MeshInstance3D::~MeshInstance3D() {
-
-    }
-
-    void MeshInstance3D::set_mesh(std::shared_ptr<Mesh> p_mesh) {
-        // Clean previous data.
-        if (mesh != nullptr) {
-
-        }
-
-        mesh = std::move(p_mesh);
+        mesh = std::make_shared<Mesh>(vertices, indices);
 
         createVertexBuffer();
         createIndexBuffer();
-
-        vkResourcesAllocated = true;
     }
 
-    std::shared_ptr<Mesh> MeshInstance3D::get_mesh() const {
-        return mesh;
-    }
-
-    void MeshInstance3D::set_texture(std::shared_ptr<Texture> p_texture) {
+    void Sprite3D::set_texture(std::shared_ptr<Texture> p_texture) {
         texture = std::move(p_texture);
 
         updateDescriptorSets();
     }
 
-    void MeshInstance3D::update(double delta) {
+    void Sprite3D::update(double delta) {
         Node3D::update(delta);
     }
 
     // This will be called by the scene tree.
-    void MeshInstance3D::draw() {
+    void Sprite3D::draw() {
         Node3D::draw();
 
         if (mesh == nullptr || texture == nullptr) return;
@@ -76,7 +61,7 @@ namespace Flint {
     }
 
     // Create descriptor pool before creating descriptor sets.
-    void MeshInstance3D::createDescriptorPool() {
+    void Sprite3D::createDescriptorPool() {
         auto swapChainImages = SwapChain::getSingleton().swapChainImages;
 
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
@@ -96,7 +81,7 @@ namespace Flint {
         }
     }
 
-    void MeshInstance3D::createDescriptorSets() {
+    void Sprite3D::createDescriptorSets() {
         auto device = Device::getSingleton().device;
         auto swapChainImages = SwapChain::getSingleton().swapChainImages;
         auto &descriptorSetLayout = RS::getSingleton().meshInstance3dDescriptorSetLayout;
@@ -114,7 +99,7 @@ namespace Flint {
         }
     }
 
-    void MeshInstance3D::updateDescriptorSets() {
+    void Sprite3D::updateDescriptorSets() {
         auto swapChainImages = SwapChain::getSingleton().swapChainImages;
         auto &descriptorSetLayout = RS::getSingleton().meshInstance3dDescriptorSetLayout;
         auto device = Device::getSingleton().device;

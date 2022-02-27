@@ -2,9 +2,10 @@
 #define FLINT_NODE_3D_H
 
 #include "../node.h"
-#include "../../common/vec3.h"
 #include "../../rendering/rendering_server.h"
 #include "../../rendering/mesh.h"
+
+#include <glm/glm.hpp>
 
 namespace Flint {
     class Node3D : public Node {
@@ -13,11 +14,11 @@ namespace Flint {
 
         // Transform.
         // ------------------------------------------
-        Vec3<float> position = Vec3<float>(0);
+        glm::vec3 position = glm::vec3(0);
 
-        Vec3<float> rotation = Vec3<float>(0);
+        glm::vec3 rotation = glm::vec3(0);
 
-        Vec3<float> scale = Vec3<float>(1);
+        glm::vec3 scale = glm::vec3(1);
         // ------------------------------------------
 
         void notify(Signal signal) override;

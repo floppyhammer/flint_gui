@@ -23,11 +23,6 @@ namespace Flint {
 
     TextureRect::TextureRect() {
         mesh = std::make_shared<Mesh>(vertices, indices);
-
-        // Pipeline should be built on the rendering server, as all texture rects use the same pipeline but with
-        // different uniform buffers.
-
-
     }
 
     TextureRect::~TextureRect() {

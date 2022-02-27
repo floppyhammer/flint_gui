@@ -9,6 +9,7 @@
 
 #include "../../common/io.h"
 #include "../../rendering/swap_chain.h"
+#include "camera_3d.h"
 
 #include <chrono>
 
@@ -143,9 +144,12 @@ namespace Flint {
                                 glm::vec3(0.0f, 0.0f, 1.0f));
 
         // Determined by camera.
-        ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
+        Camera3D camera;
+        camera.position = glm::vec3(2.0f, 2.0f, 2.0f);
+
+        ubo.view = glm::lookAt(camera.position,
                                glm::vec3(0.0f, 0.0f, 0.0f),
-                               glm::vec3(0.0f, 0.0f, 1.0f));
+                               camera.up);
 
         //auto viewport = get_viewport();
         auto viewport = std::make_shared<SubViewport>();
