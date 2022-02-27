@@ -153,13 +153,13 @@ namespace Flint {
 
         //auto viewport = get_viewport();
         auto viewport = std::make_shared<SubViewport>();
-        viewport->size = Vec2<int>(SwapChain::getSingleton().swapChainExtent.width,
+        viewport->extent = Vec2<int>(SwapChain::getSingleton().swapChainExtent.width,
                                    SwapChain::getSingleton().swapChainExtent.height);
 
         if (viewport != nullptr) {
             // Set projection matrix. Determined by viewport.
             ubo.proj = glm::perspective(glm::radians(viewport->fov),
-                                        (float) viewport->size.x / (float) viewport->size.y,
+                                        (float) viewport->extent.x / (float) viewport->extent.y,
                                         viewport->z_near,
                                         viewport->z_far);
 
