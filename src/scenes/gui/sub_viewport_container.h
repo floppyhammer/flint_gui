@@ -6,10 +6,18 @@
 namespace Flint {
     class SubViewportContainer : public Control {
     public:
-        std::shared_ptr<SubViewport> viewport;
+        void set_viewport(std::shared_ptr<SubViewport> p_viewport);
 
         /// Intercept viewport searching upwards the scene tree.
         std::shared_ptr<SubViewport> get_viewport() override;
+
+    protected:
+        std::shared_ptr<SubViewport> viewport;
+
+    protected:
+        void update(double delta) override;
+
+        void draw() override;
     };
 }
 

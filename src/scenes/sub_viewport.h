@@ -1,11 +1,16 @@
 #ifndef FLINT_SUB_VIEWPORT_H
 #define FLINT_SUB_VIEWPORT_H
 
+#include "node.h"
 #include "../common/vec2.h"
 #include "../rendering/rendering_server.h"
+#include "../core/scene_tree.h"
 
 namespace Flint {
-    class SubViewport {
+    /**
+     * SubViewport is not a node.
+     */
+    class SubViewport : public Node {
     public:
         Vec2<int> extent = {512, 512};
 
@@ -14,17 +19,40 @@ namespace Flint {
         float z_near = 0.1;
         float z_far = 10.0;
 
+        void prepare();
+
+        std::shared_ptr<SceneTree> tree;
+
+        void draw() override;
+
     protected:
+        void update(double delta) override;
+
         // Should have the same number as swap chain images.
-        std::vector<VkImage> images;
-        std::vector<VkDeviceMemory> imagesMemory;
-        std::vector<VkImageView> imageViews;
+        VkImage image;
+        VkDeviceMemory imageMemory;
+        VkImageView imageView;
+
+        // How should this sub viewport be sampled.
+        VkSampler sampler;
+
+        VkImage depthImage;
+        VkDeviceMemory depthImageMemory;
+        VkImageView depthImageView;
 
         VkRenderPass renderPass;
 
+        VkFramebuffer framebuffer;
+
+        VkDescriptorImageInfo descriptor;
+
         void createImages();
 
+        // The color attachment of this framebuffer will then be used
+        // to sample from in the fragment shader of the final pass.
         void createRenderPass();
+
+        void createFramebuffer();
     };
 }
 

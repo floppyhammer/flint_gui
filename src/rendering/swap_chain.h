@@ -22,22 +22,22 @@ public:
     /// Number of images doesn't necessarily equal to MAX_FRAMES_IN_FLIGHT (One is expected, the other is what we actually get considering device capacity).
     std::vector<VkImage> swapChainImages;
 
-    /// We only need a single depth image unlike the swap chain images, because only one draw operation is running at once.
-    VkImage depthImage;
-    VkDeviceMemory depthImageMemory;
-    VkImageView depthImageView;
+    /// VkImageView defines which part of VkImage to use.
+    std::vector<VkImageView> swapChainImageViews;
 
     /// Store the format and extent we've chosen for the swap chain images.
     VkFormat swapChainImageFormat;
     VkExtent2D swapChainExtent;
 
-    /// VkImageView defines which part of VkImage to use.
-    std::vector<VkImageView> swapChainImageViews;
-
     /// VkFramebuffer + VkRenderPass defines the render target.
     /// Render pass defines which attachment will be written with colors.
     /// VkFramebuffer defines which VkImageView is to be which attachment.
     std::vector<VkFramebuffer> swapChainFramebuffers;
+
+    /// We only need a single depth image unlike the swap chain images, because only one draw operation is running at once.
+    VkImage depthImage;
+    VkDeviceMemory depthImageMemory;
+    VkImageView depthImageView;
 
     VkRenderPass renderPass;
 

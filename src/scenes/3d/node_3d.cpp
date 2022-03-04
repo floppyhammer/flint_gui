@@ -10,6 +10,7 @@
 #include "../../common/io.h"
 #include "../../rendering/swap_chain.h"
 #include "camera_3d.h"
+#include "../sub_viewport.h"
 
 #include <chrono>
 

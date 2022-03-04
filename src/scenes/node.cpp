@@ -1,5 +1,7 @@
 #include "node.h"
 
+#include "sub_viewport.h"
+
 namespace Flint {
     void Node::update(double delta) {
         for (auto &child: children) {

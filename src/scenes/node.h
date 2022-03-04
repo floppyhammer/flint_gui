@@ -1,13 +1,14 @@
 #ifndef FLINT_NODE_H
 #define FLINT_NODE_H
 
-#include "sub_viewport.h"
 #include "../core/engine.h"
 
 #include <vector>
 #include <memory>
 
 namespace Flint {
+    class SubViewport;
+
     class Node {
     public:
         virtual void update(double delta);
