@@ -5,10 +5,24 @@
 #include <array>
 
 namespace Flint {
+    SubViewport::~SubViewport() {
+        auto device = Device::getSingleton().device;
+
+        vkDestroyPipeline(device, meshInstance3dGraphicsPipeline, nullptr);
+    }
+
     void SubViewport::prepare() {
         createImages();
+
+        // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
         createRenderPass();
         createFramebuffer();
+
+        RenderingServer::getSingleton().createMeshInstance3dGraphicsPipeline(
+                renderPass,
+                VkExtent2D{extent.x, extent.y},
+                meshInstance3dGraphicsPipeline);
+
     }
 
     void SubViewport::createImages() {
@@ -162,6 +176,7 @@ namespace Flint {
     }
 
     void SubViewport::draw() {
+        // Get current command buffer.
         auto commandBuffer = SwapChain::getSingleton().commandBuffers[SwapChain::getSingleton().currentImage];
 
         // Begin render pass.
@@ -171,8 +186,7 @@ namespace Flint {
         renderPassInfo.renderPass = renderPass;
         renderPassInfo.framebuffer = framebuffer; // Set target framebuffer.
         renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = VkExtent2D{static_cast<uint32_t>(extent.x),
-                                                      static_cast<uint32_t>(extent.y)};
+        renderPassInfo.renderArea.extent = VkExtent2D{extent.x, extent.y};
 
         // Clear color.
         std::array<VkClearValue, 2> clearValues{};
@@ -187,12 +201,11 @@ namespace Flint {
                              VK_SUBPASS_CONTENTS_INLINE);
         // ----------------------------------------------
 
+        // Start recursive calling to draw all nodes under this sub-viewport.
         Node::draw();
 
         // End render pass.
         vkCmdEndRenderPass(commandBuffer);
-
-        // Bind the previous pass.
     }
 
     void SubViewport::update(double delta) {

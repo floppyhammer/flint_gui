@@ -154,8 +154,8 @@ namespace Flint {
 
         //auto viewport = get_viewport();
         auto viewport = std::make_shared<SubViewport>();
-        viewport->extent = Vec2<int>(SwapChain::getSingleton().swapChainExtent.width,
-                                   SwapChain::getSingleton().swapChainExtent.height);
+        viewport->extent = Vec2<uint32_t>(SwapChain::getSingleton().swapChainExtent.width,
+                                          SwapChain::getSingleton().swapChainExtent.height);
 
         if (viewport != nullptr) {
             // Set projection matrix. Determined by viewport.

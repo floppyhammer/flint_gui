@@ -138,10 +138,15 @@ public:
 
     /**
      * Set up shaders, viewport, blend state, etc.
+     * @param renderPass Target render pass.
+     * @param viewportExtent Target viewport size.
+     * @param graphicsPipeline Generated pipeline.
      * @note We only need one pipeline for a specific rendering process despite of the existence of multiple swap chains.
-     * @dependency Descriptor set layout, swap chain extent.
+     * @dependency Descriptor set layout, render pass, viewport extent.
      */
-    void createMeshInstance3dGraphicsPipeline(VkRenderPass renderPass, VkExtent2D swapChainExtent);
+    void createMeshInstance3dGraphicsPipeline(VkRenderPass renderPass,
+                                              VkExtent2D viewportExtent,
+                                              VkPipeline &graphicsPipeline);
 
     void draw_mesh_instance(VkCommandBuffer commandBuffer,
                             VkDescriptorSet const &descriptorSet,

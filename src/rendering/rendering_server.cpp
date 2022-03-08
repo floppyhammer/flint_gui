@@ -11,7 +11,7 @@ RenderingServer::RenderingServer() {
 }
 
 void RenderingServer::createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
-    createMeshInstance3dGraphicsPipeline(renderPass, swapChainExtent);
+    createMeshInstance3dGraphicsPipeline(renderPass, swapChainExtent, meshInstance3dGraphicsPipeline);
 }
 
 void RenderingServer::cleanupSwapChainRelatedResources() const {
@@ -467,7 +467,9 @@ void RenderingServer::createMeshInstance3dDescriptorSetLayout() {
     }
 }
 
-void RenderingServer::createMeshInstance3dGraphicsPipeline(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
+void RenderingServer::createMeshInstance3dGraphicsPipeline(VkRenderPass renderPass,
+                                                           VkExtent2D viewportExtent,
+                                                           VkPipeline &graphicsPipeline) {
     auto vertShaderCode = readFile("../src/shaders/mesh_instance.vert.spv");
     auto fragShaderCode = readFile("../src/shaders/mesh_instance.frag.spv");
 
@@ -511,14 +513,14 @@ void RenderingServer::createMeshInstance3dGraphicsPipeline(VkRenderPass renderPa
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = (float) swapChainExtent.width;
-    viewport.height = (float) swapChainExtent.height;
+    viewport.width = (float) viewportExtent.width;
+    viewport.height = (float) viewportExtent.height;
     viewport.minDepth = 0.0f; // The depth range for the viewport.
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor{};
     scissor.offset = {0, 0};
-    scissor.extent = swapChainExtent;
+    scissor.extent = viewportExtent;
 
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -605,7 +607,7 @@ void RenderingServer::createMeshInstance3dGraphicsPipeline(VkRenderPass renderPa
                                   1,
                                   &pipelineInfo,
                                   nullptr,
-                                  &meshInstance3dGraphicsPipeline) != VK_SUCCESS) {
+                                  &graphicsPipeline) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create graphics pipeline!");
     }
 

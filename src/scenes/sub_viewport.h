@@ -12,7 +12,9 @@ namespace Flint {
      */
     class SubViewport : public Node {
     public:
-        Vec2<int> extent = {512, 512};
+        ~SubViewport();
+
+        Vec2<uint32_t> extent = {512, 512};
 
         float fov = 45.0;
 
@@ -24,6 +26,9 @@ namespace Flint {
         std::shared_ptr<SceneTree> tree;
 
         void draw() override;
+
+    public:
+        VkPipeline meshInstance3dGraphicsPipeline;
 
     protected:
         void update(double delta) override;
