@@ -26,16 +26,16 @@ namespace Flint {
 
         void draw() override;
 
+        std::shared_ptr<Texture> texture;
     public:
         // Pipelines bound with the render pass of this sub viewport.
         // ------------------------------------
-        VkPipeline modelGraphicsPipeline;
+        VkPipeline meshGraphicsPipeline;
+        VkPipeline blitGraphicsPipeline;
         // ------------------------------------
 
     protected:
         void update(double delta) override;
-
-        std::shared_ptr<Texture> texture;
 
         VkImage depthImage;
         VkDeviceMemory depthImageMemory;

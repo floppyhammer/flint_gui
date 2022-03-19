@@ -12,7 +12,8 @@ namespace Flint {
     SubViewport::~SubViewport() {
         auto device = Device::getSingleton().device;
 
-        vkDestroyPipeline(device, modelGraphicsPipeline, nullptr);
+        vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
+        vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);
     }
 
     void SubViewport::prepare() {
@@ -22,10 +23,15 @@ namespace Flint {
         createRenderPass();
         createFramebuffer();
 
-        RenderingServer::getSingleton().createMeshInstance3dGraphicsPipeline(
+        RenderingServer::getSingleton().createMeshGraphicsPipeline(
                 renderPass,
                 VkExtent2D{extent.x, extent.y},
-                modelGraphicsPipeline);
+                meshGraphicsPipeline);
+
+        RenderingServer::getSingleton().createBlitGraphicsPipeline(
+                renderPass,
+                VkExtent2D{extent.x, extent.y},
+                blitGraphicsPipeline);
     }
 
     void SubViewport::createImages() {

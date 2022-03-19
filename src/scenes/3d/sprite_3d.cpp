@@ -13,9 +13,9 @@
 namespace Flint {
     const std::vector<Vertex> vertices = {
             {{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-            {{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-            {{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-            {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+            {{0.5f,  -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+            {{0.5f,  0.5f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+            {{-0.5f, 0.5f,  0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
     };
 
     // For index buffer.
@@ -53,12 +53,12 @@ namespace Flint {
         if (mesh == nullptr || texture == nullptr) return;
 
         VkBuffer vertexBuffers[] = {vertexBuffer};
-        RS::getSingleton().draw_mesh_instance(SwapChain::getSingleton().commandBuffers[SwapChain::getSingleton().currentImage],
-                                              RS::getSingleton().meshInstance3dGraphicsPipeline,
-                                              descriptorSets[SwapChain::getSingleton().currentImage],
-                                              vertexBuffers,
-                                              indexBuffer,
-                                              mesh->indices.size());
+        RS::getSingleton().draw_mesh(SwapChain::getSingleton().commandBuffers[SwapChain::getSingleton().currentImage],
+                                     RS::getSingleton().meshGraphicsPipeline,
+                                     descriptorSets[SwapChain::getSingleton().currentImage],
+                                     vertexBuffers,
+                                     indexBuffer,
+                                     mesh->indices.size());
     }
 
     // Create descriptor pool before creating descriptor sets.
@@ -85,7 +85,7 @@ namespace Flint {
     void Sprite3D::createDescriptorSets() {
         auto device = Device::getSingleton().device;
         auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-        auto &descriptorSetLayout = RS::getSingleton().meshInstance3dDescriptorSetLayout;
+        auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
 
         std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
@@ -102,7 +102,7 @@ namespace Flint {
 
     void Sprite3D::updateDescriptorSets() {
         auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-        auto &descriptorSetLayout = RS::getSingleton().meshInstance3dDescriptorSetLayout;
+        auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
         auto device = Device::getSingleton().device;
 
         for (size_t i = 0; i < swapChainImages.size(); i++) {

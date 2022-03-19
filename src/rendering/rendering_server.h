@@ -42,7 +42,7 @@ public:
      * Create a shader module, but the shader stage is not specified yet.
      * @return Shader module.
      */
-    [[nodiscard]] static VkShaderModule createShaderModule(const std::vector<char> &code) ;
+    [[nodiscard]] static VkShaderModule createShaderModule(const std::vector<char> &code);
 
     /**
      * Create a command buffer in the command pool, and start recording.
@@ -115,9 +115,6 @@ public:
     void createTextureSampler(VkSampler &textureSampler) const;
 
 public:
-    void draw_canvas_item();
-
-public:
     // Texture rect.
     // --------------------------------------------------
 
@@ -126,15 +123,19 @@ public:
     // Mesh instance 3D.
     // --------------------------------------------------
     // These should be shared by all mesh instances.
-    VkDescriptorSetLayout meshInstance3dDescriptorSetLayout;
-    VkPipelineLayout meshInstance3dPipelineLayout;
-    VkPipeline meshInstance3dGraphicsPipeline;
+    VkDescriptorSetLayout meshDescriptorSetLayout;
+    VkPipelineLayout meshPipelineLayout;
+    VkPipeline meshGraphicsPipeline;
+
+    VkDescriptorSetLayout blitDescriptorSetLayout;
+    VkPipelineLayout blitPipelineLayout;
+    VkPipeline blitGraphicsPipeline;
 
     /**
-     * Create UBO descriptor.
+     * Create a descriptor set layout for mesh drawing.
      * @dependency None.
      */
-    void createMeshInstance3dDescriptorSetLayout();
+    void createMeshDescriptorSetLayout();
 
     /**
      * Set up shaders, viewport, blend state, etc.
@@ -144,22 +145,43 @@ public:
      * @note We only need one pipeline for a specific rendering process despite of the existence of multiple swap chains.
      * @dependency Descriptor set layout, render pass, viewport extent.
      */
-    void createMeshInstance3dGraphicsPipeline(VkRenderPass renderPass,
-                                              VkExtent2D viewportExtent,
-                                              VkPipeline &graphicsPipeline);
+    void createMeshGraphicsPipeline(VkRenderPass renderPass,
+                                    VkExtent2D viewportExtent,
+                                    VkPipeline &graphicsPipeline);
 
-    void draw_mesh_instance(VkCommandBuffer commandBuffer,
-                            VkPipeline modelGraphicsPipeline,
-                            VkDescriptorSet const &descriptorSet,
-                            VkBuffer *vertexBuffers,
-                            VkBuffer indexBuffer,
-                            uint32_t indexCount) const;
+    /**
+     * Draw a single mesh.
+     * @param commandBuffer
+     * @param meshGraphicsPipeline
+     * @param descriptorSet
+     * @param vertexBuffers
+     * @param indexBuffer
+     * @param indexCount
+     */
+    void draw_mesh(VkCommandBuffer commandBuffer,
+                   VkPipeline meshGraphicsPipeline,
+                   VkDescriptorSet const &descriptorSet,
+                   VkBuffer *vertexBuffers,
+                   VkBuffer indexBuffer,
+                   uint32_t indexCount) const;
+
+    void draw_texture(VkCommandBuffer commandBuffer,
+                      VkPipeline graphicsPipeline,
+                      const VkDescriptorSet &descriptorSet) const;
+
     // --------------------------------------------------
     void cleanupSwapChainRelatedResources() const;
 
     void createCommandPool();
 
     VkCommandPool commandPool;
+
+    void createBlitGraphicsPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &graphicsPipeline);
+
+    void createBlitDescriptorSetLayout();
+
+    void blit(VkCommandBuffer commandBuffer, VkPipeline graphicsPipeline, VkDescriptorSet const &descriptorSet,
+              VkBuffer *vertexBuffers, VkBuffer indexBuffer, uint32_t indexCount) const;
 };
 
 typedef RenderingServer RS;

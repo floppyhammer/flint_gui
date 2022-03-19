@@ -1,5 +1,5 @@
-#ifndef FLINT_MESH_INSTANCE_3D_H
-#define FLINT_MESH_INSTANCE_3D_H
+#ifndef FLINT_MODEL_H
+#define FLINT_MODEL_H
 
 #include "node_3d.h"
 #include "../../rendering/mesh.h"
@@ -39,4 +39,4 @@ namespace Flint {
     };
 }
 
-#endif //FLINT_MESH_INSTANCE_3D_H
+#endif //FLINT_MODEL_H

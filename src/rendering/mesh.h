@@ -1,6 +1,8 @@
 #ifndef FLINT_MESH_H
 #define FLINT_MESH_H
 
+#include "material.h"
+
 #include <string>
 #include <utility>
 #include <vector>
@@ -54,10 +56,12 @@ struct Vertex {
     }
 };
 
+
 class Mesh {
 public:
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
+    std::shared_ptr<Material> material;
 
     Mesh() = default;
     Mesh(std::vector<Vertex> p_vertices, std::vector<uint32_t> p_indices)

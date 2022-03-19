@@ -11,9 +11,6 @@ namespace Flint {
 
         void set_viewport(std::shared_ptr<SubViewport> p_viewport);
 
-        /// Intercept viewport searching upwards the scene tree.
-        //std::shared_ptr<SubViewport> get_viewport() override;
-
     protected:
         std::shared_ptr<SubViewport> viewport;
 
@@ -21,6 +18,14 @@ namespace Flint {
         void update(double delta) override;
 
         void draw() override;
+
+        void self_draw();
+
+        void create_descriptor_pool();
+
+        void create_descriptor_sets();
+
+        void update_descriptor_sets();
     };
 }
 

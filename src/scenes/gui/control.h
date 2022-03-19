@@ -5,15 +5,10 @@
 
 #include "../node.h"
 #include "../../common/vec2.h"
+#include "../../rendering/mesh.h"
 #include "../../rendering/rendering_server.h"
 
 namespace Flint {
-    struct Mvp2d {
-        glm::mat3 model;
-        glm::mat3 view;
-        glm::mat3 proj;
-    };
-
     class Control : public Node {
     public:
         Vec2<float> rect_position = Vec2<float>(0);
@@ -36,9 +31,48 @@ namespace Flint {
 
         void set_rect_pivot_offset(float x, float y);
 
+        const std::vector<Vertex> vertices = {
+                {{-0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+                {{0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
+                {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+                {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+        };
+
+        // For index buffer.
+        const std::vector<uint32_t> indices = {
+                0, 1, 2, 2, 3, 0
+        };
+
     protected:
+        void update(double delta);
+
+        /// Vertex buffer.
+        VkBuffer vertex_buffer;
+        VkDeviceMemory vertex_buffer_memory;
+
+        /// Index buffer.
+        VkBuffer index_buffer;
+        VkDeviceMemory index_buffer_memory;
+
+        /// We have a uniform buffer per swap chain image.
         std::vector<VkBuffer> uniform_buffers;
         std::vector<VkDeviceMemory> uniform_buffers_memory;
+
+        /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
+        VkDescriptorPool descriptorPool;
+
+        /// Descriptor sets are allocated from descriptor pool objects.
+        std::vector<VkDescriptorSet> descriptor_sets;
+
+        bool vkResourcesAllocated = false;
+
+        void create_vertex_buffer();
+
+        void create_index_buffer();
+
+        void update_uniform_buffer();
+
+        void create_uniform_buffers();
     };
 }
 

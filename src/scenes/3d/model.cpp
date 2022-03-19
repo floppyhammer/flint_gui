@@ -1,4 +1,4 @@
-#include "mesh_instance_3d.h"
+#include "model.h"
 
 #include "../../common/io.h"
 #include "../../rendering/swap_chain.h"
@@ -72,15 +72,15 @@ namespace Flint {
 
         Node *viewport_node = get_viewport();
 
-        VkPipeline pipeline = RS::getSingleton().meshInstance3dGraphicsPipeline;
+        VkPipeline pipeline = RS::getSingleton().meshGraphicsPipeline;
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-            pipeline = viewport->modelGraphicsPipeline;
+            pipeline = viewport->meshGraphicsPipeline;
         }
 
         VkBuffer vertexBuffers[] = {vertexBuffer};
-        RS::getSingleton().draw_mesh_instance(
+        RS::getSingleton().draw_mesh(
                 SwapChain::getSingleton().commandBuffers[SwapChain::getSingleton().currentImage],
                 pipeline,
                 descriptorSets[SwapChain::getSingleton().currentImage],
@@ -115,7 +115,7 @@ namespace Flint {
     void MeshInstance3D::createDescriptorSets() {
         auto device = Device::getSingleton().device;
         auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-        auto &descriptorSetLayout = RS::getSingleton().meshInstance3dDescriptorSetLayout;
+        auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
 
         std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
@@ -132,7 +132,7 @@ namespace Flint {
 
     void MeshInstance3D::updateDescriptorSets() {
         auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-        auto &descriptorSetLayout = RS::getSingleton().meshInstance3dDescriptorSetLayout;
+        auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
         auto device = Device::getSingleton().device;
 
         for (size_t i = 0; i < swapChainImages.size(); i++) {
