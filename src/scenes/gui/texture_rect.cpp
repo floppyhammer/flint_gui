@@ -22,6 +22,8 @@ namespace Flint {
     };
 
     TextureRect::TextureRect() {
+        type = NodeType::TextureRect;
+
         mesh = std::make_shared<Mesh>(vertices, indices);
     }
 

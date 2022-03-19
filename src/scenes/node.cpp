@@ -1,7 +1,5 @@
 #include "node.h"
 
-#include "sub_viewport.h"
-
 namespace Flint {
     void Node::update(double delta) {
         for (auto &child: children) {
@@ -13,6 +11,8 @@ namespace Flint {
         for (auto &child: children) {
             child->draw();
         }
+
+        Logger::verbose("DRAW", "Node");
     }
 
     void Node::notify(Signal signal) {
@@ -21,9 +21,13 @@ namespace Flint {
         }
     }
 
-    std::shared_ptr<SubViewport> Node::get_viewport() {
+    Node *Node::get_viewport() {
         if (get_parent() != nullptr) {
-            return get_parent()->get_viewport();
+            if (get_parent()->type == NodeType::SubViewport) {
+                return get_parent();
+            } else {
+                return get_parent()->get_viewport();
+            }
         } else {
             return {};
         }

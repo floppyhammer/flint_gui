@@ -4,14 +4,13 @@
 #include "node.h"
 #include "../common/vec2.h"
 #include "../rendering/rendering_server.h"
+#include "../rendering/texture.h"
 #include "../core/scene_tree.h"
 
 namespace Flint {
-    /**
-     * SubViewport is not a node.
-     */
     class SubViewport : public Node {
     public:
+        SubViewport();
         ~SubViewport();
 
         Vec2<uint32_t> extent = {512, 512};
@@ -28,18 +27,15 @@ namespace Flint {
         void draw() override;
 
     public:
-        VkPipeline meshInstance3dGraphicsPipeline;
+        // Pipelines bound with the render pass of this sub viewport.
+        // ------------------------------------
+        VkPipeline modelGraphicsPipeline;
+        // ------------------------------------
 
     protected:
         void update(double delta) override;
 
-        // Should have the same number as swap chain images.
-        VkImage image;
-        VkDeviceMemory imageMemory;
-        VkImageView imageView;
-
-        // How should this sub viewport be sampled.
-        VkSampler sampler;
+        std::shared_ptr<Texture> texture;
 
         VkImage depthImage;
         VkDeviceMemory depthImageMemory;

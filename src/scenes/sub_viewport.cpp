@@ -5,10 +5,14 @@
 #include <array>
 
 namespace Flint {
+    SubViewport::SubViewport() {
+        type = NodeType::SubViewport;
+    }
+
     SubViewport::~SubViewport() {
         auto device = Device::getSingleton().device;
 
-        vkDestroyPipeline(device, meshInstance3dGraphicsPipeline, nullptr);
+        vkDestroyPipeline(device, modelGraphicsPipeline, nullptr);
     }
 
     void SubViewport::prepare() {
@@ -21,41 +25,13 @@ namespace Flint {
         RenderingServer::getSingleton().createMeshInstance3dGraphicsPipeline(
                 renderPass,
                 VkExtent2D{extent.x, extent.y},
-                meshInstance3dGraphicsPipeline);
-
+                modelGraphicsPipeline);
     }
 
     void SubViewport::createImages() {
-        RS::getSingleton().createImage(extent.x, extent.y,
-                                       VK_FORMAT_R8G8B8A8_UNORM,
-                                       VK_IMAGE_TILING_OPTIMAL,
-                                       VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-                                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                       image,
-                                       imageMemory);
+        texture = Texture::create(extent.x, extent.y);
 
-        // Create image view.
-        imageView = RS::getSingleton().createImageView(image,
-                                                       VK_FORMAT_R8G8B8A8_UNORM,
-                                                       VK_IMAGE_ASPECT_COLOR_BIT);
-
-        // Create sampler to sample from the attachment in the fragment shader.
-        RS::getSingleton().createTextureSampler(sampler);
-
-        // Within that render pass you then can use subpass dependencies to
-        // transition the destination images to the proper layout. Your
-        // first transition should be VK_ACCESS_SHADER_READ_BIT to
-        // VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT for writing to the
-        // destination image and once that's done you transition back
-        // from VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT to
-        // VK_ACCESS_SHADER_READ_BIT, so you can e.g. render your destination
-        // images in the visual pass. An alternative would be blitting them
-        // to the swap chain if the device supports that.
-        RS::getSingleton().transitionImageLayout(image,
-                                                 VK_FORMAT_R8G8B8A8_SRGB,
-                                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                                                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-
+        // Depth.
         VkFormat depthFormat = Device::getSingleton().findDepthFormat();
         RS::getSingleton().createImage(extent.x, extent.y,
                                        depthFormat,
@@ -71,7 +47,7 @@ namespace Flint {
         // Color attachment.
         // ----------------------------------------
         VkAttachmentDescription colorAttachment{};
-        colorAttachment.format = VK_FORMAT_R8G8B8A8_UNORM; // Specifying the format of the image view that will be used for the attachment.
+        colorAttachment.format = VK_FORMAT_R8G8B8A8_SRGB; // Specifying the format of the image view that will be used for the attachment.
         colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT; // Specifying the number of samples of the image.
         colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; // Specifying how the contents of color and depth components of the attachment are treated at the beginning of the subpass where it is first used.
         colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE; // Specifying how the contents of color and depth components of the attachment are treated at the end of the subpass where it is last used.
@@ -150,7 +126,7 @@ namespace Flint {
         // Create framebuffer.
         {
             std::array<VkImageView, 2> attachments = {
-                    imageView,
+                    texture->imageView,
                     depthImageView
             };
 
@@ -171,41 +147,63 @@ namespace Flint {
 
         // Fill a descriptor for later use in a descriptor set.
         descriptor.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        descriptor.imageView = imageView;
-        descriptor.sampler = sampler;
+        descriptor.imageView = texture->imageView;
+        descriptor.sampler = texture->sampler;
     }
 
     void SubViewport::draw() {
-        // Get current command buffer.
+        // Get the current command buffer.
         auto commandBuffer = SwapChain::getSingleton().commandBuffers[SwapChain::getSingleton().currentImage];
 
+        // Might not be necessary.
+//        // Within that render pass you then can use subpass dependencies to
+//        // transition the destination images to the proper layout. Your
+//        // first transition should be VK_ACCESS_SHADER_READ_BIT to
+//        // VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT for writing to the
+//        // destination image and once that's done you transition back
+//        // from VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT to
+//        // VK_ACCESS_SHADER_READ_BIT, so you can e.g. render your destination
+//        // images in the visual pass. An alternative would be blitting them
+//        // to the swap chain if the device supports that.
+//        RS::getSingleton().transitionImageLayout(texture->image,
+//                                                 VK_FORMAT_R8G8B8A8_SRGB,
+//                                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+//                                                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
         // Begin render pass.
-        // ----------------------------------------------
-        VkRenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = renderPass;
-        renderPassInfo.framebuffer = framebuffer; // Set target framebuffer.
-        renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = VkExtent2D{extent.x, extent.y};
+        {
+            VkRenderPassBeginInfo renderPassInfo{};
+            renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            renderPassInfo.renderPass = renderPass;
+            renderPassInfo.framebuffer = framebuffer; // Set target framebuffer.
+            renderPassInfo.renderArea.offset = {0, 0};
+            renderPassInfo.renderArea.extent = VkExtent2D{extent.x, extent.y};
 
-        // Clear color.
-        std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
-        clearValues[1].depthStencil = {1.0f, 0};
+            // Clear color.
+            std::array<VkClearValue, 2> clearValues{};
+            clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
+            clearValues[1].depthStencil = {1.0f, 0};
 
-        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        renderPassInfo.pClearValues = clearValues.data();
+            renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+            renderPassInfo.pClearValues = clearValues.data();
 
-        vkCmdBeginRenderPass(commandBuffer,
-                             &renderPassInfo,
-                             VK_SUBPASS_CONTENTS_INLINE);
-        // ----------------------------------------------
+            vkCmdBeginRenderPass(commandBuffer,
+                                 &renderPassInfo,
+                                 VK_SUBPASS_CONTENTS_INLINE);
+        }
 
         // Start recursive calling to draw all nodes under this sub-viewport.
         Node::draw();
 
         // End render pass.
         vkCmdEndRenderPass(commandBuffer);
+
+//        RS::getSingleton().transitionImageLayout(texture->image,
+//                                                 VK_FORMAT_R8G8B8A8_SRGB,
+//                                                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+//                                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+        Logger::verbose("DRAW", "SubViewport");
     }
 
     void SubViewport::update(double delta) {

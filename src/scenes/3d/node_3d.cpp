@@ -15,6 +15,10 @@
 #include <chrono>
 
 namespace Flint {
+    Node3D::Node3D() {
+        type = NodeType::Node3D;
+    }
+
     Node3D::~Node3D() {
         auto device = Device::getSingleton().device;
         auto swapChainImages = SwapChain::getSingleton().swapChainImages;
@@ -152,12 +156,14 @@ namespace Flint {
                                glm::vec3(0.0f, 0.0f, 0.0f),
                                camera.up);
 
-        //auto viewport = get_viewport();
-        auto viewport = std::make_shared<SubViewport>();
-        viewport->extent = Vec2<uint32_t>(SwapChain::getSingleton().swapChainExtent.width,
-                                          SwapChain::getSingleton().swapChainExtent.height);
+        Node *viewport_node = get_viewport();
 
-        if (viewport != nullptr) {
+//        viewport->extent = Vec2<uint32_t>(SwapChain::getSingleton().swapChainExtent.width,
+//                                          SwapChain::getSingleton().swapChainExtent.height);
+
+        if (viewport_node) {
+            auto viewport = dynamic_cast<SubViewport *>(viewport_node);
+
             // Set projection matrix. Determined by viewport.
             ubo.proj = glm::perspective(glm::radians(viewport->fov),
                                         (float) viewport->extent.x / (float) viewport->extent.y,

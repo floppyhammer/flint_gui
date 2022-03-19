@@ -2,15 +2,36 @@
 #define FLINT_NODE_H
 
 #include "../core/engine.h"
+#include "../common/logger.h"
 
 #include <vector>
 #include <memory>
 
 namespace Flint {
-    class SubViewport;
+    enum class NodeType {
+        // General.
+        Node = 0,
+        SubViewport,
+
+        // GUI.
+        Control,
+        TextureRect,
+        SubViewportContainer,
+
+        // 2D.
+        Node2D,
+
+        // 3D.
+        Node3D,
+        MeshInstance3D,
+
+        Max,
+    };
 
     class Node {
     public:
+        NodeType type = NodeType::Node;
+
         virtual void update(double delta);
 
         virtual void draw();
@@ -23,7 +44,7 @@ namespace Flint {
          * Get the viewport this node belongs to.
          * @return A pointer to the viewport.
          */
-        virtual std::shared_ptr<SubViewport> get_viewport();
+        virtual Node *get_viewport();
 
         Node *get_parent();
 

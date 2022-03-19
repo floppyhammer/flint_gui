@@ -7,8 +7,8 @@
 #include <array>
 
 namespace Flint {
-    std::shared_ptr<SubViewport> SubViewportContainer::get_viewport() {
-        return {viewport};
+    SubViewportContainer::SubViewportContainer() {
+        type = NodeType::SubViewportContainer;
     }
 
     void SubViewportContainer::set_viewport(std::shared_ptr<SubViewport> p_viewport) {
@@ -60,5 +60,6 @@ namespace Flint {
         // Now draw the sub-viewport image.
         // TODO: Finish TextureRect node first.
 
+        Logger::verbose("DRAW", "SubViewportContainer");
     }
 }

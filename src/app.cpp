@@ -4,6 +4,8 @@
 #include "rendering/swap_chain.h"
 #include "rendering/rendering_server.h"
 #include "core/engine.h"
+#include "scenes/gui/sub_viewport_container.h"
+#include "scenes/sub_viewport.h"
 
 #include <cstdint>
 #include <memory>
@@ -20,6 +22,8 @@ void App::run() {
     auto swap_chain = SwapChain::getSingleton();
     // ---------------------------------------------------
 
+    Flint::Logger::set_level(Flint::Logger::VERBOSE);
+
     // Build scene tree. Use a block, so we don't increase ref counts for the nodes.
     // -----------------------------------
     {
@@ -27,8 +31,14 @@ void App::run() {
         auto node_3d = std::make_shared<Flint::Node3D>();
         auto mesh_instance_0 = std::make_shared<Flint::MeshInstance3D>();
         auto mesh_instance_1 = std::make_shared<Flint::MeshInstance3D>();
+        auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
+        auto sub_viewport = std::make_shared<Flint::SubViewport>();
 
-        node->add_child(node_3d);
+        node->add_child(sub_viewport_c);
+        sub_viewport->prepare();
+        sub_viewport_c->add_child(sub_viewport);
+        sub_viewport_c->set_viewport(sub_viewport);
+        sub_viewport->add_child(node_3d);
         node_3d->add_child(mesh_instance_0);
         node_3d->add_child(mesh_instance_1);
         mesh_instance_0->position.x = 1;
@@ -123,4 +133,6 @@ void App::drawFrame() {
 
     // Submit commands for drawing.
     SwapChain::getSingleton().flush(imageIndex);
+
+    Flint::Logger::verbose("---------------- FRAME ----------------", "Main Loop");
 }

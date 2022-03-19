@@ -149,6 +149,7 @@ public:
                                               VkPipeline &graphicsPipeline);
 
     void draw_mesh_instance(VkCommandBuffer commandBuffer,
+                            VkPipeline modelGraphicsPipeline,
                             VkDescriptorSet const &descriptorSet,
                             VkBuffer *vertexBuffers,
                             VkBuffer indexBuffer,

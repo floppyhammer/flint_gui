@@ -391,6 +391,7 @@ void RenderingServer::draw_canvas_item() {
 }
 
 void RenderingServer::draw_mesh_instance(VkCommandBuffer commandBuffer,
+                                         VkPipeline modelGraphicsPipeline,
                                          const VkDescriptorSet &descriptorSet,
                                          VkBuffer vertexBuffers[],
                                          VkBuffer indexBuffer,
@@ -398,7 +399,7 @@ void RenderingServer::draw_mesh_instance(VkCommandBuffer commandBuffer,
     // Bind pipeline.
     vkCmdBindPipeline(commandBuffer,
                       VK_PIPELINE_BIND_POINT_GRAPHICS,
-                      meshInstance3dGraphicsPipeline);
+                      modelGraphicsPipeline);
 
     // Bind vertex and index buffers.
     VkDeviceSize offsets[] = {0};

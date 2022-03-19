@@ -2,6 +2,7 @@
 
 #include "../../common/io.h"
 #include "../../rendering/swap_chain.h"
+#include "../sub_viewport.h"
 
 #include <utility>
 
@@ -10,6 +11,8 @@ namespace Flint {
     const std::string TEXTURE_PATH = "../res/viking_room.png";
 
     MeshInstance3D::MeshInstance3D() {
+        type = NodeType::MeshInstance3D;
+
         createDescriptorPool();
 
         createDescriptorSets();
@@ -24,7 +27,7 @@ namespace Flint {
         set_mesh(p_mesh);
 
         // Load texture.
-        auto p_texture = std::make_shared<Texture>(TEXTURE_PATH);
+        auto p_texture = Texture::from_file(TEXTURE_PATH);
         set_texture(p_texture);
         // --------------------------------
     }
@@ -67,12 +70,25 @@ namespace Flint {
 
         if (mesh == nullptr || texture == nullptr) return;
 
+        Node *viewport_node = get_viewport();
+
+        VkPipeline pipeline = RS::getSingleton().meshInstance3dGraphicsPipeline;
+
+        if (viewport_node) {
+            auto viewport = dynamic_cast<SubViewport *>(viewport_node);
+            pipeline = viewport->modelGraphicsPipeline;
+        }
+
         VkBuffer vertexBuffers[] = {vertexBuffer};
-        RS::getSingleton().draw_mesh_instance(SwapChain::getSingleton().commandBuffers[SwapChain::getSingleton().currentImage],
-                                              descriptorSets[SwapChain::getSingleton().currentImage],
-                                              vertexBuffers,
-                                              indexBuffer,
-                                              mesh->indices.size());
+        RS::getSingleton().draw_mesh_instance(
+                SwapChain::getSingleton().commandBuffers[SwapChain::getSingleton().currentImage],
+                pipeline,
+                descriptorSets[SwapChain::getSingleton().currentImage],
+                vertexBuffers,
+                indexBuffer,
+                mesh->indices.size());
+
+        Logger::verbose("DRAW", "MeshInstance3D");
     }
 
     // Create descriptor pool before creating descriptor sets.

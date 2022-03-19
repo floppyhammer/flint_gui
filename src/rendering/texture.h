@@ -11,10 +11,17 @@
 
 class Texture {
 public:
-    /// Load a texture from directory.
-    explicit Texture(const std::string &filename);
+    /// Create an empty texture.
+    static std::shared_ptr<Texture> create(uint32_t p_width, uint32_t p_height);
+
+    /// Create a texture from file.
+    static std::shared_ptr<Texture> from_file(const std::string &filename);
+
+    Texture() = default;
+
     ~Texture();
 
+public:
     uint32_t width = 0;
     uint32_t height = 0;
 
@@ -27,14 +34,14 @@ public:
     VkDeviceMemory imageMemory{};
 
     /// Thin wrapper.
-    VkImageView imageView;
+    VkImageView imageView{};
 
     /// How image should be filtered.
     VkSampler sampler{};
 
-    void createImageFromBytes(void *pixels, int texWidth, int texHeight);
+private:
 
-    void cleanup() const;
+    void create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height);
 };
 
 #endif //FLINT_TEXTURE_H

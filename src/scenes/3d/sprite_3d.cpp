@@ -54,6 +54,7 @@ namespace Flint {
 
         VkBuffer vertexBuffers[] = {vertexBuffer};
         RS::getSingleton().draw_mesh_instance(SwapChain::getSingleton().commandBuffers[SwapChain::getSingleton().currentImage],
+                                              RS::getSingleton().meshInstance3dGraphicsPipeline,
                                               descriptorSets[SwapChain::getSingleton().currentImage],
                                               vertexBuffers,
                                               indexBuffer,
