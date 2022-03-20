@@ -7,8 +7,12 @@
 
 RenderingServer::RenderingServer() {
     createCommandPool();
+
     createMeshDescriptorSetLayout();
+    createGraphicsPipelineLayout(meshDescriptorSetLayout, meshPipelineLayout);
+
     createBlitDescriptorSetLayout();
+    createGraphicsPipelineLayout(blitDescriptorSetLayout, blitPipelineLayout);
 }
 
 void RenderingServer::createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
@@ -643,18 +647,6 @@ void RenderingServer::createMeshGraphicsPipeline(VkRenderPass renderPass,
     colorBlending.blendConstants[2] = 0.0f;
     colorBlending.blendConstants[3] = 0.0f;
 
-    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 1;
-    pipelineLayoutInfo.pSetLayouts = &meshDescriptorSetLayout;
-    pipelineLayoutInfo.pushConstantRangeCount = 0;
-
-    // Create pipeline layout.
-    if (vkCreatePipelineLayout(Device::getSingleton().device, &pipelineLayoutInfo, nullptr, &meshPipelineLayout) !=
-        VK_SUCCESS) {
-        throw std::runtime_error("Failed to create pipeline layout!");
-    }
-
     VkPipelineDepthStencilStateCreateInfo depthStencil{};
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     depthStencil.depthTestEnable = VK_TRUE;
@@ -698,6 +690,21 @@ void RenderingServer::createMeshGraphicsPipeline(VkRenderPass renderPass,
     // Clean up shader modules.
     vkDestroyShaderModule(device, fragShaderModule, nullptr);
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
+}
+
+void RenderingServer::createGraphicsPipelineLayout(VkDescriptorSetLayout &descriptorSetLayout,
+                                                   VkPipelineLayout &graphicsPipelineLayout) {
+    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
+    pipelineLayoutInfo.pushConstantRangeCount = 0;
+
+    // Create pipeline layout.
+    if (vkCreatePipelineLayout(Device::getSingleton().device, &pipelineLayoutInfo, nullptr, &graphicsPipelineLayout) !=
+        VK_SUCCESS) {
+        throw std::runtime_error("Failed to create pipeline layout!");
+    }
 }
 
 void RenderingServer::createBlitGraphicsPipeline(VkRenderPass renderPass,
@@ -792,18 +799,6 @@ void RenderingServer::createBlitGraphicsPipeline(VkRenderPass renderPass,
     colorBlending.blendConstants[1] = 0.0f;
     colorBlending.blendConstants[2] = 0.0f;
     colorBlending.blendConstants[3] = 0.0f;
-
-    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 1;
-    pipelineLayoutInfo.pSetLayouts = &blitDescriptorSetLayout;
-    pipelineLayoutInfo.pushConstantRangeCount = 0;
-
-    // Create pipeline layout.
-    if (vkCreatePipelineLayout(Device::getSingleton().device, &pipelineLayoutInfo, nullptr, &blitPipelineLayout) !=
-        VK_SUCCESS) {
-        throw std::runtime_error("Failed to create pipeline layout!");
-    }
 
     VkPipelineDepthStencilStateCreateInfo depthStencil{};
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;

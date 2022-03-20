@@ -19,6 +19,8 @@ namespace Flint {
         create_vertex_buffer();
 
         create_index_buffer();
+
+        vk_resources_allocated = true;
     }
 
     void SubViewportContainer::set_viewport(std::shared_ptr<SubViewport> p_viewport) {
@@ -115,7 +117,7 @@ namespace Flint {
         poolInfo.pPoolSizes = poolSizes.data();
         poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
 
-        if (vkCreateDescriptorPool(Device::getSingleton().device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+        if (vkCreateDescriptorPool(Device::getSingleton().device, &poolInfo, nullptr, &descriptor_pool) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor pool!");
         }
     }
@@ -128,7 +130,7 @@ namespace Flint {
         std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = descriptorPool;
+        allocInfo.descriptorPool = descriptor_pool;
         allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
         allocInfo.pSetLayouts = layouts.data();
 

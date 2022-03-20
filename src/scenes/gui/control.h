@@ -11,6 +11,8 @@
 namespace Flint {
     class Control : public Node {
     public:
+        ~Control();
+
         Vec2<float> rect_position = Vec2<float>(0);
 
         Vec2<float> rect_size = Vec2<float>(128);
@@ -32,15 +34,15 @@ namespace Flint {
         void set_rect_pivot_offset(float x, float y);
 
         const std::vector<Vertex> vertices = {
-                {{-0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-                {{0.5f, -0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
-                {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-                {{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+                {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+                {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
+                {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+                {{0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
         };
 
-        // For index buffer.
+        // For index buffer. (Front is counter-clockwise.)
         const std::vector<uint32_t> indices = {
-                0, 1, 2, 2, 3, 0
+                0, 2, 1, 2, 0, 3
         };
 
     protected:
@@ -59,12 +61,12 @@ namespace Flint {
         std::vector<VkDeviceMemory> uniform_buffers_memory;
 
         /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
-        VkDescriptorPool descriptorPool;
+        VkDescriptorPool descriptor_pool;
 
         /// Descriptor sets are allocated from descriptor pool objects.
         std::vector<VkDescriptorSet> descriptor_sets;
 
-        bool vkResourcesAllocated = false;
+        bool vk_resources_allocated = false;
 
         void create_vertex_buffer();
 

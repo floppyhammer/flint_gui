@@ -138,6 +138,15 @@ public:
     void createMeshDescriptorSetLayout();
 
     /**
+     * Create pipeline layout. Must do this before creating pipeline.
+     * @param descriptorSetLayout Descriptor set layout of the pipeline.
+     * @param graphicsPipelineLayout Output.
+     * dependency VkDescriptorSetLayout.
+     */
+    void createGraphicsPipelineLayout(VkDescriptorSetLayout &descriptorSetLayout,
+                                      VkPipelineLayout &graphicsPipelineLayout);
+
+    /**
      * Set up shaders, viewport, blend state, etc.
      * @param renderPass Target render pass.
      * @param viewportExtent Target viewport size.
@@ -165,9 +174,8 @@ public:
                    VkBuffer indexBuffer,
                    uint32_t indexCount) const;
 
-    void draw_texture(VkCommandBuffer commandBuffer,
-                      VkPipeline graphicsPipeline,
-                      const VkDescriptorSet &descriptorSet) const;
+    void blit(VkCommandBuffer commandBuffer, VkPipeline graphicsPipeline, VkDescriptorSet const &descriptorSet,
+              VkBuffer *vertexBuffers, VkBuffer indexBuffer, uint32_t indexCount) const;
 
     // --------------------------------------------------
     void cleanupSwapChainRelatedResources() const;
@@ -179,9 +187,6 @@ public:
     void createBlitGraphicsPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &graphicsPipeline);
 
     void createBlitDescriptorSetLayout();
-
-    void blit(VkCommandBuffer commandBuffer, VkPipeline graphicsPipeline, VkDescriptorSet const &descriptorSet,
-              VkBuffer *vertexBuffers, VkBuffer indexBuffer, uint32_t indexCount) const;
 };
 
 typedef RenderingServer RS;

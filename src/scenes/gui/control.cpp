@@ -33,6 +33,30 @@ namespace Flint {
         rect_pivot_offset.y = y;
     }
 
+    Control::~Control() {
+        auto device = Device::getSingleton().device;
+        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
+
+        if (!vk_resources_allocated) return;
+
+        // When we destroy the pool, the sets inside are destroyed as well.
+        vkDestroyDescriptorPool(device, descriptor_pool, nullptr);
+
+        // Clean up uniform buffers.
+        for (size_t i = 0; i < swapChainImages.size(); i++) {
+            vkDestroyBuffer(device, uniform_buffers[i], nullptr);
+            vkFreeMemory(device, uniform_buffers_memory[i], nullptr);
+        }
+
+        // Clean up index buffer.
+        vkDestroyBuffer(device, index_buffer, nullptr);
+        vkFreeMemory(device, index_buffer_memory, nullptr);
+
+        // Clean up vertex buffer.
+        vkDestroyBuffer(device, vertex_buffer, nullptr); // GPU memory
+        vkFreeMemory(device, vertex_buffer_memory, nullptr); // CPU memory
+    }
+
     void Control::update(double delta) {
         // Branch to root.
         Node::update(delta);
@@ -43,20 +67,34 @@ namespace Flint {
     void Control::update_uniform_buffer() {
         if (uniform_buffers_memory.empty()) return;
 
-        // Prepare UBO data.
-        UniformBufferObject ubo{};
-        ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(rect_position.x / rect_size.x * 2.0f,
-                                                              rect_position.y / rect_size.y * 2.0f,
-                                                              0.0f));
-        ubo.model = glm::scale(ubo.model, glm::vec3(rect_scale.x, rect_scale.y, 1.0f));
-
         Node *viewport_node = get_viewport();
 
+        Vec2<uint32_t> viewport_extent;
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
+            viewport_extent = viewport->extent;
         } else { // Default to swap chain image.
-
+            auto extent = SwapChain::getSingleton().swapChainExtent;
+            viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
         }
+
+        // Prepare UBO data. We use this matrix to convert a full-screen to the control's rect.
+        UniformBufferObject ubo{};
+
+        // The actual application order of these matrices is reverse.
+        // 4.
+        ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(rect_position.x / viewport_extent.x * 2.0f,
+                                                        rect_position.y / viewport_extent.y * 2.0f,
+                                                        0.0f));
+        // 3.
+        ubo.model = glm::translate(ubo.model, glm::vec3(-1.0, -1.0, 0.0f));
+        // 2.
+        ubo.model = glm::scale(ubo.model, glm::vec3(rect_scale.x, rect_scale.y, 1.0f));
+        // 1.
+        ubo.model = glm::scale(ubo.model,
+                               glm::vec3(rect_size.x / viewport_extent.x * 2.0f,
+                                         rect_size.y / viewport_extent.y * 2.0f,
+                                         1.0f));
 
         // Copy the UBO data to the current uniform buffer.
         RS::getSingleton().copyDataToMemory(&ubo.model,
