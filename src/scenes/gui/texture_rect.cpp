@@ -27,8 +27,8 @@ namespace Flint {
         return texture;
     }
 
-    void TextureRect::draw() {
-        Control::draw();
+    void TextureRect::draw(VkCommandBuffer p_command_buffer) {
+        Control::draw(p_command_buffer);
     }
 
     void TextureRect::update(double delta) {

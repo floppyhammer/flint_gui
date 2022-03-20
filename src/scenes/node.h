@@ -4,6 +4,10 @@
 #include "../core/engine.h"
 #include "../common/logger.h"
 
+#define GLFW_INCLUDE_VULKAN
+
+#include "GLFW/glfw3.h"
+
 #include <vector>
 #include <memory>
 
@@ -34,7 +38,7 @@ namespace Flint {
 
         virtual void update(double delta);
 
-        virtual void draw();
+        virtual void draw(VkCommandBuffer p_command_buffer);
 
         virtual void notify(Signal signal);
 

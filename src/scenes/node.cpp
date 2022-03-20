@@ -7,9 +7,9 @@ namespace Flint {
         }
     }
 
-    void Node::draw() {
+    void Node::draw(VkCommandBuffer p_command_buffer) {
         for (auto &child: children) {
-            child->draw();
+            child->draw(p_command_buffer);
         }
 
         Logger::verbose("DRAW", "Node");

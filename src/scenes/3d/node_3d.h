@@ -27,7 +27,7 @@ namespace Flint {
     protected:
         void update(double delta) override;
 
-        void draw() override;
+        void draw(VkCommandBuffer p_command_buffer) override;
 
         /**
          * Update MVP. Update UBOs simply by memory mapping.

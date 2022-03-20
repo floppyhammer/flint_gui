@@ -34,12 +34,14 @@ void App::run() {
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
 
+
+        node->add_child(mesh_instance_0);
         node->add_child(sub_viewport_c);
+
         sub_viewport->prepare();
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
-        node_3d->add_child(mesh_instance_0);
         node_3d->add_child(mesh_instance_1);
         mesh_instance_0->position.x = 1;
         mesh_instance_1->position.x = -1;
@@ -71,32 +73,30 @@ void App::recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t 
         throw std::runtime_error("Failed to begin recording command buffer!");
     }
 
-    // Begin render pass.
-    // ----------------------------------------------
-    VkRenderPassBeginInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = SwapChain::getSingleton().renderPass;
-    renderPassInfo.framebuffer = SwapChain::getSingleton().swapChainFramebuffers[imageIndex]; // Set target framebuffer.
-    renderPassInfo.renderArea.offset = {0, 0};
-    renderPassInfo.renderArea.extent = SwapChain::getSingleton().swapChainExtent;
+    // Begin render pass. We can only do this for the swap chain render pass once due to the clear operation.
+    {
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = SwapChain::getSingleton().renderPass;
+        renderPassInfo.framebuffer = SwapChain::getSingleton().swapChainFramebuffers[imageIndex]; // Set target framebuffer.
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent = SwapChain::getSingleton().swapChainExtent;
 
-    // Clear color.
-    std::array<VkClearValue, 2> clearValues{};
-    clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
-    clearValues[1].depthStencil = {1.0f, 0};
+        // Clear color.
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
+        clearValues[1].depthStencil = {1.0f, 0};
 
-    renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-    renderPassInfo.pClearValues = clearValues.data();
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
 
-    vkCmdBeginRenderPass(commandBuffers[imageIndex],
-                         &renderPassInfo,
-                         VK_SUBPASS_CONTENTS_INLINE);
-    // ----------------------------------------------
+        vkCmdBeginRenderPass(commandBuffers[imageIndex],
+                             &renderPassInfo,
+                             VK_SUBPASS_CONTENTS_INLINE);
+    }
 
     // Record commands from the scene tree.
-    // ---------------------------------------------
-    tree.record_commands();
-    // ---------------------------------------------
+    tree.record_commands(commandBuffers[imageIndex]);
 
     // End render pass.
     vkCmdEndRenderPass(commandBuffers[imageIndex]);

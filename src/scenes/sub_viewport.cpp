@@ -15,6 +15,11 @@ namespace Flint {
         vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
         vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);
 
+        // Depth resources.
+        vkDestroyImageView(device, depthImageView, nullptr);
+        vkDestroyImage(device, depthImage, nullptr);
+        vkFreeMemory(device, depthImageMemory, nullptr);
+
         vkDestroyFramebuffer(device, framebuffer, nullptr);
         vkDestroyRenderPass(device, renderPass, nullptr);
     }
@@ -160,25 +165,7 @@ namespace Flint {
         descriptor.sampler = texture->sampler;
     }
 
-    void SubViewport::draw() {
-        // Get the current command buffer.
-        auto commandBuffer = SwapChain::getSingleton().commandBuffers[SwapChain::getSingleton().currentImage];
-
-        // Might not be necessary.
-//        // Within that render pass you then can use subpass dependencies to
-//        // transition the destination images to the proper layout. Your
-//        // first transition should be VK_ACCESS_SHADER_READ_BIT to
-//        // VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT for writing to the
-//        // destination image and once that's done you transition back
-//        // from VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT to
-//        // VK_ACCESS_SHADER_READ_BIT, so you can e.g. render your destination
-//        // images in the visual pass. An alternative would be blitting them
-//        // to the swap chain if the device supports that.
-//        RS::getSingleton().transitionImageLayout(texture->image,
-//                                                 VK_FORMAT_R8G8B8A8_SRGB,
-//                                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-//                                                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-
+    void SubViewport::draw(VkCommandBuffer p_command_buffer) {
         // Begin render pass.
         {
             VkRenderPassBeginInfo renderPassInfo{};
@@ -196,21 +183,16 @@ namespace Flint {
             renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
             renderPassInfo.pClearValues = clearValues.data();
 
-            vkCmdBeginRenderPass(commandBuffer,
+            vkCmdBeginRenderPass(p_command_buffer,
                                  &renderPassInfo,
                                  VK_SUBPASS_CONTENTS_INLINE);
         }
 
         // Start recursive calling to draw all nodes under this sub-viewport.
-        Node::draw();
+        Node::draw(p_command_buffer);
 
         // End render pass.
-        vkCmdEndRenderPass(commandBuffer);
-
-//        RS::getSingleton().transitionImageLayout(texture->image,
-//                                                 VK_FORMAT_R8G8B8A8_SRGB,
-//                                                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-//                                                 VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        vkCmdEndRenderPass(p_command_buffer);
 
         Logger::verbose("DRAW", "SubViewport");
     }

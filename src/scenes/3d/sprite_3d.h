@@ -14,7 +14,7 @@ namespace Flint {
         Sprite3D();
 
     protected:
-        void draw() override;
+        void draw(VkCommandBuffer p_command_buffer) override;
         void update(double delta) override;
 
         std::shared_ptr<Texture> texture;

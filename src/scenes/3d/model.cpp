@@ -65,8 +65,8 @@ namespace Flint {
     }
 
     // This will be called by the scene tree.
-    void MeshInstance3D::draw() {
-        Node3D::draw();
+    void MeshInstance3D::draw(VkCommandBuffer p_command_buffer) {
+        Node3D::draw(p_command_buffer);
 
         if (mesh == nullptr || texture == nullptr) return;
 
@@ -81,7 +81,7 @@ namespace Flint {
 
         VkBuffer vertexBuffers[] = {vertexBuffer};
         RS::getSingleton().draw_mesh(
-                SwapChain::getSingleton().commandBuffers[SwapChain::getSingleton().currentImage],
+                p_command_buffer,
                 pipeline,
                 descriptorSets[SwapChain::getSingleton().currentImage],
                 vertexBuffers,

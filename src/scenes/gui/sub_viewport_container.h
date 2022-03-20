@@ -17,9 +17,9 @@ namespace Flint {
     protected:
         void update(double delta) override;
 
-        void draw() override;
+        void draw(VkCommandBuffer p_command_buffer) override;
 
-        void self_draw();
+        void self_draw(VkCommandBuffer p_command_buffer);
 
         void create_descriptor_pool();
 

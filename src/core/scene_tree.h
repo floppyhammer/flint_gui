@@ -14,7 +14,7 @@ namespace Flint {
 
         void update(double delta) const;
 
-        void record_commands() const;
+        void record_commands(VkCommandBuffer p_command_buffer) const;
 
         void set_root(std::shared_ptr<Node>);
         std::shared_ptr<Node> get_root();

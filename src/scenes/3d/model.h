@@ -19,7 +19,7 @@ namespace Flint {
     protected:
         std::shared_ptr<Texture> texture;
 
-        void draw() override;
+        void draw(VkCommandBuffer p_command_buffer) override;
         void update(double delta) override;
 
         /**

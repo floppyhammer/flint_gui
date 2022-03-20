@@ -50,11 +50,11 @@ namespace Flint {
         updateUniformBuffer();
     }
 
-    void Node3D::draw() {
+    void Node3D::draw(VkCommandBuffer p_command_buffer) {
         // Do something.
 
         // Root to branch.
-        Node::draw();
+        Node::draw(p_command_buffer);
     }
 
     void Node3D::createVertexBuffer() {
@@ -173,14 +173,24 @@ namespace Flint {
             // GLM was originally designed for OpenGL,
             // where the Y coordinate of the clip coordinates is inverted.
             ubo.proj[1][1] *= -1;
-
-            // Copy the UBO data to the current uniform buffer.
-            RS::getSingleton().copyDataToMemory(&ubo,
-                                                uniformBuffersMemory[SwapChain::getSingleton().currentImage],
-                                                sizeof(ubo));
         } else {
-            // Do nothing if no viewport is provided.
+            auto viewport_extent = SwapChain::getSingleton().swapChainExtent;
+
+            // Set projection matrix. Determined by viewport.
+            ubo.proj = glm::perspective(glm::radians(45.0f),
+                                        (float) viewport_extent.width / (float) viewport_extent.height,
+                                        0.1f,
+                                        10.0f);
+
+            // GLM was originally designed for OpenGL,
+            // where the Y coordinate of the clip coordinates is inverted.
+            ubo.proj[1][1] *= -1;
         }
+
+        // Copy the UBO data to the current uniform buffer.
+        RS::getSingleton().copyDataToMemory(&ubo,
+                                            uniformBuffersMemory[SwapChain::getSingleton().currentImage],
+                                            sizeof(ubo));
     }
 
     void Node3D::notify(Signal signal) {

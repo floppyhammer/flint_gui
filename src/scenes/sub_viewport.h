@@ -22,9 +22,7 @@ namespace Flint {
 
         void prepare();
 
-        std::shared_ptr<SceneTree> tree;
-
-        void draw() override;
+        void draw(VkCommandBuffer p_command_buffer) override;
 
         std::shared_ptr<Texture> texture;
     public:
