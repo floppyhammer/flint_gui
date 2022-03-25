@@ -3,8 +3,10 @@
 #include "rendering/device.h"
 #include "rendering/swap_chain.h"
 #include "rendering/rendering_server.h"
+#include "rendering/texture.h"
 #include "core/engine.h"
 #include "scenes/gui/sub_viewport_container.h"
+#include "scenes/gui/texture_rect.h"
 #include "scenes/sub_viewport.h"
 
 #include <cstdint>
@@ -33,9 +35,12 @@ void App::run() {
         auto mesh_instance_1 = std::make_shared<Flint::MeshInstance3D>();
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
+        auto texture_rect = std::make_shared<Flint::TextureRect>();
+        texture_rect->set_texture(Texture::from_file("../res/texture.jpg"));
 
         node->add_child(mesh_instance_0);
         node->add_child(sub_viewport_c);
+        node->add_child(texture_rect);
 
         sub_viewport->prepare();
         sub_viewport_c->add_child(sub_viewport);

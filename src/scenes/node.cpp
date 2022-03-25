@@ -11,8 +11,6 @@ namespace Flint {
         for (auto &child: children) {
             child->draw(p_command_buffer);
         }
-
-        //Logger::verbose("DRAW", "Node");
     }
 
     void Node::notify(Signal signal) {
@@ -29,7 +27,7 @@ namespace Flint {
                 return get_parent()->get_viewport();
             }
         } else {
-            return {};
+            return nullptr;
         }
     }
 

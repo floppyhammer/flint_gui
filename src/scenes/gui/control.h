@@ -13,25 +13,20 @@ namespace Flint {
     public:
         ~Control();
 
-        Vec2<float> rect_position = Vec2<float>(0);
-
-        Vec2<float> rect_size = Vec2<float>(128);
-
-        Vec2<float> rect_scale = Vec2<float>(1);
-
-        float rect_rotation = 0;
-
-        Vec2<float> rect_pivot_offset = Vec2<float>(0);
-
         void set_rect_position(float x, float y);
+        Vec2<float> get_rect_position() const;
 
         void set_rect_size(float w, float h);
+        Vec2<float> get_set_rect_size() const;
 
         void set_rect_scale(float x, float y);
+        Vec2<float> get_rect_scale() const;
 
         void set_rect_rotation(float r);
+        float get_rect_rotation() const;
 
         void set_rect_pivot_offset(float x, float y);
+        Vec2<float> get_rect_pivot_offset() const;
 
         const std::vector<Vertex> vertices = {
                 {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
@@ -46,7 +41,13 @@ namespace Flint {
         };
 
     protected:
-        void update(double delta);
+        Vec2<float> rect_position = Vec2<float>(0);
+        Vec2<float> rect_size = Vec2<float>(128);
+        Vec2<float> rect_scale = Vec2<float>(1);
+        float rect_rotation = 0;
+        Vec2<float> rect_pivot_offset = Vec2<float>(0);
+
+        void update(double delta) override;
 
         /// Vertex buffer.
         VkBuffer vertex_buffer;
@@ -72,9 +73,9 @@ namespace Flint {
 
         void create_index_buffer();
 
-        void update_uniform_buffer();
-
         void create_uniform_buffers();
+
+        void update_uniform_buffer();
     };
 }
 

@@ -177,4 +177,24 @@ namespace Flint {
                                             uniform_buffers_memory[i]);
         }
     }
+
+    Vec2<float> Control::get_rect_position() const {
+        return Vec2<float>();
+    }
+
+    Vec2<float> Control::get_set_rect_size() const {
+        return Vec2<float>();
+    }
+
+    Vec2<float> Control::get_rect_scale() const {
+        return Vec2<float>();
+    }
+
+    float Control::get_rect_rotation() const {
+        return 0;
+    }
+
+    Vec2<float> Control::get_rect_pivot_offset() const {
+        return Vec2<float>();
+    }
 }

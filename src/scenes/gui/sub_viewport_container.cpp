@@ -14,11 +14,11 @@ namespace Flint {
 
         create_descriptor_sets();
 
-        create_uniform_buffers();
-
         create_vertex_buffer();
 
         create_index_buffer();
+
+        create_uniform_buffers();
 
         vk_resources_allocated = true;
     }
