@@ -12,7 +12,7 @@ namespace Flint {
             child->draw(p_command_buffer);
         }
 
-        Logger::verbose("DRAW", "Node");
+        //Logger::verbose("DRAW", "Node");
     }
 
     void Node::notify(Signal signal) {

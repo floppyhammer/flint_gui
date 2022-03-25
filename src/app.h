@@ -35,7 +35,7 @@ private:
      * Record commands into the current command buffer.
      * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline layout.
      */
-    void recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex);
+    void recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex) const;
 };
 
 #endif //FLINT_APP_H

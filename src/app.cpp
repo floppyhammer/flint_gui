@@ -11,21 +11,21 @@
 #include <memory>
 
 void App::run() {
+    Flint::Logger::set_level(Flint::Logger::WARN);
+
+    // Initialization.
+    // ---------------------------------------------------
     // 1. Initialize hardware.
     auto device = Device::getSingleton();
 
     // 2. Initialize rendering server.
-    // ---------------------------------------------------
     auto rs = RS::getSingleton();
 
     // 3. Initialize swap chain.
     auto swap_chain = SwapChain::getSingleton();
     // ---------------------------------------------------
 
-    Flint::Logger::set_level(Flint::Logger::VERBOSE);
-
     // Build scene tree. Use a block, so we don't increase ref counts for the nodes.
-    // -----------------------------------
     {
         auto node = std::make_shared<Flint::Node>();
         auto node_3d = std::make_shared<Flint::Node3D>();
@@ -33,7 +33,6 @@ void App::run() {
         auto mesh_instance_1 = std::make_shared<Flint::MeshInstance3D>();
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
-
 
         node->add_child(mesh_instance_0);
         node->add_child(sub_viewport_c);
@@ -47,21 +46,23 @@ void App::run() {
         mesh_instance_1->position.x = -1;
         tree.set_root(node);
     }
-    // -----------------------------------
 
     mainLoop();
 
-    // Release node resources.
-    tree.set_root(nullptr);
+    // Cleanup.
+    {
+        // Release node resources.
+        tree.set_root(nullptr);
 
-    swap_chain.cleanup();
+        swap_chain.cleanup();
 
-    rs.cleanup();
+        rs.cleanup();
 
-    device.cleanup();
+        device.cleanup();
+    }
 }
 
-void App::recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex) {
+void App::recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex) const {
     // Reset command buffer.
     vkResetCommandBuffer(commandBuffers[imageIndex], 0);
 
@@ -134,5 +135,5 @@ void App::drawFrame() {
     // Submit commands for drawing.
     SwapChain::getSingleton().flush(imageIndex);
 
-    Flint::Logger::verbose("---------------- FRAME ----------------", "Main Loop");
+    //Flint::Logger::verbose("---------------- FRAME ----------------", "Main Loop");
 }

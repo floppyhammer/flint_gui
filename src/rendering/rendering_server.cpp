@@ -25,14 +25,15 @@ void RenderingServer::cleanupSwapChainRelatedResources() const {
 
     // Graphics pipeline resources.
     vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(device, meshPipelineLayout, nullptr);
-
     vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(device, blitPipelineLayout, nullptr);
 }
 
 void RenderingServer::cleanup() {
     auto device = Device::getSingleton().device;
+
+    // Pipeline layouts.
+    vkDestroyPipelineLayout(device, meshPipelineLayout, nullptr);
+    vkDestroyPipelineLayout(device, blitPipelineLayout, nullptr);
 
     // Descriptor set layouts.
     vkDestroyDescriptorSetLayout(device, meshDescriptorSetLayout, nullptr);

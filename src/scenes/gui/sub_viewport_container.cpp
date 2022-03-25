@@ -50,7 +50,7 @@ namespace Flint {
         // Now draw the sub-viewport image.
         self_draw(p_command_buffer);
 
-        Logger::verbose("DRAW", "SubViewportContainer");
+        //Logger::verbose("DRAW", "SubViewportContainer");
     }
 
     // This will be called by the scene tree.
@@ -73,7 +73,7 @@ namespace Flint {
                 index_buffer,
                 indices.size());
 
-        Logger::verbose("SELF_DRAW", "SubViewportContainer");
+        //Logger::verbose("SELF_DRAW", "SubViewportContainer");
     }
 
     // Create descriptor pool before creating descriptor sets.

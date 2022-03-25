@@ -194,7 +194,7 @@ namespace Flint {
         // End render pass.
         vkCmdEndRenderPass(p_command_buffer);
 
-        Logger::verbose("DRAW", "SubViewport");
+        //Logger::verbose("DRAW", "SubViewport");
     }
 
     void SubViewport::update(double delta) {

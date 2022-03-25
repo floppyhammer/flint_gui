@@ -88,7 +88,7 @@ namespace Flint {
                 indexBuffer,
                 mesh->indices.size());
 
-        Logger::verbose("DRAW", "MeshInstance3D");
+        //Logger::verbose("DRAW", "MeshInstance3D");
     }
 
     // Create descriptor pool before creating descriptor sets.
