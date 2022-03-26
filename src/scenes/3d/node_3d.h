@@ -11,15 +11,16 @@ namespace Flint {
     class Node3D : public Node {
     public:
         Node3D();
+
         ~Node3D();
 
         // Transform.
         // ------------------------------------------
-        glm::vec3 position = glm::vec3(0);
+        glm::vec3 position{0};
 
-        glm::vec3 rotation = glm::vec3(0);
+        glm::vec3 rotation{0};
 
-        glm::vec3 scale = glm::vec3(1);
+        glm::vec3 scale{1};
         // ------------------------------------------
 
         void notify(Signal signal) override;
@@ -39,13 +40,17 @@ namespace Flint {
          * Create buffer for vertex data.
          * @dependency None.
          */
-        void createVertexBuffer();
+        static void createVertexBuffer(std::vector<Vertex> &vertices,
+                                       VkBuffer &p_vertex_buffer,
+                                       VkDeviceMemory &p_vertex_buffer_memory);
 
         /**
          * Create buffer for index data.
          * @dependency None.
          */
-        void createIndexBuffer();
+        static void createIndexBuffer(std::vector<uint32_t> &indices,
+                                      VkBuffer &p_index_buffer,
+                                      VkDeviceMemory &p_index_buffer_memory);
 
         /**
          * Create buffer for uniform data.
@@ -53,28 +58,9 @@ namespace Flint {
          */
         void createUniformBuffers();
 
-        /// Contains vertices and indices data.
-        std::shared_ptr<Mesh> mesh;
-
-        /// Vertex buffer.
-        VkBuffer vertexBuffer;
-        VkDeviceMemory vertexBufferMemory;
-
-        /// Index buffer.
-        VkBuffer indexBuffer;
-        VkDeviceMemory indexBufferMemory;
-
         /// We have a uniform buffer per swap chain image.
         std::vector<VkBuffer> uniformBuffers;
         std::vector<VkDeviceMemory> uniformBuffersMemory;
-
-        /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
-        VkDescriptorPool descriptorPool;
-
-        /// Descriptor sets are allocated from descriptor pool objects.
-        std::vector<VkDescriptorSet> descriptorSets;
-
-        bool vkResourcesAllocated = false;
     };
 }
 

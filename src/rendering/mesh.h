@@ -56,18 +56,47 @@ struct Vertex {
     }
 };
 
-
 class Mesh {
 public:
-    std::vector<Vertex> vertices;
-    std::vector<uint32_t> indices;
-    std::shared_ptr<Material> material;
+    Mesh();
 
-    Mesh() = default;
-    Mesh(std::vector<Vertex> p_vertices, std::vector<uint32_t> p_indices)
-            : vertices(std::move(p_vertices)), indices(std::move(p_indices)) {}
+    ~Mesh();
 
-    void loadFile(const std::string &filename);
+    /**
+     * A descriptor pool is used to allocate descriptor sets of some layout for use in a shader.
+     * @dependency None.
+     */
+    void createDescriptorPool();
+
+    /**
+     * Allocate descriptor sets in the pool.
+     * @dependency Descriptor pool, descriptor set layout, and actual resources (uniform buffers, images, image views).
+     */
+    void createDescriptorSets();
+
+    // Should be recalled once texture is changed.
+    void updateDescriptorSets(Material &material, std::vector<VkBuffer> &uniformBuffers);
+
+    [[nodiscard]] VkDescriptorSet getDescriptorSet(uint32_t index) const;
+
+    std::string name;
+    uint32_t indices_count = 0;
+    int32_t material_id = -1;
+
+    /// Vertex buffer.
+    VkBuffer vertexBuffer{};
+    VkDeviceMemory vertexBufferMemory{};
+
+    /// Index buffer.
+    VkBuffer indexBuffer{};
+    VkDeviceMemory indexBufferMemory{};
+
+private:
+    /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
+    VkDescriptorPool descriptorPool{};
+
+    /// Descriptor sets are allocated from descriptor pool objects.
+    std::vector<VkDescriptorSet> descriptorSets;
 };
 
 #endif //FLINT_MESH_H

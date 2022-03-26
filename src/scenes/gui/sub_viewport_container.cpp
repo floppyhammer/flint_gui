@@ -37,6 +37,7 @@ namespace Flint {
     void SubViewportContainer::draw(VkCommandBuffer p_command_buffer) {
         // Don't call Control::draw(), so we can break the recursive calling
         // to call the sub-viewport draw function below specifically.
+        // Also, we can't interrupt our previous render pass.
 
         auto sub_viewport_command_buffer = RS::getSingleton().beginSingleTimeCommands();
 
@@ -49,8 +50,6 @@ namespace Flint {
 
         // Now draw the sub-viewport image.
         self_draw(p_command_buffer);
-
-        //Logger::verbose("DRAW", "SubViewportContainer");
     }
 
     // This will be called by the scene tree.

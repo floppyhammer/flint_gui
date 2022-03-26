@@ -1,71 +1,115 @@
 #include "mesh.h"
 
-#define GLM_ENABLE_EXPERIMENTAL
+#include "device.h"
+#include "swap_chain.h"
 
-#include "glm/gtx/hash.hpp"
+Mesh::Mesh() {
+    createDescriptorPool();
 
-#define TINYOBJLOADER_IMPLEMENTATION
-
-#include "tiny_obj_loader.h"
-
-#include <unordered_map>
-
-namespace std {
-    template<>
-    struct hash<Vertex> {
-        size_t operator()(Vertex const &vertex) const {
-            return ((hash<glm::vec3>()(vertex.pos) ^
-                     (hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
-                   (hash<glm::vec2>()(vertex.texCoord) << 1);
-        }
-    };
+    createDescriptorSets();
 }
 
-void Mesh::loadFile(const std::string &filename) {
-    tinyobj::attrib_t attrib;
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
-    std::string warn, err;
+Mesh::~Mesh() {
+    auto device = Device::getSingleton().device;
 
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str())) {
-        throw std::runtime_error(warn + err);
+    // Clean up index buffer.
+    vkDestroyBuffer(device, indexBuffer, nullptr);
+    vkFreeMemory(device, indexBufferMemory, nullptr);
+
+    // Clean up vertex buffer.
+    vkDestroyBuffer(device, vertexBuffer, nullptr); // GPU memory
+    vkFreeMemory(device, vertexBufferMemory, nullptr); // CPU memory
+
+    // When we destroy the pool, the sets inside are destroyed as well.
+    vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+}
+
+// Create descriptor pool before creating descriptor sets.
+void Mesh::createDescriptorPool() {
+    auto swapChainImages = SwapChain::getSingleton().swapChainImages;
+
+    std::array<VkDescriptorPoolSize, 2> poolSizes{};
+    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+    poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+
+    VkDescriptorPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+    poolInfo.pPoolSizes = poolSizes.data();
+    poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
+
+    if (vkCreateDescriptorPool(Device::getSingleton().device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to create descriptor pool!");
     }
+}
 
-    // Use a map or unordered_map to keep track of the unique vertices and respective indices.
-    std::unordered_map<Vertex, uint32_t> uniqueVertices{};
+void Mesh::createDescriptorSets() {
+    auto device = Device::getSingleton().device;
+    auto swapChainImages = SwapChain::getSingleton().swapChainImages;
+    auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
 
-    // Iterate over the vertices and dump them straight into our vertices vector.
-    for (const auto &shape: shapes) {
-        for (const auto &index: shape.mesh.indices) {
-            Vertex vertex{};
+    std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
+    VkDescriptorSetAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    allocInfo.descriptorPool = descriptorPool;
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
+    allocInfo.pSetLayouts = layouts.data();
 
-            vertex.pos = {
-                    attrib.vertices[3 * index.vertex_index + 0],
-                    attrib.vertices[3 * index.vertex_index + 1],
-                    attrib.vertices[3 * index.vertex_index + 2]
-            };
+    descriptorSets.resize(swapChainImages.size());
+    if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to allocate descriptor sets!");
+    }
+}
 
-            vertex.texCoord = {
-                    attrib.texcoords[2 * index.texcoord_index + 0],
-                    // Flip the vertical component of the texture coordinates.
-                    1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
-            };
+void Mesh::updateDescriptorSets(Material &material, std::vector<VkBuffer> &uniformBuffers) {
+    auto swapChainImages = SwapChain::getSingleton().swapChainImages;
+    auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
+    auto device = Device::getSingleton().device;
 
-            vertex.color = {1.0f, 1.0f, 1.0f};
+    for (size_t i = 0; i < swapChainImages.size(); i++) {
+        VkDescriptorBufferInfo bufferInfo{};
+        bufferInfo.buffer = uniformBuffers[i];
+        bufferInfo.offset = 0;
+        bufferInfo.range = sizeof(UniformBufferObject);
 
-            // Every time we read a vertex from the OBJ file, we check if we've
-            // already seen a vertex with the exact same position and texture
-            // coordinates before. If not, we add it to vertices and store its
-            // index in the uniqueVertices container. After that we add the
-            // index of the new vertex to indices. If we've seen the exact same
-            // vertex before, then we look up its index in uniqueVertices and
-            // store that index in indices.
-            if (uniqueVertices.count(vertex) == 0) {
-                uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
-                vertices.push_back(vertex);
-            }
+        VkDescriptorImageInfo imageInfo{};
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = material.diffuse_texture->imageView;
+        imageInfo.sampler = material.diffuse_texture->sampler;
 
-            indices.push_back(uniqueVertices[vertex]);
-        }
+        std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+
+        descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrites[0].dstSet = descriptorSets[i];
+        descriptorWrites[0].dstBinding = 0;
+        descriptorWrites[0].dstArrayElement = 0;
+        descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        descriptorWrites[0].descriptorCount = 1;
+        descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+        descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrites[1].dstSet = descriptorSets[i];
+        descriptorWrites[1].dstBinding = 1;
+        descriptorWrites[1].dstArrayElement = 0;
+        descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        descriptorWrites[1].descriptorCount = 1;
+        descriptorWrites[1].pImageInfo = &imageInfo;
+
+        // Update the contents of a descriptor set object.
+        vkUpdateDescriptorSets(device,
+                               static_cast<uint32_t>(descriptorWrites.size()),
+                               descriptorWrites.data(),
+                               0,
+                               nullptr);
+    }
+}
+
+VkDescriptorSet Mesh::getDescriptorSet(uint32_t index) const {
+    if (index < descriptorSets.size()) {
+        return descriptorSets[index];
+    } else {
+        throw std::runtime_error("Invalid descriptor set index!");
     }
 }

@@ -20,27 +20,6 @@ namespace Flint {
     }
 
     Node3D::~Node3D() {
-        auto device = Device::getSingleton().device;
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-
-        if (!vkResourcesAllocated) return;
-
-        // When we destroy the pool, the sets inside are destroyed as well.
-        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
-
-        // Clean up uniform buffers.
-        for (size_t i = 0; i < swapChainImages.size(); i++) {
-            vkDestroyBuffer(device, uniformBuffers[i], nullptr);
-            vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
-        }
-
-        // Clean up index buffer.
-        vkDestroyBuffer(device, indexBuffer, nullptr);
-        vkFreeMemory(device, indexBufferMemory, nullptr);
-
-        // Clean up vertex buffer.
-        vkDestroyBuffer(device, vertexBuffer, nullptr); // GPU memory
-        vkFreeMemory(device, vertexBufferMemory, nullptr); // CPU memory
     }
 
     void Node3D::update(double delta) {
@@ -51,16 +30,14 @@ namespace Flint {
     }
 
     void Node3D::draw(VkCommandBuffer p_command_buffer) {
-        // Do something.
-
         // Root to branch.
         Node::draw(p_command_buffer);
     }
 
-    void Node3D::createVertexBuffer() {
-        if (mesh == nullptr) return;
-
-        VkDeviceSize bufferSize = sizeof(mesh->vertices[0]) * mesh->vertices.size();
+    void Node3D::createVertexBuffer(std::vector<Vertex> &vertices,
+                                    VkBuffer &p_vertex_buffer,
+                                    VkDeviceMemory &p_vertex_buffer_memory) {
+        VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
         VkBuffer stagingBuffer; // In GPU
         VkDeviceMemory stagingBufferMemory; // In CPU
@@ -73,27 +50,27 @@ namespace Flint {
                                         stagingBufferMemory);
 
         // Copy data to the CPU memory.
-        RS::getSingleton().copyDataToMemory(mesh->vertices.data(), stagingBufferMemory, bufferSize);
+        RS::getSingleton().copyDataToMemory(vertices.data(), stagingBufferMemory, bufferSize);
 
         // Create the vertex buffer (GPU) and bind it to the vertex memory (CPU).
         RS::getSingleton().createBuffer(bufferSize,
                                         VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                                         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                        vertexBuffer,
-                                        vertexBufferMemory);
+                                        p_vertex_buffer,
+                                        p_vertex_buffer_memory);
 
         // Copy buffer (GPU).
-        RS::getSingleton().copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+        RS::getSingleton().copyBuffer(stagingBuffer, p_vertex_buffer, bufferSize);
 
         // Clean up staging buffer and memory.
         vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
         vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
     }
 
-    void Node3D::createIndexBuffer() {
-        if (mesh == nullptr) return;
-
-        VkDeviceSize bufferSize = sizeof(mesh->indices[0]) * mesh->indices.size();
+    void Node3D::createIndexBuffer(std::vector<uint32_t> &indices,
+                                   VkBuffer &p_index_buffer,
+                                   VkDeviceMemory &p_index_buffer_memory) {
+        VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingBufferMemory;
@@ -103,18 +80,18 @@ namespace Flint {
                                         stagingBuffer,
                                         stagingBufferMemory);
 
-        RS::getSingleton().copyDataToMemory(mesh->indices.data(),
+        RS::getSingleton().copyDataToMemory(indices.data(),
                                             stagingBufferMemory,
                                             bufferSize);
 
         RS::getSingleton().createBuffer(bufferSize,
                                         VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
                                         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                        indexBuffer,
-                                        indexBufferMemory);
+                                        p_index_buffer,
+                                        p_index_buffer_memory);
 
         // Copy data from staging buffer to index buffer.
-        RS::getSingleton().copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+        RS::getSingleton().copyBuffer(stagingBuffer, p_index_buffer, bufferSize);
 
         vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
         vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
@@ -145,9 +122,11 @@ namespace Flint {
 
         // Determined by model transform.
         ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, position.z));
+        ubo.model = glm::scale(ubo.model, glm::vec3(scale.x, scale.y, scale.z));
         ubo.model = glm::rotate(ubo.model, (float) Engine::getSingleton().get_elapsed() * glm::radians(90.0f),
                                 glm::vec3(0.0f, 0.0f, 1.0f));
 
+        // FIXME: Should get camera from the viewport.
         // Determined by camera.
         Camera3D camera;
         camera.position = glm::vec3(2.0f, 2.0f, 2.0f);
@@ -157,9 +136,6 @@ namespace Flint {
                                camera.up);
 
         Node *viewport_node = get_viewport();
-
-//        viewport->extent = Vec2<uint32_t>(SwapChain::getSingleton().swapChainExtent.width,
-//                                          SwapChain::getSingleton().swapChainExtent.height);
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);

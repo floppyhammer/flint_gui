@@ -6,70 +6,56 @@
 
 #include <utility>
 
+#define TINYOBJLOADER_IMPLEMENTATION
+
+#include "tiny_obj_loader.h"
+
+#define GLM_ENABLE_EXPERIMENTAL
+
+#include "glm/gtx/hash.hpp"
+
+#include <unordered_map>
+
+namespace std {
+    template<>
+    struct hash<Vertex> {
+        size_t operator()(Vertex const &vertex) const {
+            return ((hash<glm::vec3>()(vertex.pos) ^
+                     (hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
+                   (hash<glm::vec2>()(vertex.texCoord) << 1);
+        }
+    };
+}
+
 namespace Flint {
-    const std::string MODEL_PATH = "../res/viking_room.obj";
-    const std::string TEXTURE_PATH = "../res/viking_room.png";
+    const std::string MODEL_PATH = "../res/cargo-ship/cargo-ship.obj";
+    const std::string MAT_BASE = "D:/Dev/Projects/simple-vulkan-renderer/res/cargo-ship/";
 
     MeshInstance3D::MeshInstance3D() {
         type = NodeType::MeshInstance3D;
 
-        createDescriptorPool();
-
-        createDescriptorSets();
-
         createUniformBuffers();
 
-        // Load mesh resources.
-        // --------------------------------
-        // Load mesh.
-        auto p_mesh = std::make_shared<Mesh>();
-        p_mesh->loadFile(MODEL_PATH);
-        set_mesh(p_mesh);
-
-        // Load texture.
-        auto p_texture = Texture::from_file(TEXTURE_PATH);
-        set_texture(p_texture);
-        // --------------------------------
+        // Load model.
+        loadFile(MODEL_PATH, MAT_BASE);
     }
 
     MeshInstance3D::~MeshInstance3D() {
+        auto device = Device::getSingleton().device;
+        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
 
-    }
-
-    void MeshInstance3D::set_mesh(std::shared_ptr<Mesh> p_mesh) {
-        // Clean previous data.
-        if (mesh != nullptr) {
-
+        // Clean up uniform buffers.
+        for (size_t i = 0; i < swapChainImages.size(); i++) {
+            vkDestroyBuffer(device, uniformBuffers[i], nullptr);
+            vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
         }
-
-        mesh = std::move(p_mesh);
-
-        createVertexBuffer();
-        createIndexBuffer();
-
-        vkResourcesAllocated = true;
-    }
-
-    std::shared_ptr<Mesh> MeshInstance3D::get_mesh() const {
-        return mesh;
-    }
-
-    void MeshInstance3D::set_texture(std::shared_ptr<Texture> p_texture) {
-        texture = std::move(p_texture);
-
-        updateDescriptorSets();
     }
 
     void MeshInstance3D::update(double delta) {
         Node3D::update(delta);
     }
 
-    // This will be called by the scene tree.
     void MeshInstance3D::draw(VkCommandBuffer p_command_buffer) {
-        Node3D::draw(p_command_buffer);
-
-        if (mesh == nullptr || texture == nullptr) return;
-
         Node *viewport_node = get_viewport();
 
         VkPipeline pipeline = RS::getSingleton().meshGraphicsPipeline;
@@ -79,97 +65,98 @@ namespace Flint {
             pipeline = viewport->meshGraphicsPipeline;
         }
 
-        VkBuffer vertexBuffers[] = {vertexBuffer};
-        RS::getSingleton().draw_mesh(
-                p_command_buffer,
-                pipeline,
-                descriptorSets[SwapChain::getSingleton().currentImage],
-                vertexBuffers,
-                indexBuffer,
-                mesh->indices.size());
-
-        //Logger::verbose("DRAW", "MeshInstance3D");
-    }
-
-    // Create descriptor pool before creating descriptor sets.
-    void MeshInstance3D::createDescriptorPool() {
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-
-        std::array<VkDescriptorPoolSize, 2> poolSizes{};
-        poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
-        poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
-
-        VkDescriptorPoolCreateInfo poolInfo{};
-        poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-        poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-        poolInfo.pPoolSizes = poolSizes.data();
-        poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
-
-        if (vkCreateDescriptorPool(Device::getSingleton().device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
-            throw std::runtime_error("Failed to create descriptor pool!");
+        for (const auto &mesh: meshes) {
+            VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
+            RS::getSingleton().draw_mesh(
+                    p_command_buffer,
+                    pipeline,
+                    mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                    vertexBuffers,
+                    mesh->indexBuffer,
+                    mesh->indices_count);
         }
+
+        Node3D::draw(p_command_buffer);
     }
 
-    void MeshInstance3D::createDescriptorSets() {
-        auto device = Device::getSingleton().device;
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-        auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
+    void MeshInstance3D::loadFile(const std::string &filename, const std::string &mat_base) {
+        tinyobj::attrib_t attrib;
+        std::vector<tinyobj::shape_t> shapes;
+        std::vector<tinyobj::material_t> obj_materials;
+        std::string warn, err;
 
-        std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
-        VkDescriptorSetAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = descriptorPool;
-        allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
-        allocInfo.pSetLayouts = layouts.data();
-
-        descriptorSets.resize(swapChainImages.size());
-        if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
-            throw std::runtime_error("Failed to allocate descriptor sets!");
+        if (!tinyobj::LoadObj(&attrib, &shapes, &obj_materials,
+                              &warn, &err,
+                              filename.c_str(), mat_base.c_str())) {
+            throw std::runtime_error(warn + err);
         }
-    }
 
-    void MeshInstance3D::updateDescriptorSets() {
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-        auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
-        auto device = Device::getSingleton().device;
+        // Load materials.
+        for (const auto &obj_material: obj_materials) {
+            Material material;
+            material.name = obj_material.name;
+            material.diffuse_texture = Texture::from_file(mat_base + obj_material.diffuse_texname);
+            materials.push_back(material);
+        }
 
-        for (size_t i = 0; i < swapChainImages.size(); i++) {
-            VkDescriptorBufferInfo bufferInfo{};
-            bufferInfo.buffer = uniformBuffers[i];
-            bufferInfo.offset = 0;
-            bufferInfo.range = sizeof(UniformBufferObject);
+        // Iterate over the vertices and dump them straight into our vertices vector.
+        for (const auto &shape: shapes) {
+            auto mesh = std::make_shared<Mesh>();
 
-            VkDescriptorImageInfo imageInfo{};
-            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            imageInfo.imageView = texture->imageView;
-            imageInfo.sampler = texture->sampler;
+            mesh->name = shape.name;
+            mesh->material_id = shape.mesh.material_ids[0];
 
-            std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+            // Staging vectors.
+            std::vector<Vertex> vertices;
+            std::vector<uint32_t> indices;
 
-            descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[0].dstSet = descriptorSets[i];
-            descriptorWrites[0].dstBinding = 0;
-            descriptorWrites[0].dstArrayElement = 0;
-            descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            descriptorWrites[0].descriptorCount = 1;
-            descriptorWrites[0].pBufferInfo = &bufferInfo;
+            // Use a map or unordered_map to keep track of the unique vertices and respective indices.
+            std::unordered_map<Vertex, uint32_t> uniqueVertices{};
 
-            descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[1].dstSet = descriptorSets[i];
-            descriptorWrites[1].dstBinding = 1;
-            descriptorWrites[1].dstArrayElement = 0;
-            descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            descriptorWrites[1].descriptorCount = 1;
-            descriptorWrites[1].pImageInfo = &imageInfo;
+            for (const auto &index: shape.mesh.indices) {
+                Vertex vertex{};
 
-            // Update the contents of a descriptor set object.
-            vkUpdateDescriptorSets(device,
-                                   static_cast<uint32_t>(descriptorWrites.size()),
-                                   descriptorWrites.data(),
-                                   0,
-                                   nullptr);
+                vertex.pos = {
+                        attrib.vertices[3 * index.vertex_index + 0],
+                        attrib.vertices[3 * index.vertex_index + 1],
+                        attrib.vertices[3 * index.vertex_index + 2]
+                };
+
+                vertex.texCoord = {
+                        attrib.texcoords[2 * index.texcoord_index + 0],
+                        // Flip the vertical component of the texture coordinates.
+                        1.0f - attrib.texcoords[2 * index.texcoord_index + 1]
+                };
+
+                vertex.color = {1.0f, 1.0f, 1.0f};
+
+                // Every time we read a vertex from the OBJ file, we check if we've
+                // already seen a vertex with the exact same position and texture
+                // coordinates before. If not, we add it to vertices and store its
+                // index in the uniqueVertices container. After that we add the
+                // index of the new vertex to indices. If we've seen the exact same
+                // vertex before, then we look up its index in uniqueVertices and
+                // store that index in indices.
+                if (uniqueVertices.count(vertex) == 0) {
+                    uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
+                    vertices.push_back(vertex);
+                }
+
+                indices.push_back(uniqueVertices[vertex]);
+            }
+
+            mesh->indices_count = indices.size();
+
+            Node3D::createVertexBuffer(vertices, mesh->vertexBuffer, mesh->vertexBufferMemory);
+            Node3D::createIndexBuffer(indices, mesh->indexBuffer, mesh->indexBufferMemory);
+
+            if (mesh->material_id < materials.size()) {
+                mesh->updateDescriptorSets(materials[mesh->material_id], uniformBuffers);
+            } else {
+                throw std::runtime_error("Invalid material id!");
+            }
+
+            meshes.push_back(mesh);
         }
     }
 }

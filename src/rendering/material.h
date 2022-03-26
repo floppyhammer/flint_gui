@@ -6,11 +6,11 @@
 #include <memory>
 #include <iostream>
 
-class Material {
+struct Material {
     // Material name for debugging reason.
     std::string name;
-    std::shared_ptr<Texture> diffuse_texture;
     std::shared_ptr<Texture> normal_texture;
+    std::shared_ptr<Texture> diffuse_texture;
 };
 
 #endif //FLINT_MATERIAL_H

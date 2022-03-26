@@ -83,9 +83,10 @@ namespace Flint {
 
         // The actual application order of these matrices is reverse.
         // 4.
-        ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(rect_position.x / viewport_extent.x * 2.0f,
-                                                        rect_position.y / viewport_extent.y * 2.0f,
-                                                        0.0f));
+        ubo.model = glm::translate(glm::mat4(1.0f),
+                                   glm::vec3(rect_position.x / viewport_extent.x * 2.0f,
+                                             rect_position.y / viewport_extent.y * 2.0f,
+                                             0.0f));
         // 3.
         ubo.model = glm::translate(ubo.model, glm::vec3(-1.0, -1.0, 0.0f));
         // 2.
@@ -179,22 +180,22 @@ namespace Flint {
     }
 
     Vec2<float> Control::get_rect_position() const {
-        return Vec2<float>();
+        return rect_position;
     }
 
     Vec2<float> Control::get_set_rect_size() const {
-        return Vec2<float>();
+        return rect_size;
     }
 
     Vec2<float> Control::get_rect_scale() const {
-        return Vec2<float>();
+        return rect_scale;
     }
 
     float Control::get_rect_rotation() const {
-        return 0;
+        return rect_rotation;
     }
 
     Vec2<float> Control::get_rect_pivot_offset() const {
-        return Vec2<float>();
+        return rect_pivot_offset;
     }
 }

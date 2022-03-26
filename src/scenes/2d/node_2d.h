@@ -9,11 +9,11 @@ namespace Flint {
     public:
         // Transform.
         // ------------------------------------------
-        Vec2<float> position = Vec2<float>(0);
+        Vec2<float> position{0};
 
         float rotation = 0;
 
-        Vec2<float> scale = Vec2<float>(1);
+        Vec2<float> scale{1};
         // ------------------------------------------
     };
 }
