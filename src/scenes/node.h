@@ -40,6 +40,8 @@ namespace Flint {
 
         virtual void draw(VkCommandBuffer p_command_buffer);
 
+        virtual void self_draw(VkCommandBuffer p_command_buffer);
+
         virtual void notify(Signal signal);
 
         void add_child(const std::shared_ptr<Node> &p_child);

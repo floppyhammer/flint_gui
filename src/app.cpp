@@ -38,15 +38,17 @@ void App::run() {
         auto texture_rect = std::make_shared<Flint::TextureRect>();
         texture_rect->set_texture(Texture::from_file("../res/texture.jpg"));
 
+        node->add_child(texture_rect);
         node->add_child(mesh_instance_0);
         node->add_child(sub_viewport_c);
-        //node->add_child(texture_rect);
 
         sub_viewport->prepare();
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
         node_3d->add_child(mesh_instance_1);
+        texture_rect->set_rect_scale(0.2, 0.2);
+        texture_rect->set_rect_position(400, 0);
         mesh_instance_0->position.x = 1;
         mesh_instance_0->scale.x = mesh_instance_0->scale.y = mesh_instance_0->scale.z = 0.02;
         mesh_instance_1->position.x = -1;

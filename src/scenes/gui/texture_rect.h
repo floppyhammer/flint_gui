@@ -18,6 +18,8 @@ namespace Flint {
     private:
         void draw(VkCommandBuffer p_command_buffer) override;
 
+        void self_draw(VkCommandBuffer p_command_buffer) override;
+
         void update(double delta) override;
 
         std::shared_ptr<Texture> texture;

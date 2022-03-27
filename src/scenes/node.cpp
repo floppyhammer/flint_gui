@@ -56,4 +56,8 @@ namespace Flint {
             child->cleanup();
         }
     }
+
+    void Node::self_draw(VkCommandBuffer p_command_buffer) {
+
+    }
 }

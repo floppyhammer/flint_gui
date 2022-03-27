@@ -29,11 +29,6 @@ namespace Flint {
         updateUniformBuffer();
     }
 
-    void Node3D::draw(VkCommandBuffer p_command_buffer) {
-        // Root to branch.
-        Node::draw(p_command_buffer);
-    }
-
     void Node3D::createVertexBuffer(std::vector<Vertex> &vertices,
                                     VkBuffer &p_vertex_buffer,
                                     VkDeviceMemory &p_vertex_buffer_memory) {

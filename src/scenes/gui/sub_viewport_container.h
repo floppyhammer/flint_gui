@@ -19,7 +19,7 @@ namespace Flint {
 
         void draw(VkCommandBuffer p_command_buffer) override;
 
-        void self_draw(VkCommandBuffer p_command_buffer);
+        void self_draw(VkCommandBuffer p_command_buffer) override;
 
         void create_descriptor_pool();
 

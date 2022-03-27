@@ -28,8 +28,6 @@ namespace Flint {
     protected:
         void update(double delta) override;
 
-        void draw(VkCommandBuffer p_command_buffer) override;
-
         /**
          * Update MVP. Update UBOs simply by memory mapping.
          * @param currentImage Current image, which has different meaning from `current frame`.

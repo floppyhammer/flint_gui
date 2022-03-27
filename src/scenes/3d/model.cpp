@@ -56,6 +56,12 @@ namespace Flint {
     }
 
     void MeshInstance3D::draw(VkCommandBuffer p_command_buffer) {
+        self_draw(p_command_buffer);
+
+        Node::draw(p_command_buffer);
+    }
+
+    void MeshInstance3D::self_draw(VkCommandBuffer p_command_buffer) {
         Node *viewport_node = get_viewport();
 
         VkPipeline pipeline = RS::getSingleton().meshGraphicsPipeline;
@@ -75,8 +81,6 @@ namespace Flint {
                     mesh->indexBuffer,
                     mesh->indices_count);
         }
-
-        Node3D::draw(p_command_buffer);
     }
 
     void MeshInstance3D::loadFile(const std::string &filename, const std::string &mat_base) {

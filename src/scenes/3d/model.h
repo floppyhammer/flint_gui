@@ -16,6 +16,9 @@ namespace Flint {
         std::vector<Material> materials;
 
         void draw(VkCommandBuffer p_command_buffer) override;
+
+        void self_draw(VkCommandBuffer p_command_buffer) override;
+
         void update(double delta) override;
 
         void loadFile(const std::string &filename, const std::string &mat_base);
