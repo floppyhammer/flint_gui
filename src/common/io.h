@@ -6,7 +6,7 @@
 #include <istream>
 #include <fstream>
 
-static std::vector<char> readFile(const std::string &filename) {
+inline std::vector<char> readFile(const std::string &filename) {
     std::ifstream input(filename, std::ios::binary);
 
     std::vector<char> bytes((std::istreambuf_iterator<char>(input)),
@@ -15,6 +15,16 @@ static std::vector<char> readFile(const std::string &filename) {
     input.close();
 
     return bytes;
+}
+
+inline void split_filename(const std::string& str, std::string& file_directory) {
+    size_t found;
+    std::cout << "Splitting: " << str << std::endl;
+    found=str.find_last_of("/\\");
+    std::cout << " folder: " << str.substr(0,found) << std::endl;
+    std::cout << " file: " << str.substr(found+1) << std::endl;
+
+    file_directory = str.substr(0,found);
 }
 
 #endif //FLINT_IO_H

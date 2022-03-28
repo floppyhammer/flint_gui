@@ -21,7 +21,7 @@ namespace Flint {
 
         void update(double delta) override;
 
-        void loadFile(const std::string &filename, const std::string &mat_base);
+        void loadFile(const std::string &filename);
     };
 }
 

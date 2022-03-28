@@ -28,8 +28,7 @@ namespace std {
 }
 
 namespace Flint {
-    const std::string MODEL_PATH = "../res/cargo-ship/cargo-ship.obj";
-    const std::string MAT_BASE = "D:/Dev/Projects/simple-vulkan-renderer/res/cargo-ship/";
+    const std::string MODEL_NAME = "../res/viking_room/viking_room.obj";
 
     MeshInstance3D::MeshInstance3D() {
         type = NodeType::MeshInstance3D;
@@ -37,7 +36,7 @@ namespace Flint {
         createUniformBuffers();
 
         // Load model.
-        loadFile(MODEL_PATH, MAT_BASE);
+        loadFile(MODEL_NAME);
     }
 
     MeshInstance3D::~MeshInstance3D() {
@@ -83,15 +82,19 @@ namespace Flint {
         }
     }
 
-    void MeshInstance3D::loadFile(const std::string &filename, const std::string &mat_base) {
+    void MeshInstance3D::loadFile(const std::string &filename) {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> obj_materials;
         std::string warn, err;
 
+        // Get file base.
+        std::string file_directory;
+        split_filename(filename, file_directory);
+
         if (!tinyobj::LoadObj(&attrib, &shapes, &obj_materials,
                               &warn, &err,
-                              filename.c_str(), mat_base.c_str())) {
+                              filename.c_str(), file_directory.c_str())) {
             throw std::runtime_error(warn + err);
         }
 
@@ -99,7 +102,7 @@ namespace Flint {
         for (const auto &obj_material: obj_materials) {
             Material material;
             material.name = obj_material.name;
-            material.diffuse_texture = Texture::from_file(mat_base + obj_material.diffuse_texname);
+            material.diffuse_texture = Texture::from_file(file_directory + "/" + obj_material.diffuse_texname);
             materials.push_back(material);
         }
 
