@@ -17,11 +17,10 @@ namespace Flint {
         void draw(VkCommandBuffer p_command_buffer) const;
 
         void set_root(std::shared_ptr<Node>);
-        std::shared_ptr<Node> get_root();
+
+        [[nodiscard]] std::shared_ptr<Node> get_root() const;
 
     private:
-        bool tree_changed = false;
-
         std::shared_ptr<Node> root;
     };
 }

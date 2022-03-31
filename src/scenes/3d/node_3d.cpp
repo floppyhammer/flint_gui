@@ -131,7 +131,7 @@ namespace Flint {
 
         ubo.view = glm::lookAt(camera.position,
                                glm::vec3(0.0f, 0.0f, 0.0f),
-                               camera.up);
+                               camera.get_up_direction());
 
         Node *viewport_node = get_viewport();
 

@@ -10,7 +10,7 @@ namespace Flint {
         root = std::move(p_node);
     }
 
-    std::shared_ptr<Node> SceneTree::get_root() {
+    std::shared_ptr<Node> SceneTree::get_root() const {
         return root;
     }
 
