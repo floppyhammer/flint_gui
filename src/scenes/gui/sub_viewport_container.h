@@ -15,11 +15,13 @@ namespace Flint {
         std::shared_ptr<SubViewport> viewport;
 
     protected:
+        void _update(double delta) override;
+
+        void _draw(VkCommandBuffer p_command_buffer) override;
+
         void update(double delta) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
-
-        void self_draw(VkCommandBuffer p_command_buffer) override;
 
         void create_descriptor_pool();
 

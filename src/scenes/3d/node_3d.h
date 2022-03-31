@@ -23,9 +23,11 @@ namespace Flint {
         glm::vec3 scale{1};
         // ------------------------------------------
 
-        void notify(Signal signal) override;
+        void _notify(Signal signal) override;
 
     protected:
+        void _update(double delta) override;
+
         void update(double delta) override;
 
         /**

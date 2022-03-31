@@ -15,11 +15,11 @@ namespace Flint {
         std::vector<std::shared_ptr<Mesh>> meshes;
         std::vector<Material> materials;
 
+        void _draw(VkCommandBuffer p_command_buffer) override;
+
         void draw(VkCommandBuffer p_command_buffer) override;
 
-        void self_draw(VkCommandBuffer p_command_buffer) override;
-
-        void update(double delta) override;
+        void _update(double delta) override;
 
         void loadFile(const std::string &filename);
     };

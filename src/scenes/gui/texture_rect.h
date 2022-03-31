@@ -16,11 +16,13 @@ namespace Flint {
         [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
 
     private:
-        void draw(VkCommandBuffer p_command_buffer) override;
+        void _draw(VkCommandBuffer p_command_buffer) override;
 
-        void self_draw(VkCommandBuffer p_command_buffer) override;
+        void _update(double delta) override;
 
         void update(double delta) override;
+
+        void draw(VkCommandBuffer p_command_buffer) override;
 
         std::shared_ptr<Texture> texture;
 

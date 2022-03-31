@@ -57,10 +57,14 @@ namespace Flint {
         vkFreeMemory(device, vertex_buffer_memory, nullptr); // CPU memory
     }
 
-    void Control::update(double delta) {
-        // Branch to root.
-        Node::update(delta);
+    void Control::_update(double delta) {
+        // Root to leaf.
+        update(delta);
 
+        Node::_update(delta);
+    }
+
+    void Control::update(double delta) {
         update_uniform_buffer();
     }
 

@@ -7,24 +7,7 @@
 namespace Flint {
     SubViewport::SubViewport() {
         type = NodeType::SubViewport;
-    }
 
-    SubViewport::~SubViewport() {
-        auto device = Device::getSingleton().device;
-
-        vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
-        vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);
-
-        // Depth resources.
-        vkDestroyImageView(device, depthImageView, nullptr);
-        vkDestroyImage(device, depthImage, nullptr);
-        vkFreeMemory(device, depthImageMemory, nullptr);
-
-        vkDestroyFramebuffer(device, framebuffer, nullptr);
-        vkDestroyRenderPass(device, renderPass, nullptr);
-    }
-
-    void SubViewport::prepare() {
         createImages();
 
         // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
@@ -40,6 +23,21 @@ namespace Flint {
                 renderPass,
                 VkExtent2D{extent.x, extent.y},
                 blitGraphicsPipeline);
+    }
+
+    SubViewport::~SubViewport() {
+        auto device = Device::getSingleton().device;
+
+        vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
+        vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);
+
+        // Depth resources.
+        vkDestroyImageView(device, depthImageView, nullptr);
+        vkDestroyImage(device, depthImage, nullptr);
+        vkFreeMemory(device, depthImageMemory, nullptr);
+
+        vkDestroyFramebuffer(device, framebuffer, nullptr);
+        vkDestroyRenderPass(device, renderPass, nullptr);
     }
 
     void SubViewport::createImages() {
@@ -165,7 +163,7 @@ namespace Flint {
         descriptor.sampler = texture->sampler;
     }
 
-    void SubViewport::draw(VkCommandBuffer p_command_buffer) {
+    void SubViewport::_draw(VkCommandBuffer p_command_buffer) {
         // Begin render pass.
         {
             VkRenderPassBeginInfo renderPassInfo{};
@@ -189,13 +187,13 @@ namespace Flint {
         }
 
         // Start recursive calling to draw all nodes under this sub-viewport.
-        Node::draw(p_command_buffer);
+        Node::_draw(p_command_buffer);
 
         // End render pass.
         vkCmdEndRenderPass(p_command_buffer);
     }
 
-    void SubViewport::update(double delta) {
-        Node::update(delta);
+    void SubViewport::_update(double delta) {
+        Node::_update(delta);
     }
 }

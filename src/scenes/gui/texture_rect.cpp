@@ -40,13 +40,22 @@ namespace Flint {
         return texture;
     }
 
-    void TextureRect::draw(VkCommandBuffer p_command_buffer) {
-        self_draw(p_command_buffer);
+    void TextureRect::_update(double delta) {
+        Control::update(delta);
 
-        Node::draw(p_command_buffer);
+        Node::_update(delta);
     }
 
-    void TextureRect::self_draw(VkCommandBuffer p_command_buffer) {
+    void TextureRect::update(double delta) {
+    }
+
+    void TextureRect::_draw(VkCommandBuffer p_command_buffer) {
+        draw(p_command_buffer);
+
+        Node::_draw(p_command_buffer);
+    }
+
+    void TextureRect::draw(VkCommandBuffer p_command_buffer) {
         Node *viewport_node = get_viewport();
 
         VkPipeline pipeline = RS::getSingleton().blitGraphicsPipeline;
@@ -64,10 +73,6 @@ namespace Flint {
                 vertexBuffers,
                 index_buffer,
                 indices.size());
-    }
-
-    void TextureRect::update(double delta) {
-        Control::update(delta);
     }
 
     void TextureRect::create_descriptor_pool() {

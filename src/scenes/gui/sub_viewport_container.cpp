@@ -29,13 +29,17 @@ namespace Flint {
         update_descriptor_sets();
     }
 
-    void SubViewportContainer::update(double delta) {
-        // Branch to root.
+    void SubViewportContainer::_update(double delta) {
         Control::update(delta);
+
+        Node::_update(delta);
     }
 
-    void SubViewportContainer::draw(VkCommandBuffer p_command_buffer) {
-        // Don't call Control::draw(), so we can break the recursive calling
+    void SubViewportContainer::update(double delta) {
+    }
+
+    void SubViewportContainer::_draw(VkCommandBuffer p_command_buffer) {
+        // Don't call Node::_draw(), so we can break the recursive calling
         // to call the sub-viewport draw function below specifically.
         // Also, we can't interrupt our previous render pass.
 
@@ -43,17 +47,16 @@ namespace Flint {
 
         // Start sub-viewport render pass.
         if (viewport != nullptr) {
-            viewport->draw(sub_viewport_command_buffer);
+            viewport->_draw(sub_viewport_command_buffer);
         }
 
         RS::getSingleton().endSingleTimeCommands(sub_viewport_command_buffer);
 
-        // Now draw the sub-viewport image.
-        self_draw(p_command_buffer);
+        // Now draw the rendered sub-viewport texture.
+        draw(p_command_buffer);
     }
 
-    // This will be called by the scene tree.
-    void SubViewportContainer::self_draw(VkCommandBuffer p_command_buffer) {
+    void SubViewportContainer::draw(VkCommandBuffer p_command_buffer) {
         Node *viewport_node = get_viewport();
 
         VkPipeline pipeline = RS::getSingleton().blitGraphicsPipeline;
@@ -71,8 +74,6 @@ namespace Flint {
                 vertexBuffers,
                 index_buffer,
                 indices.size());
-
-        //Logger::verbose("SELF_DRAW", "SubViewportContainer");
     }
 
     // Create descriptor pool before creating descriptor sets.

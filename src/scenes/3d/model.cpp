@@ -50,17 +50,19 @@ namespace Flint {
         }
     }
 
-    void MeshInstance3D::update(double delta) {
+    void MeshInstance3D::_update(double delta) {
         Node3D::update(delta);
+
+        Node::_update(delta);
+    }
+
+    void MeshInstance3D::_draw(VkCommandBuffer p_command_buffer) {
+        draw(p_command_buffer);
+
+        Node::_draw(p_command_buffer);
     }
 
     void MeshInstance3D::draw(VkCommandBuffer p_command_buffer) {
-        self_draw(p_command_buffer);
-
-        Node::draw(p_command_buffer);
-    }
-
-    void MeshInstance3D::self_draw(VkCommandBuffer p_command_buffer) {
         Node *viewport_node = get_viewport();
 
         VkPipeline pipeline = RS::getSingleton().meshGraphicsPipeline;

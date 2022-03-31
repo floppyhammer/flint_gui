@@ -20,9 +20,7 @@ namespace Flint {
         float z_near = 0.1;
         float z_far = 10.0;
 
-        void prepare();
-
-        void draw(VkCommandBuffer p_command_buffer) override;
+        void _draw(VkCommandBuffer p_command_buffer) override;
 
         std::shared_ptr<Texture> texture;
     public:
@@ -33,7 +31,7 @@ namespace Flint {
         // ------------------------------------
 
     protected:
-        void update(double delta) override;
+        void _update(double delta) override;
 
         VkImage depthImage;
         VkDeviceMemory depthImageMemory;

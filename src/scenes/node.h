@@ -36,13 +36,17 @@ namespace Flint {
     public:
         NodeType type = NodeType::Node;
 
+        virtual void _update(double delta);
+
+        virtual void _draw(VkCommandBuffer p_command_buffer);
+
+        virtual void _notify(Signal signal);
+
+        void _cleanup();
+
         virtual void update(double delta);
 
         virtual void draw(VkCommandBuffer p_command_buffer);
-
-        virtual void self_draw(VkCommandBuffer p_command_buffer);
-
-        virtual void notify(Signal signal);
 
         void add_child(const std::shared_ptr<Node> &p_child);
 
@@ -57,8 +61,6 @@ namespace Flint {
         std::vector<std::shared_ptr<Node>> get_children();
 
         void remove_child(size_t index);
-
-        void cleanup();
 
     protected:
         std::vector<std::shared_ptr<Node>> children;

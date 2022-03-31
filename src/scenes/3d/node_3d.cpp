@@ -22,10 +22,13 @@ namespace Flint {
     Node3D::~Node3D() {
     }
 
-    void Node3D::update(double delta) {
-        // Branch to root.
-        Node::update(delta);
+    void Node3D::_update(double delta) {
+        update(delta);
 
+        Node::_update(delta);
+    }
+
+    void Node3D::update(double delta) {
         updateUniformBuffer();
     }
 
@@ -164,9 +167,8 @@ namespace Flint {
                                             sizeof(ubo));
     }
 
-    void Node3D::notify(Signal signal) {
-        Node::notify(signal);
-
+    void Node3D::_notify(Signal signal) {
+        // We can intercept signal here.
         switch (signal) {
             case Signal::SwapChainChanged: {
 
@@ -175,5 +177,7 @@ namespace Flint {
             default:
                 break;
         }
+
+        Node::_notify(signal);
     }
 }

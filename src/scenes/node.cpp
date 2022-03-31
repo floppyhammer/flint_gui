@@ -1,21 +1,21 @@
 #include "node.h"
 
 namespace Flint {
-    void Node::update(double delta) {
+    void Node::_update(double delta) {
         for (auto &child: children) {
-            child->update(delta);
+            child->_update(delta);
         }
     }
 
-    void Node::draw(VkCommandBuffer p_command_buffer) {
+    void Node::_draw(VkCommandBuffer p_command_buffer) {
         for (auto &child: children) {
-            child->draw(p_command_buffer);
+            child->_draw(p_command_buffer);
         }
     }
 
-    void Node::notify(Signal signal) {
+    void Node::_notify(Signal signal) {
         for (auto &child: children) {
-            notify(signal);
+            child->_notify(signal);
         }
     }
 
@@ -51,13 +51,15 @@ namespace Flint {
         children.erase(children.begin() + index);
     }
 
-    void Node::cleanup() {
+    void Node::_cleanup() {
         for (auto &child: children) {
-            child->cleanup();
+            child->_cleanup();
         }
     }
 
-    void Node::self_draw(VkCommandBuffer p_command_buffer) {
+    void Node::update(double delta) {
+    }
 
+    void Node::draw(VkCommandBuffer p_command_buffer) {
     }
 }

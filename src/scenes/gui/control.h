@@ -52,6 +52,8 @@ namespace Flint {
         float rect_rotation = 0;
         Vec2<float> rect_pivot_offset{0};
 
+        void _update(double delta) override;
+
         void update(double delta) override;
 
         /// Vertex buffer.

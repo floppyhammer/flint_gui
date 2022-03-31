@@ -41,8 +41,6 @@ void App::run() {
         node->add_child(texture_rect);
         node->add_child(mesh_instance_0);
         node->add_child(sub_viewport_c);
-
-        sub_viewport->prepare();
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
@@ -106,7 +104,7 @@ void App::recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t 
     }
 
     // Record commands from the scene tree.
-    tree.record_commands(commandBuffers[imageIndex]);
+    tree.draw(commandBuffers[imageIndex]);
 
     // End render pass.
     vkCmdEndRenderPass(commandBuffers[imageIndex]);
