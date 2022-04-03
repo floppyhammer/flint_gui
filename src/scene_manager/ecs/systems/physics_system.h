@@ -1,7 +1,3 @@
-//
-// Created by floppyhammer on 4/2/2022.
-//
-
 #ifndef FLINT_PHYSICS_SYSTEM_H
 #define FLINT_PHYSICS_SYSTEM_H
 

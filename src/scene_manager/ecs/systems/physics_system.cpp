@@ -1,7 +1,3 @@
-//
-// Created by floppyhammer on 4/2/2022.
-//
-
 #include "physics_system.h"
 
 #include "../components/components.h"
@@ -13,7 +9,7 @@ namespace Flint {
             auto coordinator = Coordinator::get_singleton();
 
             auto &rigidBody = coordinator.get_component<RigidBody>(entity);
-            auto &transform = coordinator.get_component<Transform>(entity);
+            auto &transform = coordinator.get_component<Transform3D>(entity);
             auto const &gravity = coordinator.get_component<Gravity>(entity);
 
             //transform.position += rigidBody.velocity * dt;
