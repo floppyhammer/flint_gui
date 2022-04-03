@@ -71,6 +71,8 @@ void App::run() {
         coordinator.register_component<Flint::Gravity>();
         coordinator.register_component<Flint::RigidBody>();
         coordinator.register_component<Flint::Transform3D>();
+        coordinator.register_component<Flint::Sprite2D>();
+        coordinator.register_component<Flint::TransformGUI>();
 
 //        // Register systems.
 //        auto physics_system = coordinator.register_system<Flint::PhysicsSystem>();
@@ -83,15 +85,15 @@ void App::run() {
 //            coordinator.set_system_signature<Flint::PhysicsSystem>(signature);
 //        }
 //
-//        auto sprite_render_system = coordinator.register_system<Flint::SpriteRenderSystem>();
-//        // Set signature.
-//        {
-//            Flint::Signature signature;
-//            signature.set(coordinator.get_component_type<Flint::Model>());
-//            signature.set(coordinator.get_component_type<Flint::Transform3D>());
-//            coordinator.set_system_signature<Flint::SpriteRenderSystem>(signature);
-//        }
-//
+        sprite_render_system = coordinator.register_system<Flint::SpriteRenderSystem>();
+        // Set signature.
+        {
+            Flint::Signature signature;
+            signature.set(coordinator.get_component_type<Flint::Sprite2D>());
+            signature.set(coordinator.get_component_type<Flint::TransformGUI>());
+            coordinator.set_system_signature<Flint::SpriteRenderSystem>(signature);
+        }
+
 //        auto model_render_system = coordinator.register_system<Flint::ModelRenderSystem>();
 //        // Set signature.
 //        {
@@ -100,18 +102,21 @@ void App::run() {
 //            signature.set(coordinator.get_component_type<Flint::Transform3D>());
 //            coordinator.set_system_signature<Flint::ModelRenderSystem>(signature);
 //        }
-//
-//        // Allocate space for entities.
-//        std::vector<Flint::Entity> entities(10);
-//
-//        // Create entities.
-//        for (auto &entity: entities) {
-//            entity = coordinator.create_entity();
-//
-//            coordinator.add_component(
-//                    entity,
-//                    Flint::Sprite2D{});
-//        }
+
+        // Allocate space for entities.
+        entities.resize(10);
+
+        // Create entities.
+        for (auto &entity: entities) {
+            entity = coordinator.create_entity();
+
+            coordinator.add_component(
+                    entity,
+                    Flint::Sprite2D{});
+            coordinator.add_component(
+                    entity,
+                    Flint::TransformGUI{});
+        }
         // ----------------------------------------------------------
     }
 
@@ -167,6 +172,8 @@ void App::recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t 
     // Record commands from the scene_manager tree.
     tree.draw(commandBuffers[imageIndex]);
 
+    //sprite_render_system->draw(commandBuffers[imageIndex]);
+
     // End render pass.
     vkCmdEndRenderPass(commandBuffers[imageIndex]);
 
@@ -196,6 +203,8 @@ void App::drawFrame() {
 
     // Update the scene_manager tree.
     tree.update(Flint::Engine::getSingleton().get_delta());
+
+    //sprite_render_system->update(Flint::Engine::getSingleton().get_delta());
 
     // Record draw calls.
     recordCommands(SwapChain::getSingleton().commandBuffers, imageIndex);

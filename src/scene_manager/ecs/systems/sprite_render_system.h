@@ -13,7 +13,7 @@
 namespace Flint {
     class SpriteRenderSystem : public System {
     public:
-        void update(float dt);
+        void update(double dt);
 
         void draw(VkCommandBuffer command_buffer);
     };

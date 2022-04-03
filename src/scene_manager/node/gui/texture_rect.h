@@ -12,8 +12,6 @@ namespace Flint {
     public:
         TextureRect();
 
-        ~TextureRect();
-
         void set_texture(std::shared_ptr<Texture> p_texture);
         [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
 

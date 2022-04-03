@@ -19,11 +19,18 @@
 #include "rendering/texture.h"
 #include "core/scene_tree.h"
 
+#include "scene_manager/ecs/entity.h"
+#include "scene_manager/ecs/systems/sprite_render_system.h"
+
 class App {
 public:
     void run();
 
     Flint::SceneTree tree;
+
+    std::vector<Flint::Entity> entities;
+
+    std::shared_ptr<Flint::SpriteRenderSystem> sprite_render_system;
 
 private:
     void mainLoop();

@@ -17,6 +17,8 @@
 namespace Flint {
     Node3D::Node3D() {
         type = NodeType::Node3D;
+
+        mvp_buffer = std::make_shared<MvpBuffer>();
     }
 
     Node3D::~Node3D() {
@@ -29,7 +31,7 @@ namespace Flint {
     }
 
     void Node3D::update(double delta) {
-        updateUniformBuffer();
+        update_mvp();
     }
 
     void Node3D::createVertexBuffer(std::vector<Vertex> &vertices,
@@ -95,26 +97,7 @@ namespace Flint {
         vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
     }
 
-    void Node3D::createUniformBuffers() {
-        auto &swapChainImages = SwapChain::getSingleton().swapChainImages;
-
-        VkDeviceSize bufferSize = sizeof(UniformBufferObject);
-
-        uniformBuffers.resize(swapChainImages.size());
-        uniformBuffersMemory.resize(swapChainImages.size());
-
-        for (size_t i = 0; i < swapChainImages.size(); i++) {
-            RS::getSingleton().createBuffer(bufferSize,
-                                            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                            uniformBuffers[i],
-                                            uniformBuffersMemory[i]);
-        }
-    }
-
-    void Node3D::updateUniformBuffer() {
-        if (uniformBuffersMemory.empty()) return;
-
+    void Node3D::update_mvp() {
         // Prepare UBO data.
         UniformBufferObject ubo{};
 
@@ -161,10 +144,7 @@ namespace Flint {
             ubo.proj[1][1] *= -1;
         }
 
-        // Copy the UBO data to the current uniform buffer.
-        RS::getSingleton().copyDataToMemory(&ubo,
-                                            uniformBuffersMemory[SwapChain::getSingleton().currentImage],
-                                            sizeof(ubo));
+        mvp_buffer->update_uniform_buffer(ubo);
     }
 
     void Node3D::_notify(Signal signal) {

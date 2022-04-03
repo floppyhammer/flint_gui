@@ -33,21 +33,8 @@ namespace Flint {
     MeshInstance3D::MeshInstance3D() {
         type = NodeType::MeshInstance3D;
 
-        createUniformBuffers();
-
         // Load model.
         loadFile(MODEL_NAME);
-    }
-
-    MeshInstance3D::~MeshInstance3D() {
-        auto device = Device::getSingleton().device;
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-
-        // Clean up uniform buffers.
-        for (size_t i = 0; i < swapChainImages.size(); i++) {
-            vkDestroyBuffer(device, uniformBuffers[i], nullptr);
-            vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
-        }
     }
 
     void MeshInstance3D::_update(double delta) {
@@ -160,7 +147,7 @@ namespace Flint {
             Node3D::createIndexBuffer(indices, mesh->indexBuffer, mesh->indexBufferMemory);
 
             if (mesh->material_id < materials.size()) {
-                mesh->updateDescriptorSets(materials[mesh->material_id], uniformBuffers);
+                mesh->updateDescriptorSets(materials[mesh->material_id], mvp_buffer->uniform_buffers);
             } else {
                 throw std::runtime_error("Invalid material id!");
             }

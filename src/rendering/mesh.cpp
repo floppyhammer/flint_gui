@@ -2,6 +2,7 @@
 
 #include "device.h"
 #include "swap_chain.h"
+#include "mvp_uniform_buffer.h"
 
 Mesh3D::Mesh3D() {
     createDescriptorPool();
@@ -88,7 +89,7 @@ void Mesh3D::updateDescriptorSets(std::shared_ptr<Material> p_material, std::vec
         VkDescriptorBufferInfo bufferInfo{};
         bufferInfo.buffer = uniformBuffers[i];
         bufferInfo.offset = 0;
-        bufferInfo.range = sizeof(UniformBufferObject);
+        bufferInfo.range = sizeof(Flint::UniformBufferObject);
 
         VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

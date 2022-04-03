@@ -9,7 +9,6 @@ namespace Flint {
     class MeshInstance3D : public Node3D {
     public:
         MeshInstance3D();
-        ~MeshInstance3D();
 
     protected:
         std::vector<std::shared_ptr<Mesh>> meshes;

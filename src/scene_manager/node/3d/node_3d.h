@@ -4,6 +4,7 @@
 #include "../node.h"
 #include "../../../rendering/rendering_server.h"
 #include "../../../rendering/mesh.h"
+#include "../../../rendering/mvp_uniform_buffer.h"
 
 #include "glm/glm.hpp"
 
@@ -30,11 +31,7 @@ namespace Flint {
 
         void update(double delta) override;
 
-        /**
-         * Update MVP. Update UBOs simply by memory mapping.
-         * @param currentImage Current image, which has different meaning from `current frame`.
-         */
-        void updateUniformBuffer();
+        void update_mvp();
 
         /**
          * Create buffer for vertex data.
@@ -52,15 +49,7 @@ namespace Flint {
                                       VkBuffer &p_index_buffer,
                                       VkDeviceMemory &p_index_buffer_memory);
 
-        /**
-         * Create buffer for uniform data.
-         * @dependency Swap chain count.
-         */
-        void createUniformBuffers();
-
-        /// We have a uniform buffer per swap chain image.
-        std::vector<VkBuffer> uniformBuffers;
-        std::vector<VkDeviceMemory> uniformBuffersMemory;
+        std::shared_ptr<MvpBuffer> mvp_buffer;
     };
 }
 

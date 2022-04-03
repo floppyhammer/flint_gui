@@ -7,10 +7,13 @@
 #include "../../../common/vec2.h"
 #include "../../../rendering/mesh.h"
 #include "../../../rendering/rendering_server.h"
+#include "../../../rendering/mvp_uniform_buffer.h"
 
 namespace Flint {
     class Control : public Node {
     public:
+        Control();
+
         ~Control() = default;
 
         void set_rect_position(float x, float y);
@@ -56,15 +59,9 @@ namespace Flint {
 
         void update(double delta) override;
 
-        /// We have a uniform buffer per swap chain image.
-        std::vector<VkBuffer> uniform_buffers;
-        std::vector<VkDeviceMemory> uniform_buffers_memory;
+        std::shared_ptr<MvpBuffer> mvp_buffer;
 
-        void create_uniform_buffers();
-
-        void update_uniform_buffer();
-
-        void free_uniform_buffers();
+        void update_mvp();
 
         std::shared_ptr<Mesh2D> mesh;
 

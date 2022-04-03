@@ -9,6 +9,12 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace Flint {
+    Control::Control() {
+        type = NodeType::Control;
+
+        mvp_buffer = std::make_shared<MvpBuffer>();
+    }
+
     void Control::set_rect_position(float x, float y) {
         rect_position.x = x;
         rect_position.y = y;
@@ -33,17 +39,6 @@ namespace Flint {
         rect_pivot_offset.y = y;
     }
 
-    void Control::free_uniform_buffers() {
-        auto device = Device::getSingleton().device;
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-
-        // Clean up uniform buffers.
-        for (size_t i = 0; i < swapChainImages.size(); i++) {
-            vkDestroyBuffer(device, uniform_buffers[i], nullptr);
-            vkFreeMemory(device, uniform_buffers_memory[i], nullptr);
-        }
-    }
-
     void Control::_update(double delta) {
         // Root to leaf.
         update(delta);
@@ -52,12 +47,10 @@ namespace Flint {
     }
 
     void Control::update(double delta) {
-        update_uniform_buffer();
+        update_mvp();
     }
 
-    void Control::update_uniform_buffer() {
-        if (uniform_buffers_memory.empty()) return;
-
+    void Control::update_mvp() {
         Node *viewport_node = get_viewport();
 
         Vec2<uint32_t> viewport_extent;
@@ -88,27 +81,7 @@ namespace Flint {
                                          rect_size.y / viewport_extent.y * 2.0f,
                                          1.0f));
 
-        // Copy the UBO data to the current uniform buffer.
-        RS::getSingleton().copyDataToMemory(&ubo.model,
-                                            uniform_buffers_memory[SwapChain::getSingleton().currentImage],
-                                            sizeof(ubo.model));
-    }
-
-    void Control::create_uniform_buffers() {
-        auto &swapChainImages = SwapChain::getSingleton().swapChainImages;
-
-        VkDeviceSize bufferSize = sizeof(glm::mat4);
-
-        uniform_buffers.resize(swapChainImages.size());
-        uniform_buffers_memory.resize(swapChainImages.size());
-
-        for (size_t i = 0; i < swapChainImages.size(); i++) {
-            RS::getSingleton().createBuffer(bufferSize,
-                                            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                            uniform_buffers[i],
-                                            uniform_buffers_memory[i]);
-        }
+        mvp_buffer->update_uniform_buffer(ubo);
     }
 
     void Control::init_default_mesh() {

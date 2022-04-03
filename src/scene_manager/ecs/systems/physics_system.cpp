@@ -4,7 +4,7 @@
 #include "../coordinator.h"
 
 namespace Flint {
-    void PhysicsSystem::update(float dt) {
+    void PhysicsSystem::update(double dt) {
         for (auto const &entity: entities) {
             auto coordinator = Coordinator::get_singleton();
 

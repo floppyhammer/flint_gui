@@ -14,13 +14,7 @@ namespace Flint {
     TextureRect::TextureRect() {
         type = NodeType::TextureRect;
 
-        create_uniform_buffers();
-
         init_default_mesh();
-    }
-
-    TextureRect::~TextureRect() {
-        free_uniform_buffers();
     }
 
     void TextureRect::set_texture(std::shared_ptr<Texture> p_texture) {
@@ -29,7 +23,7 @@ namespace Flint {
         rect_size.x = (float) p_texture->width;
         rect_size.y = (float) p_texture->height;
 
-        mesh->updateDescriptorSets(material, uniform_buffers);
+        mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
     }
 
     std::shared_ptr<Texture> TextureRect::get_texture() const {

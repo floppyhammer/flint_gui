@@ -4,12 +4,13 @@
 #include "../coordinator.h"
 #include "../../../rendering/swap_chain.h"
 #include "../../../rendering/mesh.h"
+#include "../../../rendering/mvp_uniform_buffer.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace Flint {
-    void SpriteRenderSystem::update(float dt) {
+    void SpriteRenderSystem::update(double dt) {
         for (auto const &entity: entities) {
             auto coordinator = Coordinator::get_singleton();
 

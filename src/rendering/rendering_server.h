@@ -5,22 +5,11 @@
 
 #include "GLFW/glfw3.h"
 
-#define GLM_FORCE_RADIANS
-
-#include <glm/glm.hpp>
-
 #include "device.h"
 
 #include <vector>
 #include <iostream>
 #include <optional>
-
-/// MVP, which will be sent to vertex shaders.
-struct UniformBufferObject {
-    glm::mat4 model;
-    glm::mat4 view;
-    glm::mat4 proj;
-};
 
 class RenderingServer {
 public:

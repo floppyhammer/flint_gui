@@ -3,6 +3,8 @@
 
 layout(binding = 0) uniform uMvp {
     mat4 model;
+    mat4 view;
+    mat4 proj;
 } mvp;
 
 layout(location = 0) in vec3 inPosition;

@@ -10,13 +10,7 @@ namespace Flint {
     SubViewportContainer::SubViewportContainer() {
         type = NodeType::SubViewportContainer;
 
-        create_uniform_buffers();
-
         init_default_mesh();
-    }
-
-    SubViewportContainer::~SubViewportContainer() {
-        free_uniform_buffers();
     }
 
     void SubViewportContainer::set_viewport(std::shared_ptr<SubViewport> p_viewport) {
@@ -24,7 +18,7 @@ namespace Flint {
 
         material->texture = viewport->texture;
 
-        mesh->updateDescriptorSets(material, uniform_buffers);
+        mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
     }
 
     void SubViewportContainer::_update(double delta) {

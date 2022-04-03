@@ -9,8 +9,6 @@ namespace Flint {
     public:
         SubViewportContainer();
 
-        ~SubViewportContainer();
-
         void set_viewport(std::shared_ptr<SubViewport> p_viewport);
 
     protected:
