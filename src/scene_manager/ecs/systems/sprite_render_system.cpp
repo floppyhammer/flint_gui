@@ -56,14 +56,14 @@ namespace Flint {
 
             VkPipeline pipeline = RS::getSingleton().blitGraphicsPipeline;
 
-            VkBuffer vertexBuffers[] = {sprite.vertex_buffer};
+            VkBuffer vertexBuffers[] = {sprite.mesh->vertexBuffer};
             RS::getSingleton().blit(
                     command_buffer,
                     pipeline,
-                    sprite.descriptor_sets[SwapChain::getSingleton().currentImage],
+                    sprite.mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),
                     vertexBuffers,
-                    sprite.index_buffer,
-                    sprite.indices_count);
+                    sprite.mesh->indexBuffer,
+                    sprite.mesh->indices_count);
         }
     }
 }

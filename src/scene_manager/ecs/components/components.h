@@ -39,25 +39,12 @@ namespace Flint {
     // RENDER
     // -----------------------------
     struct Sprite2D {
-        // FIXME: Should wrap these resources a bit, so they can be released automatically.
-        /// Vertex buffer.
-        VkBuffer vertex_buffer;
-        VkDeviceMemory vertex_buffer_memory;
-
-        /// Index buffer.
-        VkBuffer index_buffer;
-        VkDeviceMemory index_buffer_memory;
-        uint32_t indices_count = 0;
+        std::shared_ptr<Mesh2D> mesh;
+        std::shared_ptr<Material2D> material;
 
         /// We have a uniform buffer per swap chain image.
         std::vector<VkBuffer> uniform_buffers;
         std::vector<VkDeviceMemory> uniform_buffers_memory;
-
-        /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
-        VkDescriptorPool descriptor_pool;
-
-        /// Descriptor sets are allocated from descriptor pool objects.
-        std::vector<VkDescriptorSet> descriptor_sets;
     };
 
     struct Sprite3D {
@@ -73,8 +60,8 @@ namespace Flint {
     };
 
     struct Model {
-        std::vector<std::shared_ptr<Mesh>> meshes;
-        std::vector<Material> materials;
+        std::vector<std::shared_ptr<Mesh3D>> meshes;
+        std::vector<std::shared_ptr<Material3D>> materials;
 
         /// We have a uniform buffer per swap chain image.
         std::vector<VkBuffer> uniform_buffers;
