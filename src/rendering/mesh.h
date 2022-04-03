@@ -103,9 +103,30 @@ protected:
     std::vector<VkDescriptorSet> descriptorSets;
 };
 
+const std::vector<Vertex> vertices = {
+        {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+        {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
+        {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+        {{0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
+};
+
+// For index buffer. (Front is counter-clockwise.)
+const std::vector<uint32_t> indices = {
+        0, 2, 1, 2, 0, 3
+};
+
 class Mesh2D : public Mesh {
 public:
     Mesh2D();
+    static std::shared_ptr<Mesh2D> from_default() {
+        auto mesh = std::make_shared<Mesh2D>();
+
+        mesh->create_vertex_buffer();
+
+        mesh->create_index_buffer();
+
+        return mesh;
+    }
 
     void createDescriptorPool() override;
 
@@ -113,8 +134,10 @@ public:
 
     void updateDescriptorSets(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) override;
 
-protected:
-    std::shared_ptr<Texture> texture;
+private:
+    void create_vertex_buffer();
+
+    void create_index_buffer();
 };
 
 class Mesh3D : public Mesh {

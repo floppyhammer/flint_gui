@@ -16,8 +16,7 @@ namespace Flint {
 
             auto &sprite = coordinator.get_component<Sprite2D>(entity);
             auto &transform = coordinator.get_component<TransformGUI>(entity);
-
-            if (sprite.uniform_buffers_memory.empty()) continue;
+            auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
 
             // Default to swap chain image.
             auto extent = SwapChain::getSingleton().swapChainExtent;
@@ -42,10 +41,7 @@ namespace Flint {
                                              transform.rect_size.y / viewport_extent.y * 2.0f,
                                              1.0f));
 
-            // Copy the UBO data to the current uniform buffer.
-            RS::getSingleton().copyDataToMemory(&ubo.model,
-                                                sprite.uniform_buffers_memory[SwapChain::getSingleton().currentImage],
-                                                sizeof(ubo.model));
+            mvp_component.mvp_buffer->update_uniform_buffer(ubo);
         }
     }
 

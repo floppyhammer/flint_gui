@@ -16,6 +16,7 @@
 #include "scene_manager/ecs/systems/physics_system.h"
 #include "scene_manager/ecs/systems/sprite_render_system.h"
 #include "scene_manager/ecs/systems/model_render_system.h"
+#include "scene_manager/ecs/systems/model_render_system.h"
 
 #include <cstdint>
 #include <memory>
@@ -59,7 +60,7 @@ void App::run() {
         //mesh_instance_0->scale.x = mesh_instance_0->scale.y = mesh_instance_0->scale.z = 0.02;
         mesh_instance_1->position.x = -1;
         //mesh_instance_1->scale.x = mesh_instance_1->scale.y = mesh_instance_1->scale.z = 0.02;
-        tree.set_root(node);
+        //tree.set_root(node);
     }
 
     {
@@ -73,6 +74,7 @@ void App::run() {
         coordinator.register_component<Flint::Transform3D>();
         coordinator.register_component<Flint::Sprite2D>();
         coordinator.register_component<Flint::TransformGUI>();
+        coordinator.register_component<Flint::MvpComponent>();
 
 //        // Register systems.
 //        auto physics_system = coordinator.register_system<Flint::PhysicsSystem>();
@@ -91,6 +93,7 @@ void App::run() {
             Flint::Signature signature;
             signature.set(coordinator.get_component_type<Flint::Sprite2D>());
             signature.set(coordinator.get_component_type<Flint::TransformGUI>());
+            signature.set(coordinator.get_component_type<Flint::MvpComponent>());
             coordinator.set_system_signature<Flint::SpriteRenderSystem>(signature);
         }
 
@@ -110,12 +113,23 @@ void App::run() {
         for (auto &entity: entities) {
             entity = coordinator.create_entity();
 
+            auto material = std::make_shared<Material2D>();
+            material->texture = Texture::from_file("../res/texture.jpg");
+
+            auto mvp_buffer = std::make_shared<Flint::MvpBuffer>();
+
+            auto mesh = Mesh2D::from_default();
+            mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
+
             coordinator.add_component(
                     entity,
-                    Flint::Sprite2D{});
+                    Flint::Sprite2D{mesh, material});
             coordinator.add_component(
                     entity,
                     Flint::TransformGUI{});
+            coordinator.add_component(
+                    entity,
+                    Flint::MvpComponent{mvp_buffer});
         }
         // ----------------------------------------------------------
     }
@@ -172,7 +186,7 @@ void App::recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t 
     // Record commands from the scene_manager tree.
     tree.draw(commandBuffers[imageIndex]);
 
-    //sprite_render_system->draw(commandBuffers[imageIndex]);
+    sprite_render_system->draw(commandBuffers[imageIndex]);
 
     // End render pass.
     vkCmdEndRenderPass(commandBuffers[imageIndex]);
@@ -204,7 +218,7 @@ void App::drawFrame() {
     // Update the scene_manager tree.
     tree.update(Flint::Engine::getSingleton().get_delta());
 
-    //sprite_render_system->update(Flint::Engine::getSingleton().get_delta());
+    sprite_render_system->update(Flint::Engine::getSingleton().get_delta());
 
     // Record draw calls.
     recordCommands(SwapChain::getSingleton().commandBuffers, imageIndex);

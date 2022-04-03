@@ -163,6 +163,68 @@ void Mesh2D::createDescriptorSets() {
     }
 }
 
+void Mesh2D::create_vertex_buffer() {
+    VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+
+    VkBuffer stagingBuffer; // In GPU
+    VkDeviceMemory stagingBufferMemory; // In CPU
+
+    // Create the GPU buffer and link it with the CPU memory.
+    RS::getSingleton().createBuffer(bufferSize,
+                                    VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                    stagingBuffer,
+                                    stagingBufferMemory);
+
+    // Copy data to the CPU memory.
+    RS::getSingleton().copyDataToMemory((void *) vertices.data(), stagingBufferMemory, bufferSize);
+
+    // Create the vertex buffer (GPU) and bind it to the vertex memory (CPU).
+    RS::getSingleton().createBuffer(bufferSize,
+                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                    vertexBuffer,
+                                    vertexBufferMemory);
+
+    // Copy buffer (GPU).
+    RS::getSingleton().copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+
+    // Clean up staging buffer and memory.
+    vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
+    vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
+}
+
+void Mesh2D::create_index_buffer() {
+    VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+    // Set indices count for mesh.
+    indices_count = indices.size();
+
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    RS::getSingleton().createBuffer(bufferSize,
+                                    VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                    stagingBuffer,
+                                    stagingBufferMemory);
+
+    RS::getSingleton().copyDataToMemory((void *) indices.data(),
+                                        stagingBufferMemory,
+                                        bufferSize);
+
+    RS::getSingleton().createBuffer(bufferSize,
+                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                    indexBuffer,
+                                    indexBufferMemory);
+
+    // Copy data from staging buffer to index buffer.
+    RS::getSingleton().copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+
+    vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
+    vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
+}
+
 void Mesh2D::updateDescriptorSets(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) {
     // Cast to Material3D.
     auto material = std::static_pointer_cast<Material2D>(p_material);

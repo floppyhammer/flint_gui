@@ -37,7 +37,7 @@ namespace Flint {
         if (uniform_buffers_memory.empty()) return;
 
         // Copy the UBO data to the current uniform buffer.
-        RS::getSingleton().copyDataToMemory(&ubo.model,
+        RS::getSingleton().copyDataToMemory(&ubo,
                                             uniform_buffers_memory[SwapChain::getSingleton().currentImage],
                                             sizeof(ubo));
     }

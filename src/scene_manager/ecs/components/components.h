@@ -6,6 +6,7 @@
 #include "../../../common/math/quaternion.h"
 #include "../../../rendering/mesh.h"
 #include "../../../rendering/material.h"
+#include "../../../rendering/mvp_uniform_buffer.h"
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -41,14 +42,14 @@ namespace Flint {
     struct Sprite2D {
         std::shared_ptr<Mesh2D> mesh;
         std::shared_ptr<Material2D> material;
-
-        /// We have a uniform buffer per swap chain image.
-        std::vector<VkBuffer> uniform_buffers;
-        std::vector<VkDeviceMemory> uniform_buffers_memory;
     };
 
     struct Sprite3D {
 
+    };
+
+    struct MvpComponent {
+        std::shared_ptr<MvpBuffer> mvp_buffer;
     };
 
     struct TransformGUI {
@@ -63,9 +64,7 @@ namespace Flint {
         std::vector<std::shared_ptr<Mesh3D>> meshes;
         std::vector<std::shared_ptr<Material3D>> materials;
 
-        /// We have a uniform buffer per swap chain image.
-        std::vector<VkBuffer> uniform_buffers;
-        std::vector<VkDeviceMemory> uniform_buffers_memory;
+        std::shared_ptr<MvpBuffer> mvp_buffer;
     };
     // -----------------------------
 }

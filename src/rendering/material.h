@@ -19,8 +19,8 @@ public:
 
 class Material3D : public Material {
 public:
-    std::shared_ptr<Texture> normal_texture;
     std::shared_ptr<Texture> diffuse_texture;
+    std::shared_ptr<Texture> normal_texture;
 };
 
 #endif //FLINT_MATERIAL_H

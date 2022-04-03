@@ -17,8 +17,7 @@ namespace Flint {
 
             auto &model = coordinator.get_component<Model>(entity);
             auto &transform = coordinator.get_component<Transform3D>(entity);
-
-            if (model.uniform_buffers_memory.empty()) continue;
+            auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
 
             // Prepare UBO data.
             UniformBufferObject ubo{};
@@ -45,10 +44,7 @@ namespace Flint {
             // where the Y coordinate of the clip coordinates is inverted.
             ubo.proj[1][1] *= -1;
 
-            // Copy the UBO data to the current uniform buffer.
-            RS::getSingleton().copyDataToMemory(&ubo,
-                                                model.uniform_buffers_memory[SwapChain::getSingleton().currentImage],
-                                                sizeof(ubo));
+            mvp_component.mvp_buffer->update_uniform_buffer(ubo);
         }
     }
 

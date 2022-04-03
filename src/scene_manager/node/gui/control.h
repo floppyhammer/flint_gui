@@ -36,18 +36,6 @@ namespace Flint {
 
         Vec2<float> get_rect_pivot_offset() const;
 
-        const std::vector<Vertex> vertices = {
-                {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-                {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
-                {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-                {{0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
-        };
-
-        // For index buffer. (Front is counter-clockwise.)
-        const std::vector<uint32_t> indices = {
-                0, 2, 1, 2, 0, 3
-        };
-
     protected:
         Vec2<float> rect_position{0};
         Vec2<float> rect_size{128};
@@ -68,11 +56,6 @@ namespace Flint {
         std::shared_ptr<Material2D> material;
 
         void init_default_mesh();
-
-    private:
-        void create_vertex_buffer();
-
-        void create_index_buffer();
     };
 }
 
