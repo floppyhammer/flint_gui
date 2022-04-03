@@ -1,7 +1,3 @@
-//
-// Created by chy on 2/24/2022.
-//
-
 #ifndef FLINT_SWAP_CHAIN_H
 #define FLINT_SWAP_CHAIN_H
 

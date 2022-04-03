@@ -5,6 +5,7 @@
 #include <string>
 #include <istream>
 #include <fstream>
+#include <iostream>
 
 inline std::vector<char> readFile(const std::string &filename) {
     std::ifstream input(filename, std::ios::binary);

@@ -17,7 +17,6 @@
 
 #include "rendering/mesh.h"
 #include "rendering/texture.h"
-#include "scenes/3d/model.h"
 #include "core/scene_tree.h"
 
 class App {

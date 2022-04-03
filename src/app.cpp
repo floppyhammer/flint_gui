@@ -5,9 +5,11 @@
 #include "rendering/rendering_server.h"
 #include "rendering/texture.h"
 #include "core/engine.h"
-#include "scenes/gui/sub_viewport_container.h"
-#include "scenes/gui/texture_rect.h"
-#include "scenes/sub_viewport.h"
+
+#include "scene_manager/node/gui/sub_viewport_container.h"
+#include "scene_manager/node/3d/model.h"
+#include "scene_manager/node/gui/texture_rect.h"
+#include "scene_manager/node/sub_viewport.h"
 
 #include <cstdint>
 #include <memory>
@@ -27,7 +29,7 @@ void App::run() {
     auto swap_chain = SwapChain::getSingleton();
     // ---------------------------------------------------
 
-    // Build scene tree. Use a block, so we don't increase ref counts for the nodes.
+    // Build scene_manager tree. Use a block, so we don't increase ref counts for the node.
     {
         auto node = std::make_shared<Flint::Node>();
         auto node_3d = std::make_shared<Flint::Node3D>();
@@ -103,7 +105,7 @@ void App::recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t 
                              VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    // Record commands from the scene tree.
+    // Record commands from the scene_manager tree.
     tree.draw(commandBuffers[imageIndex]);
 
     // End render pass.
@@ -133,7 +135,7 @@ void App::drawFrame() {
     uint32_t imageIndex;
     if (!SwapChain::getSingleton().acquireSwapChainImage(imageIndex)) return;
 
-    // Update the scene tree.
+    // Update the scene_manager tree.
     tree.update(Flint::Engine::getSingleton().get_delta());
 
     // Record draw calls.

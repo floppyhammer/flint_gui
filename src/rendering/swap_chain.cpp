@@ -1,7 +1,3 @@
-//
-// Created by chy on 2/24/2022.
-//
-
 #include "swap_chain.h"
 
 #include "device.h"
