@@ -3,24 +3,27 @@
 
 #include "material.h"
 
-#include <string>
-#include <utility>
-#include <vector>
-#include <array>
-
 #define GLFW_INCLUDE_VULKAN
 
 #include "GLFW/glfw3.h"
 
 #include "glm/glm.hpp"
 
+#include <string>
+#include <utility>
+#include <vector>
+#include <array>
+
+/**
+ * Shared by 2D and 3D meshes.
+ */
 struct Vertex {
     glm::vec3 pos;
     glm::vec3 color;
-    glm::vec2 texCoord;
+    glm::vec2 uv;
 
     bool operator==(const Vertex &other) const {
-        return pos == other.pos && color == other.color && texCoord == other.texCoord;
+        return pos == other.pos && color == other.color && uv == other.uv;
     }
 
     /// Binding info.
@@ -50,7 +53,7 @@ struct Vertex {
         attributeDescriptions[2].binding = 0;
         attributeDescriptions[2].location = 2;
         attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
+        attributeDescriptions[2].offset = offsetof(Vertex, uv);
 
         return attributeDescriptions;
     }
@@ -58,29 +61,29 @@ struct Vertex {
 
 class Mesh {
 public:
-    Mesh();
+    Mesh() = default;
 
     ~Mesh();
 
     /**
      * A descriptor pool is used to allocate descriptor sets of some layout for use in a shader.
+     * Create descriptor pool before creating descriptor sets.
      * @dependency None.
      */
-    void createDescriptorPool();
+    virtual void createDescriptorPool() = 0;
 
     /**
      * Allocate descriptor sets in the pool.
      * @dependency Descriptor pool, descriptor set layout, and actual resources (uniform buffers, images, image views).
      */
-    void createDescriptorSets();
+    virtual void createDescriptorSets() = 0;
 
-    // Should be recalled once texture is changed.
-    void updateDescriptorSets(Material &material, std::vector<VkBuffer> &uniformBuffers);
+    /// Should be called once uniform/texture bindings have changed.
+    virtual void updateDescriptorSets(std::shared_ptr<Material>, std::vector<VkBuffer> &uniformBuffers) = 0;
 
     [[nodiscard]] VkDescriptorSet getDescriptorSet(uint32_t index) const;
 
     std::string name;
-    uint32_t indices_count = 0;
     int32_t material_id = -1;
 
     /// Vertex buffer.
@@ -90,13 +93,39 @@ public:
     /// Index buffer.
     VkBuffer indexBuffer{};
     VkDeviceMemory indexBufferMemory{};
+    uint32_t indices_count = 0;
 
-private:
+protected:
     /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
     VkDescriptorPool descriptorPool{};
 
     /// Descriptor sets are allocated from descriptor pool objects.
     std::vector<VkDescriptorSet> descriptorSets;
+};
+
+class Mesh2D : public Mesh {
+public:
+    Mesh2D();
+
+    void createDescriptorPool() override;
+
+    void createDescriptorSets() override;
+
+    void updateDescriptorSets(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) override;
+
+protected:
+    std::shared_ptr<Texture> texture;
+};
+
+class Mesh3D : public Mesh {
+public:
+    Mesh3D();
+
+    void createDescriptorPool() override;
+
+    void createDescriptorSets() override;
+
+    void updateDescriptorSets(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) override;
 };
 
 #endif //FLINT_MESH_H

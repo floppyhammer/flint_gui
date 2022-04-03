@@ -9,6 +9,8 @@ namespace Flint {
     public:
         SubViewportContainer();
 
+        ~SubViewportContainer();
+
         void set_viewport(std::shared_ptr<SubViewport> p_viewport);
 
     protected:
@@ -22,12 +24,6 @@ namespace Flint {
         void update(double delta) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
-
-        void create_descriptor_pool();
-
-        void create_descriptor_sets();
-
-        void update_descriptor_sets();
     };
 }
 

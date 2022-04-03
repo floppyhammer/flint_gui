@@ -11,7 +11,7 @@
 namespace Flint {
     class Control : public Node {
     public:
-        ~Control();
+        ~Control() = default;
 
         void set_rect_position(float x, float y);
 
@@ -56,33 +56,26 @@ namespace Flint {
 
         void update(double delta) override;
 
-        /// Vertex buffer.
-        VkBuffer vertex_buffer;
-        VkDeviceMemory vertex_buffer_memory;
-
-        /// Index buffer.
-        VkBuffer index_buffer;
-        VkDeviceMemory index_buffer_memory;
-
         /// We have a uniform buffer per swap chain image.
         std::vector<VkBuffer> uniform_buffers;
         std::vector<VkDeviceMemory> uniform_buffers_memory;
 
-        /// A descriptor pool maintains a pool of descriptors, from which descriptor sets are allocated.
-        VkDescriptorPool descriptor_pool;
-
-        /// Descriptor sets are allocated from descriptor pool objects.
-        std::vector<VkDescriptorSet> descriptor_sets;
-
-        bool vk_resources_allocated = false;
-
-        void create_vertex_buffer();
-
-        void create_index_buffer();
-
         void create_uniform_buffers();
 
         void update_uniform_buffer();
+
+        void free_uniform_buffers();
+
+        std::shared_ptr<Mesh2D> mesh;
+
+        std::shared_ptr<Material2D> material;
+
+        void init_default_mesh();
+
+    private:
+        void create_vertex_buffer();
+
+        void create_index_buffer();
     };
 }
 

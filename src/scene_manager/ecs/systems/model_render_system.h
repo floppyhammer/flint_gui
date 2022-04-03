@@ -1,5 +1,5 @@
-#ifndef FLINT_SPRITE_RENDER_SYSTEM_H
-#define FLINT_SPRITE_RENDER_SYSTEM_H
+#ifndef FLINT_MODEL_RENDER_SYSTEM_H
+#define FLINT_MODEL_RENDER_SYSTEM_H
 
 #include "../system.h"
 #include "../entity.h"
@@ -19,4 +19,4 @@ namespace Flint {
     };
 }
 
-#endif //FLINT_SPRITE_RENDER_SYSTEM_H
+#endif //FLINT_MODEL_RENDER_SYSTEM_H

@@ -22,7 +22,7 @@ namespace std {
         size_t operator()(Vertex const &vertex) const {
             return ((hash<glm::vec3>()(vertex.pos) ^
                      (hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
-                   (hash<glm::vec2>()(vertex.texCoord) << 1);
+                   (hash<glm::vec2>()(vertex.uv) << 1);
         }
     };
 }
@@ -102,15 +102,15 @@ namespace Flint {
 
         // Load materials.
         for (const auto &obj_material: obj_materials) {
-            Material material;
-            material.name = obj_material.name;
-            material.diffuse_texture = Texture::from_file(file_directory + "/" + obj_material.diffuse_texname);
+            auto material = std::make_shared<Material3D>();
+            material->name = obj_material.name;
+            material->diffuse_texture = Texture::from_file(file_directory + "/" + obj_material.diffuse_texname);
             materials.push_back(material);
         }
 
         // Iterate over the vertices and dump them straight into our vertices vector.
         for (const auto &shape: shapes) {
-            auto mesh = std::make_shared<Mesh>();
+            auto mesh = std::make_shared<Mesh3D>();
 
             mesh->name = shape.name;
             mesh->material_id = shape.mesh.material_ids[0];
@@ -131,7 +131,7 @@ namespace Flint {
                         attrib.vertices[3 * index.vertex_index + 2]
                 };
 
-                vertex.texCoord = {
+                vertex.uv = {
                         attrib.texcoords[2 * index.texcoord_index + 0],
                         // Flip the vertical component of the texture coordinates.
                         1.0f - attrib.texcoords[2 * index.texcoord_index + 1]

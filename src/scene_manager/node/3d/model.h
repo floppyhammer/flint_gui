@@ -13,7 +13,7 @@ namespace Flint {
 
     protected:
         std::vector<std::shared_ptr<Mesh>> meshes;
-        std::vector<Material> materials;
+        std::vector<std::shared_ptr<Material>> materials;
 
         void _draw(VkCommandBuffer p_command_buffer) override;
 

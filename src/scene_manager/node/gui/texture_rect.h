@@ -12,6 +12,8 @@ namespace Flint {
     public:
         TextureRect();
 
+        ~TextureRect();
+
         void set_texture(std::shared_ptr<Texture> p_texture);
         [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
 
@@ -23,16 +25,6 @@ namespace Flint {
         void update(double delta) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
-
-        std::shared_ptr<Texture> texture;
-
-        // Create descriptor pool before creating descriptor sets.
-        void create_descriptor_pool();
-
-        void create_descriptor_sets();
-
-        // Should call when a new texture is set.
-        void update_descriptor_sets();
     };
 }
 

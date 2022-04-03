@@ -28,7 +28,7 @@ namespace Flint {
     struct Transform2D {
         Vec2<float> position;
         Vec2<float> scale;
-        float rotation;
+        float rotation = 0;
     };
 
     struct Gravity {
@@ -39,6 +39,7 @@ namespace Flint {
     // RENDER
     // -----------------------------
     struct Sprite2D {
+        // FIXME: Should wrap these resources a bit, so they can be released automatically.
         /// Vertex buffer.
         VkBuffer vertex_buffer;
         VkDeviceMemory vertex_buffer_memory;
@@ -59,16 +60,16 @@ namespace Flint {
         std::vector<VkDescriptorSet> descriptor_sets;
     };
 
+    struct Sprite3D {
+
+    };
+
     struct TransformGUI {
         Vec2<float> rect_position{0};
         Vec2<float> rect_size{128};
         Vec2<float> rect_scale{1};
         Vec2<float> rect_pivot_offset{0}; // Top-left as the default origin.
         float rect_rotation = 0;
-    };
-
-    struct Sprite3D {
-
     };
 
     struct Model {

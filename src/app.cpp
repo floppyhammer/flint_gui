@@ -11,6 +11,12 @@
 #include "scene_manager/node/gui/texture_rect.h"
 #include "scene_manager/node/sub_viewport.h"
 
+#include "scene_manager/ecs/coordinator.h"
+#include "scene_manager/ecs/components/components.h"
+#include "scene_manager/ecs/systems/physics_system.h"
+#include "scene_manager/ecs/systems/sprite_render_system.h"
+#include "scene_manager/ecs/systems/model_render_system.h"
+
 #include <cstdint>
 #include <memory>
 
@@ -54,6 +60,59 @@ void App::run() {
         mesh_instance_1->position.x = -1;
         //mesh_instance_1->scale.x = mesh_instance_1->scale.y = mesh_instance_1->scale.z = 0.02;
         tree.set_root(node);
+    }
+
+    {
+        // ECS test.
+        // ----------------------------------------------------------
+        auto coordinator = Flint::Coordinator::get_singleton();
+
+        // Register components.
+        coordinator.register_component<Flint::Gravity>();
+        coordinator.register_component<Flint::RigidBody>();
+        coordinator.register_component<Flint::Transform3D>();
+
+//        // Register systems.
+//        auto physics_system = coordinator.register_system<Flint::PhysicsSystem>();
+//        // Set signature.
+//        {
+//            Flint::Signature signature;
+//            signature.set(coordinator.get_component_type<Flint::Gravity>());
+//            signature.set(coordinator.get_component_type<Flint::RigidBody>());
+//            signature.set(coordinator.get_component_type<Flint::Transform3D>());
+//            coordinator.set_system_signature<Flint::PhysicsSystem>(signature);
+//        }
+//
+//        auto sprite_render_system = coordinator.register_system<Flint::SpriteRenderSystem>();
+//        // Set signature.
+//        {
+//            Flint::Signature signature;
+//            signature.set(coordinator.get_component_type<Flint::Model>());
+//            signature.set(coordinator.get_component_type<Flint::Transform3D>());
+//            coordinator.set_system_signature<Flint::SpriteRenderSystem>(signature);
+//        }
+//
+//        auto model_render_system = coordinator.register_system<Flint::ModelRenderSystem>();
+//        // Set signature.
+//        {
+//            Flint::Signature signature;
+//            signature.set(coordinator.get_component_type<Flint::Model>());
+//            signature.set(coordinator.get_component_type<Flint::Transform3D>());
+//            coordinator.set_system_signature<Flint::ModelRenderSystem>(signature);
+//        }
+//
+//        // Allocate space for entities.
+//        std::vector<Flint::Entity> entities(10);
+//
+//        // Create entities.
+//        for (auto &entity: entities) {
+//            entity = coordinator.create_entity();
+//
+//            coordinator.add_component(
+//                    entity,
+//                    Flint::Sprite2D{});
+//        }
+        // ----------------------------------------------------------
     }
 
     mainLoop();
