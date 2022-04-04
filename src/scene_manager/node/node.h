@@ -24,9 +24,11 @@ namespace Flint {
 
         // 2D.
         Node2D,
+        Sprite2D,
 
         // 3D.
         Node3D,
+        Sprite3D,
         MeshInstance3D,
 
         Max,

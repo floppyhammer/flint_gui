@@ -70,13 +70,13 @@ void App::run() {
         auto coordinator = Flint::Coordinator::get_singleton();
 
         // Register components.
-        coordinator.register_component<Flint::Gravity>();
-        coordinator.register_component<Flint::RigidBody>();
-        coordinator.register_component<Flint::Transform2d>();
-        coordinator.register_component<Flint::Transform3d>();
-        coordinator.register_component<Flint::TransformGui>();
-        coordinator.register_component<Flint::Sprite2d>();
-        coordinator.register_component<Flint::Sprite3d>();
+        coordinator.register_component<Flint::GravityComponent>();
+        coordinator.register_component<Flint::RigidBodyComponent>();
+        coordinator.register_component<Flint::Transform2dComponent>();
+        coordinator.register_component<Flint::Transform3dComponent>();
+        coordinator.register_component<Flint::TransformGuiComponent>();
+        coordinator.register_component<Flint::Sprite2dComponent>();
+        coordinator.register_component<Flint::Sprite3dComponent>();
         coordinator.register_component<Flint::MvpComponent>();
         coordinator.register_component<Flint::ViewportInputComponent>();
         coordinator.register_component<Flint::ViewportOutputComponent>();
@@ -86,9 +86,9 @@ void App::run() {
         // Set signature.
         {
             Flint::Signature signature;
-            signature.set(coordinator.get_component_type<Flint::Gravity>());
-            signature.set(coordinator.get_component_type<Flint::RigidBody>());
-            signature.set(coordinator.get_component_type<Flint::Transform2d>());
+            signature.set(coordinator.get_component_type<Flint::GravityComponent>());
+            signature.set(coordinator.get_component_type<Flint::RigidBodyComponent>());
+            signature.set(coordinator.get_component_type<Flint::Transform2dComponent>());
             coordinator.set_system_signature<Flint::Physics2dSystem>(signature);
         }
 
@@ -96,8 +96,8 @@ void App::run() {
         // Set signature.
         {
             Flint::Signature signature;
-            signature.set(coordinator.get_component_type<Flint::Sprite2d>());
-            signature.set(coordinator.get_component_type<Flint::Transform2d>());
+            signature.set(coordinator.get_component_type<Flint::Sprite2dComponent>());
+            signature.set(coordinator.get_component_type<Flint::Transform2dComponent>());
             signature.set(coordinator.get_component_type<Flint::MvpComponent>());
             coordinator.set_system_signature<Flint::Sprite2dRenderSystem>(signature);
         }
@@ -139,7 +139,7 @@ void App::run() {
 
                 coordinator.add_component(
                         entity,
-                        Flint::Sprite2d{mesh, material});
+                        Flint::Sprite2dComponent{mesh, material});
                 coordinator.add_component(
                         entity,
                         Flint::MvpComponent{mvp_buffer});
@@ -149,7 +149,7 @@ void App::run() {
             {
                 coordinator.add_component(
                         entity,
-                        Flint::Transform2d{
+                        Flint::Transform2dComponent{
                                 Flint::Vec2<float>(rand_position(generator), rand_position(generator)),
                                 Flint::Vec2<float>(1.0),
                                 Flint::Vec2<float>(1.0),
@@ -158,11 +158,11 @@ void App::run() {
 
                 coordinator.add_component(
                         entity,
-                        Flint::Gravity{Flint::Vec3<float>(0.0f, 0.0f, 0.0f)});
+                        Flint::GravityComponent{Flint::Vec3<float>(0.0f, 0.0f, 0.0f)});
 
                 coordinator.add_component(
                         entity,
-                        Flint::RigidBody{
+                        Flint::RigidBodyComponent{
                                 Flint::Vec3<float>(rand_velocity(generator), rand_velocity(generator), 0.0f),
                                 Flint::Vec3<float>(0.0f, 0.0f, 0.0f),
                         });

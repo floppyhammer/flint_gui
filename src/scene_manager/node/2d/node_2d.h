@@ -5,15 +5,17 @@
 #include "../../../common/vec2.h"
 
 namespace Flint {
-    class Node2D : public Node {
+    class Node2d : public Node {
     public:
+        Node2d();
+
         // Transform.
         // ------------------------------------------
         Vec2<float> position{0};
 
-        float rotation = 0;
-
         Vec2<float> scale{1};
+
+        float rotation = 0;
         // ------------------------------------------
     };
 }

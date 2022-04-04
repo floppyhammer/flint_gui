@@ -26,37 +26,37 @@ namespace Flint {
 
     // PHYSICS
     // -----------------------------
-    struct RigidBody {
+    struct RigidBodyComponent {
         Vec3<float> velocity;
         Vec3<float> acceleration;
     };
 
-    struct Transform3d {
+    struct Transform3dComponent {
         Vec3<float> position;
         Vec3<float> scale;
         Quaternion rotation;
     };
 
-    struct Transform2d {
+    struct Transform2dComponent {
         Vec2<float> position;
         Vec2<float> scale;
         Vec2<float> offset; // Center as the default origin.
         float rotation = 0;
     };
 
-    struct Gravity {
+    struct GravityComponent {
         Vec3<float> force;
     };
     // -----------------------------
 
     // RENDER
     // -----------------------------
-    struct Sprite2d {
+    struct Sprite2dComponent {
         std::shared_ptr<Mesh2D> mesh;
         std::shared_ptr<Material2D> material;
     };
 
-    struct Sprite3d {
+    struct Sprite3dComponent {
 
     };
 
@@ -64,7 +64,7 @@ namespace Flint {
         std::shared_ptr<MvpBuffer> mvp_buffer;
     };
 
-    struct TransformGui {
+    struct TransformGuiComponent {
         Vec2<float> rect_position{0};
         Vec2<float> rect_size{128};
         Vec2<float> rect_scale{1};
@@ -72,7 +72,7 @@ namespace Flint {
         float rect_rotation = 0;
     };
 
-    struct Model {
+    struct ModelComponent {
         std::vector<std::shared_ptr<Mesh3D>> meshes;
         std::vector<std::shared_ptr<Material3D>> materials;
 
@@ -101,7 +101,7 @@ namespace Flint {
     /**
      * Entities with this component will make some changes once the window size changes.
      */
-    struct WindowSizeAdapter {
+    struct WindowSizeAdapterComponent {
 
     };
     // -----------------------------

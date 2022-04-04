@@ -15,8 +15,8 @@ namespace Flint {
         auto coordinator = Coordinator::get_singleton();
 
         for (auto const &entity: entities) {
-            auto &model = coordinator.get_component<Model>(entity);
-            auto &transform = coordinator.get_component<Transform3d>(entity);
+            auto &model = coordinator.get_component<ModelComponent>(entity);
+            auto &transform = coordinator.get_component<Transform3dComponent>(entity);
             auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
 
             // Prepare UBO data.
@@ -52,7 +52,7 @@ namespace Flint {
         for (auto const &entity: entities) {
             auto coordinator = Coordinator::get_singleton();
 
-            auto &model = coordinator.get_component<Model>(entity);
+            auto &model = coordinator.get_component<ModelComponent>(entity);
 
             VkPipeline pipeline = RS::getSingleton().meshGraphicsPipeline;
 

@@ -14,8 +14,8 @@ namespace Flint {
         for (auto const &entity: entities) {
             auto coordinator = Coordinator::get_singleton();
 
-            auto &sprite = coordinator.get_component<Sprite2d>(entity);
-            auto &transform = coordinator.get_component<TransformGui>(entity);
+            auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
+            auto &transform = coordinator.get_component<TransformGuiComponent>(entity);
             auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
 
             // Default to swap chain image.
@@ -49,7 +49,7 @@ namespace Flint {
         auto coordinator = Coordinator::get_singleton();
 
         for (auto const &entity: entities) {
-            auto &sprite = coordinator.get_component<Sprite2d>(entity);
+            auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
 
             VkPipeline pipeline = RS::getSingleton().blitGraphicsPipeline;
 
@@ -68,8 +68,8 @@ namespace Flint {
         auto coordinator = Coordinator::get_singleton();
 
         for (auto const &entity: entities) {
-            auto &sprite = coordinator.get_component<Sprite2d>(entity);
-            auto &transform = coordinator.get_component<Transform2d>(entity);
+            auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
+            auto &transform = coordinator.get_component<Transform2dComponent>(entity);
             auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
 
             float sprite_width = sprite.material->texture->width * transform.scale.x;
@@ -106,7 +106,7 @@ namespace Flint {
         auto coordinator = Coordinator::get_singleton();
 
         for (auto const &entity: entities) {
-            auto &sprite = coordinator.get_component<Sprite2d>(entity);
+            auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
 
             VkPipeline pipeline = RS::getSingleton().blitGraphicsPipeline;
 

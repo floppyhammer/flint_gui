@@ -121,6 +121,7 @@ const std::vector<uint32_t> indices = {
         0, 2, 1, 2, 0, 3
 };
 
+// TODO: Simple quad meshes should all share the same vertex and index buffers.
 class Mesh2D : public Mesh {
 public:
     Mesh2D();

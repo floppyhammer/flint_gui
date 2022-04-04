@@ -8,9 +8,9 @@ namespace Flint {
         auto coordinator = Coordinator::get_singleton();
 
         for (auto const &entity: entities) {
-            auto &rigidBody = coordinator.get_component<RigidBody>(entity);
-            auto &transform = coordinator.get_component<Transform2d>(entity);
-            auto const &gravity = coordinator.get_component<Gravity>(entity);
+            auto &rigidBody = coordinator.get_component<RigidBodyComponent>(entity);
+            auto &transform = coordinator.get_component<Transform2dComponent>(entity);
+            auto const &gravity = coordinator.get_component<GravityComponent>(entity);
 
             transform.position += rigidBody.velocity.xy() * dt;
             rigidBody.velocity += gravity.force * dt;
@@ -26,9 +26,9 @@ namespace Flint {
         for (auto const &entity: entities) {
             auto coordinator = Coordinator::get_singleton();
 
-            auto &rigidBody = coordinator.get_component<RigidBody>(entity);
-            auto &transform = coordinator.get_component<Transform3d>(entity);
-            auto const &gravity = coordinator.get_component<Gravity>(entity);
+            auto &rigidBody = coordinator.get_component<RigidBodyComponent>(entity);
+            auto &transform = coordinator.get_component<Transform3dComponent>(entity);
+            auto const &gravity = coordinator.get_component<GravityComponent>(entity);
 
             transform.position += rigidBody.velocity * dt;
             rigidBody.velocity += gravity.force * dt;
