@@ -7,12 +7,22 @@
 #include "../../../rendering/mesh.h"
 #include "../../../rendering/material.h"
 #include "../../../rendering/mvp_uniform_buffer.h"
+#include "../../../core/input_event.h"
 
 #define GLFW_INCLUDE_VULKAN
 
 #include "GLFW/glfw3.h"
 
+#include <queue>
+
 namespace Flint {
+    // INPUT
+    // -----------------------------
+    struct InputComponent {
+        std::queue<InputEvent> input_queue;
+    };
+    // -----------------------------
+
     // PHYSICS
     // -----------------------------
     struct RigidBody {

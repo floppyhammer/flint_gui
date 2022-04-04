@@ -12,8 +12,8 @@
 #include <iostream>
 #include <fstream>
 #include <array>
-
 #include <cstring>
+#include <queue>
 
 #include "rendering/mesh.h"
 #include "rendering/texture.h"
@@ -21,6 +21,7 @@
 
 #include "scene_manager/ecs/entity.h"
 #include "scene_manager/ecs/systems/sprite_render_system.h"
+#include "scene_manager/ecs/systems/physics_system.h"
 
 class App {
 public:
@@ -28,14 +29,20 @@ public:
 
     Flint::SceneTree tree;
 
+    std::queue<Flint::InputEvent> input_queue;
+
     std::vector<Flint::Entity> entities;
 
     std::shared_ptr<Flint::SpriteRenderSystem> sprite_render_system;
+
+    std::shared_ptr<Flint::PhysicsSystem> physics_system;
 
 private:
     void mainLoop();
 
     void drawFrame();
+
+    void bindInput();
 
     /**
      * Record commands into the current command buffer.

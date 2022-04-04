@@ -2,6 +2,7 @@
 #define FLINT_SCENE_TREE_H
 
 #include "../scene_manager/node/node.h"
+#include "input_event.h"
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -11,6 +12,8 @@ namespace Flint {
     class SceneTree {
     public:
         SceneTree() = default;
+
+        void input(const InputEvent &input_event) const;
 
         void update(double delta) const;
 

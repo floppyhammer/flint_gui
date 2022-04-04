@@ -23,4 +23,8 @@ namespace Flint {
         if (root == nullptr) return;
         root->_draw(p_command_buffer);
     }
+
+    void SceneTree::input(const InputEvent &input_event) const {
+
+    }
 }

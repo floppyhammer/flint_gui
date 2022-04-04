@@ -5,6 +5,7 @@
 #include "rendering/rendering_server.h"
 #include "rendering/texture.h"
 #include "core/engine.h"
+#include "core/input_event.h"
 
 #include "scene_manager/node/gui/sub_viewport_container.h"
 #include "scene_manager/node/3d/model.h"
@@ -16,13 +17,14 @@
 #include "scene_manager/ecs/systems/physics_system.h"
 #include "scene_manager/ecs/systems/sprite_render_system.h"
 #include "scene_manager/ecs/systems/model_render_system.h"
-#include "scene_manager/ecs/systems/model_render_system.h"
 
 #include <cstdint>
 #include <memory>
+#include <functional>
+#include <random>
 
 void App::run() {
-    Flint::Logger::set_level(Flint::Logger::WARN);
+    Flint::Logger::set_level(Flint::Logger::VERBOSE);
 
     // Initialization.
     // ---------------------------------------------------
@@ -76,17 +78,17 @@ void App::run() {
         coordinator.register_component<Flint::TransformGUI>();
         coordinator.register_component<Flint::MvpComponent>();
 
-//        // Register systems.
-//        auto physics_system = coordinator.register_system<Flint::PhysicsSystem>();
-//        // Set signature.
-//        {
-//            Flint::Signature signature;
-//            signature.set(coordinator.get_component_type<Flint::Gravity>());
-//            signature.set(coordinator.get_component_type<Flint::RigidBody>());
-//            signature.set(coordinator.get_component_type<Flint::Transform3D>());
-//            coordinator.set_system_signature<Flint::PhysicsSystem>(signature);
-//        }
-//
+        // Register systems.
+        physics_system = coordinator.register_system<Flint::PhysicsSystem>();
+        // Set signature.
+        {
+            Flint::Signature signature;
+            signature.set(coordinator.get_component_type<Flint::Gravity>());
+            signature.set(coordinator.get_component_type<Flint::RigidBody>());
+            signature.set(coordinator.get_component_type<Flint::Transform3D>());
+            coordinator.set_system_signature<Flint::PhysicsSystem>(signature);
+        }
+
         sprite_render_system = coordinator.register_system<Flint::SpriteRenderSystem>();
         // Set signature.
         {
@@ -109,29 +111,83 @@ void App::run() {
         // Allocate space for entities.
         entities.resize(10);
 
+        std::default_random_engine generator;
+        std::uniform_real_distribution<float> rand_position(-100.0f, 100.0f);
+        std::uniform_real_distribution<float> rand_rotation(0.0f, 3.0f);
+        std::uniform_real_distribution<float> rand_scale(3.0f, 5.0f);
+        std::uniform_real_distribution<float> rand_gravity(-10.0f, -1.0f);
+
+        float scale = rand_scale(generator);
+
         // Create entities.
         for (auto &entity: entities) {
             entity = coordinator.create_entity();
 
-            auto material = std::make_shared<Material2D>();
-            material->texture = Texture::from_file("../res/texture.jpg");
+            // Render components.
+            {
+                auto material = std::make_shared<Material2D>();
+                material->texture = Texture::from_file("../res/texture.jpg");
 
-            auto mvp_buffer = std::make_shared<Flint::MvpBuffer>();
+                auto mvp_buffer = std::make_shared<Flint::MvpBuffer>();
 
-            auto mesh = Mesh2D::from_default();
-            mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
+                auto mesh = Mesh2D::from_default();
+                mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
 
-            coordinator.add_component(
-                    entity,
-                    Flint::Sprite2D{mesh, material});
-            coordinator.add_component(
-                    entity,
-                    Flint::TransformGUI{});
-            coordinator.add_component(
-                    entity,
-                    Flint::MvpComponent{mvp_buffer});
+                coordinator.add_component(
+                        entity,
+                        Flint::Sprite2D{mesh, material});
+                coordinator.add_component(
+                        entity,
+                        Flint::TransformGUI{});
+                coordinator.add_component(
+                        entity,
+                        Flint::MvpComponent{mvp_buffer});
+            }
+
+//            // Physics components.
+//            {
+//                coordinator.add_component(
+//                        entity,
+//                        Flint::Gravity{Flint::Vec3<float>(0.0f, rand_gravity(generator), 0.0f)});
+//
+//                coordinator.add_component(
+//                        entity,
+//                        Flint::RigidBody{
+//                                .velocity = Flint::Vec3<float>(0.0f, 0.0f, 0.0f),
+//                                .acceleration = Flint::Vec3<float>(0.0f, 0.0f, 0.0f)
+//                        });
+//
+//                coordinator.add_component(
+//                        entity,
+//                        Flint::Transform3D{
+//                                Flint::Vec3<float>(rand_position(generator), rand_position(generator), rand_position(generator)),
+//                                Flint::Vec3<float>(rand_rotation(generator), rand_rotation(generator), rand_rotation(generator)),
+//                                Flint::Vec3<float>(scale, scale, scale)
+//                        });
+//            }
         }
         // ----------------------------------------------------------
+    }
+
+    // GLFW input callbacks.
+    {
+        // A lambda function that doesn't capture anything can be implicitly converted to a regular function pointer.
+        auto cursor_position_callback = [](GLFWwindow* window, double x_pos, double y_pos) {
+            Flint::InputEvent input_event{};
+            input_event.type =  Flint::InputEventType::MouseMotion;
+            input_event.args.mouse_motion.position = {x_pos, y_pos};
+            Flint::Logger::verbose("Cursor movement", "InputEvent");
+        };
+        glfwSetCursorPosCallback(Device::getSingleton().window, cursor_position_callback);
+
+        auto cursor_button_callback = [](GLFWwindow* window, int button, int action, int mods) {
+            Flint::InputEvent input_event{};
+            input_event.type =  Flint::InputEventType::MouseButton;
+            input_event.args.mouse_button.button = button;
+            input_event.args.mouse_button.pressed = action == GLFW_PRESS;
+            Flint::Logger::verbose("Cursor button", "InputEvent");
+        };
+        glfwSetMouseButtonCallback(Device::getSingleton().window, cursor_button_callback);
     }
 
     mainLoop();
@@ -225,6 +281,8 @@ void App::drawFrame() {
 
     // Submit commands for drawing.
     SwapChain::getSingleton().flush(imageIndex);
+}
 
-    //Flint::Logger::verbose("---------------- FRAME ----------------", "Main Loop");
+void App::bindInput() {
+
 }
