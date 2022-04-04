@@ -5,9 +5,9 @@
 
 namespace Flint {
     void Physics2dSystem::update(double dt) {
-        for (auto const &entity: entities) {
-            auto coordinator = Coordinator::get_singleton();
+        auto coordinator = Coordinator::get_singleton();
 
+        for (auto const &entity: entities) {
             auto &rigidBody = coordinator.get_component<RigidBody>(entity);
             auto &transform = coordinator.get_component<Transform2d>(entity);
             auto const &gravity = coordinator.get_component<Gravity>(entity);

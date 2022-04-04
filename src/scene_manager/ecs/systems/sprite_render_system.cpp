@@ -46,9 +46,9 @@ namespace Flint {
     }
 
     void SpriteGuiRenderSystem::draw(VkCommandBuffer command_buffer) {
-        for (auto const &entity: entities) {
-            auto coordinator = Coordinator::get_singleton();
+        auto coordinator = Coordinator::get_singleton();
 
+        for (auto const &entity: entities) {
             auto &sprite = coordinator.get_component<Sprite2d>(entity);
 
             VkPipeline pipeline = RS::getSingleton().blitGraphicsPipeline;
@@ -65,9 +65,9 @@ namespace Flint {
     }
 
     void Sprite2dRenderSystem::update() {
-        for (auto const &entity: entities) {
-            auto coordinator = Coordinator::get_singleton();
+        auto coordinator = Coordinator::get_singleton();
 
+        for (auto const &entity: entities) {
             auto &sprite = coordinator.get_component<Sprite2d>(entity);
             auto &transform = coordinator.get_component<Transform2d>(entity);
             auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
@@ -103,9 +103,9 @@ namespace Flint {
     }
 
     void Sprite2dRenderSystem::draw(VkCommandBuffer command_buffer) {
-        for (auto const &entity: entities) {
-            auto coordinator = Coordinator::get_singleton();
+        auto coordinator = Coordinator::get_singleton();
 
+        for (auto const &entity: entities) {
             auto &sprite = coordinator.get_component<Sprite2d>(entity);
 
             VkPipeline pipeline = RS::getSingleton().blitGraphicsPipeline;

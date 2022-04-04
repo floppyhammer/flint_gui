@@ -78,6 +78,8 @@ void App::run() {
         coordinator.register_component<Flint::Sprite2d>();
         coordinator.register_component<Flint::Sprite3d>();
         coordinator.register_component<Flint::MvpComponent>();
+        coordinator.register_component<Flint::ViewportInputComponent>();
+        coordinator.register_component<Flint::ViewportOutputComponent>();
 
         // Register systems.
         physics_system = coordinator.register_system<Flint::Physics2dSystem>();
@@ -119,7 +121,7 @@ void App::run() {
         std::uniform_real_distribution<float> rand_scale(0.2f, 0.2f);
         std::uniform_real_distribution<float> rand_gravity(-10.0f, -1.0f);
 
-        auto tex = Texture::from_file("../res/texture.jpg");
+        auto tex = Texture::from_file("../res/duck.png");
 
         // Create entities.
         for (auto &entity: entities) {
@@ -149,8 +151,8 @@ void App::run() {
                         entity,
                         Flint::Transform2d{
                                 Flint::Vec2<float>(rand_position(generator), rand_position(generator)),
-                                Flint::Vec2<float>(0.2),
-                                Flint::Vec2<float>(0.2),
+                                Flint::Vec2<float>(1.0),
+                                Flint::Vec2<float>(1.0),
                                 0.0f,
                         });
 

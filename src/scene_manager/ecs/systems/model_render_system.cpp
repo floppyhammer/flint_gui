@@ -12,9 +12,9 @@
 
 namespace Flint {
     void ModelRenderSystem::update(float dt) {
-        for (auto const &entity: entities) {
-            auto coordinator = Coordinator::get_singleton();
+        auto coordinator = Coordinator::get_singleton();
 
+        for (auto const &entity: entities) {
             auto &model = coordinator.get_component<Model>(entity);
             auto &transform = coordinator.get_component<Transform3d>(entity);
             auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
