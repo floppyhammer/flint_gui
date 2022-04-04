@@ -1,7 +1,3 @@
-//
-// Created by floppyhammer on 4/2/2022.
-//
-
 #ifndef FLINT_ENTITY_MANAGER_H
 #define FLINT_ENTITY_MANAGER_H
 
@@ -36,10 +32,10 @@ namespace Flint {
         void destroy_entity(Entity entity) {
             assert(entity < MAX_ENTITIES && "Entity out of range.");
 
-            // Invalidate the destroyed entity's signature
+            // Invalidate the destroyed entity's signature.
             signatures[entity].reset();
 
-            // Put the destroyed ID at the back of the queue
+            // Put the destroyed ID at the back of the queue.
             available_entities.push(entity);
             living_entity_count--;
         }

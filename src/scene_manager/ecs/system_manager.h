@@ -1,7 +1,3 @@
-//
-// Created by floppyhammer on 4/2/2022.
-//
-
 #ifndef FLINT_SYSTEM_MANAGER_H
 #define FLINT_SYSTEM_MANAGER_H
 
@@ -18,29 +14,29 @@ namespace Flint {
     public:
         template<typename T>
         std::shared_ptr<T> register_system() {
-            const char *typeName = typeid(T).name();
+            const char *type_name = typeid(T).name();
 
-            assert(systems.find(typeName) == systems.end() && "Registering system more than once.");
+            assert(systems.find(type_name) == systems.end() && "Registering system more than once.");
 
-            // Create a pointer to the system and return it so it can be used externally
+            // Create a pointer to the system and return it, so it can be used externally.
             auto system = std::make_shared<T>();
-            systems.insert({typeName, system});
+            systems.insert({type_name, system});
             return system;
         }
 
         template<typename T>
         void set_signature(Signature signature) {
-            const char *typeName = typeid(T).name();
+            const char *type_name = typeid(T).name();
 
-            assert(systems.find(typeName) != systems.end() && "System used before registered.");
+            assert(systems.find(type_name) != systems.end() && "System used before registered.");
 
             // Set the signature for this system
-            signatures.insert({typeName, signature});
+            signatures.insert({type_name, signature});
         }
 
         void entity_destroyed(Entity entity) {
-            // Erase a destroyed entity from all system lists
-            // mEntities is a set so no check needed
+            // Erase a destroyed entity from all system lists.
+            // `entities` is a set so no check needed.
             for (auto const &pair: systems) {
                 auto const &system = pair.second;
 
@@ -48,29 +44,27 @@ namespace Flint {
             }
         }
 
-        void entity_signature_changed(Entity entity, Signature entitySignature) {
-            // Notify each system that an entity's signature changed
+        void entity_signature_changed(Entity entity, Signature entity_signature) {
+            // Notify each system that an entity's signature changed.
             for (auto const &pair: systems) {
                 auto const &type = pair.first;
                 auto const &system = pair.second;
-                auto const &systemSignature = signatures[type];
+                auto const &system_signature = signatures[type];
 
-                // Entity signature matches system signature - insert into set
-                if ((entitySignature & systemSignature) == systemSignature) {
+                // Entity signature matches system signature - insert into set.
+                if ((entity_signature & system_signature) == system_signature) {
                     system->entities.insert(entity);
-                }
-                    // Entity signature does not match system signature - erase from set
-                else {
+                } else { // Entity signature does not match system signature - erase from set.
                     system->entities.erase(entity);
                 }
             }
         }
 
     private:
-        // Map from system type string pointer to a signature
+        // Map from system type string pointer to a signature.
         std::unordered_map<const char *, Signature> signatures{};
 
-        // Map from system type string pointer to a system pointer
+        // Map from system type string pointer to a system pointer.
         std::unordered_map<const char *, std::shared_ptr<System>> systems{};
     };
 }

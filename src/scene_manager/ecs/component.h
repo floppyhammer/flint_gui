@@ -47,18 +47,18 @@ namespace Flint {
         void remove_data(Entity entity) {
             assert(entity_to_index_map.find(entity) != entity_to_index_map.end() && "Removing non-existent component.");
 
-            // Copy element at end into deleted element's place to maintain density
-            size_t indexOfRemovedEntity = entity_to_index_map[entity];
-            size_t indexOfLastElement = size - 1;
-            component_array[indexOfRemovedEntity] = component_array[indexOfLastElement];
+            // Copy element at end into deleted element's place to maintain density.
+            size_t index_of_removed_entity = entity_to_index_map[entity];
+            size_t index_of_last_element = size - 1;
+            component_array[index_of_removed_entity] = component_array[index_of_last_element];
 
-            // Update map to point to moved spot
-            Entity entityOfLastElement = index_to_entity_map[indexOfLastElement];
-            entity_to_index_map[entityOfLastElement] = indexOfRemovedEntity;
-            index_to_entity_map[indexOfRemovedEntity] = entityOfLastElement;
+            // Update map to point to moved spot.
+            Entity entity_of_last_element = index_to_entity_map[index_of_last_element];
+            entity_to_index_map[entity_of_last_element] = index_of_removed_entity;
+            index_to_entity_map[index_of_removed_entity] = entity_of_last_element;
 
             entity_to_index_map.erase(entity);
-            index_to_entity_map.erase(indexOfLastElement);
+            index_to_entity_map.erase(index_of_last_element);
 
             --size;
         }
@@ -66,13 +66,13 @@ namespace Flint {
         T &get_data(Entity entity) {
             assert(entity_to_index_map.find(entity) != entity_to_index_map.end() && "Retrieving non-existent component.");
 
-            // Return a reference to the entity's component
+            // Return a reference to the entity's component.
             return component_array[entity_to_index_map[entity]];
         }
 
         void entity_destroyed(Entity entity) override {
             if (entity_to_index_map.find(entity) != entity_to_index_map.end()) {
-                // Remove the entity's component if it existed
+                // Remove the entity's component if it existed.
                 remove_data(entity);
             }
         }
