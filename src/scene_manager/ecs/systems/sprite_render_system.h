@@ -13,14 +13,14 @@
 namespace Flint {
     class SpriteGuiRenderSystem : public System {
     public:
-        void update(double dt);
+        void update();
 
         void draw(VkCommandBuffer command_buffer);
     };
 
     class Sprite2dRenderSystem : public System {
     public:
-        void update(double dt);
+        void update();
 
         void draw(VkCommandBuffer command_buffer);
     };

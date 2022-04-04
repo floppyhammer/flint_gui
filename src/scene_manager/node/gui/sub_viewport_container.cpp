@@ -16,7 +16,7 @@ namespace Flint {
     void SubViewportContainer::set_viewport(std::shared_ptr<SubViewport> p_viewport) {
         viewport = std::move(p_viewport);
 
-        material->texture = viewport->texture;
+        material->texture = viewport->get_texture();
 
         mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
     }
@@ -55,7 +55,7 @@ namespace Flint {
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-            pipeline = viewport->blitGraphicsPipeline;
+            pipeline = viewport->viewport->blitGraphicsPipeline;
         }
 
         VkBuffer vertexBuffers[] = {mesh->vertexBuffer};

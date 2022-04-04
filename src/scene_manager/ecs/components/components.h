@@ -7,6 +7,7 @@
 #include "../../../rendering/mesh.h"
 #include "../../../rendering/material.h"
 #include "../../../rendering/mvp_buffer.h"
+#include "../../../rendering/viewport.h"
 #include "../../../core/input_event.h"
 
 #define GLFW_INCLUDE_VULKAN
@@ -39,6 +40,7 @@ namespace Flint {
     struct Transform2d {
         Vec2<float> position;
         Vec2<float> scale;
+        Vec2<float> offset; // Center as the default origin.
         float rotation = 0;
     };
 
@@ -76,6 +78,37 @@ namespace Flint {
 
         std::shared_ptr<MvpBuffer> mvp_buffer;
     };
+
+    /**
+     * Entities with this component will be drawn to a sub-viewport.
+     */
+    struct ViewportInputComponent {
+        std::shared_ptr<Viewport> viewport;
+
+        float fov = 45.0;
+
+        float z_near = 0.1;
+        float z_far = 10.0;
+    };
+
+    /**
+     * Entities with this component will be used to draw a sub-viewport's content.
+     */
+    struct ViewportOutputComponent {
+        std::shared_ptr<Viewport> viewport;
+    };
+
+    /**
+     * Entities with this component will make some changes once the window size changes.
+     */
+    struct WindowSizeAdapter {
+
+    };
+    // -----------------------------
+
+    // CUSTOM
+    // -----------------------------
+
     // -----------------------------
 }
 

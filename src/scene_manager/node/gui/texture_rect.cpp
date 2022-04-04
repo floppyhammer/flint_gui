@@ -52,7 +52,7 @@ namespace Flint {
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-            pipeline = viewport->blitGraphicsPipeline;
+            pipeline = viewport->viewport->blitGraphicsPipeline;
         }
 
         VkBuffer vertexBuffers[] = {mesh->vertexBuffer};

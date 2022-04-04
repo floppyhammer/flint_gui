@@ -10,7 +10,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace Flint {
-    void SpriteGuiRenderSystem::update(double dt) {
+    void SpriteGuiRenderSystem::update() {
         for (auto const &entity: entities) {
             auto coordinator = Coordinator::get_singleton();
 
@@ -64,7 +64,7 @@ namespace Flint {
         }
     }
 
-    void Sprite2dRenderSystem::update(double dt) {
+    void Sprite2dRenderSystem::update() {
         for (auto const &entity: entities) {
             auto coordinator = Coordinator::get_singleton();
 

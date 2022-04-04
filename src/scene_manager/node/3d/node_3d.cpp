@@ -123,7 +123,7 @@ namespace Flint {
 
             // Set projection matrix. Determined by viewport.
             ubo.proj = glm::perspective(glm::radians(viewport->fov),
-                                        (float) viewport->extent.x / (float) viewport->extent.y,
+                                        (float) viewport->get_extent().x / (float) viewport->get_extent().y,
                                         viewport->z_near,
                                         viewport->z_far);
 

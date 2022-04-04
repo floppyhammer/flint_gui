@@ -59,10 +59,9 @@ void App::run() {
         texture_rect->set_rect_scale(0.3, 0.3);
         texture_rect->set_rect_position(400, 0);
         mesh_instance_0->position.x = 1;
-        //mesh_instance_0->scale.x = mesh_instance_0->scale.y = mesh_instance_0->scale.z = 0.02;
         mesh_instance_1->position.x = -1;
         //mesh_instance_1->scale.x = mesh_instance_1->scale.y = mesh_instance_1->scale.z = 0.02;
-        //tree.set_root(node);
+        tree.set_root(node);
     }
 
     {
@@ -151,6 +150,7 @@ void App::run() {
                         Flint::Transform2d{
                                 Flint::Vec2<float>(rand_position(generator), rand_position(generator)),
                                 Flint::Vec2<float>(0.2),
+                                Flint::Vec2<float>(0.2),
                                 0.0f,
                         });
 
@@ -162,7 +162,7 @@ void App::run() {
                         entity,
                         Flint::RigidBody{
                                 Flint::Vec3<float>(rand_velocity(generator), rand_velocity(generator), 0.0f),
-                                Flint::Vec3<float>(0.0f, 0.0f, 0.0f)
+                                Flint::Vec3<float>(0.0f, 0.0f, 0.0f),
                         });
             }
         }
@@ -206,18 +206,18 @@ void App::run() {
 }
 
 void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex) const {
-    // Reset command buffer.
+    // Reset current command buffer.
     vkResetCommandBuffer(commandBuffers[imageIndex], 0);
 
     // Begin recording.
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
     if (vkBeginCommandBuffer(commandBuffers[imageIndex], &beginInfo) != VK_SUCCESS) {
         throw std::runtime_error("Failed to begin recording command buffer!");
     }
 
-    // Begin render pass. We can only do this for the swap chain render pass once due to the clear operation.
+    // Begin render pass.
+    // We can only do this once for the main render pass due to the clear operation.
     {
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -228,7 +228,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
 
         // Clear color.
         std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = {{0.0f, 0.0f, 0.0f, 1.0f}};
+        clearValues[0].color = {{0.02f, 0.02f, 0.02f, 1.0f}};
         clearValues[1].depthStencil = {1.0f, 0};
 
         renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -239,10 +239,12 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
                              VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    // Record commands from the scene_manager tree.
-    tree.draw(commandBuffers[imageIndex]);
+    // Record commands from the scene manager.
+    {
+        tree.draw(commandBuffers[imageIndex]);
 
-    sprite_render_system->draw(commandBuffers[imageIndex]);
+        sprite_render_system->draw(commandBuffers[imageIndex]);
+    }
 
     // End render pass.
     vkCmdEndRenderPass(commandBuffers[imageIndex]);
@@ -280,7 +282,7 @@ void App::draw_frame() {
 
         // ECS scene manager.
         physics_system->update(delta);
-        sprite_render_system->update(Flint::Engine::getSingleton().get_delta());
+        sprite_render_system->update();
     }
 
     // Record draw calls.

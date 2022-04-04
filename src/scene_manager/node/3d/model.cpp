@@ -56,7 +56,7 @@ namespace Flint {
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-            pipeline = viewport->meshGraphicsPipeline;
+            pipeline = viewport->viewport->meshGraphicsPipeline;
         }
 
         for (const auto &mesh: meshes) {

@@ -7,12 +7,14 @@
 
 /**
  * Cache resources.
- * Texture with same file path.
- * Mesh with same file path.
+ * Texture: file path.
+ * Mesh: file path.
+ * Vertex buffer.
+ * Index buffer.
+ * Pipeline.
  */
 class ResourceManager {
 
 };
-
 
 #endif //FLINT_RESOURCE_MANAGER_H

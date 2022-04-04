@@ -5,15 +5,25 @@
 #include "../../common/vec2.h"
 #include "../../rendering/rendering_server.h"
 #include "../../rendering/texture.h"
+#include "../../rendering/viewport.h"
 #include "../../core/scene_tree.h"
+#include "../../common/color.h"
 
 namespace Flint {
+    /**
+     * A thin wrapper over rendering Viewport.
+     */
     class SubViewport : public Node {
     public:
         SubViewport();
-        ~SubViewport();
 
-        Vec2<uint32_t> extent = {512, 512};
+        [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
+
+        [[nodiscard]] Vec2<uint32_t> get_extent() const;
+
+        std::shared_ptr<Viewport> viewport;
+
+        ColorF clear_color = ColorF(0.1, 0.2, 0.3, 1.0);
 
         float fov = 45.0;
 
@@ -22,34 +32,8 @@ namespace Flint {
 
         void _draw(VkCommandBuffer p_command_buffer) override;
 
-        std::shared_ptr<Texture> texture;
-    public:
-        // Pipelines bound with the render pass of this sub viewport.
-        // ------------------------------------
-        VkPipeline meshGraphicsPipeline;
-        VkPipeline blitGraphicsPipeline;
-        // ------------------------------------
-
     protected:
         void _update(double delta) override;
-
-        VkImage depthImage;
-        VkDeviceMemory depthImageMemory;
-        VkImageView depthImageView;
-
-        VkRenderPass renderPass;
-
-        VkFramebuffer framebuffer;
-
-        VkDescriptorImageInfo descriptor;
-
-        void createImages();
-
-        // The color attachment of this framebuffer will then be used
-        // to sample from in the fragment shader of the final pass.
-        void createRenderPass();
-
-        void createFramebuffer();
     };
 }
 
