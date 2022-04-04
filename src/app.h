@@ -27,6 +27,7 @@ class App {
 public:
     void run();
 
+private:
     Flint::SceneTree tree;
 
     std::queue<Flint::InputEvent> input_queue;
@@ -38,17 +39,15 @@ public:
     std::shared_ptr<Flint::PhysicsSystem> physics_system;
 
 private:
-    void mainLoop();
+    void main_loop();
 
-    void drawFrame();
-
-    void bindInput();
+    void draw_frame();
 
     /**
      * Record commands into the current command buffer.
      * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline layout.
      */
-    void recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex) const;
+    void record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex) const;
 };
 
 #endif //FLINT_APP_H

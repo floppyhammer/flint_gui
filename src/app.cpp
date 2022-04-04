@@ -112,12 +112,10 @@ void App::run() {
         entities.resize(10);
 
         std::default_random_engine generator;
-        std::uniform_real_distribution<float> rand_position(-100.0f, 100.0f);
+        std::uniform_real_distribution<float> rand_position(0.0f, 400.0f);
         std::uniform_real_distribution<float> rand_rotation(0.0f, 3.0f);
         std::uniform_real_distribution<float> rand_scale(3.0f, 5.0f);
         std::uniform_real_distribution<float> rand_gravity(-10.0f, -1.0f);
-
-        float scale = rand_scale(generator);
 
         // Create entities.
         for (auto &entity: entities) {
@@ -133,12 +131,15 @@ void App::run() {
                 auto mesh = Mesh2D::from_default();
                 mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
 
+                Flint::TransformGUI transform;
+                transform.rect_position = {rand_position(generator), rand_position(generator)};
+
                 coordinator.add_component(
                         entity,
                         Flint::Sprite2D{mesh, material});
                 coordinator.add_component(
                         entity,
-                        Flint::TransformGUI{});
+                        transform);
                 coordinator.add_component(
                         entity,
                         Flint::MvpComponent{mvp_buffer});
@@ -190,7 +191,7 @@ void App::run() {
         glfwSetMouseButtonCallback(Device::getSingleton().window, cursor_button_callback);
     }
 
-    mainLoop();
+    main_loop();
 
     // Cleanup.
     {
@@ -205,7 +206,7 @@ void App::run() {
     }
 }
 
-void App::recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex) const {
+void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex) const {
     // Reset command buffer.
     vkResetCommandBuffer(commandBuffers[imageIndex], 0);
 
@@ -253,36 +254,37 @@ void App::recordCommands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t 
     }
 }
 
-void App::mainLoop() {
+void App::main_loop() {
     while (!glfwWindowShouldClose(Device::getSingleton().window)) {
         glfwPollEvents();
-        drawFrame();
+        draw_frame();
     }
 
     // Wait on the host for the completion of outstanding queue operations for all queues on a given logical device.
     vkDeviceWaitIdle(Device::getSingleton().device);
 }
 
-void App::drawFrame() {
+void App::draw_frame() {
     // Engine processing.
     Flint::Engine::getSingleton().tick();
 
     // Acquire next image.
+    // We should do this before updating scene as we need to modify different buffers according to the current image index.
     uint32_t imageIndex;
     if (!SwapChain::getSingleton().acquireSwapChainImage(imageIndex)) return;
 
-    // Update the scene_manager tree.
-    tree.update(Flint::Engine::getSingleton().get_delta());
+    // Update the scene.
+    {
+        // Node scene manager.
+        tree.update(Flint::Engine::getSingleton().get_delta());
 
-    sprite_render_system->update(Flint::Engine::getSingleton().get_delta());
+        // ECS scene manager.
+        sprite_render_system->update(Flint::Engine::getSingleton().get_delta());
+    }
 
     // Record draw calls.
-    recordCommands(SwapChain::getSingleton().commandBuffers, imageIndex);
+    record_commands(SwapChain::getSingleton().commandBuffers, imageIndex);
 
     // Submit commands for drawing.
     SwapChain::getSingleton().flush(imageIndex);
-}
-
-void App::bindInput() {
-
 }

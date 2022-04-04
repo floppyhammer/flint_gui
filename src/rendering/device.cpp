@@ -51,7 +51,29 @@ void Device::initWindow() {
     // Enable window resizing. This needs us to recreate the swap chain.
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
+    // Hide window upon creation as we need to center the window before showing it.
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+
+    // Get monitor position (used to correctly center the window in a multi-monitor scenario).
+    int monitors_count, monitor_x, monitor_y;
+    GLFWmonitor** monitors = glfwGetMonitors(&monitors_count);
+    const GLFWvidmode* videoMode = glfwGetVideoMode(monitors[0]);
+    glfwGetMonitorPos(monitors[0], &monitor_x, &monitor_y);
+
+    // Get DPI scale.
+    float dpi_scale_x, dpi_scale_y;
+    glfwGetMonitorContentScale(monitors[0], &dpi_scale_x, &dpi_scale_y);
+
     window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+
+    // Center window.
+    glfwSetWindowPos(window,
+                     monitor_x + (videoMode->width - WIDTH) / 2,
+                     monitor_y + (videoMode->height - HEIGHT) / 2);
+
+    // Show window.
+    glfwShowWindow(window);
+
     glfwSetWindowUserPointer(window, this);
     glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
