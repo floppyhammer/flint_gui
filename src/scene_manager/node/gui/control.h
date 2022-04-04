@@ -7,7 +7,7 @@
 #include "../../../common/vec2.h"
 #include "../../../rendering/mesh.h"
 #include "../../../rendering/rendering_server.h"
-#include "../../../rendering/mvp_uniform_buffer.h"
+#include "../../../rendering/mvp_buffer.h"
 
 namespace Flint {
     class Control : public Node {

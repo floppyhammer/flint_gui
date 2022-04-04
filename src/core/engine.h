@@ -26,6 +26,7 @@ namespace Flint {
         double get_elapsed() const;
 
     private:
+        std::chrono::time_point<std::chrono::steady_clock> last_time_showed_fps;
         double elapsed = 0;
         double delta = 0;
     };

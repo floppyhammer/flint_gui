@@ -34,9 +34,9 @@ private:
 
     std::vector<Flint::Entity> entities;
 
-    std::shared_ptr<Flint::SpriteRenderSystem> sprite_render_system;
+    std::shared_ptr<Flint::Sprite2dRenderSystem> sprite_render_system;
 
-    std::shared_ptr<Flint::PhysicsSystem> physics_system;
+    std::shared_ptr<Flint::Physics2dSystem> physics_system;
 
 private:
     void main_loop();

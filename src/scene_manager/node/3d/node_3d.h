@@ -4,7 +4,7 @@
 #include "../node.h"
 #include "../../../rendering/rendering_server.h"
 #include "../../../rendering/mesh.h"
-#include "../../../rendering/mvp_uniform_buffer.h"
+#include "../../../rendering/mvp_buffer.h"
 
 #include "glm/glm.hpp"
 

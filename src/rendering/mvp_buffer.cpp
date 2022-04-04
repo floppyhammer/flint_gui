@@ -2,7 +2,7 @@
 // Created by tannh on 4/3/2022.
 //
 
-#include "mvp_uniform_buffer.h"
+#include "mvp_buffer.h"
 
 #include "swap_chain.h"
 #include "rendering_server.h"

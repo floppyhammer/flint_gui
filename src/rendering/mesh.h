@@ -20,7 +20,7 @@
 struct Vertex {
     glm::vec3 pos;
     glm::vec3 color;
-    glm::vec2 uv;
+    glm::vec2 uv; // Texture coordinates.
 
     bool operator==(const Vertex &other) const {
         return pos == other.pos && color == other.color && uv == other.uv;
@@ -67,23 +67,28 @@ public:
 
     /**
      * A descriptor pool is used to allocate descriptor sets of some layout for use in a shader.
-     * Create descriptor pool before creating descriptor sets.
+     * Do this before creating descriptor sets.
      * @dependency None.
      */
     virtual void createDescriptorPool() = 0;
 
     /**
      * Allocate descriptor sets in the pool.
-     * @dependency Descriptor pool, descriptor set layout, and actual resources (uniform buffers, images, image views).
+     * @dependency Descriptor pool, descriptor set layout.
      */
     virtual void createDescriptorSets() = 0;
 
-    /// Should be called once uniform/texture bindings have changed.
+    /**
+     * Should be called once uniform/texture bindings changed.
+     * @dependency Actual resources (buffers, images, image views).
+     */
     virtual void updateDescriptorSets(std::shared_ptr<Material>, std::vector<VkBuffer> &uniformBuffers) = 0;
 
     [[nodiscard]] VkDescriptorSet getDescriptorSet(uint32_t index) const;
 
     std::string name;
+
+    /// Material index in a material vector/list/set as different meshes can use the same material.
     int32_t material_id = -1;
 
     /// Vertex buffer.
@@ -103,6 +108,7 @@ protected:
     std::vector<VkDescriptorSet> descriptorSets;
 };
 
+// Default vertices and indices data for 2D quad mesh.
 const std::vector<Vertex> vertices = {
         {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
         {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
@@ -118,6 +124,10 @@ const std::vector<uint32_t> indices = {
 class Mesh2D : public Mesh {
 public:
     Mesh2D();
+
+    /**
+     * Default quad mesh.
+     */
     static std::shared_ptr<Mesh2D> from_default() {
         auto mesh = std::make_shared<Mesh2D>();
 

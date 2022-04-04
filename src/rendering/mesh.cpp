@@ -2,7 +2,7 @@
 
 #include "device.h"
 #include "swap_chain.h"
-#include "mvp_uniform_buffer.h"
+#include "mvp_buffer.h"
 
 Mesh3D::Mesh3D() {
     createDescriptorPool();

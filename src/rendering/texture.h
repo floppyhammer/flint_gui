@@ -40,7 +40,6 @@ public:
     VkSampler sampler{};
 
 private:
-
     void create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height);
 };
 

@@ -2,8 +2,8 @@
 // Created by tannh on 4/3/2022.
 //
 
-#ifndef FLINT_MVP_UNIFORM_BUFFER_H
-#define FLINT_MVP_UNIFORM_BUFFER_H
+#ifndef FLINT_MVP_BUFFER_H
+#define FLINT_MVP_BUFFER_H
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -51,4 +51,4 @@ namespace Flint {
     };
 }
 
-#endif //FLINT_MVP_UNIFORM_BUFFER_H
+#endif //FLINT_MVP_BUFFER_H

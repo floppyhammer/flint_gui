@@ -7,7 +7,12 @@
 #include <set>
 
 namespace Flint {
-    class PhysicsSystem : public System {
+    class Physics2dSystem : public System {
+    public:
+        void update(double dt);
+    };
+
+    class Physics3dSystem : public System {
     public:
         void update(double dt);
     };

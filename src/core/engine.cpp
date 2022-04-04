@@ -1,7 +1,13 @@
 #include "engine.h"
 
+#include "../common/logger.h"
+
+#include <sstream>
+
 namespace Flint {
-    Engine::Engine() = default;
+    Engine::Engine() {
+        last_time_showed_fps = std::chrono::high_resolution_clock::now();
+    }
 
     void Engine::tick() {
         static auto start_time = std::chrono::high_resolution_clock::now();
@@ -12,6 +18,17 @@ namespace Flint {
         delta = new_elapsed - elapsed;
 
         elapsed = new_elapsed;
+
+        // Print FPS.
+        std::chrono::duration<double> duration = current_time - last_time_showed_fps;
+        if (duration.count() > 1) {
+            last_time_showed_fps = current_time;
+
+            // Set frame time.
+            std::ostringstream string_stream;
+            string_stream << "FPS " << round(1.0 / delta * 10.f) * 0.1f;
+            Logger::verbose(string_stream.str(), "Engine");
+        }
     }
 
     double Engine::get_delta() const {

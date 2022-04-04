@@ -11,7 +11,21 @@
 #include <set>
 
 namespace Flint {
-    class SpriteRenderSystem : public System {
+    class SpriteGuiRenderSystem : public System {
+    public:
+        void update(double dt);
+
+        void draw(VkCommandBuffer command_buffer);
+    };
+
+    class Sprite2dRenderSystem : public System {
+    public:
+        void update(double dt);
+
+        void draw(VkCommandBuffer command_buffer);
+    };
+
+    class Sprite3dRenderSystem : public System {
     public:
         void update(double dt);
 

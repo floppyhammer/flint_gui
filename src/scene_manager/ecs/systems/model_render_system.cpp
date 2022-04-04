@@ -5,7 +5,7 @@
 #include "../../../rendering/swap_chain.h"
 #include "../../../core/engine.h"
 #include "../../../rendering/mesh.h"
-#include "../../../rendering/mvp_uniform_buffer.h"
+#include "../../../rendering/mvp_buffer.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -16,7 +16,7 @@ namespace Flint {
             auto coordinator = Coordinator::get_singleton();
 
             auto &model = coordinator.get_component<Model>(entity);
-            auto &transform = coordinator.get_component<Transform3D>(entity);
+            auto &transform = coordinator.get_component<Transform3d>(entity);
             auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
 
             // Prepare UBO data.

@@ -1,6 +1,8 @@
 #ifndef FLINT_VEC3_H
 #define FLINT_VEC3_H
 
+#include "vec2.h"
+
 namespace Flint {
     template<typename T>
     struct Vec3 {
@@ -16,6 +18,20 @@ namespace Flint {
 
         static inline Vec3 zero() {
             return {0};
+        }
+
+        Vec2<T> xy() const {
+            return {x, y};
+        }
+
+        inline Vec3 operator*(float s) const {
+            return Vec3{x * s, y * s, z * s};
+        }
+
+        inline void operator+=(const Vec3 &b) {
+            x += b.x;
+            y += b.y;
+            z += b.z;
         }
     };
 }

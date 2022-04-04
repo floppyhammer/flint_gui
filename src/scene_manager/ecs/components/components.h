@@ -6,7 +6,7 @@
 #include "../../../common/math/quaternion.h"
 #include "../../../rendering/mesh.h"
 #include "../../../rendering/material.h"
-#include "../../../rendering/mvp_uniform_buffer.h"
+#include "../../../rendering/mvp_buffer.h"
 #include "../../../core/input_event.h"
 
 #define GLFW_INCLUDE_VULKAN
@@ -30,13 +30,13 @@ namespace Flint {
         Vec3<float> acceleration;
     };
 
-    struct Transform3D {
+    struct Transform3d {
         Vec3<float> position;
         Vec3<float> scale;
         Quaternion rotation;
     };
 
-    struct Transform2D {
+    struct Transform2d {
         Vec2<float> position;
         Vec2<float> scale;
         float rotation = 0;
@@ -49,12 +49,12 @@ namespace Flint {
 
     // RENDER
     // -----------------------------
-    struct Sprite2D {
+    struct Sprite2d {
         std::shared_ptr<Mesh2D> mesh;
         std::shared_ptr<Material2D> material;
     };
 
-    struct Sprite3D {
+    struct Sprite3d {
 
     };
 
@@ -62,7 +62,7 @@ namespace Flint {
         std::shared_ptr<MvpBuffer> mvp_buffer;
     };
 
-    struct TransformGUI {
+    struct TransformGui {
         Vec2<float> rect_position{0};
         Vec2<float> rect_size{128};
         Vec2<float> rect_scale{1};
