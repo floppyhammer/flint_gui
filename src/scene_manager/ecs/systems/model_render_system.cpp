@@ -11,7 +11,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace Flint {
-    void ModelRenderSystem::update(float dt) {
+    void ModelRenderSystem::update() {
         auto coordinator = Coordinator::get_singleton();
 
         for (auto const &entity: entities) {

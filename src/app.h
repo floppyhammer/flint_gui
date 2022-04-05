@@ -21,6 +21,7 @@
 
 #include "scene_manager/ecs/entity.h"
 #include "scene_manager/ecs/systems/sprite_render_system.h"
+#include "scene_manager/ecs/systems/model_render_system.h"
 #include "scene_manager/ecs/systems/physics_system.h"
 
 class App {
@@ -35,6 +36,8 @@ private:
     std::vector<Flint::Entity> entities;
 
     std::shared_ptr<Flint::Sprite2dRenderSystem> sprite_render_system;
+
+    std::shared_ptr<Flint::ModelRenderSystem> model_render_system;
 
     std::shared_ptr<Flint::Physics2dSystem> physics_system;
 

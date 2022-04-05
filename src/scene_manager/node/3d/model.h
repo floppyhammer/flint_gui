@@ -6,21 +6,21 @@
 #include "../../../resources/texture.h"
 
 namespace Flint {
-    class MeshInstance3D : public Node3D {
+    class Model : public Node3D {
     public:
-        MeshInstance3D();
-
-    protected:
-        std::vector<std::shared_ptr<Mesh>> meshes;
-        std::vector<std::shared_ptr<Material>> materials;
-
-        void _draw(VkCommandBuffer p_command_buffer) override;
-
-        void draw(VkCommandBuffer p_command_buffer) override;
+        Model();
 
         void _update(double delta) override;
 
-        void loadFile(const std::string &filename);
+        void _draw(VkCommandBuffer p_command_buffer) override;
+
+    protected:
+        std::vector<std::shared_ptr<Mesh3D>> meshes;
+        std::vector<std::shared_ptr<Material3D>> materials;
+
+        void draw(VkCommandBuffer p_command_buffer) override;
+
+        void load_file(const std::string &filename);
     };
 }
 

@@ -29,7 +29,7 @@ namespace Flint {
         // 3D.
         Node3D,
         Sprite3D,
-        MeshInstance3D,
+        Model,
 
         Max,
     };

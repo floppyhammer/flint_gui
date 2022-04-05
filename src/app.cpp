@@ -6,6 +6,7 @@
 #include "resources/texture.h"
 #include "core/engine.h"
 #include "core/input_event.h"
+#include "io/obj_importer.h"
 
 #include "scene_manager/node/gui/sub_viewport_container.h"
 #include "scene_manager/node/3d/model.h"
@@ -42,8 +43,8 @@ void App::run() {
     {
         auto node = std::make_shared<Flint::Node>();
         auto node_3d = std::make_shared<Flint::Node3D>();
-        auto mesh_instance_0 = std::make_shared<Flint::MeshInstance3D>();
-        auto mesh_instance_1 = std::make_shared<Flint::MeshInstance3D>();
+        auto mesh_instance_0 = std::make_shared<Flint::Model>();
+        auto mesh_instance_1 = std::make_shared<Flint::Model>();
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
         auto texture_rect = std::make_shared<Flint::TextureRect>();
@@ -61,7 +62,7 @@ void App::run() {
         mesh_instance_0->position.x = 1;
         mesh_instance_1->position.x = -1;
         //mesh_instance_1->scale.x = mesh_instance_1->scale.y = mesh_instance_1->scale.z = 0.02;
-        tree.set_root(node);
+        //tree.set_root(node);
     }
 
     {
@@ -77,6 +78,7 @@ void App::run() {
         coordinator.register_component<Flint::TransformGuiComponent>();
         coordinator.register_component<Flint::Sprite2dComponent>();
         coordinator.register_component<Flint::Sprite3dComponent>();
+        coordinator.register_component<Flint::ModelComponent>();
         coordinator.register_component<Flint::MvpComponent>();
         coordinator.register_component<Flint::ViewportInputComponent>();
         coordinator.register_component<Flint::ViewportOutputComponent>();
@@ -102,17 +104,17 @@ void App::run() {
             coordinator.set_system_signature<Flint::Sprite2dRenderSystem>(signature);
         }
 
-//        auto model_render_system = coordinator.register_system<Flint::ModelRenderSystem>();
-//        // Set signature.
-//        {
-//            Flint::Signature signature;
-//            signature.set(coordinator.get_component_type<Flint::Model>());
-//            signature.set(coordinator.get_component_type<Flint::Transform3D>());
-//            coordinator.set_system_signature<Flint::ModelRenderSystem>(signature);
-//        }
+        model_render_system = coordinator.register_system<Flint::ModelRenderSystem>();
+        // Set signature.
+        {
+            Flint::Signature signature;
+            signature.set(coordinator.get_component_type<Flint::ModelComponent>());
+            signature.set(coordinator.get_component_type<Flint::Transform3dComponent>());
+            coordinator.set_system_signature<Flint::ModelRenderSystem>(signature);
+        }
 
         // Allocate space for entities.
-        entities.resize(1000);
+        entities.resize(10);
 
         std::default_random_engine generator;
         std::uniform_real_distribution<float> rand_position(0.0f, 400.0f);
@@ -168,7 +170,29 @@ void App::run() {
                         });
             }
         }
-        // ----------------------------------------------------------
+
+        // Model.
+        auto entity = coordinator.create_entity();
+        {
+            auto meshes = std::vector<std::shared_ptr<Mesh3D>>();
+            auto materials = std::vector<std::shared_ptr<Material3D>>();
+            auto mvp_buffer = std::make_shared<Flint::MvpBuffer>();
+            Flint::ObjImporter::load_file("../assets/viking_room/viking_room.obj", meshes, materials, mvp_buffer);;
+
+            coordinator.add_component(
+                    entity,
+                    Flint::ModelComponent{meshes, materials, mvp_buffer});
+
+            Flint::Transform3dComponent transform;
+            transform.position.x = 0.5;
+            coordinator.add_component(
+                    entity,
+                    transform);
+
+            coordinator.add_component(
+                    entity,
+                    Flint::MvpComponent{mvp_buffer});
+        }
     }
 
     // GLFW input callbacks.
@@ -246,6 +270,8 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
         tree.draw(commandBuffers[imageIndex]);
 
         sprite_render_system->draw(commandBuffers[imageIndex]);
+
+        model_render_system->draw(commandBuffers[imageIndex]);
     }
 
     // End render pass.
@@ -285,6 +311,7 @@ void App::draw_frame() {
         // ECS scene manager.
         physics_system->update(delta);
         sprite_render_system->update();
+        model_render_system->update();
     }
 
     // Record draw calls.

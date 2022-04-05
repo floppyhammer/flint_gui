@@ -1,15 +1,63 @@
 #ifndef FLINT_RENDERING_SERVER_H
 #define FLINT_RENDERING_SERVER_H
 
+#include "device.h"
+
 #define GLFW_INCLUDE_VULKAN
 
 #include "GLFW/glfw3.h"
 
-#include "device.h"
+#include "glm/glm.hpp"
 
 #include <vector>
 #include <iostream>
 #include <optional>
+#include <array>
+
+/**
+ * Shared by 2D and 3D meshes.
+ */
+struct Vertex {
+    glm::vec3 pos;
+    glm::vec3 color;
+    glm::vec2 uv; // Texture coordinates.
+
+    bool operator==(const Vertex &other) const {
+        return pos == other.pos && color == other.color && uv == other.uv;
+    }
+
+    /// Binding info.
+    static VkVertexInputBindingDescription getBindingDescription() {
+        VkVertexInputBindingDescription bindingDescription{};
+        bindingDescription.binding = 0;
+        bindingDescription.stride = sizeof(Vertex);
+        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; // Specify rate at which vertex attributes are pulled from buffers.
+
+        return bindingDescription;
+    }
+
+    /// Attributes info.
+    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
+        std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
+
+        attributeDescriptions[0].binding = 0;
+        attributeDescriptions[0].location = 0;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+        attributeDescriptions[1].binding = 0;
+        attributeDescriptions[1].location = 1;
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+        attributeDescriptions[2].binding = 0;
+        attributeDescriptions[2].location = 2;
+        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[2].offset = offsetof(Vertex, uv);
+
+        return attributeDescriptions;
+    }
+};
 
 class RenderingServer {
 public:
@@ -176,6 +224,14 @@ public:
     void createBlitGraphicsPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &graphicsPipeline);
 
     void createBlitDescriptorSetLayout();
+
+    static void createIndexBuffer(std::vector<uint32_t> &indices,
+                                  VkBuffer &p_index_buffer,
+                                  VkDeviceMemory &p_index_buffer_memory);
+
+    static void createVertexBuffer(std::vector<Vertex> &vertices,
+                                   VkBuffer &p_vertex_buffer,
+                                   VkDeviceMemory &p_vertex_buffer_memory);
 };
 
 typedef RenderingServer RS;

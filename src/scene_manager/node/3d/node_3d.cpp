@@ -34,69 +34,6 @@ namespace Flint {
         update_mvp();
     }
 
-    void Node3D::createVertexBuffer(std::vector<Vertex> &vertices,
-                                    VkBuffer &p_vertex_buffer,
-                                    VkDeviceMemory &p_vertex_buffer_memory) {
-        VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
-
-        VkBuffer stagingBuffer; // In GPU
-        VkDeviceMemory stagingBufferMemory; // In CPU
-
-        // Create the GPU buffer and link it with the CPU memory.
-        RS::getSingleton().createBuffer(bufferSize,
-                                        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                        stagingBuffer,
-                                        stagingBufferMemory);
-
-        // Copy data to the CPU memory.
-        RS::getSingleton().copyDataToMemory(vertices.data(), stagingBufferMemory, bufferSize);
-
-        // Create the vertex buffer (GPU) and bind it to the vertex memory (CPU).
-        RS::getSingleton().createBuffer(bufferSize,
-                                        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                        p_vertex_buffer,
-                                        p_vertex_buffer_memory);
-
-        // Copy buffer (GPU).
-        RS::getSingleton().copyBuffer(stagingBuffer, p_vertex_buffer, bufferSize);
-
-        // Clean up staging buffer and memory.
-        vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
-        vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
-    }
-
-    void Node3D::createIndexBuffer(std::vector<uint32_t> &indices,
-                                   VkBuffer &p_index_buffer,
-                                   VkDeviceMemory &p_index_buffer_memory) {
-        VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
-
-        VkBuffer stagingBuffer;
-        VkDeviceMemory stagingBufferMemory;
-        RS::getSingleton().createBuffer(bufferSize,
-                                        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                        stagingBuffer,
-                                        stagingBufferMemory);
-
-        RS::getSingleton().copyDataToMemory(indices.data(),
-                                            stagingBufferMemory,
-                                            bufferSize);
-
-        RS::getSingleton().createBuffer(bufferSize,
-                                        VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                        p_index_buffer,
-                                        p_index_buffer_memory);
-
-        // Copy data from staging buffer to index buffer.
-        RS::getSingleton().copyBuffer(stagingBuffer, p_index_buffer, bufferSize);
-
-        vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
-        vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
-    }
-
     void Node3D::update_mvp() {
         // Prepare UBO data.
         UniformBufferObject ubo{};

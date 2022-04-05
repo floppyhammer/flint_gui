@@ -13,7 +13,7 @@
 namespace Flint {
     class ModelRenderSystem : public System {
     public:
-        void update(float dt);
+        void update();
 
         void draw(VkCommandBuffer command_buffer);
     };

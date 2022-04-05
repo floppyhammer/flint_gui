@@ -27,25 +27,25 @@ namespace Flint {
     // PHYSICS
     // -----------------------------
     struct RigidBodyComponent {
-        Vec3<float> velocity;
-        Vec3<float> acceleration;
+        Vec3<float> velocity{0.0f};
+        Vec3<float> acceleration{0.0f};
     };
 
     struct Transform3dComponent {
-        Vec3<float> position;
-        Vec3<float> scale;
+        Vec3<float> position{0.0f};
+        Vec3<float> scale{1.0f};
         Quaternion rotation;
     };
 
     struct Transform2dComponent {
-        Vec2<float> position;
-        Vec2<float> scale;
-        Vec2<float> offset; // Center as the origin.
+        Vec2<float> position{0.0f};
+        Vec2<float> scale{1.0f};
+        Vec2<float> offset{0.0f}; // Center as the origin.
         float rotation = 0;
     };
 
     struct GravityComponent {
-        Vec3<float> force;
+        Vec3<float> force{0.0f};
     };
     // -----------------------------
 
