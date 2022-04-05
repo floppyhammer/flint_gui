@@ -56,8 +56,8 @@ void App::run() {
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
         node_3d->add_child(mesh_instance_1);
-        texture_rect->set_rect_scale(0.3, 0.3);
-        texture_rect->set_rect_position(400, 0);
+        texture_rect->scale = {0.3, 0.3};
+        texture_rect->position = {400, 0};
         mesh_instance_0->position.x = 1;
         mesh_instance_1->position.x = -1;
         //mesh_instance_1->scale.x = mesh_instance_1->scale.y = mesh_instance_1->scale.z = 0.02;

@@ -20,8 +20,8 @@ namespace Flint {
     void TextureRect::set_texture(std::shared_ptr<Texture> p_texture) {
         material->texture = p_texture;
 
-        rect_size.x = (float) p_texture->width;
-        rect_size.y = (float) p_texture->height;
+        size.x = (float) p_texture->width;
+        size.y = (float) p_texture->height;
 
         mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
     }
@@ -31,8 +31,10 @@ namespace Flint {
     }
 
     void TextureRect::_update(double delta) {
-        Control::update(delta);
+        // Update self.
+        NodeGui::update(delta);
 
+        // Update children.
         Node::_update(delta);
     }
 

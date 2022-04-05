@@ -22,8 +22,10 @@ namespace Flint {
     }
 
     void SubViewportContainer::_update(double delta) {
-        Control::update(delta);
+        // Update self.
+        NodeGui::update(delta);
 
+        // Update children.
         Node::_update(delta);
     }
 

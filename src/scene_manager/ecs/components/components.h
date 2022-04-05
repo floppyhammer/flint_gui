@@ -40,7 +40,7 @@ namespace Flint {
     struct Transform2dComponent {
         Vec2<float> position;
         Vec2<float> scale;
-        Vec2<float> offset; // Center as the default origin.
+        Vec2<float> offset; // Center as the origin.
         float rotation = 0;
     };
 
@@ -65,11 +65,11 @@ namespace Flint {
     };
 
     struct TransformGuiComponent {
-        Vec2<float> rect_position{0};
-        Vec2<float> rect_size{128};
-        Vec2<float> rect_scale{1};
-        Vec2<float> rect_pivot_offset{0}; // Top-left as the default origin.
-        float rect_rotation = 0;
+        Vec2<float> position{0};
+        Vec2<float> size{128};
+        Vec2<float> scale{1};
+        Vec2<float> pivot_offset{0}; // Top-left as the origin.
+        float rotation = 0;
     };
 
     struct ModelComponent {

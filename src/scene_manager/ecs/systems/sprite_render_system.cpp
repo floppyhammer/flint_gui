@@ -28,17 +28,17 @@ namespace Flint {
             // The actual application order of these matrices is reverse.
             // 4.
             ubo.model = glm::translate(glm::mat4(1.0f),
-                                       glm::vec3(transform.rect_position.x / viewport_extent.x * 2.0f,
-                                                 transform.rect_position.y / viewport_extent.y * 2.0f,
+                                       glm::vec3(transform.position.x / viewport_extent.x * 2.0f,
+                                                 transform.position.y / viewport_extent.y * 2.0f,
                                                  0.0f));
             // 3.
             ubo.model = glm::translate(ubo.model, glm::vec3(-1.0, -1.0, 0.0f));
             // 2.
-            ubo.model = glm::scale(ubo.model, glm::vec3(transform.rect_scale.x, transform.rect_scale.y, 1.0f));
+            ubo.model = glm::scale(ubo.model, glm::vec3(transform.scale.x, transform.scale.y, 1.0f));
             // 1.
             ubo.model = glm::scale(ubo.model,
-                                   glm::vec3(transform.rect_size.x / viewport_extent.x * 2.0f,
-                                             transform.rect_size.y / viewport_extent.y * 2.0f,
+                                   glm::vec3(transform.size.x / viewport_extent.x * 2.0f,
+                                             transform.size.y / viewport_extent.y * 2.0f,
                                              1.0f));
 
             mvp_component.mvp_buffer->update_uniform_buffer(ubo);

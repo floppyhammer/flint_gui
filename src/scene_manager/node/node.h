@@ -18,7 +18,7 @@ namespace Flint {
         SubViewport,
 
         // GUI.
-        Control,
+        NodeGui,
         TextureRect,
         SubViewportContainer,
 

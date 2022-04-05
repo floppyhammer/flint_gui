@@ -10,13 +10,12 @@ namespace Flint {
         Node2d();
 
         // Transform.
-        // ------------------------------------------
+        // ----------------------------
         Vec2<float> position{0};
-
         Vec2<float> scale{1};
-
+        Vec2<float> offset{0}; // Center as the origin.
         float rotation = 0;
-        // ------------------------------------------
+        // ----------------------------
     };
 }
 
