@@ -10,16 +10,18 @@ namespace Flint {
     public:
         Sprite2d();
 
-        void _draw(VkCommandBuffer p_command_buffer);
+        void _update(double delta) override;
+
+        void _draw(VkCommandBuffer p_command_buffer) override;
+
+        void set_texture(std::shared_ptr<Texture> p_texture);
+
+        [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
 
     private:
-        std::shared_ptr<Mesh2D> mesh;
+        void update(double delta) override;
 
-        std::shared_ptr<Material2D> material;
-
-        std::shared_ptr<MvpBuffer> mvp_buffer;
-
-        void draw(VkCommandBuffer p_command_buffer);
+        void draw(VkCommandBuffer p_command_buffer) override;
 
         void update_mvp();
     };

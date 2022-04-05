@@ -12,6 +12,30 @@
 namespace Flint {
     Sprite2d::Sprite2d() {
         type = NodeType::Sprite2D;
+
+        init_default_mesh();
+    }
+
+    void Sprite2d::set_texture(std::shared_ptr<Texture> p_texture) {
+        material->texture = p_texture;
+
+        mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
+    }
+
+    std::shared_ptr<Texture> Sprite2d::get_texture() const {
+        return material->texture;
+    }
+
+    void Sprite2d::_update(double delta) {
+        // Update self.
+        update(delta);
+
+        // Update children;
+        Node::_update(delta);
+    }
+
+    void Sprite2d::update(double delta) {
+        update_mvp();
     }
 
     void Sprite2d::update_mvp() {
@@ -29,14 +53,16 @@ namespace Flint {
         float sprite_width = material->texture->width * scale.x;
         float sprite_height = material->texture->height * scale.y;
 
+        auto global_position = get_global_position();
+
         // Prepare UBO data. We use this matrix to convert a full-screen to the control's rect.
         UniformBufferObject ubo{};
 
         // The actual application order of these matrices is reverse.
         // 4.
         ubo.model = glm::translate(glm::mat4(1.0f),
-                                   glm::vec3(position.x / viewport_extent.x * 2.0f,
-                                             position.y / viewport_extent.y * 2.0f,
+                                   glm::vec3(global_position.x / viewport_extent.x * 2.0f,
+                                             global_position.y / viewport_extent.y * 2.0f,
                                              0.0f));
         // 3.
         ubo.model = glm::translate(ubo.model, glm::vec3(-1.0, -1.0, 0.0f));

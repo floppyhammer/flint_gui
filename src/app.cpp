@@ -12,6 +12,8 @@
 #include "scene_manager/node/3d/model.h"
 #include "scene_manager/node/gui/texture_rect.h"
 #include "scene_manager/node/sub_viewport.h"
+#include "scene_manager/node/2d/sprite_2d.h"
+#include "scene_manager/node/2d/rigid_body_2d.h"
 
 #include "scene_manager/ecs/coordinator.h"
 #include "scene_manager/ecs/components/components.h"
@@ -39,6 +41,13 @@ void App::run() {
     auto swap_chain = SwapChain::getSingleton();
     // ---------------------------------------------------
 
+    std::default_random_engine generator;
+    std::uniform_real_distribution<float> rand_position(0.0f, 400.0f);
+    std::uniform_real_distribution<float> rand_rotation(0.0f, 3.0f);
+    std::uniform_real_distribution<float> rand_velocity(-100.0f, 100.0f);
+    std::uniform_real_distribution<float> rand_scale(0.2f, 0.2f);
+    std::uniform_real_distribution<float> rand_gravity(-10.0f, -1.0f);
+
     // Build scene_manager tree. Use a block, so we don't increase ref counts for the node.
     {
         auto node = std::make_shared<Flint::Node>();
@@ -47,22 +56,22 @@ void App::run() {
         auto mesh_instance_1 = std::make_shared<Flint::Model>();
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
-        auto texture_rect = std::make_shared<Flint::TextureRect>();
-        texture_rect->set_texture(Texture::from_file("../assets/texture.jpg"));
 
-        node->add_child(texture_rect);
+        auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
+        rigid_body_2d->position = {rand_position(generator), rand_position(generator)};
+        rigid_body_2d->velocity = {rand_velocity(generator), rand_velocity(generator)};
+        auto sprite_2d = std::make_shared<Flint::Sprite2d>();
+        sprite_2d->set_texture(Texture::from_file("../assets/duck.png"));
+        rigid_body_2d->add_child(sprite_2d);
+
+        node->add_child(rigid_body_2d);
         node->add_child(mesh_instance_0);
         node->add_child(sub_viewport_c);
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
         node_3d->add_child(mesh_instance_1);
-        texture_rect->scale = {0.3, 0.3};
-        texture_rect->position = {400, 0};
-        mesh_instance_0->position.x = 1;
-        mesh_instance_1->position.x = -1;
-        //mesh_instance_1->scale.x = mesh_instance_1->scale.y = mesh_instance_1->scale.z = 0.02;
-        //tree.set_root(node);
+        tree.set_root(node);
     }
 
     {
@@ -115,13 +124,6 @@ void App::run() {
 
         // Allocate space for entities.
         entities.resize(10);
-
-        std::default_random_engine generator;
-        std::uniform_real_distribution<float> rand_position(0.0f, 400.0f);
-        std::uniform_real_distribution<float> rand_rotation(0.0f, 3.0f);
-        std::uniform_real_distribution<float> rand_velocity(-100.0f, 100.0f);
-        std::uniform_real_distribution<float> rand_scale(0.2f, 0.2f);
-        std::uniform_real_distribution<float> rand_gravity(-10.0f, -1.0f);
 
         auto tex = Texture::from_file("../assets/duck.png");
 
@@ -269,9 +271,9 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
     {
         tree.draw(commandBuffers[imageIndex]);
 
-        sprite_render_system->draw(commandBuffers[imageIndex]);
-
-        model_render_system->draw(commandBuffers[imageIndex]);
+//        sprite_render_system->draw(commandBuffers[imageIndex]);
+//
+//        model_render_system->draw(commandBuffers[imageIndex]);
     }
 
     // End render pass.

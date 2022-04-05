@@ -25,6 +25,7 @@ namespace Flint {
         // 2D.
         Node2D,
         Sprite2D,
+        RigidBody2D,
 
         // 3D.
         Node3D,
@@ -63,6 +64,8 @@ namespace Flint {
         std::vector<std::shared_ptr<Node>> get_children();
 
         void remove_child(size_t index);
+
+        NodeType extended_from_which_base_node() const;
 
     protected:
         std::vector<std::shared_ptr<Node>> children;

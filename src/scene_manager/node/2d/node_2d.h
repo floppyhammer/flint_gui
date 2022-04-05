@@ -3,6 +3,8 @@
 
 #include "../node.h"
 #include "../../../common/vec2.h"
+#include "../../../rendering/mvp_buffer.h"
+#include "../../../resources/mesh.h"
 
 namespace Flint {
     class Node2d : public Node {
@@ -16,6 +18,17 @@ namespace Flint {
         Vec2<float> offset{0}; // Center as the origin.
         float rotation = 0;
         // ----------------------------
+
+        [[nodiscard]] Vec2<float> get_global_position() const;
+
+    protected:
+        std::shared_ptr<Mesh2D> mesh;
+
+        std::shared_ptr<Material2D> material;
+
+        std::shared_ptr<MvpBuffer> mvp_buffer;
+
+        void init_default_mesh();
     };
 }
 

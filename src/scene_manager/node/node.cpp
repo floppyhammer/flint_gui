@@ -51,6 +51,19 @@ namespace Flint {
         children.erase(children.begin() + index);
     }
 
+    NodeType Node::extended_from_which_base_node() const {
+        if (type < NodeType::NodeGui)
+            return NodeType::Node;
+        else if (type < NodeType::Node2D)
+            return NodeType::NodeGui;
+        else if (type < NodeType::Node3D)
+            return NodeType::Node2D;
+        else if (type < NodeType::Max)
+            return NodeType::Node3D;
+        else
+            return NodeType::Max;
+    }
+
     void Node::_cleanup() {
         for (auto &child: children) {
             child->_cleanup();
