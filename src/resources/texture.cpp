@@ -71,10 +71,13 @@ void Texture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t
 }
 
 std::shared_ptr<Texture> Texture::create(uint32_t p_width, uint32_t p_height) {
+    assert(p_width != 0 && p_height != 0 && "Creating texture with zero size.");
+
     auto texture = std::make_shared<Texture>();
     texture->width = p_width;
     texture->height = p_height;
 
+    // Pixel data.
     std::vector<unsigned char> pixels(p_width * p_height * 4, 0);
 
     // Create image and image memory.

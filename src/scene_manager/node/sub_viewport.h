@@ -4,7 +4,7 @@
 #include "node.h"
 #include "../../common/vec2.h"
 #include "../../rendering/rendering_server.h"
-#include "../../rendering/texture.h"
+#include "../../resources/texture.h"
 #include "../../rendering/viewport.h"
 #include "../../core/scene_tree.h"
 #include "../../common/color.h"

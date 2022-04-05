@@ -4,7 +4,7 @@
 #include "../common/vec2.h"
 #include "../common/color.h"
 #include "rendering_server.h"
-#include "texture.h"
+#include "../resources/texture.h"
 
 namespace Flint {
     class Viewport {

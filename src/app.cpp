@@ -3,7 +3,7 @@
 #include "rendering/device.h"
 #include "rendering/swap_chain.h"
 #include "rendering/rendering_server.h"
-#include "rendering/texture.h"
+#include "resources/texture.h"
 #include "core/engine.h"
 #include "core/input_event.h"
 
@@ -47,7 +47,7 @@ void App::run() {
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
         auto texture_rect = std::make_shared<Flint::TextureRect>();
-        texture_rect->set_texture(Texture::from_file("../res/texture.jpg"));
+        texture_rect->set_texture(Texture::from_file("../assets/texture.jpg"));
 
         node->add_child(texture_rect);
         node->add_child(mesh_instance_0);
@@ -121,7 +121,7 @@ void App::run() {
         std::uniform_real_distribution<float> rand_scale(0.2f, 0.2f);
         std::uniform_real_distribution<float> rand_gravity(-10.0f, -1.0f);
 
-        auto tex = Texture::from_file("../res/duck.png");
+        auto tex = Texture::from_file("../assets/duck.png");
 
         // Create entities.
         for (auto &entity: entities) {

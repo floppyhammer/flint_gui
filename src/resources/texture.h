@@ -5,13 +5,13 @@
 
 #include "GLFW/glfw3.h"
 
-#include "rendering_server.h"
+#include "../rendering/rendering_server.h"
 
 #include <memory>
 
 class Texture {
 public:
-    /// Create an empty texture.
+    /// Create an empty texture with specific size.
     static std::shared_ptr<Texture> create(uint32_t p_width, uint32_t p_height);
 
     /// Create a texture from file.

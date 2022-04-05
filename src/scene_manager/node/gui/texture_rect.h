@@ -2,8 +2,8 @@
 #define FLINT_TEXTURE_RECT_H
 
 #include "control.h"
-#include "../../../rendering/texture.h"
-#include "../../../rendering/mesh.h"
+#include "../../../resources/texture.h"
+#include "../../../resources/mesh.h"
 
 #include <memory>
 

@@ -28,7 +28,7 @@ namespace std {
 }
 
 namespace Flint {
-    const std::string MODEL_NAME = "../res/viking_room/viking_room.obj";
+    const std::string MODEL_NAME = "../assets/viking_room/viking_room.obj";
 
     MeshInstance3D::MeshInstance3D() {
         type = NodeType::MeshInstance3D;

@@ -15,8 +15,8 @@
 #include <cstring>
 #include <queue>
 
-#include "rendering/mesh.h"
-#include "rendering/texture.h"
+#include "resources/mesh.h"
+#include "resources/texture.h"
 #include "core/scene_tree.h"
 
 #include "scene_manager/ecs/entity.h"

@@ -4,7 +4,7 @@
 #include "../coordinator.h"
 #include "../../../rendering/swap_chain.h"
 #include "../../../core/engine.h"
-#include "../../../rendering/mesh.h"
+#include "../../../resources/mesh.h"
 #include "../../../rendering/mvp_buffer.h"
 
 #include "glm/glm.hpp"

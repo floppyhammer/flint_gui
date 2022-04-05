@@ -2,7 +2,7 @@
 #define FLINT_SPRITE_2D_H
 
 #include "node_2d.h"
-#include "../../../rendering/mesh.h"
+#include "../../../resources/mesh.h"
 #include "../../../rendering/mvp_buffer.h"
 
 namespace Flint {

@@ -6,6 +6,8 @@
 #include <memory>
 #include <iostream>
 
+/// Material Resources
+
 class Material {
 public:
     // Material name for debugging reason.

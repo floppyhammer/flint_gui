@@ -5,7 +5,7 @@
 
 #include "../node.h"
 #include "../../../common/vec2.h"
-#include "../../../rendering/mesh.h"
+#include "../../../resources/mesh.h"
 #include "../../../rendering/rendering_server.h"
 #include "../../../rendering/mvp_buffer.h"
 

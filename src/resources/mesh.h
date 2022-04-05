@@ -14,6 +14,8 @@
 #include <vector>
 #include <array>
 
+/// Mesh Resources
+
 /**
  * Shared by 2D and 3D meshes.
  */

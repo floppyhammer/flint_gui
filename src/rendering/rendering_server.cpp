@@ -2,7 +2,7 @@
 #include <set>
 
 #include "rendering_server.h"
-#include "mesh.h"
+#include "../resources/mesh.h"
 #include "../common/io.h"
 
 RenderingServer::RenderingServer() {

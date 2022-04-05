@@ -2,8 +2,8 @@
 #define FLINT_MODEL_H
 
 #include "node_3d.h"
-#include "../../../rendering/mesh.h"
-#include "../../../rendering/texture.h"
+#include "../../../resources/mesh.h"
+#include "../../../resources/texture.h"
 
 namespace Flint {
     class MeshInstance3D : public Node3D {
