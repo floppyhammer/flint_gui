@@ -702,8 +702,10 @@ void RenderingServer::createGraphicsPipelineLayout(VkDescriptorSetLayout &descri
     pipelineLayoutInfo.pushConstantRangeCount = 0;
 
     // Create pipeline layout.
-    if (vkCreatePipelineLayout(Device::getSingleton().device, &pipelineLayoutInfo, nullptr, &graphicsPipelineLayout) !=
-        VK_SUCCESS) {
+    if (vkCreatePipelineLayout(Device::getSingleton().device,
+                               &pipelineLayoutInfo,
+                               nullptr,
+                               &graphicsPipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create pipeline layout!");
     }
 }

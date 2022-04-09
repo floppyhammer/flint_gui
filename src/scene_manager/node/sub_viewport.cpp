@@ -20,7 +20,7 @@ namespace Flint {
             renderPassInfo.renderPass = viewport->renderPass;
             renderPassInfo.framebuffer = viewport->framebuffer; // Set target framebuffer.
             renderPassInfo.renderArea.offset = {0, 0};
-            renderPassInfo.renderArea.extent = VkExtent2D{viewport->extent.x, viewport->extent.y};
+            renderPassInfo.renderArea.extent = VkExtent2D{viewport->get_extent().x, viewport->get_extent().y};
 
             // Clear color.
             std::array<VkClearValue, 2> clearValues{};
@@ -51,6 +51,6 @@ namespace Flint {
     }
 
     Vec2<uint32_t> SubViewport::get_extent() const {
-        return viewport->extent;
+        return viewport->get_extent();
     }
 }

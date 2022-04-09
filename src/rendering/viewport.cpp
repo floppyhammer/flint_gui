@@ -4,40 +4,22 @@
 
 namespace Flint {
     Viewport::Viewport() {
-        createImages();
+        // Render pass is not extent dependent.
+        create_render_pass();
 
-        // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
-        createRenderPass();
-        createFramebuffer();
-
-        RenderingServer::getSingleton().createMeshGraphicsPipeline(
-                renderPass,
-                VkExtent2D{extent.x, extent.y},
-                meshGraphicsPipeline);
-
-        RenderingServer::getSingleton().createBlitGraphicsPipeline(
-                renderPass,
-                VkExtent2D{extent.x, extent.y},
-                blitGraphicsPipeline);
+        extent_dependent_init();
     }
 
     Viewport::~Viewport() {
         auto device = Device::getSingleton().device;
 
-        vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
-        vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);
+        extent_dependent_cleanup();
 
-        // Depth resources.
-        vkDestroyImageView(device, depthImageView, nullptr);
-        vkDestroyImage(device, depthImage, nullptr);
-        vkFreeMemory(device, depthImageMemory, nullptr);
-
-        vkDestroyFramebuffer(device, framebuffer, nullptr);
         vkDestroyRenderPass(device, renderPass, nullptr);
     }
 
-
-    void Viewport::createImages() {
+    void Viewport::create_images() {
+        // Color.
         texture = Texture::create(extent.x, extent.y);
 
         // Depth.
@@ -52,7 +34,7 @@ namespace Flint {
         depthImageView = RS::getSingleton().createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
     }
 
-    void Viewport::createRenderPass() {
+    void Viewport::create_render_pass() {
         // Color attachment.
         // ----------------------------------------
         VkAttachmentDescription colorAttachment{};
@@ -131,7 +113,7 @@ namespace Flint {
         }
     }
 
-    void Viewport::createFramebuffer() {
+    void Viewport::create_framebuffer() {
         // Create framebuffer.
         {
             std::array<VkImageView, 2> attachments = {
@@ -148,8 +130,10 @@ namespace Flint {
             framebufferInfo.height = extent.y;
             framebufferInfo.layers = 1;
 
-            if (vkCreateFramebuffer(Device::getSingleton().device, &framebufferInfo, nullptr, &framebuffer) !=
-                VK_SUCCESS) {
+            if (vkCreateFramebuffer(Device::getSingleton().device,
+                                    &framebufferInfo,
+                                    nullptr,
+                                    &framebuffer) != VK_SUCCESS) {
                 throw std::runtime_error("Failed to create framebuffer!");
             }
         }
@@ -169,5 +153,53 @@ namespace Flint {
         renderPassInfo.renderArea.extent = VkExtent2D{extent.x, extent.y};
 
         return renderPassInfo;
+    }
+
+    void Viewport::create_pipelines() {
+        // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
+        RenderingServer::getSingleton().createMeshGraphicsPipeline(
+                renderPass,
+                VkExtent2D{extent.x, extent.y},
+                meshGraphicsPipeline);
+
+        RenderingServer::getSingleton().createBlitGraphicsPipeline(
+                renderPass,
+                VkExtent2D{extent.x, extent.y},
+                blitGraphicsPipeline);
+    }
+
+    void Viewport::set_extent(Vec2<uint32_t> p_extent) {
+        if (extent != p_extent) {
+            extent = p_extent;
+            extent_dependent_cleanup();
+            extent_dependent_init();
+        }
+    }
+
+    Vec2<uint32_t> Viewport::get_extent() {
+        return extent;
+    }
+
+    void Viewport::extent_dependent_init() {
+        // Create color & depth images.
+        create_images();
+
+        create_framebuffer();
+
+        create_pipelines();
+    }
+
+    void Viewport::extent_dependent_cleanup() const {
+        auto device = Device::getSingleton().device;
+
+        vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
+        vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);
+
+        // Depth resources.
+        vkDestroyImageView(device, depthImageView, nullptr);
+        vkDestroyImage(device, depthImage, nullptr);
+        vkFreeMemory(device, depthImageMemory, nullptr);
+
+        vkDestroyFramebuffer(device, framebuffer, nullptr);
     }
 }
