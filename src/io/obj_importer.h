@@ -13,7 +13,7 @@ namespace Flint {
         static void load_file(const std::string &filename,
                               std::vector<std::shared_ptr<Mesh3D>> &meshes,
                               std::vector<std::shared_ptr<Material3D>> &materials,
-                              std::shared_ptr<MvpBuffer> mvp_buffer);
+                              const std::shared_ptr<MvpBuffer>& mvp_buffer);
     };
 }
 

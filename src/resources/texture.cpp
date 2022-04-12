@@ -1,6 +1,7 @@
 #include <stdexcept>
 
 #include "texture.h"
+#include "../common/logger.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -70,7 +71,7 @@ void Texture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t
     vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
 }
 
-std::shared_ptr<Texture> Texture::create(uint32_t p_width, uint32_t p_height) {
+std::shared_ptr<Texture> Texture::from_empty(uint32_t p_width, uint32_t p_height) {
     assert(p_width != 0 && p_height != 0 && "Creating texture with zero size.");
 
     auto texture = std::make_shared<Texture>();
@@ -101,7 +102,9 @@ std::shared_ptr<Texture> Texture::from_file(const std::string &filename) {
     stbi_uc *pixels = stbi_load(filename.c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
 
     if (!pixels) {
-        throw std::runtime_error("Failed to load texture image!");
+        Flint::Logger::warn("Failed to load image file " + filename, "Texture");
+        return Texture::from_empty(4, 4);
+        //throw std::runtime_error("Failed to load texture image!");
     }
 
     auto texture = std::make_shared<Texture>();

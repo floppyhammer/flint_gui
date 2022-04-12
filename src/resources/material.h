@@ -21,6 +21,8 @@ public:
 
 class Material3D : public Material {
 public:
+    static std::shared_ptr<Material3D> from_default();
+
     std::shared_ptr<Texture> diffuse_texture;
     std::shared_ptr<Texture> normal_texture;
 };

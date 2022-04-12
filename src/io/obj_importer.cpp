@@ -1,6 +1,7 @@
 #include "obj_importer.h"
 
 #include "../common/io.h"
+#include "../common/logger.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 
@@ -27,7 +28,7 @@ namespace Flint {
     void ObjImporter::load_file(const std::string &filename,
                                 std::vector<std::shared_ptr<Mesh3D>> &meshes,
                                 std::vector<std::shared_ptr<Material3D>> &materials,
-                                std::shared_ptr<MvpBuffer> mvp_buffer) {
+                                const std::shared_ptr<MvpBuffer>& mvp_buffer) {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> obj_materials;
@@ -38,17 +39,23 @@ namespace Flint {
         split_filename(filename, file_directory);
 
         if (!tinyobj::LoadObj(&attrib, &shapes, &obj_materials,
-                              &warn, &err,
-                              filename.c_str(), file_directory.c_str())) {
+                              &warn, &err, filename.c_str(), file_directory.c_str())) {
             throw std::runtime_error(warn + err);
         }
 
         // Load materials.
-        for (const auto &obj_material: obj_materials) {
-            auto material = std::make_shared<Material3D>();
-            material->name = obj_material.name;
-            material->diffuse_texture = Texture::from_file(file_directory + "/" + obj_material.diffuse_texname);
-            materials.push_back(material);
+        if (obj_materials.empty()) {
+            Logger::warn("No material found in the .mtl file or no .mtl file found at " + file_directory, "OBJ Importer");
+
+            // Default material.
+            materials.push_back(Material3D::from_default());
+        } else {
+            for (const auto &obj_material: obj_materials) {
+                auto material = std::make_shared<Material3D>();
+                material->name = obj_material.name;
+                material->diffuse_texture = Texture::from_file(file_directory + "/" + obj_material.diffuse_texname);
+                materials.push_back(material);
+            }
         }
 
         // Iterate over the vertices and dump them straight into our vertices vector.
@@ -102,10 +109,12 @@ namespace Flint {
             RenderingServer::createVertexBuffer(vertices, mesh->vertexBuffer, mesh->vertexBufferMemory);
             RenderingServer::createIndexBuffer(indices, mesh->indexBuffer, mesh->indexBufferMemory);
 
-            if (mesh->material_id < materials.size()) {
+            if (mesh->material_id > 0 && mesh->material_id < materials.size()) {
                 mesh->updateDescriptorSets(materials[mesh->material_id], mvp_buffer->uniform_buffers);
             } else {
-                throw std::runtime_error("Invalid material id!");
+                mesh->material_id = 0;
+                mesh->updateDescriptorSets(materials[0], mvp_buffer->uniform_buffers);
+                //throw std::runtime_error("Invalid material id!");
             }
 
             meshes.push_back(mesh);
