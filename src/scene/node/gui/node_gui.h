@@ -6,8 +6,8 @@
 #include "../node.h"
 #include "../../../common/vec2.h"
 #include "../../../resources/mesh.h"
-#include "../../../rendering/render_server.h"
-#include "../../../rendering/mvp_buffer.h"
+#include "../../../render/render_server.h"
+#include "../../../render/mvp_buffer.h"
 
 namespace Flint {
     class NodeGui : public Node {

@@ -2,7 +2,7 @@
 
 #include "../components/components.h"
 #include "../coordinator.h"
-#include "../../../rendering/swap_chain.h"
+#include "../../../render/swap_chain.h"
 
 namespace Flint {
     void SubViewportInputSystem::update() {

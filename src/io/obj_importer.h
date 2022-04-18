@@ -2,7 +2,7 @@
 #define FLINT_OBJ_IMPORTER_H
 
 #include "../resources/mesh.h"
-#include "../rendering/mvp_buffer.h"
+#include "../render/mvp_buffer.h"
 
 #include <vector>
 #include <memory>

@@ -1,6 +1,6 @@
 #include "sub_viewport.h"
 
-#include "../../rendering/swap_chain.h"
+#include "../../render/swap_chain.h"
 
 #include <array>
 

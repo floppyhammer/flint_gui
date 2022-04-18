@@ -1,7 +1,7 @@
 #ifndef FLINT_SCENE_TREE_H
 #define FLINT_SCENE_TREE_H
 
-#include "../scene_manager/node/node.h"
+#include "../scene/node/node.h"
 #include "input_event.h"
 
 #define GLFW_INCLUDE_VULKAN

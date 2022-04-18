@@ -1,8 +1,8 @@
 #include "mesh.h"
 
-#include "../rendering/platform.h"
-#include "../rendering/swap_chain.h"
-#include "../rendering/mvp_buffer.h"
+#include "../render/platform.h"
+#include "../render/swap_chain.h"
+#include "../render/mvp_buffer.h"
 
 Mesh3D::Mesh3D() {
     createDescriptorPool();

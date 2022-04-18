@@ -19,10 +19,10 @@
 #include "resources/texture.h"
 #include "core/scene_tree.h"
 
-#include "scene_manager/ecs/entity.h"
-#include "scene_manager/ecs/systems/sprite_render_system.h"
-#include "scene_manager/ecs/systems/model_render_system.h"
-#include "scene_manager/ecs/systems/physics_system.h"
+#include "scene/ecs/entity.h"
+#include "scene/ecs/systems/sprite_render_system.h"
+#include "scene/ecs/systems/model_render_system.h"
+#include "scene/ecs/systems/physics_system.h"
 
 class App {
 public:

@@ -2,9 +2,9 @@
 #define FLINT_NODE_3D_H
 
 #include "../node.h"
-#include "../../../rendering/render_server.h"
+#include "../../../render/render_server.h"
 #include "../../../resources/mesh.h"
-#include "../../../rendering/mvp_buffer.h"
+#include "../../../render/mvp_buffer.h"
 
 #include "glm/glm.hpp"
 

@@ -4,7 +4,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "../../../core/engine.h"
-#include "../../../rendering/swap_chain.h"
+#include "../../../render/swap_chain.h"
 #include "../sub_viewport.h"
 
 #include <memory>

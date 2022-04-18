@@ -2,9 +2,9 @@
 
 #include "../components/components.h"
 #include "../coordinator.h"
-#include "../../../rendering/swap_chain.h"
+#include "../../../render/swap_chain.h"
 #include "../../../resources/mesh.h"
-#include "../../../rendering/mvp_buffer.h"
+#include "../../../render/mvp_buffer.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"

@@ -3,7 +3,7 @@
 
 #include "../node.h"
 #include "../../../common/vec2.h"
-#include "../../../rendering/mvp_buffer.h"
+#include "../../../render/mvp_buffer.h"
 #include "../../../resources/mesh.h"
 
 namespace Flint {

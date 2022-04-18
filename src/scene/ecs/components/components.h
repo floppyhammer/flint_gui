@@ -6,8 +6,8 @@
 #include "../../../common/math/quaternion.h"
 #include "../../../resources/mesh.h"
 #include "../../../resources/material.h"
-#include "../../../rendering/mvp_buffer.h"
-#include "../../../rendering/viewport.h"
+#include "../../../render/mvp_buffer.h"
+#include "../../../render/viewport.h"
 #include "../../../core/input_event.h"
 
 #define GLFW_INCLUDE_VULKAN

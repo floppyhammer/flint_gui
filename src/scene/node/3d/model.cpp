@@ -2,7 +2,7 @@
 
 #include "../../../common/io.h"
 #include "../../../io/obj_importer.h"
-#include "../../../rendering/swap_chain.h"
+#include "../../../render/swap_chain.h"
 #include "../sub_viewport.h"
 
 #include <utility>

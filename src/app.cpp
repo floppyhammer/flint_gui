@@ -1,25 +1,25 @@
 #include "app.h"
 
-#include "rendering/platform.h"
-#include "rendering/swap_chain.h"
-#include "rendering/render_server.h"
+#include "render/platform.h"
+#include "render/swap_chain.h"
+#include "render/render_server.h"
 #include "resources/texture.h"
 #include "core/engine.h"
 #include "core/input_event.h"
 #include "io/obj_importer.h"
 
-#include "scene_manager/node/gui/sub_viewport_container.h"
-#include "scene_manager/node/3d/model.h"
-#include "scene_manager/node/gui/texture_rect.h"
-#include "scene_manager/node/sub_viewport.h"
-#include "scene_manager/node/2d/sprite_2d.h"
-#include "scene_manager/node/2d/rigid_body_2d.h"
+#include "scene/node/gui/sub_viewport_container.h"
+#include "scene/node/3d/model.h"
+#include "scene/node/gui/texture_rect.h"
+#include "scene/node/sub_viewport.h"
+#include "scene/node/2d/sprite_2d.h"
+#include "scene/node/2d/rigid_body_2d.h"
 
-#include "scene_manager/ecs/coordinator.h"
-#include "scene_manager/ecs/components/components.h"
-#include "scene_manager/ecs/systems/physics_system.h"
-#include "scene_manager/ecs/systems/sprite_render_system.h"
-#include "scene_manager/ecs/systems/model_render_system.h"
+#include "scene/ecs/coordinator.h"
+#include "scene/ecs/components/components.h"
+#include "scene/ecs/systems/physics_system.h"
+#include "scene/ecs/systems/sprite_render_system.h"
+#include "scene/ecs/systems/model_render_system.h"
 
 #include <cstdint>
 #include <memory>
@@ -48,7 +48,7 @@ void App::run() {
     std::uniform_real_distribution<float> rand_scale(0.2f, 0.2f);
     std::uniform_real_distribution<float> rand_gravity(-10.0f, -1.0f);
 
-    // Build scene_manager tree. Use a block, so we don't increase ref counts for the node.
+    // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
         auto node = std::make_shared<Flint::Node>();
         auto node_3d = std::make_shared<Flint::Node3D>();

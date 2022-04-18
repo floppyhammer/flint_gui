@@ -3,7 +3,7 @@
 
 #include "node_2d.h"
 #include "../../../resources/mesh.h"
-#include "../../../rendering/mvp_buffer.h"
+#include "../../../render/mvp_buffer.h"
 
 namespace Flint {
     class Sprite2d : public Node2d {

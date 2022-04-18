@@ -1,6 +1,6 @@
 #include "scene_tree.h"
 
-#include "../rendering/render_server.h"
+#include "../render/render_server.h"
 
 #include <array>
 #include <utility>

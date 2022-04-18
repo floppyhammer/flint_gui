@@ -1,6 +1,6 @@
 #include "rigid_body_2d.h"
 
-#include "../../../rendering/render_server.h"
+#include "../../../render/render_server.h"
 
 namespace Flint {
     RigidBody2d::RigidBody2d() {
