@@ -1,7 +1,7 @@
 #ifndef FLINT_SWAP_CHAIN_H
 #define FLINT_SWAP_CHAIN_H
 
-#include "device.h"
+#include "platform.h"
 
 class SwapChain {
 public:

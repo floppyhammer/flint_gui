@@ -21,7 +21,7 @@ void RenderingServer::createSwapChainRelatedResources(VkRenderPass renderPass, V
 }
 
 void RenderingServer::cleanupSwapChainRelatedResources() const {
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     // Graphics pipeline resources.
     vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
@@ -29,7 +29,7 @@ void RenderingServer::cleanupSwapChainRelatedResources() const {
 }
 
 void RenderingServer::cleanup() {
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     // Pipeline layouts.
     vkDestroyPipelineLayout(device, meshPipelineLayout, nullptr);
@@ -45,7 +45,7 @@ void RenderingServer::cleanup() {
 uint32_t RenderingServer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const {
     VkPhysicalDeviceMemoryProperties memProperties;
     // Reports memory information for the specified physical device.
-    vkGetPhysicalDeviceMemoryProperties(Device::getSingleton().physicalDevice, &memProperties);
+    vkGetPhysicalDeviceMemoryProperties(Platform::getSingleton().physicalDevice, &memProperties);
 
     for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
         if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
@@ -63,7 +63,7 @@ VkShaderModule RenderingServer::createShaderModule(const std::vector<char> &code
     createInfo.pCode = reinterpret_cast<const uint32_t *>(code.data());
 
     VkShaderModule shaderModule;
-    if (vkCreateShaderModule(Device::getSingleton().device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+    if (vkCreateShaderModule(Platform::getSingleton().device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create shader module!");
     }
 
@@ -71,20 +71,20 @@ VkShaderModule RenderingServer::createShaderModule(const std::vector<char> &code
 }
 
 void RenderingServer::createCommandPool() {
-    QueueFamilyIndices qfIndices = Device::getSingleton().findQueueFamilies(Device::getSingleton().physicalDevice);
+    QueueFamilyIndices qfIndices = Platform::getSingleton().findQueueFamilies(Platform::getSingleton().physicalDevice);
 
     VkCommandPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     poolInfo.queueFamilyIndex = qfIndices.graphicsFamily.value();
     poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // So we can reset command buffers.
 
-    if (vkCreateCommandPool(Device::getSingleton().device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
+    if (vkCreateCommandPool(Platform::getSingleton().device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create command pool!");
     }
 }
 
 VkCommandBuffer RenderingServer::beginSingleTimeCommands() const {
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     // Allocate a command buffer.
     // ----------------------------------------
@@ -121,12 +121,12 @@ void RenderingServer::endSingleTimeCommands(VkCommandBuffer commandBuffer) const
     submitInfo.commandBufferCount = 1;
     submitInfo.pCommandBuffers = &commandBuffer;
 
-    vkQueueSubmit(Device::getSingleton().graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(Device::getSingleton().graphicsQueue);
+    vkQueueSubmit(Platform::getSingleton().graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(Platform::getSingleton().graphicsQueue);
     // ----------------------------------------
 
     // Free the command buffer.
-    vkFreeCommandBuffers(Device::getSingleton().device, commandPool, 1, &commandBuffer);
+    vkFreeCommandBuffers(Platform::getSingleton().device, commandPool, 1, &commandBuffer);
 }
 
 void RenderingServer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout,
@@ -253,7 +253,7 @@ void RenderingServer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDevic
 void RenderingServer::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
                                   VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage &image,
                                   VkDeviceMemory &imageMemory) const {
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -296,7 +296,7 @@ void RenderingServer::createImage(uint32_t width, uint32_t height, VkFormat form
 VkImageView RenderingServer::createImageView(VkImage image,
                                              VkFormat format,
                                              VkImageAspectFlags aspectFlags) const {
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     VkImageViewCreateInfo viewInfo{};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -320,7 +320,7 @@ VkImageView RenderingServer::createImageView(VkImage image,
 void RenderingServer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                                    VkMemoryPropertyFlags properties,
                                    VkBuffer &buffer, VkDeviceMemory &bufferMemory) const {
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     // Structure specifying the parameters of a newly created buffer object.
     VkBufferCreateInfo bufferInfo{};
@@ -354,7 +354,7 @@ void RenderingServer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
 }
 
 void RenderingServer::copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize) const {
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     void *data;
     vkMapMemory(device, bufferMemory, 0, dataSize, 0, &data);
@@ -373,7 +373,7 @@ void RenderingServer::createTextureSampler(VkSampler &textureSampler) const {
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
     VkPhysicalDeviceProperties properties{};
-    vkGetPhysicalDeviceProperties(Device::getSingleton().physicalDevice, &properties);
+    vkGetPhysicalDeviceProperties(Platform::getSingleton().physicalDevice, &properties);
 
     samplerInfo.anisotropyEnable = VK_TRUE;
     samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
@@ -392,7 +392,7 @@ void RenderingServer::createTextureSampler(VkSampler &textureSampler) const {
     samplerInfo.minLod = 0.0f;
     samplerInfo.maxLod = 0.0f;
 
-    if (vkCreateSampler(Device::getSingleton().device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
+    if (vkCreateSampler(Platform::getSingleton().device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create texture sampler!");
     }
 }
@@ -508,7 +508,7 @@ void RenderingServer::createMeshDescriptorSetLayout() {
     layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
     layoutInfo.pBindings = bindings.data();
 
-    if (vkCreateDescriptorSetLayout(Device::getSingleton().device, &layoutInfo, nullptr,
+    if (vkCreateDescriptorSetLayout(Platform::getSingleton().device, &layoutInfo, nullptr,
                                     &meshDescriptorSetLayout) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor set layout!");
     }
@@ -549,7 +549,7 @@ void RenderingServer::createBlitDescriptorSetLayout() {
     layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
     layoutInfo.pBindings = bindings.data();
 
-    if (vkCreateDescriptorSetLayout(Device::getSingleton().device, &layoutInfo, nullptr,
+    if (vkCreateDescriptorSetLayout(Platform::getSingleton().device, &layoutInfo, nullptr,
                                     &blitDescriptorSetLayout) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor set layout!");
     }
@@ -676,7 +676,7 @@ void RenderingServer::createMeshGraphicsPipeline(VkRenderPass renderPass,
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
 
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device,
@@ -702,7 +702,7 @@ void RenderingServer::createGraphicsPipelineLayout(VkDescriptorSetLayout &descri
     pipelineLayoutInfo.pushConstantRangeCount = 0;
 
     // Create pipeline layout.
-    if (vkCreatePipelineLayout(Device::getSingleton().device,
+    if (vkCreatePipelineLayout(Platform::getSingleton().device,
                                &pipelineLayoutInfo,
                                nullptr,
                                &graphicsPipelineLayout) != VK_SUCCESS) {
@@ -840,7 +840,7 @@ void RenderingServer::createBlitGraphicsPipeline(VkRenderPass renderPass,
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
 
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device,
@@ -886,8 +886,8 @@ void RenderingServer::createVertexBuffer(std::vector<Vertex> &vertices,
     RS::getSingleton().copyBuffer(stagingBuffer, p_vertex_buffer, bufferSize);
 
     // Clean up staging buffer and memory.
-    vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
-    vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
+    vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
+    vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
 }
 
 void RenderingServer::createIndexBuffer(std::vector<uint32_t> &indices,
@@ -916,6 +916,6 @@ void RenderingServer::createIndexBuffer(std::vector<uint32_t> &indices,
     // Copy data from staging buffer to index buffer.
     RS::getSingleton().copyBuffer(stagingBuffer, p_index_buffer, bufferSize);
 
-    vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
-    vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
+    vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
+    vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
 }

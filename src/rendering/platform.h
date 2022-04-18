@@ -1,5 +1,5 @@
-#ifndef FLINT_DEVICE_H
-#define FLINT_DEVICE_H
+#ifndef FLINT_PLATFORM_H
+#define FLINT_PLATFORM_H
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -40,19 +40,16 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-class Device {
+class Platform {
 public:
-    Device();
+    Platform();
 
-    static Device &getSingleton() {
-        static Device singleton;
+    static Platform &getSingleton() {
+        static Platform singleton;
         return singleton;
     }
 
     GLFWwindow *window;
-
-    VkInstance instance;
-    VkDebugUtilsMessengerEXT debugMessenger;
 
     VkSurfaceKHR surface;
 
@@ -62,37 +59,17 @@ public:
     /// Logical device.
     VkDevice device{};
 
-    static const bool enableValidationLayers = true;
-
     void initWindow();
 
     bool framebufferResized = false;
 
     static void framebufferResizeCallback(GLFWwindow *window, int width, int height) {
-        auto app = reinterpret_cast<Device *>(glfwGetWindowUserPointer(window));
+        auto app = reinterpret_cast<Platform *>(glfwGetWindowUserPointer(window));
         app->framebufferResized = true;
     }
 
-    void createInstance();
-
-    void createSurface();
-
-    bool checkDeviceExtensionSupport(VkPhysicalDevice pPhysicalDevice) const;
-
-    /**
-     * Check if a physical device is suitable.
-     * @param pPhysicalDevice
-     * @return
-     */
-    bool isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const;
-
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) const;
 
-    void pickPhysicalDevice();
-
-    void createLogicalDevice();
-
-    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
 
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
 
@@ -146,8 +123,6 @@ public:
         return true;
     }
 
-    void setupDebugMessenger();
-
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice pPhysicalDevice) const;
 
     VkQueue graphicsQueue;
@@ -162,6 +137,34 @@ public:
                                                VkFormatFeatureFlags features) const;
 
     void cleanup();
+
+private:
+    VkInstance instance;
+    VkDebugUtilsMessengerEXT debugMessenger;
+
+    static const bool enableValidationLayers = true;
+
+    void setupDebugMessenger();
+
+
+    void createInstance();
+
+    void createSurface();
+
+    bool checkDeviceExtensionSupport(VkPhysicalDevice pPhysicalDevice) const;
+
+    /**
+     * Check if a physical device is suitable.
+     * @param pPhysicalDevice
+     * @return
+     */
+    bool isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const;
+
+    void pickPhysicalDevice();
+
+    void createLogicalDevice();
+
+    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
 };
 
-#endif //FLINT_DEVICE_H
+#endif //FLINT_PLATFORM_H

@@ -8,7 +8,7 @@
 #include "stb_image.h"
 
 Texture::~Texture() {
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     vkDestroySampler(device, sampler, nullptr);
 
@@ -67,8 +67,8 @@ void Texture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t
                                              VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     // Clean up staging stuff.
-    vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
-    vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
+    vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
+    vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
 }
 
 std::shared_ptr<Texture> Texture::from_empty(uint32_t p_width, uint32_t p_height) {

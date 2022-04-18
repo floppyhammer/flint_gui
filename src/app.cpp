@@ -1,6 +1,6 @@
 #include "app.h"
 
-#include "rendering/device.h"
+#include "rendering/platform.h"
 #include "rendering/swap_chain.h"
 #include "rendering/rendering_server.h"
 #include "resources/texture.h"
@@ -32,7 +32,7 @@ void App::run() {
     // Initialization.
     // ---------------------------------------------------
     // 1. Initialize hardware.
-    auto device = Device::getSingleton();
+    auto platform = Platform::getSingleton();
 
     // 2. Initialize rendering server.
     auto rs = RS::getSingleton();
@@ -206,7 +206,7 @@ void App::run() {
             input_event.args.mouse_motion.position = {x_pos, y_pos};
             //Flint::Logger::verbose("Cursor movement", "InputEvent");
         };
-        glfwSetCursorPosCallback(Device::getSingleton().window, cursor_position_callback);
+        glfwSetCursorPosCallback(Platform::getSingleton().window, cursor_position_callback);
 
         auto cursor_button_callback = [](GLFWwindow *window, int button, int action, int mods) {
             Flint::InputEvent input_event{};
@@ -215,7 +215,7 @@ void App::run() {
             input_event.args.mouse_button.pressed = action == GLFW_PRESS;
             Flint::Logger::verbose("Cursor button", "InputEvent");
         };
-        glfwSetMouseButtonCallback(Device::getSingleton().window, cursor_button_callback);
+        glfwSetMouseButtonCallback(Platform::getSingleton().window, cursor_button_callback);
     }
 
     main_loop();
@@ -229,7 +229,7 @@ void App::run() {
 
         rs.cleanup();
 
-        device.cleanup();
+        platform.cleanup();
     }
 }
 
@@ -286,13 +286,13 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
 }
 
 void App::main_loop() {
-    while (!glfwWindowShouldClose(Device::getSingleton().window)) {
+    while (!glfwWindowShouldClose(Platform::getSingleton().window)) {
         glfwPollEvents();
         draw_frame();
     }
 
     // Wait on the host for the completion of outstanding queue operations for all queues on a given logical device.
-    vkDeviceWaitIdle(Device::getSingleton().device);
+    vkDeviceWaitIdle(Platform::getSingleton().device);
 }
 
 void App::draw_frame() {

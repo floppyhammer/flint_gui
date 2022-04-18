@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-#include "../rendering/device.h"
+#include "../rendering/platform.h"
 #include "../rendering/swap_chain.h"
 #include "../rendering/mvp_buffer.h"
 
@@ -17,7 +17,7 @@ Mesh2D::Mesh2D() {
 }
 
 Mesh::~Mesh() {
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     // Clean up index buffer.
     vkDestroyBuffer(device, indexBuffer, nullptr);
@@ -54,13 +54,13 @@ void Mesh3D::createDescriptorPool() {
     poolInfo.pPoolSizes = poolSizes.data();
     poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
 
-    if (vkCreateDescriptorPool(Device::getSingleton().device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(Platform::getSingleton().device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor pool!");
     }
 }
 
 void Mesh3D::createDescriptorSets() {
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
     auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
 
@@ -83,7 +83,7 @@ void Mesh3D::updateDescriptorSets(std::shared_ptr<Material> p_material, std::vec
 
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
     auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     for (size_t i = 0; i < swapChainImages.size(); i++) {
         VkDescriptorBufferInfo bufferInfo{};
@@ -140,13 +140,13 @@ void Mesh2D::createDescriptorPool() {
     poolInfo.pPoolSizes = poolSizes.data();
     poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
 
-    if (vkCreateDescriptorPool(Device::getSingleton().device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(Platform::getSingleton().device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor pool!");
     }
 }
 
 void Mesh2D::createDescriptorSets() {
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
     auto &descriptorSetLayout = RS::getSingleton().blitDescriptorSetLayout;
 
@@ -190,8 +190,8 @@ void Mesh2D::create_vertex_buffer() {
     RS::getSingleton().copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
 
     // Clean up staging buffer and memory.
-    vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
-    vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
+    vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
+    vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
 }
 
 void Mesh2D::create_index_buffer() {
@@ -221,8 +221,8 @@ void Mesh2D::create_index_buffer() {
     // Copy data from staging buffer to index buffer.
     RS::getSingleton().copyBuffer(stagingBuffer, indexBuffer, bufferSize);
 
-    vkDestroyBuffer(Device::getSingleton().device, stagingBuffer, nullptr);
-    vkFreeMemory(Device::getSingleton().device, stagingBufferMemory, nullptr);
+    vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
+    vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
 }
 
 void Mesh2D::updateDescriptorSets(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) {
@@ -231,7 +231,7 @@ void Mesh2D::updateDescriptorSets(std::shared_ptr<Material> p_material, std::vec
 
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
     auto &descriptorSetLayout = RS::getSingleton().blitDescriptorSetLayout;
-    auto device = Device::getSingleton().device;
+    auto device = Platform::getSingleton().device;
 
     for (size_t i = 0; i < swapChainImages.size(); i++) {
         VkDescriptorBufferInfo bufferInfo{};

@@ -43,7 +43,7 @@ namespace Flint {
     }
 
     void MvpBuffer::free_uniform_buffers() {
-        auto device = Device::getSingleton().device;
+        auto device = Platform::getSingleton().device;
         auto swapChainImages = SwapChain::getSingleton().swapChainImages;
 
         // Clean up uniform buffers.

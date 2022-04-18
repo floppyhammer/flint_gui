@@ -1,4 +1,4 @@
-#include "device.h"
+#include "platform.h"
 
 #include <stdexcept>
 #include <set>
@@ -24,7 +24,8 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
     }
 }
 
-Device::Device() {
+Platform::Platform() {
+    // Get a GLFW window.
     initWindow();
 
     // Initialize the Vulkan library by creating an instance.
@@ -38,10 +39,11 @@ Device::Device() {
     // Pick a suitable GPU.
     pickPhysicalDevice();
 
+    // Create a logical device.
     createLogicalDevice();
 }
 
-void Device::initWindow() {
+void Platform::initWindow() {
     // Initializes the GLFW library.
     glfwInit();
 
@@ -56,8 +58,8 @@ void Device::initWindow() {
 
     // Get monitor position (used to correctly center the window in a multi-monitor scenario).
     int monitors_count, monitor_x, monitor_y;
-    GLFWmonitor** monitors = glfwGetMonitors(&monitors_count);
-    const GLFWvidmode* videoMode = glfwGetVideoMode(monitors[0]);
+    GLFWmonitor **monitors = glfwGetMonitors(&monitors_count);
+    const GLFWvidmode *videoMode = glfwGetVideoMode(monitors[0]);
     glfwGetMonitorPos(monitors[0], &monitor_x, &monitor_y);
 
     // Get DPI scale.
@@ -78,7 +80,7 @@ void Device::initWindow() {
     glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
-void Device::createInstance() {
+void Platform::createInstance() {
     if (enableValidationLayers && !checkValidationLayerSupport()) {
         throw std::runtime_error("Validation layers requested, but not available!");
     }
@@ -120,7 +122,7 @@ void Device::createInstance() {
     }
 }
 
-VkExtent2D Device::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) const {
+VkExtent2D Platform::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) const {
     if (capabilities.currentExtent.width != UINT32_MAX) {
         return capabilities.currentExtent;
     } else {
@@ -141,7 +143,7 @@ VkExtent2D Device::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities
     }
 }
 
-void Device::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
+void Platform::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
     createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     createInfo.messageSeverity =
@@ -153,7 +155,7 @@ void Device::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT
     createInfo.pfnUserCallback = debugCallback;
 }
 
-void Device::setupDebugMessenger() {
+void Platform::setupDebugMessenger() {
     if (!enableValidationLayers) return;
 
     VkDebugUtilsMessengerCreateInfoEXT createInfo;
@@ -164,13 +166,13 @@ void Device::setupDebugMessenger() {
     }
 }
 
-void Device::createSurface() {
+void Platform::createSurface() {
     if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create window surface!");
     }
 }
 
-bool Device::checkDeviceExtensionSupport(VkPhysicalDevice pPhysicalDevice) const {
+bool Platform::checkDeviceExtensionSupport(VkPhysicalDevice pPhysicalDevice) const {
     uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(pPhysicalDevice, nullptr, &extensionCount, nullptr);
 
@@ -186,7 +188,7 @@ bool Device::checkDeviceExtensionSupport(VkPhysicalDevice pPhysicalDevice) const
     return requiredExtensions.empty();
 }
 
-SwapChainSupportDetails Device::querySwapChainSupport(VkPhysicalDevice pPhysicalDevice) const {
+SwapChainSupportDetails Platform::querySwapChainSupport(VkPhysicalDevice pPhysicalDevice) const {
     SwapChainSupportDetails details;
 
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(pPhysicalDevice, surface, &details.capabilities);
@@ -213,7 +215,7 @@ SwapChainSupportDetails Device::querySwapChainSupport(VkPhysicalDevice pPhysical
     return details;
 }
 
-bool Device::isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const {
+bool Platform::isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const {
     QueueFamilyIndices indices = findQueueFamilies(pPhysicalDevice);
 
     bool extensionsSupported = checkDeviceExtensionSupport(pPhysicalDevice);
@@ -230,7 +232,7 @@ bool Device::isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const {
     return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
 }
 
-void Device::pickPhysicalDevice() {
+void Platform::pickPhysicalDevice() {
     // Enumerates the physical devices accessible to a Vulkan instance.
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -256,7 +258,7 @@ void Device::pickPhysicalDevice() {
     }
 }
 
-VkSurfaceFormatKHR Device::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats) {
+VkSurfaceFormatKHR Platform::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats) {
     for (const auto &availableFormat: availableFormats) {
         if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
             availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -267,7 +269,7 @@ VkSurfaceFormatKHR Device::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFo
     return availableFormats[0];
 }
 
-VkPresentModeKHR Device::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
+VkPresentModeKHR Platform::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
     for (const auto &availablePresentMode: availablePresentModes) {
         if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
             return availablePresentMode;
@@ -277,7 +279,7 @@ VkPresentModeKHR Device::chooseSwapPresentMode(const std::vector<VkPresentModeKH
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-QueueFamilyIndices Device::findQueueFamilies(VkPhysicalDevice pPhysicalDevice) const {
+QueueFamilyIndices Platform::findQueueFamilies(VkPhysicalDevice pPhysicalDevice) const {
     QueueFamilyIndices qfIndices;
 
     // Reports properties of the queues of the specified physical device.
@@ -314,7 +316,7 @@ QueueFamilyIndices Device::findQueueFamilies(VkPhysicalDevice pPhysicalDevice) c
     return qfIndices;
 }
 
-void Device::createLogicalDevice() {
+void Platform::createLogicalDevice() {
     QueueFamilyIndices qfIndices = findQueueFamilies(physicalDevice);
 
     // Structure specifying parameters of a newly created device queue.
@@ -367,12 +369,12 @@ void Device::createLogicalDevice() {
     vkGetDeviceQueue(device, qfIndices.presentFamily.value(), 0, &presentQueue);
 }
 
-VkFormat Device::findSupportedFormat(const std::vector<VkFormat> &candidates,
-                                              VkImageTiling tiling,
-                                              VkFormatFeatureFlags features) const {
+VkFormat Platform::findSupportedFormat(const std::vector<VkFormat> &candidates,
+                                     VkImageTiling tiling,
+                                     VkFormatFeatureFlags features) const {
     for (VkFormat format: candidates) {
         VkFormatProperties props;
-        vkGetPhysicalDeviceFormatProperties(Device::getSingleton().physicalDevice, format, &props);
+        vkGetPhysicalDeviceFormatProperties(Platform::getSingleton().physicalDevice, format, &props);
 
         if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
             return format;
@@ -384,7 +386,7 @@ VkFormat Device::findSupportedFormat(const std::vector<VkFormat> &candidates,
     throw std::runtime_error("Failed to find supported format!");
 }
 
-VkFormat Device::findDepthFormat() const {
+VkFormat Platform::findDepthFormat() const {
     return findSupportedFormat(
             {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
             VK_IMAGE_TILING_OPTIMAL,
@@ -392,7 +394,7 @@ VkFormat Device::findDepthFormat() const {
     );
 }
 
-void Device::cleanup() {
+void Platform::cleanup() {
     vkDestroyDevice(device, nullptr);
 
     if (enableValidationLayers) {

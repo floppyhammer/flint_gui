@@ -11,7 +11,7 @@ namespace Flint {
     }
 
     Viewport::~Viewport() {
-        auto device = Device::getSingleton().device;
+        auto device = Platform::getSingleton().device;
 
         extent_dependent_cleanup();
 
@@ -23,7 +23,7 @@ namespace Flint {
         texture = Texture::from_empty(extent.x, extent.y);
 
         // Depth.
-        VkFormat depthFormat = Device::getSingleton().findDepthFormat();
+        VkFormat depthFormat = Platform::getSingleton().findDepthFormat();
         RS::getSingleton().createImage(extent.x, extent.y,
                                        depthFormat,
                                        VK_IMAGE_TILING_OPTIMAL,
@@ -55,7 +55,7 @@ namespace Flint {
         // Depth attachment.
         // ----------------------------------------
         VkAttachmentDescription depthAttachment{};
-        depthAttachment.format = Device::getSingleton().findDepthFormat();
+        depthAttachment.format = Platform::getSingleton().findDepthFormat();
         depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
         depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -108,7 +108,7 @@ namespace Flint {
         renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
         renderPassInfo.pDependencies = dependencies.data();
 
-        if (vkCreateRenderPass(Device::getSingleton().device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
+        if (vkCreateRenderPass(Platform::getSingleton().device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create render pass!");
         }
     }
@@ -130,7 +130,7 @@ namespace Flint {
             framebufferInfo.height = extent.y;
             framebufferInfo.layers = 1;
 
-            if (vkCreateFramebuffer(Device::getSingleton().device,
+            if (vkCreateFramebuffer(Platform::getSingleton().device,
                                     &framebufferInfo,
                                     nullptr,
                                     &framebuffer) != VK_SUCCESS) {
@@ -190,7 +190,7 @@ namespace Flint {
     }
 
     void Viewport::extent_dependent_cleanup() const {
-        auto device = Device::getSingleton().device;
+        auto device = Platform::getSingleton().device;
 
         vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
         vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);

@@ -1,7 +1,7 @@
 #ifndef FLINT_RENDERING_SERVER_H
 #define FLINT_RENDERING_SERVER_H
 
-#include "device.h"
+#include "platform.h"
 
 #define GLFW_INCLUDE_VULKAN
 
