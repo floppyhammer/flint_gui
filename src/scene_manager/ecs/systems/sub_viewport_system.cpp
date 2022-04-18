@@ -6,7 +6,7 @@
 
 namespace Flint {
     void SubViewportInputSystem::update() {
-        auto command_buffer = RS::getSingleton().beginSingleTimeCommands();
+        auto command_buffer = RenderServer::getSingleton().beginSingleTimeCommands();
 
         auto coordinator = Coordinator::get_singleton();
 
@@ -18,6 +18,6 @@ namespace Flint {
 //        // End render pass.
 //        vkCmdEndRenderPass(p_command_buffer);
 //
-//        RS::getSingleton().endSingleTimeCommands(sub_viewport_command_buffer);
+//        RenderServer::getSingleton().endSingleTimeCommands(sub_viewport_command_buffer);
     }
 }

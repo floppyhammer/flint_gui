@@ -62,7 +62,7 @@ void Mesh3D::createDescriptorPool() {
 void Mesh3D::createDescriptorSets() {
     auto device = Platform::getSingleton().device;
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-    auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
+    auto &descriptorSetLayout = RenderServer::getSingleton().meshDescriptorSetLayout;
 
     std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
@@ -82,7 +82,7 @@ void Mesh3D::updateDescriptorSets(std::shared_ptr<Material> p_material, std::vec
     auto material = std::static_pointer_cast<Material3D>(p_material);
 
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-    auto &descriptorSetLayout = RS::getSingleton().meshDescriptorSetLayout;
+    auto &descriptorSetLayout = RenderServer::getSingleton().meshDescriptorSetLayout;
     auto device = Platform::getSingleton().device;
 
     for (size_t i = 0; i < swapChainImages.size(); i++) {
@@ -148,7 +148,7 @@ void Mesh2D::createDescriptorPool() {
 void Mesh2D::createDescriptorSets() {
     auto device = Platform::getSingleton().device;
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-    auto &descriptorSetLayout = RS::getSingleton().blitDescriptorSetLayout;
+    auto &descriptorSetLayout = RenderServer::getSingleton().blitDescriptorSetLayout;
 
     std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
@@ -170,24 +170,24 @@ void Mesh2D::create_vertex_buffer() {
     VkDeviceMemory stagingBufferMemory; // In CPU
 
     // Create the GPU buffer and link it with the CPU memory.
-    RS::getSingleton().createBuffer(bufferSize,
+    RenderServer::getSingleton().createBuffer(bufferSize,
                                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                                     stagingBuffer,
                                     stagingBufferMemory);
 
     // Copy data to the CPU memory.
-    RS::getSingleton().copyDataToMemory((void *) vertices.data(), stagingBufferMemory, bufferSize);
+    RenderServer::getSingleton().copyDataToMemory((void *) vertices.data(), stagingBufferMemory, bufferSize);
 
     // Create the vertex buffer (GPU) and bind it to the vertex memory (CPU).
-    RS::getSingleton().createBuffer(bufferSize,
+    RenderServer::getSingleton().createBuffer(bufferSize,
                                     VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                                     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                     vertexBuffer,
                                     vertexBufferMemory);
 
     // Copy buffer (GPU).
-    RS::getSingleton().copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+    RenderServer::getSingleton().copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
 
     // Clean up staging buffer and memory.
     vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
@@ -202,24 +202,24 @@ void Mesh2D::create_index_buffer() {
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
-    RS::getSingleton().createBuffer(bufferSize,
+    RenderServer::getSingleton().createBuffer(bufferSize,
                                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                                     stagingBuffer,
                                     stagingBufferMemory);
 
-    RS::getSingleton().copyDataToMemory((void *) indices.data(),
+    RenderServer::getSingleton().copyDataToMemory((void *) indices.data(),
                                         stagingBufferMemory,
                                         bufferSize);
 
-    RS::getSingleton().createBuffer(bufferSize,
+    RenderServer::getSingleton().createBuffer(bufferSize,
                                     VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
                                     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                     indexBuffer,
                                     indexBufferMemory);
 
     // Copy data from staging buffer to index buffer.
-    RS::getSingleton().copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+    RenderServer::getSingleton().copyBuffer(stagingBuffer, indexBuffer, bufferSize);
 
     vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
     vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
@@ -230,7 +230,7 @@ void Mesh2D::updateDescriptorSets(std::shared_ptr<Material> p_material, std::vec
     auto material = std::static_pointer_cast<Material2D>(p_material);
 
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-    auto &descriptorSetLayout = RS::getSingleton().blitDescriptorSetLayout;
+    auto &descriptorSetLayout = RenderServer::getSingleton().blitDescriptorSetLayout;
     auto device = Platform::getSingleton().device;
 
     for (size_t i = 0; i < swapChainImages.size(); i++) {

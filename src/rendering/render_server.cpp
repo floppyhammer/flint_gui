@@ -1,11 +1,11 @@
 #include <stdexcept>
 #include <set>
 
-#include "rendering_server.h"
+#include "render_server.h"
 #include "../resources/mesh.h"
 #include "../common/io.h"
 
-RenderingServer::RenderingServer() {
+RenderServer::RenderServer() {
     createCommandPool();
 
     createMeshDescriptorSetLayout();
@@ -15,12 +15,12 @@ RenderingServer::RenderingServer() {
     createGraphicsPipelineLayout(blitDescriptorSetLayout, blitPipelineLayout);
 }
 
-void RenderingServer::createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
+void RenderServer::createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
     createMeshGraphicsPipeline(renderPass, swapChainExtent, meshGraphicsPipeline);
     createBlitGraphicsPipeline(renderPass, swapChainExtent, blitGraphicsPipeline);
 }
 
-void RenderingServer::cleanupSwapChainRelatedResources() const {
+void RenderServer::cleanupSwapChainRelatedResources() const {
     auto device = Platform::getSingleton().device;
 
     // Graphics pipeline resources.
@@ -28,7 +28,7 @@ void RenderingServer::cleanupSwapChainRelatedResources() const {
     vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);
 }
 
-void RenderingServer::cleanup() {
+void RenderServer::cleanup() {
     auto device = Platform::getSingleton().device;
 
     // Pipeline layouts.
@@ -42,7 +42,7 @@ void RenderingServer::cleanup() {
     vkDestroyCommandPool(device, commandPool, nullptr);
 }
 
-uint32_t RenderingServer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const {
+uint32_t RenderServer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const {
     VkPhysicalDeviceMemoryProperties memProperties;
     // Reports memory information for the specified physical device.
     vkGetPhysicalDeviceMemoryProperties(Platform::getSingleton().physicalDevice, &memProperties);
@@ -56,7 +56,7 @@ uint32_t RenderingServer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFl
     throw std::runtime_error("Failed to find suitable memory type!");
 }
 
-VkShaderModule RenderingServer::createShaderModule(const std::vector<char> &code) {
+VkShaderModule RenderServer::createShaderModule(const std::vector<char> &code) {
     VkShaderModuleCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.codeSize = code.size();
@@ -70,7 +70,7 @@ VkShaderModule RenderingServer::createShaderModule(const std::vector<char> &code
     return shaderModule;
 }
 
-void RenderingServer::createCommandPool() {
+void RenderServer::createCommandPool() {
     QueueFamilyIndices qfIndices = Platform::getSingleton().findQueueFamilies(Platform::getSingleton().physicalDevice);
 
     VkCommandPoolCreateInfo poolInfo{};
@@ -83,7 +83,7 @@ void RenderingServer::createCommandPool() {
     }
 }
 
-VkCommandBuffer RenderingServer::beginSingleTimeCommands() const {
+VkCommandBuffer RenderServer::beginSingleTimeCommands() const {
     auto device = Platform::getSingleton().device;
 
     // Allocate a command buffer.
@@ -110,7 +110,7 @@ VkCommandBuffer RenderingServer::beginSingleTimeCommands() const {
     return commandBuffer;
 }
 
-void RenderingServer::endSingleTimeCommands(VkCommandBuffer commandBuffer) const {
+void RenderServer::endSingleTimeCommands(VkCommandBuffer commandBuffer) const {
     // End recording the command buffer.
     vkEndCommandBuffer(commandBuffer);
 
@@ -129,8 +129,8 @@ void RenderingServer::endSingleTimeCommands(VkCommandBuffer commandBuffer) const
     vkFreeCommandBuffers(Platform::getSingleton().device, commandPool, 1, &commandBuffer);
 }
 
-void RenderingServer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout,
-                                            VkImageLayout newLayout) const {
+void RenderServer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout,
+                                         VkImageLayout newLayout) const {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkImageMemoryBarrier barrier{};
@@ -201,7 +201,7 @@ void RenderingServer::transitionImageLayout(VkImage image, VkFormat format, VkIm
     endSingleTimeCommands(commandBuffer);
 }
 
-void RenderingServer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) const {
+void RenderServer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) const {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     // Structure specifying a buffer image copy operation.
@@ -233,11 +233,11 @@ void RenderingServer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t
     endSingleTimeCommands(commandBuffer);
 }
 
-bool RenderingServer::hasStencilComponent(VkFormat format) {
+bool RenderServer::hasStencilComponent(VkFormat format) {
     return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
-void RenderingServer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const {
+void RenderServer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const {
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     // Send copy command.
@@ -250,9 +250,9 @@ void RenderingServer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDevic
     endSingleTimeCommands(commandBuffer);
 }
 
-void RenderingServer::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
-                                  VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage &image,
-                                  VkDeviceMemory &imageMemory) const {
+void RenderServer::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
+                               VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage &image,
+                               VkDeviceMemory &imageMemory) const {
     auto device = Platform::getSingleton().device;
 
     VkImageCreateInfo imageInfo{};
@@ -293,9 +293,9 @@ void RenderingServer::createImage(uint32_t width, uint32_t height, VkFormat form
     // -------------------------------------
 }
 
-VkImageView RenderingServer::createImageView(VkImage image,
-                                             VkFormat format,
-                                             VkImageAspectFlags aspectFlags) const {
+VkImageView RenderServer::createImageView(VkImage image,
+                                          VkFormat format,
+                                          VkImageAspectFlags aspectFlags) const {
     auto device = Platform::getSingleton().device;
 
     VkImageViewCreateInfo viewInfo{};
@@ -317,9 +317,9 @@ VkImageView RenderingServer::createImageView(VkImage image,
     return imageView;
 }
 
-void RenderingServer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
-                                   VkMemoryPropertyFlags properties,
-                                   VkBuffer &buffer, VkDeviceMemory &bufferMemory) const {
+void RenderServer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
+                                VkMemoryPropertyFlags properties,
+                                VkBuffer &buffer, VkDeviceMemory &bufferMemory) const {
     auto device = Platform::getSingleton().device;
 
     // Structure specifying the parameters of a newly created buffer object.
@@ -353,7 +353,7 @@ void RenderingServer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
     vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
-void RenderingServer::copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize) const {
+void RenderServer::copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize) const {
     auto device = Platform::getSingleton().device;
 
     void *data;
@@ -362,7 +362,7 @@ void RenderingServer::copyDataToMemory(void *src, VkDeviceMemory bufferMemory, s
     vkUnmapMemory(device, bufferMemory);
 }
 
-void RenderingServer::createTextureSampler(VkSampler &textureSampler) const {
+void RenderServer::createTextureSampler(VkSampler &textureSampler) const {
     VkSamplerCreateInfo samplerInfo{};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
     samplerInfo.magFilter = VK_FILTER_LINEAR;
@@ -397,12 +397,12 @@ void RenderingServer::createTextureSampler(VkSampler &textureSampler) const {
     }
 }
 
-void RenderingServer::blit(VkCommandBuffer commandBuffer,
-                           VkPipeline graphicsPipeline,
-                           const VkDescriptorSet &descriptorSet,
-                           VkBuffer vertexBuffers[],
-                           VkBuffer indexBuffer,
-                           uint32_t indexCount) const {
+void RenderServer::blit(VkCommandBuffer commandBuffer,
+                        VkPipeline graphicsPipeline,
+                        const VkDescriptorSet &descriptorSet,
+                        VkBuffer vertexBuffers[],
+                        VkBuffer indexBuffer,
+                        uint32_t indexCount) const {
     // Bind pipeline.
     vkCmdBindPipeline(commandBuffer,
                       VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -435,12 +435,12 @@ void RenderingServer::blit(VkCommandBuffer commandBuffer,
     vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 }
 
-void RenderingServer::draw_mesh(VkCommandBuffer commandBuffer,
-                                VkPipeline graphicsPipeline,
-                                const VkDescriptorSet &descriptorSet,
-                                VkBuffer vertexBuffers[],
-                                VkBuffer indexBuffer,
-                                uint32_t indexCount) const {
+void RenderServer::draw_mesh(VkCommandBuffer commandBuffer,
+                             VkPipeline graphicsPipeline,
+                             const VkDescriptorSet &descriptorSet,
+                             VkBuffer vertexBuffers[],
+                             VkBuffer indexBuffer,
+                             uint32_t indexCount) const {
     // Bind pipeline.
     vkCmdBindPipeline(commandBuffer,
                       VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -473,7 +473,7 @@ void RenderingServer::draw_mesh(VkCommandBuffer commandBuffer,
     vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 }
 
-void RenderingServer::createMeshDescriptorSetLayout() {
+void RenderServer::createMeshDescriptorSetLayout() {
     // MVP uniform binding.
     // ------------------------------
     VkDescriptorSetLayoutBinding uboLayoutBinding{};
@@ -514,7 +514,7 @@ void RenderingServer::createMeshDescriptorSetLayout() {
     }
 }
 
-void RenderingServer::createBlitDescriptorSetLayout() {
+void RenderServer::createBlitDescriptorSetLayout() {
     // MVP uniform binding.
     // ------------------------------
     VkDescriptorSetLayoutBinding uboLayoutBinding{};
@@ -555,9 +555,9 @@ void RenderingServer::createBlitDescriptorSetLayout() {
     }
 }
 
-void RenderingServer::createMeshGraphicsPipeline(VkRenderPass renderPass,
-                                                 VkExtent2D viewportExtent,
-                                                 VkPipeline &graphicsPipeline) {
+void RenderServer::createMeshGraphicsPipeline(VkRenderPass renderPass,
+                                              VkExtent2D viewportExtent,
+                                              VkPipeline &graphicsPipeline) {
     auto vertShaderCode = readFile("../src/shaders/mesh_instance.vert.spv");
     auto fragShaderCode = readFile("../src/shaders/mesh_instance.frag.spv");
 
@@ -693,8 +693,8 @@ void RenderingServer::createMeshGraphicsPipeline(VkRenderPass renderPass,
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
-void RenderingServer::createGraphicsPipelineLayout(VkDescriptorSetLayout &descriptorSetLayout,
-                                                   VkPipelineLayout &graphicsPipelineLayout) {
+void RenderServer::createGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
+                                                VkPipelineLayout &graphicsPipelineLayout) {
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1;
@@ -710,9 +710,9 @@ void RenderingServer::createGraphicsPipelineLayout(VkDescriptorSetLayout &descri
     }
 }
 
-void RenderingServer::createBlitGraphicsPipeline(VkRenderPass renderPass,
-                                                 VkExtent2D viewportExtent,
-                                                 VkPipeline &graphicsPipeline) {
+void RenderServer::createBlitGraphicsPipeline(VkRenderPass renderPass,
+                                              VkExtent2D viewportExtent,
+                                              VkPipeline &graphicsPipeline) {
     auto vertShaderCode = readFile("../src/shaders/blit_vert.spv");
     auto fragShaderCode = readFile("../src/shaders/blit_frag.spv");
 
@@ -857,64 +857,64 @@ void RenderingServer::createBlitGraphicsPipeline(VkRenderPass renderPass,
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
-void RenderingServer::createVertexBuffer(std::vector<Vertex> &vertices,
-                                         VkBuffer &p_vertex_buffer,
-                                         VkDeviceMemory &p_vertex_buffer_memory) {
+void RenderServer::createVertexBuffer(std::vector<Vertex> &vertices,
+                                      VkBuffer &p_vertex_buffer,
+                                      VkDeviceMemory &p_vertex_buffer_memory) {
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
     VkBuffer stagingBuffer; // In GPU
     VkDeviceMemory stagingBufferMemory; // In CPU
 
     // Create the GPU buffer and link it with the CPU memory.
-    RS::getSingleton().createBuffer(bufferSize,
-                                    VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                    stagingBuffer,
-                                    stagingBufferMemory);
+    createBuffer(bufferSize,
+                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                 stagingBuffer,
+                 stagingBufferMemory);
 
     // Copy data to the CPU memory.
-    RS::getSingleton().copyDataToMemory(vertices.data(), stagingBufferMemory, bufferSize);
+    copyDataToMemory(vertices.data(), stagingBufferMemory, bufferSize);
 
     // Create the vertex buffer (GPU) and bind it to the vertex memory (CPU).
-    RS::getSingleton().createBuffer(bufferSize,
-                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                    p_vertex_buffer,
-                                    p_vertex_buffer_memory);
+    createBuffer(bufferSize,
+                 VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                 p_vertex_buffer,
+                 p_vertex_buffer_memory);
 
     // Copy buffer (GPU).
-    RS::getSingleton().copyBuffer(stagingBuffer, p_vertex_buffer, bufferSize);
+    copyBuffer(stagingBuffer, p_vertex_buffer, bufferSize);
 
     // Clean up staging buffer and memory.
     vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
     vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
 }
 
-void RenderingServer::createIndexBuffer(std::vector<uint32_t> &indices,
-                                        VkBuffer &p_index_buffer,
-                                        VkDeviceMemory &p_index_buffer_memory) {
+void RenderServer::createIndexBuffer(std::vector<uint32_t> &indices,
+                                     VkBuffer &p_index_buffer,
+                                     VkDeviceMemory &p_index_buffer_memory) {
     VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
-    RS::getSingleton().createBuffer(bufferSize,
-                                    VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                    stagingBuffer,
-                                    stagingBufferMemory);
+    createBuffer(bufferSize,
+                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                 stagingBuffer,
+                 stagingBufferMemory);
 
-    RS::getSingleton().copyDataToMemory(indices.data(),
-                                        stagingBufferMemory,
-                                        bufferSize);
+    copyDataToMemory(indices.data(),
+                     stagingBufferMemory,
+                     bufferSize);
 
-    RS::getSingleton().createBuffer(bufferSize,
-                                    VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                    p_index_buffer,
-                                    p_index_buffer_memory);
+    createBuffer(bufferSize,
+                 VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                 p_index_buffer,
+                 p_index_buffer_memory);
 
     // Copy data from staging buffer to index buffer.
-    RS::getSingleton().copyBuffer(stagingBuffer, p_index_buffer, bufferSize);
+    copyBuffer(stagingBuffer, p_index_buffer, bufferSize);
 
     vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
     vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);

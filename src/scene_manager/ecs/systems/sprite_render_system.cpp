@@ -51,10 +51,10 @@ namespace Flint {
         for (auto const &entity: entities) {
             auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
 
-            VkPipeline pipeline = RS::getSingleton().blitGraphicsPipeline;
+            VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
 
             VkBuffer vertexBuffers[] = {sprite.mesh->vertexBuffer};
-            RS::getSingleton().blit(
+            RenderServer::getSingleton().blit(
                     command_buffer,
                     pipeline,
                     sprite.mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),
@@ -108,10 +108,10 @@ namespace Flint {
         for (auto const &entity: entities) {
             auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
 
-            VkPipeline pipeline = RS::getSingleton().blitGraphicsPipeline;
+            VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
 
             VkBuffer vertexBuffers[] = {sprite.mesh->vertexBuffer};
-            RS::getSingleton().blit(
+            RenderServer::getSingleton().blit(
                     command_buffer,
                     pipeline,
                     sprite.mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),

@@ -5,7 +5,7 @@
 
 #include "GLFW/glfw3.h"
 
-#include "../rendering/rendering_server.h"
+#include "../rendering/render_server.h"
 
 #include <memory>
 

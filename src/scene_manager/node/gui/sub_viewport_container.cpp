@@ -37,14 +37,14 @@ namespace Flint {
         // to call the sub-viewport draw function below specifically.
         // Also, we can't interrupt our previous render pass.
 
-        auto sub_viewport_command_buffer = RS::getSingleton().beginSingleTimeCommands();
+        auto sub_viewport_command_buffer = RenderServer::getSingleton().beginSingleTimeCommands();
 
         // Start sub-viewport render pass.
         if (viewport != nullptr) {
             viewport->_draw(sub_viewport_command_buffer);
         }
 
-        RS::getSingleton().endSingleTimeCommands(sub_viewport_command_buffer);
+        RenderServer::getSingleton().endSingleTimeCommands(sub_viewport_command_buffer);
 
         // Now draw the rendered sub-viewport texture.
         draw(p_command_buffer);
@@ -53,7 +53,7 @@ namespace Flint {
     void SubViewportContainer::draw(VkCommandBuffer p_command_buffer) {
         Node *viewport_node = get_viewport();
 
-        VkPipeline pipeline = RS::getSingleton().blitGraphicsPipeline;
+        VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
@@ -61,7 +61,7 @@ namespace Flint {
         }
 
         VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
-        RS::getSingleton().blit(
+        RenderServer::getSingleton().blit(
                 p_command_buffer,
                 pipeline,
                 mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),

@@ -1,7 +1,7 @@
 #include "swap_chain.h"
 
 #include "platform.h"
-#include "rendering_server.h"
+#include "render_server.h"
 
 #include <cstdint>
 #include <memory>
@@ -30,7 +30,7 @@ void SwapChain::initSwapChain() {
     // Create a command buffer for each swap chain image.
     createCommandBuffers();
 
-    RS::getSingleton().createSwapChainRelatedResources(renderPass, swapChainExtent);
+    RenderServer::getSingleton().createSwapChainRelatedResources(renderPass, swapChainExtent);
 }
 
 void SwapChain::recreateSwapChain() {
@@ -55,7 +55,7 @@ void SwapChain::cleanupSwapChain() {
     auto device = Platform::getSingleton().device;
 
     // Command buffers contain swap chain related info, so we also need to free them here.
-    RS::getSingleton().cleanupSwapChainRelatedResources();
+    RenderServer::getSingleton().cleanupSwapChainRelatedResources();
 
     // Depth resources.
     vkDestroyImageView(device, depthImageView, nullptr);
@@ -69,7 +69,7 @@ void SwapChain::cleanupSwapChain() {
 
     // Only command buffers are freed but not the pool.
     vkFreeCommandBuffers(device,
-                         RS::getSingleton().commandPool,
+                         RenderServer::getSingleton().commandPool,
                          static_cast<uint32_t>(commandBuffers.size()),
                          commandBuffers.data());
 
@@ -160,20 +160,20 @@ void SwapChain::createImageViews() {
     swapChainImageViews.resize(swapChainImages.size());
 
     for (uint32_t i = 0; i < swapChainImages.size(); i++) {
-        swapChainImageViews[i] = RS::getSingleton().createImageView(swapChainImages[i], swapChainImageFormat,
+        swapChainImageViews[i] = RenderServer::getSingleton().createImageView(swapChainImages[i], swapChainImageFormat,
                                                                     VK_IMAGE_ASPECT_COLOR_BIT);
     }
 }
 
 void SwapChain::createDepthResources() {
     VkFormat depthFormat = Platform::getSingleton().findDepthFormat();
-    RS::getSingleton().createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL,
+    RenderServer::getSingleton().createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL,
                                    VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                    depthImage,
                                    depthImageMemory);
-    depthImageView = RS::getSingleton().createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+    depthImageView = RenderServer::getSingleton().createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 
-    RS::getSingleton().transitionImageLayout(depthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED,
+    RenderServer::getSingleton().transitionImageLayout(depthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED,
                                              VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 }
 
@@ -325,7 +325,7 @@ void SwapChain::createCommandBuffers() {
     // Allocate command buffers.
     VkCommandBufferAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.commandPool = RS::getSingleton().commandPool;
+    allocInfo.commandPool = RenderServer::getSingleton().commandPool;
     allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocInfo.commandBufferCount = (uint32_t) commandBuffers.size();
 

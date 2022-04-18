@@ -59,13 +59,11 @@ public:
     /// Logical device.
     VkDevice device{};
 
-    void initWindow();
-
     bool framebufferResized = false;
 
     static void framebufferResizeCallback(GLFWwindow *window, int width, int height) {
-        auto app = reinterpret_cast<Platform *>(glfwGetWindowUserPointer(window));
-        app->framebufferResized = true;
+        auto platform = reinterpret_cast<Platform *>(glfwGetWindowUserPointer(window));
+        platform->framebufferResized = true;
     }
 
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) const;
@@ -144,8 +142,10 @@ private:
 
     static const bool enableValidationLayers = true;
 
-    void setupDebugMessenger();
+private:
+    void initWindow();
 
+    void setupDebugMessenger();
 
     void createInstance();
 

@@ -34,7 +34,7 @@ namespace Flint {
     void Model::draw(VkCommandBuffer p_command_buffer) {
         Node *viewport_node = get_viewport();
 
-        VkPipeline pipeline = RS::getSingleton().meshGraphicsPipeline;
+        VkPipeline pipeline = RenderServer::getSingleton().meshGraphicsPipeline;
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
@@ -43,7 +43,7 @@ namespace Flint {
 
         for (const auto &mesh: meshes) {
             VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
-            RS::getSingleton().draw_mesh(
+            RenderServer::getSingleton().draw_mesh(
                     p_command_buffer,
                     pipeline,
                     mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),

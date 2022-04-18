@@ -54,11 +54,11 @@ namespace Flint {
 
             auto &model = coordinator.get_component<ModelComponent>(entity);
 
-            VkPipeline pipeline = RS::getSingleton().meshGraphicsPipeline;
+            VkPipeline pipeline = RenderServer::getSingleton().meshGraphicsPipeline;
 
             for (const auto &mesh: model.meshes) {
                 VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
-                RS::getSingleton().draw_mesh(
+                RenderServer::getSingleton().draw_mesh(
                         command_buffer,
                         pipeline,
                         mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),

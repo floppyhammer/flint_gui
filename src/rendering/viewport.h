@@ -3,7 +3,7 @@
 
 #include "../common/vec2.h"
 #include "../common/color.h"
-#include "rendering_server.h"
+#include "render_server.h"
 #include "../resources/texture.h"
 
 namespace Flint {

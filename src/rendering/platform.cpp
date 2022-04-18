@@ -76,6 +76,7 @@ void Platform::initWindow() {
     // Show window.
     glfwShowWindow(window);
 
+    // Assign this to window user, so we can fetch it when window size changes.
     glfwSetWindowUserPointer(window, this);
     glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }

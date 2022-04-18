@@ -6,7 +6,7 @@
 #include "../node.h"
 #include "../../../common/vec2.h"
 #include "../../../resources/mesh.h"
-#include "../../../rendering/rendering_server.h"
+#include "../../../rendering/render_server.h"
 #include "../../../rendering/mvp_buffer.h"
 
 namespace Flint {

@@ -5,7 +5,7 @@
 #include "mvp_buffer.h"
 
 #include "swap_chain.h"
-#include "rendering_server.h"
+#include "render_server.h"
 
 namespace Flint {
     MvpBuffer::MvpBuffer() {
@@ -25,11 +25,12 @@ namespace Flint {
         uniform_buffers_memory.resize(swapChainImages.size());
 
         for (size_t i = 0; i < swapChainImages.size(); i++) {
-            RS::getSingleton().createBuffer(bufferSize,
-                                            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                                            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                            uniform_buffers[i],
-                                            uniform_buffers_memory[i]);
+            RenderServer::getSingleton().createBuffer(bufferSize,
+                                                      VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                      VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                                      uniform_buffers[i],
+                                                      uniform_buffers_memory[i]);
         }
     }
 
@@ -37,9 +38,9 @@ namespace Flint {
         if (uniform_buffers_memory.empty()) return;
 
         // Copy the UBO data to the current uniform buffer.
-        RS::getSingleton().copyDataToMemory(&ubo,
-                                            uniform_buffers_memory[SwapChain::getSingleton().currentImage],
-                                            sizeof(ubo));
+        RenderServer::getSingleton().copyDataToMemory(&ubo,
+                                                      uniform_buffers_memory[SwapChain::getSingleton().currentImage],
+                                                      sizeof(ubo));
     }
 
     void MvpBuffer::free_uniform_buffers() {

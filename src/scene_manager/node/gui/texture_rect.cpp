@@ -50,7 +50,7 @@ namespace Flint {
     void TextureRect::draw(VkCommandBuffer p_command_buffer) {
         Node *viewport_node = get_viewport();
 
-        VkPipeline pipeline = RS::getSingleton().blitGraphicsPipeline;
+        VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
@@ -58,7 +58,7 @@ namespace Flint {
         }
 
         VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
-        RS::getSingleton().blit(
+        RenderServer::getSingleton().blit(
                 p_command_buffer,
                 pipeline,
                 mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),

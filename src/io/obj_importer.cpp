@@ -28,7 +28,7 @@ namespace Flint {
     void ObjImporter::load_file(const std::string &filename,
                                 std::vector<std::shared_ptr<Mesh3D>> &meshes,
                                 std::vector<std::shared_ptr<Material3D>> &materials,
-                                const std::shared_ptr<MvpBuffer>& mvp_buffer) {
+                                const std::shared_ptr<MvpBuffer> &mvp_buffer) {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> obj_materials;
@@ -45,7 +45,8 @@ namespace Flint {
 
         // Load materials.
         if (obj_materials.empty()) {
-            Logger::warn("No material found in the .mtl file or no .mtl file found at " + file_directory, "OBJ Importer");
+            Logger::warn("No material found in the .mtl file or no .mtl file found at " + file_directory,
+                         "OBJ Importer");
 
             // Default material.
             materials.push_back(Material3D::from_default());
@@ -106,8 +107,8 @@ namespace Flint {
 
             mesh->indices_count = indices.size();
 
-            RenderingServer::createVertexBuffer(vertices, mesh->vertexBuffer, mesh->vertexBufferMemory);
-            RenderingServer::createIndexBuffer(indices, mesh->indexBuffer, mesh->indexBufferMemory);
+            RenderServer::getSingleton().createVertexBuffer(vertices, mesh->vertexBuffer, mesh->vertexBufferMemory);
+            RenderServer::getSingleton().createIndexBuffer(indices, mesh->indexBuffer, mesh->indexBufferMemory);
 
             if (mesh->material_id > 0 && mesh->material_id < materials.size()) {
                 mesh->updateDescriptorSets(materials[mesh->material_id], mvp_buffer->uniform_buffers);

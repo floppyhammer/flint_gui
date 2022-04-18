@@ -3,7 +3,7 @@
 
 #include "node.h"
 #include "../../common/vec2.h"
-#include "../../rendering/rendering_server.h"
+#include "../../rendering/render_server.h"
 #include "../../resources/texture.h"
 #include "../../rendering/viewport.h"
 #include "../../core/scene_tree.h"

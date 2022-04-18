@@ -2,7 +2,7 @@
 
 #include "rendering/platform.h"
 #include "rendering/swap_chain.h"
-#include "rendering/rendering_server.h"
+#include "rendering/render_server.h"
 #include "resources/texture.h"
 #include "core/engine.h"
 #include "core/input_event.h"
@@ -35,7 +35,7 @@ void App::run() {
     auto platform = Platform::getSingleton();
 
     // 2. Initialize rendering server.
-    auto rs = RS::getSingleton();
+    auto render_server = RenderServer::getSingleton();
 
     // 3. Initialize swap chain.
     auto swap_chain = SwapChain::getSingleton();
@@ -227,7 +227,7 @@ void App::run() {
 
         swap_chain.cleanup();
 
-        rs.cleanup();
+        render_server.cleanup();
 
         platform.cleanup();
     }

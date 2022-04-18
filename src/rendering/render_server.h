@@ -1,5 +1,5 @@
-#ifndef FLINT_RENDERING_SERVER_H
-#define FLINT_RENDERING_SERVER_H
+#ifndef FLINT_RENDER_SERVER_H
+#define FLINT_RENDER_SERVER_H
 
 #include "platform.h"
 
@@ -59,14 +59,14 @@ struct Vertex {
     }
 };
 
-class RenderingServer {
+class RenderServer {
 public:
-    static RenderingServer &getSingleton() {
-        static RenderingServer singleton;
+    static RenderServer &getSingleton() {
+        static RenderServer singleton;
         return singleton;
     }
 
-    RenderingServer();
+    RenderServer();
 
     void createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent);
 
@@ -175,12 +175,12 @@ public:
     void createMeshDescriptorSetLayout();
 
     /**
-     * Create pipeline layout. Must do this before creating pipeline.
-     * @param descriptorSetLayout Descriptor set layout of the pipeline.
-     * @param graphicsPipelineLayout Output.
-     * dependency VkDescriptorSetLayout.
+     * Create pipeline layout. Must do this before creating pipelines.
+     * @param descriptorSetLayout Layout for the descriptor set of the pipeline.
+     * @param graphicsPipelineLayout OUTPUT
+     * @dependency VkDescriptorSetLayout
      */
-    void createGraphicsPipelineLayout(VkDescriptorSetLayout &descriptorSetLayout,
+    void createGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
                                       VkPipelineLayout &graphicsPipelineLayout);
 
     /**
@@ -225,15 +225,13 @@ public:
 
     void createBlitDescriptorSetLayout();
 
-    static void createIndexBuffer(std::vector<uint32_t> &indices,
+    void createIndexBuffer(std::vector<uint32_t> &indices,
                                   VkBuffer &p_index_buffer,
                                   VkDeviceMemory &p_index_buffer_memory);
 
-    static void createVertexBuffer(std::vector<Vertex> &vertices,
+    void createVertexBuffer(std::vector<Vertex> &vertices,
                                    VkBuffer &p_vertex_buffer,
                                    VkDeviceMemory &p_vertex_buffer_memory);
 };
 
-typedef RenderingServer RS;
-
-#endif //FLINT_RENDERING_SERVER_H
+#endif //FLINT_RENDER_SERVER_H
