@@ -57,21 +57,25 @@ void App::run() {
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
 
-        auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
-        rigid_body_2d->position = {rand_position(generator), rand_position(generator)};
-        rigid_body_2d->velocity = {rand_velocity(generator), rand_velocity(generator)};
-        auto sprite_2d = std::make_shared<Flint::Sprite2d>();
-        sprite_2d->set_texture(Texture::from_file("../assets/duck.png"));
-        rigid_body_2d->add_child(sprite_2d);
+        auto tex = Texture::from_file("../assets/duck.png");
 
-        node->add_child(rigid_body_2d);
-        node->add_child(mesh_instance_0);
-        node->add_child(sub_viewport_c);
-        sub_viewport_c->add_child(sub_viewport);
-        sub_viewport_c->set_viewport(sub_viewport);
-        sub_viewport->add_child(node_3d);
-        node_3d->add_child(mesh_instance_1);
-        //tree.set_root(node);
+        for (int i = 0; i < 0; i++) {
+            auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
+            rigid_body_2d->position = {rand_position(generator), rand_position(generator)};
+            rigid_body_2d->velocity = {rand_velocity(generator), rand_velocity(generator)};
+            auto sprite_2d = std::make_shared<Flint::Sprite2d>();
+            sprite_2d->set_texture(tex);
+            rigid_body_2d->add_child(sprite_2d);
+            node->add_child(rigid_body_2d);
+        }
+
+//        node->add_child(mesh_instance_0);
+//        node->add_child(sub_viewport_c);
+//        sub_viewport_c->add_child(sub_viewport);
+//        sub_viewport_c->set_viewport(sub_viewport);
+//        sub_viewport->add_child(node_3d);
+//        node_3d->add_child(mesh_instance_1);
+        tree.set_root(node);
     }
 
     {
@@ -125,7 +129,7 @@ void App::run() {
         }
 
         // Allocate space for entities.
-        entities.resize(1000);
+        entities.resize(100);
 
         auto tex = Texture::from_file("../assets/duck.png");
 

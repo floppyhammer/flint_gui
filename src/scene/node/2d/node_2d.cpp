@@ -17,6 +17,7 @@ namespace Flint {
         return position;
     }
 
+    // FIXME: Should make these resources shared by nodes.
     void Node2d::init_default_mesh() {
         mesh = Mesh2D::from_default();
         desc_set = std::make_shared<Mesh2dDescSet>();

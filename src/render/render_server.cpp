@@ -817,7 +817,7 @@ void RenderServer::createBlitGraphicsPipeline(VkRenderPass renderPass,
     VkPipelineDepthStencilStateCreateInfo depthStencil{};
     depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     depthStencil.depthTestEnable = VK_TRUE;
-    // In general, when you use blending you should keep depth test enabled, but disable depth write.
+    // In general, when using blending we should keep depth test enabled, but disable depth write.
     depthStencil.depthWriteEnable = VK_FALSE;
     depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
     depthStencil.depthBoundsTestEnable = VK_FALSE;
