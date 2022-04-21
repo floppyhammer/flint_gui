@@ -19,7 +19,7 @@ namespace Flint {
     void Sprite2d::set_texture(std::shared_ptr<Texture> p_texture) {
         material->texture = p_texture;
 
-        mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
+        desc_set->updateDescriptorSet(material, mvp_buffer->uniform_buffers);
     }
 
     std::shared_ptr<Texture> Sprite2d::get_texture() const {
@@ -97,7 +97,7 @@ namespace Flint {
         RenderServer::getSingleton().blit(
                 p_command_buffer,
                 pipeline,
-                mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
                 vertexBuffers,
                 mesh->indexBuffer,
                 mesh->indices_count);

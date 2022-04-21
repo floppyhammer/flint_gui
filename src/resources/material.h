@@ -8,7 +8,7 @@
 
 /// Material Resources
 
-class Material {
+class Material : public Resource {
 public:
     // Material name for debugging reason.
     std::string name;

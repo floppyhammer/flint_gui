@@ -71,7 +71,7 @@ void App::run() {
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
         node_3d->add_child(mesh_instance_1);
-        tree.set_root(node);
+        //tree.set_root(node);
     }
 
     {
@@ -123,9 +123,13 @@ void App::run() {
         }
 
         // Allocate space for entities.
-        entities.resize(10);
+        entities.resize(1000);
 
         auto tex = Texture::from_file("../assets/duck.png");
+
+        auto material = std::make_shared<Material2D>();
+        material->texture = tex;
+        auto mesh = Mesh2D::from_default();
 
         // Create entities.
         for (auto &entity: entities) {
@@ -133,17 +137,15 @@ void App::run() {
 
             // Render components.
             {
-                auto material = std::make_shared<Material2D>();
-                material->texture = tex;
-
                 auto mvp_buffer = std::make_shared<Flint::MvpBuffer>();
 
-                auto mesh = Mesh2D::from_default();
-                mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
+                auto desc_set = std::make_shared<Mesh2dDescSet>();
+                desc_set->updateDescriptorSet(material, mvp_buffer->uniform_buffers);
 
                 coordinator.add_component(
                         entity,
-                        Flint::Sprite2dComponent{mesh, material});
+                        Flint::Sprite2dComponent{mesh, desc_set, material});
+
                 coordinator.add_component(
                         entity,
                         Flint::MvpComponent{mvp_buffer});
@@ -177,13 +179,14 @@ void App::run() {
         auto entity = coordinator.create_entity();
         {
             auto meshes = std::vector<std::shared_ptr<Mesh3D>>();
+            auto desc_sets = std::vector<std::shared_ptr<Mesh3dDescSet>>();
             auto materials = std::vector<std::shared_ptr<Material3D>>();
-            auto mvp_buffer = std::make_shared<Flint::MvpBuffer>();
-            Flint::ObjImporter::load_file("../assets/viking_room/viking_room.obj", meshes, materials, mvp_buffer);;
+            auto mvp_buffer = std::make_shared<Flint::MvpBuffer>(); // We only need a single mvp buffer.
+            Flint::ObjImporter::load_file("../assets/viking_room/viking_room.obj", meshes, desc_sets, materials, mvp_buffer);
 
             coordinator.add_component(
                     entity,
-                    Flint::ModelComponent{meshes, materials, mvp_buffer});
+                    Flint::ModelComponent{meshes, desc_sets, materials, mvp_buffer});
 
             Flint::Transform3dComponent transform;
             transform.position.x = 0.5;
@@ -244,7 +247,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
         throw std::runtime_error("Failed to begin recording command buffer!");
     }
 
-    // Begin render pass.
+    // Begin render pass. We bind the target framebuffer here.
     // We can only do this once for the main render pass due to the clear operation.
     {
         VkRenderPassBeginInfo renderPassInfo{};
@@ -252,7 +255,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
         renderPassInfo.renderPass = SwapChain::getSingleton().renderPass;
         renderPassInfo.framebuffer = SwapChain::getSingleton().swapChainFramebuffers[imageIndex]; // Set target framebuffer.
         renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = SwapChain::getSingleton().swapChainExtent;
+        renderPassInfo.renderArea.extent = SwapChain::getSingleton().swapChainExtent; // Has to be larger than the area we're going to draw.
 
         // Clear color.
         std::array<VkClearValue, 2> clearValues{};
@@ -271,9 +274,9 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
     {
         tree.draw(commandBuffers[imageIndex]);
 
-//        sprite_render_system->draw(commandBuffers[imageIndex]);
-//
-//        model_render_system->draw(commandBuffers[imageIndex]);
+        sprite_render_system->draw(commandBuffers[imageIndex]);
+
+        model_render_system->draw(commandBuffers[imageIndex]);
     }
 
     // End render pass.

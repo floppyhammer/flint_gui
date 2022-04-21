@@ -53,6 +53,7 @@ namespace Flint {
     // -----------------------------
     struct Sprite2dComponent {
         std::shared_ptr<Mesh2D> mesh;
+        std::shared_ptr<Mesh2dDescSet> desc_set;
         std::shared_ptr<Material2D> material;
     };
 
@@ -74,8 +75,8 @@ namespace Flint {
 
     struct ModelComponent {
         std::vector<std::shared_ptr<Mesh3D>> meshes;
+        std::vector<std::shared_ptr<Mesh3dDescSet>> desc_sets;
         std::vector<std::shared_ptr<Material3D>> materials;
-
         std::shared_ptr<MvpBuffer> mvp_buffer;
     };
 

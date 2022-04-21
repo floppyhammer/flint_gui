@@ -57,7 +57,7 @@ namespace Flint {
             RenderServer::getSingleton().blit(
                     command_buffer,
                     pipeline,
-                    sprite.mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                    sprite.desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
                     vertexBuffers,
                     sprite.mesh->indexBuffer,
                     sprite.mesh->indices_count);
@@ -114,7 +114,7 @@ namespace Flint {
             RenderServer::getSingleton().blit(
                     command_buffer,
                     pipeline,
-                    sprite.mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                    sprite.desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
                     vertexBuffers,
                     sprite.mesh->indexBuffer,
                     sprite.mesh->indices_count);

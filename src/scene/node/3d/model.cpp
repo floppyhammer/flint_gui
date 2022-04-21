@@ -41,12 +41,15 @@ namespace Flint {
             pipeline = viewport->viewport->meshGraphicsPipeline;
         }
 
-        for (const auto &mesh: meshes) {
+        for (int i = 0; i < meshes.size(); i++) {
+            const auto &mesh = meshes[i];
+            const auto &desc_set = desc_sets[i];
+
             VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
             RenderServer::getSingleton().draw_mesh(
                     p_command_buffer,
                     pipeline,
-                    mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                    desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
                     vertexBuffers,
                     mesh->indexBuffer,
                     mesh->indices_count);
@@ -54,6 +57,6 @@ namespace Flint {
     }
 
     void Model::load_file(const std::string &filename) {
-        ObjImporter::load_file(filename, meshes, materials, mvp_buffer);
+        ObjImporter::load_file(filename, meshes, desc_sets, materials, mvp_buffer);
     }
 }

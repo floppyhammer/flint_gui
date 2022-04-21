@@ -19,6 +19,7 @@ namespace Flint {
 
     void Node2d::init_default_mesh() {
         mesh = Mesh2D::from_default();
+        desc_set = std::make_shared<Mesh2dDescSet>();
         material = std::make_shared<Material2D>();
     }
 }

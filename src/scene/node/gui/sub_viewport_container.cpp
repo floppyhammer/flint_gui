@@ -18,7 +18,7 @@ namespace Flint {
 
         material->texture = viewport->get_texture();
 
-        mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
+        //mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
     }
 
     void SubViewportContainer::_update(double delta) {
@@ -61,12 +61,12 @@ namespace Flint {
         }
 
         VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
-        RenderServer::getSingleton().blit(
-                p_command_buffer,
-                pipeline,
-                mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),
-                vertexBuffers,
-                mesh->indexBuffer,
-                mesh->indices_count);
+//        RenderServer::getSingleton().blit(
+//                p_command_buffer,
+//                pipeline,
+//                mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),
+//                vertexBuffers,
+//                mesh->indexBuffer,
+//                mesh->indices_count);
     }
 }

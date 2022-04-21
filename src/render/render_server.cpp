@@ -8,10 +8,12 @@
 RenderServer::RenderServer() {
     createCommandPool();
 
+    // Create descriptor set layouts.
     createMeshDescriptorSetLayout();
-    createGraphicsPipelineLayout(meshDescriptorSetLayout, meshPipelineLayout);
-
     createBlitDescriptorSetLayout();
+
+    // Create pipeline layouts using the created descriptor set layouts.
+    createGraphicsPipelineLayout(meshDescriptorSetLayout, meshPipelineLayout);
     createGraphicsPipelineLayout(blitDescriptorSetLayout, blitPipelineLayout);
 }
 

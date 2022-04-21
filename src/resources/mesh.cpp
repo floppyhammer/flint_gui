@@ -4,16 +4,16 @@
 #include "../render/swap_chain.h"
 #include "../render/mvp_buffer.h"
 
-Mesh3D::Mesh3D() {
+Mesh2dDescSet::Mesh2dDescSet() {
     createDescriptorPool();
 
-    createDescriptorSets();
+    createDescriptorSet();
 }
 
-Mesh2D::Mesh2D() {
+Mesh3dDescSet::Mesh3dDescSet() {
     createDescriptorPool();
 
-    createDescriptorSets();
+    createDescriptorSet();
 }
 
 Mesh::~Mesh() {
@@ -26,12 +26,9 @@ Mesh::~Mesh() {
     // Clean up vertex buffer.
     vkDestroyBuffer(device, vertexBuffer, nullptr); // GPU memory
     vkFreeMemory(device, vertexBufferMemory, nullptr); // CPU memory
-
-    // When we destroy the pool, the sets inside are destroyed as well.
-    vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 }
 
-VkDescriptorSet Mesh::getDescriptorSet(uint32_t index) const {
+VkDescriptorSet MeshDescSet::getDescriptorSet(uint32_t index) const {
     if (index < descriptorSets.size()) {
         return descriptorSets[index];
     } else {
@@ -39,7 +36,14 @@ VkDescriptorSet Mesh::getDescriptorSet(uint32_t index) const {
     }
 }
 
-void Mesh3D::createDescriptorPool() {
+MeshDescSet::~MeshDescSet() {
+    auto device = Platform::getSingleton().device;
+
+    // When we destroy the pool, the sets inside are destroyed as well.
+    vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+}
+
+void Mesh3dDescSet::createDescriptorPool() {
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
 
     std::array<VkDescriptorPoolSize, 2> poolSizes{};
@@ -59,7 +63,7 @@ void Mesh3D::createDescriptorPool() {
     }
 }
 
-void Mesh3D::createDescriptorSets() {
+void Mesh3dDescSet::createDescriptorSet() {
     auto device = Platform::getSingleton().device;
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
     auto &descriptorSetLayout = RenderServer::getSingleton().meshDescriptorSetLayout;
@@ -77,7 +81,7 @@ void Mesh3D::createDescriptorSets() {
     }
 }
 
-void Mesh3D::updateDescriptorSets(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) {
+void Mesh3dDescSet::updateDescriptorSet(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) {
     // Cast to Material3D.
     auto material = std::static_pointer_cast<Material3D>(p_material);
 
@@ -125,7 +129,7 @@ void Mesh3D::updateDescriptorSets(std::shared_ptr<Material> p_material, std::vec
 
 // Mesh2D
 
-void Mesh2D::createDescriptorPool() {
+void Mesh2dDescSet::createDescriptorPool() {
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
 
     std::array<VkDescriptorPoolSize, 2> poolSizes{};
@@ -145,7 +149,7 @@ void Mesh2D::createDescriptorPool() {
     }
 }
 
-void Mesh2D::createDescriptorSets() {
+void Mesh2dDescSet::createDescriptorSet() {
     auto device = Platform::getSingleton().device;
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
     auto &descriptorSetLayout = RenderServer::getSingleton().blitDescriptorSetLayout;
@@ -225,7 +229,7 @@ void Mesh2D::create_index_buffer() {
     vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
 }
 
-void Mesh2D::updateDescriptorSets(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) {
+void Mesh2dDescSet::updateDescriptorSet(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) {
     // Cast to Material3D.
     auto material = std::static_pointer_cast<Material2D>(p_material);
 

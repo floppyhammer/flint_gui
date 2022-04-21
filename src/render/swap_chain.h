@@ -83,6 +83,8 @@ public:
      * use for each of them and how their contents should be
      * handled throughout the rendering operations. All of this
      * information is wrapped in a render pass object.
+     * @note A render pass doesn't have viewport extent requirement, which means
+     * we can bind framebuffers with any size to it.
      * @dependency Swap chain image format.
      */
     void createRenderPass();

@@ -68,6 +68,11 @@ public:
 
     RenderServer();
 
+    /**
+     * Once swap chain extent changes, render pass also changes. We need recreate pipelines due to that.
+     * @param renderPass
+     * @param swapChainExtent
+     */
     void createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent);
 
     [[nodiscard]] uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;

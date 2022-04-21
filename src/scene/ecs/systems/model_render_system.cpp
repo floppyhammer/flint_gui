@@ -56,12 +56,15 @@ namespace Flint {
 
             VkPipeline pipeline = RenderServer::getSingleton().meshGraphicsPipeline;
 
-            for (const auto &mesh: model.meshes) {
+            for (int i = 0; i < model.meshes.size(); i++) {
+                const auto &mesh = model.meshes[i];
+                const auto &desc_set = model.desc_sets[i];
+
                 VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
                 RenderServer::getSingleton().draw_mesh(
                         command_buffer,
                         pipeline,
-                        mesh->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                        desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
                         vertexBuffers,
                         mesh->indexBuffer,
                         mesh->indices_count);

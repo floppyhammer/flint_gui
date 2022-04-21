@@ -138,6 +138,7 @@ public:
 
 private:
     VkInstance instance;
+
     VkDebugUtilsMessengerEXT debugMessenger;
 
     static const bool enableValidationLayers = true;

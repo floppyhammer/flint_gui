@@ -27,6 +27,7 @@ namespace std {
 namespace Flint {
     void ObjImporter::load_file(const std::string &filename,
                                 std::vector<std::shared_ptr<Mesh3D>> &meshes,
+                                std::vector<std::shared_ptr<Mesh3dDescSet>> &desc_sets,
                                 std::vector<std::shared_ptr<Material3D>> &materials,
                                 const std::shared_ptr<MvpBuffer> &mvp_buffer) {
         tinyobj::attrib_t attrib;
@@ -110,15 +111,17 @@ namespace Flint {
             RenderServer::getSingleton().createVertexBuffer(vertices, mesh->vertexBuffer, mesh->vertexBufferMemory);
             RenderServer::getSingleton().createIndexBuffer(indices, mesh->indexBuffer, mesh->indexBufferMemory);
 
+            auto desc_set = std::make_shared<Mesh3dDescSet>();
             if (mesh->material_id > 0 && mesh->material_id < materials.size()) {
-                mesh->updateDescriptorSets(materials[mesh->material_id], mvp_buffer->uniform_buffers);
+                desc_set->updateDescriptorSet(materials[mesh->material_id], mvp_buffer->uniform_buffers);
             } else {
                 mesh->material_id = 0;
-                mesh->updateDescriptorSets(materials[0], mvp_buffer->uniform_buffers);
+                desc_set->updateDescriptorSet(materials[0], mvp_buffer->uniform_buffers);
                 //throw std::runtime_error("Invalid material id!");
             }
 
             meshes.push_back(mesh);
+            desc_sets.push_back(desc_set);
         }
     }
 }
