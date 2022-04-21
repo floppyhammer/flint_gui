@@ -71,6 +71,7 @@ namespace Flint {
             auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
             auto &transform = coordinator.get_component<Transform2dComponent>(entity);
             auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
+            auto &sort_z = coordinator.get_component<SortZ2d>(entity);
 
             float sprite_width = sprite.material->texture->width * transform.scale.x;
             float sprite_height = sprite.material->texture->height * transform.scale.y;
@@ -87,7 +88,7 @@ namespace Flint {
             ubo.model = glm::translate(glm::mat4(1.0f),
                                        glm::vec3((transform.position.x) / viewport_extent.x * 2.0f,
                                                  (transform.position.y) / viewport_extent.y * 2.0f,
-                                                 0.0f));
+                                                 sort_z.z));
             // 3.
             ubo.model = glm::translate(ubo.model, glm::vec3(-1.0, -1.0, 0.0f));
             // 2.

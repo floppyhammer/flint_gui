@@ -57,6 +57,10 @@ namespace Flint {
         std::shared_ptr<Material2D> material;
     };
 
+    struct SortZ2d {
+        float z;
+    };
+
     struct Sprite3dComponent {
 
     };

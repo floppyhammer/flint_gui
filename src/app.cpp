@@ -91,6 +91,7 @@ void App::run() {
         coordinator.register_component<Flint::MvpComponent>();
         coordinator.register_component<Flint::ViewportInputComponent>();
         coordinator.register_component<Flint::ViewportOutputComponent>();
+        coordinator.register_component<Flint::SortZ2d>();
 
         // Register systems.
         physics_system = coordinator.register_system<Flint::Physics2dSystem>();
@@ -110,6 +111,7 @@ void App::run() {
             signature.set(coordinator.get_component_type<Flint::Sprite2dComponent>());
             signature.set(coordinator.get_component_type<Flint::Transform2dComponent>());
             signature.set(coordinator.get_component_type<Flint::MvpComponent>());
+            signature.set(coordinator.get_component_type<Flint::SortZ2d>());
             coordinator.set_system_signature<Flint::Sprite2dRenderSystem>(signature);
         }
 
@@ -131,7 +133,8 @@ void App::run() {
         material->texture = tex;
         auto mesh = Mesh2D::from_default();
 
-        // Create entities.
+        // 2D sprites.
+        int z = 0;
         for (auto &entity: entities) {
             entity = coordinator.create_entity();
 
@@ -149,6 +152,10 @@ void App::run() {
                 coordinator.add_component(
                         entity,
                         Flint::MvpComponent{mvp_buffer});
+
+                coordinator.add_component(
+                        entity,
+                        Flint::SortZ2d{(float) z++ / (float) entities.size()});
             }
 
             // Physics components.
@@ -156,48 +163,49 @@ void App::run() {
                 coordinator.add_component(
                         entity,
                         Flint::Transform2dComponent{
-                                Flint::Vec2<float>(rand_position(generator), rand_position(generator)),
-                                Flint::Vec2<float>(1.0),
-                                Flint::Vec2<float>(1.0),
+                                Flint::Vec2<float>(0.0f),
+                                Flint::Vec2<float>(1.0f),
+                                Flint::Vec2<float>(1.0f),
                                 0.0f,
                         });
 
                 coordinator.add_component(
                         entity,
-                        Flint::GravityComponent{Flint::Vec3<float>(0.0f, 0.0f, 0.0f)});
+                        Flint::GravityComponent{Flint::Vec3<float>(0.0f)});
 
                 coordinator.add_component(
                         entity,
                         Flint::RigidBodyComponent{
                                 Flint::Vec3<float>(rand_velocity(generator), rand_velocity(generator), 0.0f),
-                                Flint::Vec3<float>(0.0f, 0.0f, 0.0f),
+                                Flint::Vec3<float>(0.0f),
                         });
             }
         }
 
-        // Model.
-        auto entity = coordinator.create_entity();
-        {
-            auto meshes = std::vector<std::shared_ptr<Mesh3D>>();
-            auto desc_sets = std::vector<std::shared_ptr<Mesh3dDescSet>>();
-            auto materials = std::vector<std::shared_ptr<Material3D>>();
-            auto mvp_buffer = std::make_shared<Flint::MvpBuffer>(); // We only need a single mvp buffer.
-            Flint::ObjImporter::load_file("../assets/viking_room/viking_room.obj", meshes, desc_sets, materials, mvp_buffer);
-
-            coordinator.add_component(
-                    entity,
-                    Flint::ModelComponent{meshes, desc_sets, materials, mvp_buffer});
-
-            Flint::Transform3dComponent transform;
-            transform.position.x = 0.5;
-            coordinator.add_component(
-                    entity,
-                    transform);
-
-            coordinator.add_component(
-                    entity,
-                    Flint::MvpComponent{mvp_buffer});
-        }
+        // 3D model.
+//        {
+//            auto meshes = std::vector<std::shared_ptr<Mesh3D>>();
+//            auto desc_sets = std::vector<std::shared_ptr<Mesh3dDescSet>>();
+//            auto materials = std::vector<std::shared_ptr<Material3D>>();
+//            auto mvp_buffer = std::make_shared<Flint::MvpBuffer>(); // We only need a single mvp buffer.
+//            Flint::ObjImporter::load_file("../assets/viking_room/viking_room.obj", meshes, desc_sets, materials, mvp_buffer);
+//
+//            auto entity = coordinator.create_entity();
+//
+//            coordinator.add_component(
+//                    entity,
+//                    Flint::ModelComponent{meshes, desc_sets, materials, mvp_buffer});
+//
+//            Flint::Transform3dComponent transform;
+//            transform.position.x = 0.5;
+//            coordinator.add_component(
+//                    entity,
+//                    transform);
+//
+//            coordinator.add_component(
+//                    entity,
+//                    Flint::MvpComponent{mvp_buffer});
+//        }
     }
 
     // GLFW input callbacks.
