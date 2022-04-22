@@ -17,6 +17,9 @@
 #include <queue>
 
 namespace Flint {
+    /// NOTE: Must not allocate any on-heap data in components' default constructors as we will be
+    /// using component arrays made up of default components.
+
     // INPUT
     // -----------------------------
     struct InputComponent {

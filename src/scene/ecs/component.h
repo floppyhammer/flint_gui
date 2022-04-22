@@ -52,6 +52,9 @@ namespace Flint {
             size_t index_of_last_element = size - 1;
             component_array[index_of_removed_entity] = component_array[index_of_last_element];
 
+            // This is to fix smart pointer holdup. We cannot leave it as it is even though we don't need it anymore.
+            component_array[index_of_last_element] = T();
+
             // Update map to point to moved spot.
             Entity entity_of_last_element = index_to_entity_map[index_of_last_element];
             entity_to_index_map[entity_of_last_element] = index_of_removed_entity;
