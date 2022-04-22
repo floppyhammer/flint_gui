@@ -83,7 +83,7 @@ void Mesh3dDescSet::createDescriptorSet() {
 
 void Mesh3dDescSet::updateDescriptorSet(const std::shared_ptr<Material>& p_material) {
     // Cast to Material3D.
-    auto material = std::static_pointer_cast<Material3D>(p_material);
+    auto material = std::static_pointer_cast<Material3d>(p_material);
 
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
     auto &descriptorSetLayout = RenderServer::getSingleton().meshDescriptorSetLayout;
@@ -169,7 +169,7 @@ void Mesh2dDescSet::createDescriptorSet() {
 
 void Mesh2dDescSet::updateDescriptorSet(const std::shared_ptr<Material>& p_material) {
     // Cast to Material3D.
-    auto material = std::static_pointer_cast<Material2D>(p_material);
+    auto material = std::static_pointer_cast<Material2d>(p_material);
 
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
     auto &descriptorSetLayout = RenderServer::getSingleton().blitDescriptorSetLayout;
@@ -213,7 +213,7 @@ void Mesh2dDescSet::updateDescriptorSet(const std::shared_ptr<Material>& p_mater
     }
 }
 
-void Mesh2D::create_vertex_buffer() {
+void Mesh2d::create_vertex_buffer() {
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
     VkBuffer stagingBuffer; // In GPU
@@ -244,7 +244,7 @@ void Mesh2D::create_vertex_buffer() {
     vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
 }
 
-void Mesh2D::create_index_buffer() {
+void Mesh2d::create_index_buffer() {
     VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 
     // Set indices count for mesh.

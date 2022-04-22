@@ -23,9 +23,9 @@ namespace Flint {
     }
 
     void Physics3dSystem::update(double dt) {
-        for (auto const &entity: entities) {
-            auto coordinator = Coordinator::get_singleton();
+        auto coordinator = Coordinator::get_singleton();
 
+        for (auto const &entity: entities) {
             auto &rigidBody = coordinator.get_component<RigidBodyComponent>(entity);
             auto &transform = coordinator.get_component<Transform3dComponent>(entity);
             auto const &gravity = coordinator.get_component<GravityComponent>(entity);

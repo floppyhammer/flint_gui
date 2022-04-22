@@ -18,6 +18,10 @@ namespace Flint {
 
         [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
 
+        void set_mesh(const std::shared_ptr<Mesh2d>& p_mesh);
+
+        void set_material(const std::shared_ptr<Material2d>& p_material);
+
     private:
         void update(double delta) override;
 

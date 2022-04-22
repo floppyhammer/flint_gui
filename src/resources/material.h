@@ -14,14 +14,14 @@ public:
     std::string name;
 };
 
-class Material2D : public Material {
+class Material2d : public Material {
 public:
     std::shared_ptr<Texture> texture;
 };
 
-class Material3D : public Material {
+class Material3d : public Material {
 public:
-    static std::shared_ptr<Material3D> from_default();
+    static std::shared_ptr<Material3d> from_default();
 
     std::shared_ptr<Texture> diffuse_texture;
     std::shared_ptr<Texture> normal_texture;

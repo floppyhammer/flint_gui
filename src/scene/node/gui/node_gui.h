@@ -29,11 +29,11 @@ namespace Flint {
 
         void update_mvp();
 
-        std::shared_ptr<Mesh2D> mesh;
+        std::shared_ptr<Mesh2d> mesh;
 
         std::shared_ptr<Mesh2dDescSet> desc_set;
 
-        std::shared_ptr<Material2D> material;
+        std::shared_ptr<Material2d> material;
 
         std::shared_ptr<MvpBuffer> mvp_buffer;
 

@@ -17,6 +17,11 @@ namespace Flint {
     }
 
     void Sprite2d::set_texture(std::shared_ptr<Texture> p_texture) {
+        if (material == nullptr) {
+            Logger::warn("No material set for Sprite 2D!");
+            return;
+        }
+
         material->texture = p_texture;
 
         desc_set->updateDescriptorSet(material);
@@ -24,6 +29,14 @@ namespace Flint {
 
     std::shared_ptr<Texture> Sprite2d::get_texture() const {
         return material->texture;
+    }
+
+    void Sprite2d::set_mesh(const std::shared_ptr<Mesh2d>& p_mesh) {
+        mesh = p_mesh;
+    }
+
+    void Sprite2d::set_material(const std::shared_ptr<Material2d>& p_material) {
+        material = p_material;
     }
 
     void Sprite2d::_update(double delta) {
@@ -39,6 +52,10 @@ namespace Flint {
     }
 
     void Sprite2d::update_mvp() {
+        if (material == nullptr) {
+            return;
+        }
+
         Node *viewport_node = get_viewport();
 
         Vec2<uint32_t> viewport_extent;
@@ -75,7 +92,6 @@ namespace Flint {
                                          1.0f));
 
         push_constant.model = ubo.model;
-        //mvp_buffer->update_uniform_buffer(ubo);
     }
 
     void Sprite2d::_draw(VkCommandBuffer p_command_buffer) {
@@ -85,6 +101,11 @@ namespace Flint {
     }
 
     void Sprite2d::draw(VkCommandBuffer p_command_buffer) {
+        if (mesh == nullptr || material == nullptr) {
+            Logger::warn("No valid mesh or material set for Sprite 2D!");
+            return;
+        }
+
         Node *viewport_node = get_viewport();
 
         VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;

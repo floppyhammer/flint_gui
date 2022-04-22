@@ -22,13 +22,11 @@ namespace Flint {
         [[nodiscard]] Vec2<float> get_global_position() const;
 
     protected:
-        std::shared_ptr<Mesh2D> mesh;
+        std::shared_ptr<Mesh2d> mesh;
 
         std::shared_ptr<Mesh2dDescSet> desc_set;
 
-        std::shared_ptr<Material2D> material;
-
-        std::shared_ptr<MvpBuffer> mvp_buffer;
+        std::shared_ptr<Material2d> material;
 
         void init_default_mesh();
     };

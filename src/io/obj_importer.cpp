@@ -26,9 +26,9 @@ namespace std {
 
 namespace Flint {
     void ObjImporter::load_file(const std::string &filename,
-                                std::vector<std::shared_ptr<Mesh3D>> &meshes,
+                                std::vector<std::shared_ptr<Mesh3d>> &meshes,
                                 std::vector<std::shared_ptr<Mesh3dDescSet>> &desc_sets,
-                                std::vector<std::shared_ptr<Material3D>> &materials) {
+                                std::vector<std::shared_ptr<Material3d>> &materials) {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> obj_materials;
@@ -49,10 +49,10 @@ namespace Flint {
                          "OBJ Importer");
 
             // Default material.
-            materials.push_back(Material3D::from_default());
+            materials.push_back(Material3d::from_default());
         } else {
             for (const auto &obj_material: obj_materials) {
-                auto material = std::make_shared<Material3D>();
+                auto material = std::make_shared<Material3d>();
                 material->name = obj_material.name;
                 material->diffuse_texture = Texture::from_file(file_directory + "/" + obj_material.diffuse_texname);
                 materials.push_back(material);
@@ -61,7 +61,7 @@ namespace Flint {
 
         // Iterate over the vertices and dump them straight into our vertices vector.
         for (const auto &shape: shapes) {
-            auto mesh = std::make_shared<Mesh3D>();
+            auto mesh = std::make_shared<Mesh3d>();
 
             mesh->name = shape.name;
             mesh->material_id = shape.mesh.material_ids[0];

@@ -117,15 +117,15 @@ struct Mesh3dPushConstant {
 };
 
 // TODO: Simple quad meshes should all share the same vertex and index buffers.
-class Mesh2D : public Mesh {
+class Mesh2d : public Mesh {
 public:
-    Mesh2D() = default;
+    Mesh2d() = default;
 
     /**
      * Default quad mesh.
      */
-    static std::shared_ptr<Mesh2D> from_default() {
-        auto mesh = std::make_shared<Mesh2D>();
+    static std::shared_ptr<Mesh2d> from_default() {
+        auto mesh = std::make_shared<Mesh2d>();
 
         mesh->create_vertex_buffer();
 
@@ -140,20 +140,20 @@ private:
     void create_index_buffer();
 };
 
-class Mesh3D : public Mesh {
+class Mesh3d : public Mesh {
 public:
-    Mesh3D() = default;
+    Mesh3d() = default;
 
-    static std::shared_ptr<Mesh3D> from_plane() {
-        return std::make_shared<Mesh3D>();
+    static std::shared_ptr<Mesh3d> from_plane() {
+        return std::make_shared<Mesh3d>();
     }
 
-    static std::shared_ptr<Mesh3D> from_cube() {
-        return std::make_shared<Mesh3D>();
+    static std::shared_ptr<Mesh3d> from_cube() {
+        return std::make_shared<Mesh3d>();
     }
 
-    static std::shared_ptr<Mesh3D> from_sphere() {
-        return std::make_shared<Mesh3D>();
+    static std::shared_ptr<Mesh3d> from_sphere() {
+        return std::make_shared<Mesh3d>();
     }
 };
 

@@ -41,6 +41,9 @@ void App::run() {
     auto swap_chain = SwapChain::getSingleton();
     // ---------------------------------------------------
 
+    uint32_t NODE_SPRITE_COUNT = 1000;
+    uint32_t ECS_SPRITE_COUNT = 0;
+
     std::default_random_engine generator;
     std::uniform_real_distribution<float> rand_position(0.0f, 400.0f);
     std::uniform_real_distribution<float> rand_rotation(0.0f, 3.0f);
@@ -58,18 +61,22 @@ void App::run() {
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
 
         auto tex = Texture::from_file("../assets/duck.png");
+        auto material = std::make_shared<Material2d>();
+        auto mesh = Mesh2d::from_default();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < NODE_SPRITE_COUNT; i++) {
             auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
             rigid_body_2d->position = {rand_position(generator), rand_position(generator)};
             rigid_body_2d->velocity = {rand_velocity(generator), rand_velocity(generator)};
             auto sprite_2d = std::make_shared<Flint::Sprite2d>();
+            sprite_2d->set_mesh(mesh);
+            sprite_2d->set_material(material);
             sprite_2d->set_texture(tex);
             rigid_body_2d->add_child(sprite_2d);
             node->add_child(rigid_body_2d);
         }
 
-        node->add_child(mesh_instance_0);
+//        node->add_child(mesh_instance_0);
 //        node->add_child(sub_viewport_c);
 //        sub_viewport_c->add_child(sub_viewport);
 //        sub_viewport_c->set_viewport(sub_viewport);
@@ -92,7 +99,6 @@ void App::run() {
         coordinator.register_component<Flint::Sprite2dComponent>();
         coordinator.register_component<Flint::Sprite3dComponent>();
         coordinator.register_component<Flint::ModelComponent>();
-        //coordinator.register_component<Flint::MvpComponent>();
         coordinator.register_component<Flint::ViewportInputComponent>();
         coordinator.register_component<Flint::ViewportOutputComponent>();
         coordinator.register_component<Flint::ZSort2d>();
@@ -129,13 +135,13 @@ void App::run() {
         }
 
         // Allocate space for entities.
-        entities.resize(0);
+        entities.resize(ECS_SPRITE_COUNT);
 
         auto tex = Texture::from_file("../assets/duck.png");
 
-        auto material = std::make_shared<Material2D>();
+        auto material = std::make_shared<Material2d>();
         material->texture = tex;
-        auto mesh = Mesh2D::from_default();
+        auto mesh = Mesh2d::from_default();
 
         // 2D sprites.
         int z = 0;
@@ -152,10 +158,6 @@ void App::run() {
                 coordinator.add_component(
                         entity,
                         Flint::Sprite2dComponent{mesh, desc_set, material});
-
-//                coordinator.add_component(
-//                        entity,
-//                        Flint::MvpComponent{mvp_buffer});
 
                 coordinator.add_component(
                         entity,

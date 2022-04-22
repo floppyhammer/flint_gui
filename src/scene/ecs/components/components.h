@@ -52,9 +52,9 @@ namespace Flint {
     // RENDER
     // -----------------------------
     struct Sprite2dComponent {
-        std::shared_ptr<Mesh2D> mesh;
+        std::shared_ptr<Mesh2d> mesh;
         std::shared_ptr<Mesh2dDescSet> desc_set;
-        std::shared_ptr<Material2D> material;
+        std::shared_ptr<Material2d> material;
         Mesh2dPushConstant push_constant;
     };
 
@@ -75,9 +75,9 @@ namespace Flint {
     };
 
     struct ModelComponent {
-        std::vector<std::shared_ptr<Mesh3D>> meshes;
+        std::vector<std::shared_ptr<Mesh3d>> meshes;
         std::vector<std::shared_ptr<Mesh3dDescSet>> desc_sets;
-        std::vector<std::shared_ptr<Material3D>> materials;
+        std::vector<std::shared_ptr<Material3d>> materials;
         Mesh3dPushConstant push_constant;
     };
 
