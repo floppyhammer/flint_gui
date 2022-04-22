@@ -13,8 +13,8 @@ RenderServer::RenderServer() {
     createBlitDescriptorSetLayout();
 
     // Create pipeline layouts using the created descriptor set layouts.
-    createGraphicsPipelineLayout(meshDescriptorSetLayout, meshPipelineLayout);
-    createGraphicsPipelineLayout(blitDescriptorSetLayout, blitPipelineLayout);
+    createMeshGraphicsPipelineLayout(meshDescriptorSetLayout, meshPipelineLayout);
+    createBlitGraphicsPipelineLayout(blitDescriptorSetLayout, blitPipelineLayout);
 }
 
 void RenderServer::createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
@@ -477,34 +477,34 @@ void RenderServer::draw_mesh(VkCommandBuffer commandBuffer,
 
 void RenderServer::createMeshDescriptorSetLayout() {
     // MVP uniform binding.
-    // ------------------------------
-    VkDescriptorSetLayoutBinding uboLayoutBinding{};
-    uboLayoutBinding.binding = 0;
-    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-
-    // It is possible for the shader variable to represent an array of uniform buffer objects,
-    // and descriptorCount specifies the number of values in the array.
-    // This could be used to specify a transformation for each of the bones
-    // in a skeleton for skeletal animation, for example.
-    uboLayoutBinding.descriptorCount = 1;
-
-    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-    // The pImmutableSamplers field is only relevant for image sampling related descriptors.
-    uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
-    // ------------------------------
+//    // ------------------------------
+//    VkDescriptorSetLayoutBinding uboLayoutBinding{};
+//    uboLayoutBinding.binding = 0;
+//    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+//
+//    // It is possible for the shader variable to represent an array of uniform buffer objects,
+//    // and descriptorCount specifies the number of values in the array.
+//    // This could be used to specify a transformation for each of the bones
+//    // in a skeleton for skeletal animation, for example.
+//    uboLayoutBinding.descriptorCount = 1;
+//
+//    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+//
+//    // The pImmutableSamplers field is only relevant for image sampling related descriptors.
+//    uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
+//    // ------------------------------
 
     // Image sampler uniform binding.
     // ------------------------------
     VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-    samplerLayoutBinding.binding = 1;
+    samplerLayoutBinding.binding = 0;
     samplerLayoutBinding.descriptorCount = 1;
     samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     samplerLayoutBinding.pImmutableSamplers = nullptr;
     samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
     // ------------------------------
 
-    std::array<VkDescriptorSetLayoutBinding, 2> bindings = {uboLayoutBinding, samplerLayoutBinding};
+    std::array<VkDescriptorSetLayoutBinding, 1> bindings = {samplerLayoutBinding};
     VkDescriptorSetLayoutCreateInfo layoutInfo{};
     layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -517,35 +517,35 @@ void RenderServer::createMeshDescriptorSetLayout() {
 }
 
 void RenderServer::createBlitDescriptorSetLayout() {
-    // MVP uniform binding.
+    // MVP uniform binding. (We use PushConstant instead.)
     // ------------------------------
-    VkDescriptorSetLayoutBinding uboLayoutBinding{};
-    uboLayoutBinding.binding = 0;
-    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-
-    // It is possible for the shader variable to represent an array of uniform buffer objects,
-    // and descriptorCount specifies the number of values in the array.
-    // This could be used to specify a transformation for each of the bones
-    // in a skeleton for skeletal animation, for example.
-    uboLayoutBinding.descriptorCount = 1;
-
-    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-    // The pImmutableSamplers field is only relevant for image sampling related descriptors.
-    uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
+//    VkDescriptorSetLayoutBinding uboLayoutBinding{};
+//    uboLayoutBinding.binding = 0;
+//    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+//
+//    // It is possible for the shader variable to represent an array of uniform buffer objects,
+//    // and descriptorCount specifies the number of values in the array.
+//    // This could be used to specify a transformation for each of the bones
+//    // in a skeleton for skeletal animation, for example.
+//    uboLayoutBinding.descriptorCount = 1;
+//
+//    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+//
+//    // The pImmutableSamplers field is only relevant for image sampling related descriptors.
+//    uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
     // ------------------------------
 
     // Image sampler uniform binding.
     // ------------------------------
     VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-    samplerLayoutBinding.binding = 1;
+    samplerLayoutBinding.binding = 0;
     samplerLayoutBinding.descriptorCount = 1;
     samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     samplerLayoutBinding.pImmutableSamplers = nullptr;
     samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
     // ------------------------------
 
-    std::array<VkDescriptorSetLayoutBinding, 2> bindings = {uboLayoutBinding, samplerLayoutBinding};
+    std::array<VkDescriptorSetLayoutBinding, 1> bindings = {samplerLayoutBinding};
     VkDescriptorSetLayoutCreateInfo layoutInfo{};
     layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -560,8 +560,8 @@ void RenderServer::createBlitDescriptorSetLayout() {
 void RenderServer::createMeshGraphicsPipeline(VkRenderPass renderPass,
                                               VkExtent2D viewportExtent,
                                               VkPipeline &graphicsPipeline) {
-    auto vertShaderCode = readFile("../src/shaders/mesh_instance.vert.spv");
-    auto fragShaderCode = readFile("../src/shaders/mesh_instance.frag.spv");
+    auto vertShaderCode = readFile("../src/shaders/mesh_instance_vert.spv");
+    auto fragShaderCode = readFile("../src/shaders/mesh_instance_frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -695,19 +695,54 @@ void RenderServer::createMeshGraphicsPipeline(VkRenderPass renderPass,
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
-void RenderServer::createGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
-                                                VkPipelineLayout &graphicsPipelineLayout) {
+void RenderServer::createMeshGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
+                                                    VkPipelineLayout &graphicsPipelineLayout) {
+    // Push constant.
+    VkPushConstantRange pushConstant;
+    {
+        pushConstant.offset = 0;
+        pushConstant.size = sizeof(Mesh3dPushConstant);
+        pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    }
+
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount = 1;
     pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
-    pipelineLayoutInfo.pushConstantRangeCount = 0;
+    pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
+    pipelineLayoutInfo.pushConstantRangeCount = 1;
 
     // Create pipeline layout.
     if (vkCreatePipelineLayout(Platform::getSingleton().device,
                                &pipelineLayoutInfo,
                                nullptr,
                                &graphicsPipelineLayout) != VK_SUCCESS) {
+        throw std::runtime_error("Failed to create pipeline layout!");
+    }
+}
+
+void RenderServer::createBlitGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
+                                                    VkPipelineLayout &pipelineLayout) {
+    // Push constant.
+    VkPushConstantRange pushConstant;
+    {
+        pushConstant.offset = 0;
+        pushConstant.size = sizeof(Mesh2dPushConstant);
+        pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    }
+
+    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
+    pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
+    pipelineLayoutInfo.pushConstantRangeCount = 1;
+
+    // Create pipeline layout.
+    if (vkCreatePipelineLayout(Platform::getSingleton().device,
+                               &pipelineLayoutInfo,
+                               nullptr,
+                               &pipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create pipeline layout!");
     }
 }

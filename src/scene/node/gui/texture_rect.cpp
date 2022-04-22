@@ -23,7 +23,7 @@ namespace Flint {
         size.x = (float) p_texture->width;
         size.y = (float) p_texture->height;
 
-        desc_set->updateDescriptorSet(material, mvp_buffer->uniform_buffers);
+        desc_set->updateDescriptorSet(material);
     }
 
     std::shared_ptr<Texture> TextureRect::get_texture() const {

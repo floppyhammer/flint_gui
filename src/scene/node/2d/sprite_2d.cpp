@@ -19,7 +19,7 @@ namespace Flint {
     void Sprite2d::set_texture(std::shared_ptr<Texture> p_texture) {
         material->texture = p_texture;
 
-        desc_set->updateDescriptorSet(material, mvp_buffer->uniform_buffers);
+        desc_set->updateDescriptorSet(material);
     }
 
     std::shared_ptr<Texture> Sprite2d::get_texture() const {
@@ -74,7 +74,8 @@ namespace Flint {
                                          sprite_height / viewport_extent.y * 2.0f,
                                          1.0f));
 
-        mvp_buffer->update_uniform_buffer(ubo);
+        push_constant.model = ubo.model;
+        //mvp_buffer->update_uniform_buffer(ubo);
     }
 
     void Sprite2d::_draw(VkCommandBuffer p_command_buffer) {
@@ -87,11 +88,17 @@ namespace Flint {
         Node *viewport_node = get_viewport();
 
         VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
+        VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
             pipeline = viewport->viewport->blitGraphicsPipeline;
         }
+
+        // Upload the model matrix to the GPU via push constants.
+        vkCmdPushConstants(p_command_buffer, pipeline_layout,
+                           VK_SHADER_STAGE_VERTEX_BIT, 0,
+                           sizeof(Mesh2dPushConstant), &push_constant);
 
         VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
         RenderServer::getSingleton().blit(

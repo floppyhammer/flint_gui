@@ -60,7 +60,7 @@ public:
      * Should be called once uniform/texture bindings changed.
      * @dependency Actual resources (buffers, images, image views).
      */
-    virtual void updateDescriptorSet(std::shared_ptr<Material>, std::vector<VkBuffer> &uniformBuffers) = 0;
+    //virtual void updateDescriptorSet(std::shared_ptr<Material>, std::vector<VkBuffer> &uniformBuffers) = 0;
 
     [[nodiscard]] VkDescriptorSet getDescriptorSet(uint32_t index) const;
 
@@ -80,7 +80,7 @@ public:
 
     void createDescriptorSet() override;
 
-    void updateDescriptorSet(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) override;
+    void updateDescriptorSet(const std::shared_ptr<Material>& p_material);
 };
 
 class Mesh3dDescSet : public MeshDescSet {
@@ -91,7 +91,7 @@ public:
 
     void createDescriptorSet() override;
 
-    void updateDescriptorSet(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) override;
+    void updateDescriptorSet(const std::shared_ptr<Material>& p_material);
 };
 
 // Default vertices and indices data for 2D quad mesh.
@@ -105,6 +105,15 @@ const std::vector<Vertex> vertices = {
 // For index buffer. (Front is counter-clockwise.)
 const std::vector<uint32_t> indices = {
         0, 2, 1, 2, 0, 3
+};
+
+struct Mesh2dPushConstant {
+    glm::mat4 model;
+};
+
+// TODO: We might need to push model, view and projection separately.
+struct Mesh3dPushConstant {
+    glm::mat4 mvp;
 };
 
 // TODO: Simple quad meshes should all share the same vertex and index buffers.

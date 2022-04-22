@@ -8,6 +8,10 @@
 #include "render_server.h"
 
 namespace Flint {
+    glm::mat4 UniformBufferObject::calculate_mvp() const {
+        return proj * view * model;
+    }
+
     MvpBuffer::MvpBuffer() {
         create_uniform_buffers();
     }

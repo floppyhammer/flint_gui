@@ -4,7 +4,7 @@ namespace Flint {
     Node2d::Node2d() {
         type = NodeType::Node2D;
 
-        mvp_buffer = std::make_shared<MvpBuffer>();
+        //mvp_buffer = std::make_shared<MvpBuffer>();
     }
 
     Vec2<float> Node2d::get_global_position() const {

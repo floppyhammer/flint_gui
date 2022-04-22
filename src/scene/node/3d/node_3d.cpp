@@ -17,8 +17,6 @@
 namespace Flint {
     Node3D::Node3D() {
         type = NodeType::Node3D;
-
-        mvp_buffer = std::make_shared<MvpBuffer>();
     }
 
     Node3D::~Node3D() {
@@ -81,7 +79,8 @@ namespace Flint {
             ubo.proj[1][1] *= -1;
         }
 
-        mvp_buffer->update_uniform_buffer(ubo);
+        push_constant.mvp = ubo.calculate_mvp();
+        //mvp_buffer->update_uniform_buffer(ubo);
     }
 
     void Node3D::_notify(Signal signal) {

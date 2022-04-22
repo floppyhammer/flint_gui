@@ -17,7 +17,6 @@ namespace Flint {
         for (auto const &entity: entities) {
             auto &model = coordinator.get_component<ModelComponent>(entity);
             auto &transform = coordinator.get_component<Transform3dComponent>(entity);
-            auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
 
             // Prepare UBO data.
             UniformBufferObject ubo{};
@@ -44,7 +43,7 @@ namespace Flint {
             // where the Y coordinate of the clip coordinates is inverted.
             ubo.proj[1][1] *= -1;
 
-            mvp_component.mvp_buffer->update_uniform_buffer(ubo);
+            model.push_constant.mvp = ubo.calculate_mvp();
         }
     }
 
@@ -55,6 +54,12 @@ namespace Flint {
             auto &model = coordinator.get_component<ModelComponent>(entity);
 
             VkPipeline pipeline = RenderServer::getSingleton().meshGraphicsPipeline;
+            VkPipelineLayout pipeline_layout = RenderServer::getSingleton().meshPipelineLayout;
+
+            // Upload the model matrix to the GPU via push constants.
+            vkCmdPushConstants(command_buffer, pipeline_layout,
+                               VK_SHADER_STAGE_VERTEX_BIT, 0,
+                               sizeof(Mesh2dPushConstant), &model.push_constant.mvp);
 
             for (int i = 0; i < model.meshes.size(); i++) {
                 const auto &mesh = model.meshes[i];

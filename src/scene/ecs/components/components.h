@@ -55,18 +55,15 @@ namespace Flint {
         std::shared_ptr<Mesh2D> mesh;
         std::shared_ptr<Mesh2dDescSet> desc_set;
         std::shared_ptr<Material2D> material;
+        Mesh2dPushConstant push_constant;
     };
 
-    struct SortZ2d {
+    struct ZSort2d {
         float z;
     };
 
     struct Sprite3dComponent {
 
-    };
-
-    struct MvpComponent {
-        std::shared_ptr<MvpBuffer> mvp_buffer;
     };
 
     struct TransformGuiComponent {
@@ -81,7 +78,7 @@ namespace Flint {
         std::vector<std::shared_ptr<Mesh3D>> meshes;
         std::vector<std::shared_ptr<Mesh3dDescSet>> desc_sets;
         std::vector<std::shared_ptr<Material3D>> materials;
-        std::shared_ptr<MvpBuffer> mvp_buffer;
+        Mesh3dPushConstant push_constant;
     };
 
     /**

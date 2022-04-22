@@ -185,7 +185,16 @@ public:
      * @param graphicsPipelineLayout OUTPUT
      * @dependency VkDescriptorSetLayout
      */
-    void createGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
+    void createMeshGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
+                                      VkPipelineLayout &graphicsPipelineLayout);
+
+    /**
+     * Create pipeline layout. Must do this before creating pipelines.
+     * @param descriptorSetLayout Layout for the descriptor set of the pipeline.
+     * @param graphicsPipelineLayout OUTPUT
+     * @dependency VkDescriptorSetLayout
+     */
+    void createBlitGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
                                       VkPipelineLayout &graphicsPipelineLayout);
 
     /**

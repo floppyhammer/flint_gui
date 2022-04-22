@@ -46,11 +46,11 @@ MeshDescSet::~MeshDescSet() {
 void Mesh3dDescSet::createDescriptorPool() {
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
 
-    std::array<VkDescriptorPoolSize, 2> poolSizes{};
-    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    std::array<VkDescriptorPoolSize, 1> poolSizes{};
+//    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+//    poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+    poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
-    poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
 
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -81,7 +81,7 @@ void Mesh3dDescSet::createDescriptorSet() {
     }
 }
 
-void Mesh3dDescSet::updateDescriptorSet(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) {
+void Mesh3dDescSet::updateDescriptorSet(const std::shared_ptr<Material>& p_material) {
     // Cast to Material3D.
     auto material = std::static_pointer_cast<Material3D>(p_material);
 
@@ -90,33 +90,33 @@ void Mesh3dDescSet::updateDescriptorSet(std::shared_ptr<Material> p_material, st
     auto device = Platform::getSingleton().device;
 
     for (size_t i = 0; i < swapChainImages.size(); i++) {
-        VkDescriptorBufferInfo bufferInfo{};
-        bufferInfo.buffer = uniformBuffers[i];
-        bufferInfo.offset = 0;
-        bufferInfo.range = sizeof(Flint::UniformBufferObject);
+//        VkDescriptorBufferInfo bufferInfo{};
+//        bufferInfo.buffer = uniformBuffers[i];
+//        bufferInfo.offset = 0;
+//        bufferInfo.range = sizeof(Flint::UniformBufferObject);
 
         VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         imageInfo.imageView = material->diffuse_texture->imageView;
         imageInfo.sampler = material->diffuse_texture->sampler;
 
-        std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+        std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+
+//        descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+//        descriptorWrites[0].dstSet = descriptorSets[i];
+//        descriptorWrites[0].dstBinding = 0;
+//        descriptorWrites[0].dstArrayElement = 0;
+//        descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+//        descriptorWrites[0].descriptorCount = 1;
+//        descriptorWrites[0].pBufferInfo = &bufferInfo;
 
         descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
         descriptorWrites[0].dstSet = descriptorSets[i];
         descriptorWrites[0].dstBinding = 0;
         descriptorWrites[0].dstArrayElement = 0;
-        descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         descriptorWrites[0].descriptorCount = 1;
-        descriptorWrites[0].pBufferInfo = &bufferInfo;
-
-        descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrites[1].dstSet = descriptorSets[i];
-        descriptorWrites[1].dstBinding = 1;
-        descriptorWrites[1].dstArrayElement = 0;
-        descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        descriptorWrites[1].descriptorCount = 1;
-        descriptorWrites[1].pImageInfo = &imageInfo;
+        descriptorWrites[0].pImageInfo = &imageInfo;
 
         // Update the contents of a descriptor set object.
         vkUpdateDescriptorSets(device,
@@ -132,11 +132,11 @@ void Mesh3dDescSet::updateDescriptorSet(std::shared_ptr<Material> p_material, st
 void Mesh2dDescSet::createDescriptorPool() {
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
 
-    std::array<VkDescriptorPoolSize, 2> poolSizes{};
-    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    std::array<VkDescriptorPoolSize, 1> poolSizes{};
+//    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+//    poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+    poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
-    poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
 
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -164,6 +164,52 @@ void Mesh2dDescSet::createDescriptorSet() {
     descriptorSets.resize(swapChainImages.size());
     if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate descriptor sets!");
+    }
+}
+
+void Mesh2dDescSet::updateDescriptorSet(const std::shared_ptr<Material>& p_material) {
+    // Cast to Material3D.
+    auto material = std::static_pointer_cast<Material2D>(p_material);
+
+    auto swapChainImages = SwapChain::getSingleton().swapChainImages;
+    auto &descriptorSetLayout = RenderServer::getSingleton().blitDescriptorSetLayout;
+    auto device = Platform::getSingleton().device;
+
+    for (size_t i = 0; i < swapChainImages.size(); i++) {
+//        VkDescriptorBufferInfo bufferInfo{};
+//        bufferInfo.buffer = uniformBuffers[i];
+//        bufferInfo.offset = 0;
+//        bufferInfo.range = sizeof(glm::mat4);
+
+        VkDescriptorImageInfo imageInfo{};
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = material->texture->imageView;
+        imageInfo.sampler = material->texture->sampler;
+
+        std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+
+//        descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+//        descriptorWrites[0].dstSet = descriptorSets[i];
+//        descriptorWrites[0].dstBinding = 0;
+//        descriptorWrites[0].dstArrayElement = 0;
+//        descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+//        descriptorWrites[0].descriptorCount = 1;
+//        descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+        descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrites[0].dstSet = descriptorSets[i];
+        descriptorWrites[0].dstBinding = 0;
+        descriptorWrites[0].dstArrayElement = 0;
+        descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        descriptorWrites[0].descriptorCount = 1;
+        descriptorWrites[0].pImageInfo = &imageInfo;
+
+        // Update the contents of a descriptor set object.
+        vkUpdateDescriptorSets(device,
+                               static_cast<uint32_t>(descriptorWrites.size()),
+                               descriptorWrites.data(),
+                               0,
+                               nullptr);
     }
 }
 
@@ -227,50 +273,4 @@ void Mesh2D::create_index_buffer() {
 
     vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
     vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
-}
-
-void Mesh2dDescSet::updateDescriptorSet(std::shared_ptr<Material> p_material, std::vector<VkBuffer> &uniformBuffers) {
-    // Cast to Material3D.
-    auto material = std::static_pointer_cast<Material2D>(p_material);
-
-    auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-    auto &descriptorSetLayout = RenderServer::getSingleton().blitDescriptorSetLayout;
-    auto device = Platform::getSingleton().device;
-
-    for (size_t i = 0; i < swapChainImages.size(); i++) {
-        VkDescriptorBufferInfo bufferInfo{};
-        bufferInfo.buffer = uniformBuffers[i];
-        bufferInfo.offset = 0;
-        bufferInfo.range = sizeof(glm::mat4);
-
-        VkDescriptorImageInfo imageInfo{};
-        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = material->texture->imageView;
-        imageInfo.sampler = material->texture->sampler;
-
-        std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
-
-        descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrites[0].dstSet = descriptorSets[i];
-        descriptorWrites[0].dstBinding = 0;
-        descriptorWrites[0].dstArrayElement = 0;
-        descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        descriptorWrites[0].descriptorCount = 1;
-        descriptorWrites[0].pBufferInfo = &bufferInfo;
-
-        descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrites[1].dstSet = descriptorSets[i];
-        descriptorWrites[1].dstBinding = 1;
-        descriptorWrites[1].dstArrayElement = 0;
-        descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        descriptorWrites[1].descriptorCount = 1;
-        descriptorWrites[1].pImageInfo = &imageInfo;
-
-        // Update the contents of a descriptor set object.
-        vkUpdateDescriptorSets(device,
-                               static_cast<uint32_t>(descriptorWrites.size()),
-                               descriptorWrites.data(),
-                               0,
-                               nullptr);
-    }
 }

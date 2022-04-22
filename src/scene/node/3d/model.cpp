@@ -35,11 +35,17 @@ namespace Flint {
         Node *viewport_node = get_viewport();
 
         VkPipeline pipeline = RenderServer::getSingleton().meshGraphicsPipeline;
+        VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
             pipeline = viewport->viewport->meshGraphicsPipeline;
         }
+
+        // Upload the model matrix to the GPU via push constants.
+        vkCmdPushConstants(p_command_buffer, pipeline_layout,
+                           VK_SHADER_STAGE_VERTEX_BIT, 0,
+                           sizeof(Mesh3dPushConstant), &push_constant);
 
         for (int i = 0; i < meshes.size(); i++) {
             const auto &mesh = meshes[i];
@@ -57,6 +63,6 @@ namespace Flint {
     }
 
     void Model::load_file(const std::string &filename) {
-        ObjImporter::load_file(filename, meshes, desc_sets, materials, mvp_buffer);
+        ObjImporter::load_file(filename, meshes, desc_sets, materials);
     }
 }

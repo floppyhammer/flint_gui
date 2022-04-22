@@ -16,7 +16,7 @@ namespace Flint {
 
             auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
             auto &transform = coordinator.get_component<TransformGuiComponent>(entity);
-            auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
+            //auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
 
             // Default to swap chain image.
             auto extent = SwapChain::getSingleton().swapChainExtent;
@@ -41,7 +41,8 @@ namespace Flint {
                                              transform.size.y / viewport_extent.y * 2.0f,
                                              1.0f));
 
-            mvp_component.mvp_buffer->update_uniform_buffer(ubo);
+            sprite.push_constant.model = ubo.model;
+            //mvp_component.mvp_buffer->update_uniform_buffer(ubo);
         }
     }
 
@@ -52,6 +53,12 @@ namespace Flint {
             auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
 
             VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
+            VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
+
+            // Upload the model matrix to the GPU via push constants.
+            vkCmdPushConstants(command_buffer, pipeline_layout,
+                               VK_SHADER_STAGE_VERTEX_BIT, 0,
+                               sizeof(Mesh2dPushConstant), &sprite.push_constant.model);
 
             VkBuffer vertexBuffers[] = {sprite.mesh->vertexBuffer};
             RenderServer::getSingleton().blit(
@@ -70,8 +77,8 @@ namespace Flint {
         for (auto const &entity: entities) {
             auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
             auto &transform = coordinator.get_component<Transform2dComponent>(entity);
-            auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
-            auto &sort_z = coordinator.get_component<SortZ2d>(entity);
+            //auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
+            auto &sort_z = coordinator.get_component<ZSort2d>(entity);
 
             float sprite_width = sprite.material->texture->width * transform.scale.x;
             float sprite_height = sprite.material->texture->height * transform.scale.y;
@@ -99,7 +106,8 @@ namespace Flint {
                                              sprite_height / viewport_extent.y * 2.0f,
                                              1.0f));
 
-            mvp_component.mvp_buffer->update_uniform_buffer(ubo);
+            sprite.push_constant.model = ubo.model;
+            //mvp_component.mvp_buffer->update_uniform_buffer(ubo);
         }
     }
 
@@ -110,6 +118,12 @@ namespace Flint {
             auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
 
             VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
+            VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
+
+            // Upload the model matrix to the GPU via push constants.
+            vkCmdPushConstants(command_buffer, pipeline_layout,
+                               VK_SHADER_STAGE_VERTEX_BIT, 0,
+                               sizeof(Mesh2dPushConstant), &sprite.push_constant.model);
 
             VkBuffer vertexBuffers[] = {sprite.mesh->vertexBuffer};
             RenderServer::getSingleton().blit(

@@ -24,6 +24,8 @@ namespace Flint {
         void draw(VkCommandBuffer p_command_buffer) override;
 
         void update_mvp();
+
+        Mesh2dPushConstant push_constant;
     };
 }
 

@@ -49,7 +49,7 @@ namespace Flint {
                                       VkBuffer &p_index_buffer,
                                       VkDeviceMemory &p_index_buffer_memory);
 
-        std::shared_ptr<MvpBuffer> mvp_buffer;
+        Mesh3dPushConstant push_constant;
     };
 }
 
