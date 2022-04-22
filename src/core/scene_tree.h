@@ -15,7 +15,7 @@ namespace Flint {
 
         void input(const InputEvent &input_event) const;
 
-        void update(double delta) const;
+        void update(double dt) const;
 
         void draw(VkCommandBuffer p_command_buffer) const;
 

@@ -14,9 +14,9 @@ namespace Flint {
         return root;
     }
 
-    void SceneTree::update(double delta) const {
+    void SceneTree::update(double dt) const {
         if (root == nullptr) return;
-        root->_update(delta);
+        root->_update(dt);
     }
 
     void SceneTree::draw(VkCommandBuffer p_command_buffer) const {

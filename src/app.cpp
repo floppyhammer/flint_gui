@@ -41,8 +41,8 @@ void App::run() {
     auto swap_chain = SwapChain::getSingleton();
     // ---------------------------------------------------
 
-    uint32_t NODE_SPRITE_COUNT = 1000;
-    uint32_t ECS_SPRITE_COUNT = 0;
+    uint32_t NODE_SPRITE_COUNT = 000;
+    uint32_t ECS_SPRITE_COUNT = 5000;
 
     std::default_random_engine generator;
     std::uniform_real_distribution<float> rand_position(0.0f, 400.0f);
@@ -66,7 +66,6 @@ void App::run() {
 
         for (int i = 0; i < NODE_SPRITE_COUNT; i++) {
             auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
-            rigid_body_2d->position = {rand_position(generator), rand_position(generator)};
             rigid_body_2d->velocity = {rand_velocity(generator), rand_velocity(generator)};
             auto sprite_2d = std::make_shared<Flint::Sprite2d>();
             sprite_2d->set_mesh(mesh);
@@ -311,7 +310,7 @@ void App::main_loop() {
 void App::draw_frame() {
     // Engine processing.
     Flint::Engine::getSingleton().tick();
-    auto delta = Flint::Engine::getSingleton().get_delta();
+    auto dt = Flint::Engine::getSingleton().get_delta();
 
     // Acquire next image.
     // We should do this before updating scene as we need to modify different buffers according to the current image index.
@@ -321,10 +320,10 @@ void App::draw_frame() {
     // Update the scene.
     {
         // Node scene manager.
-        tree.update(delta);
+        tree.update(dt);
 
         // ECS scene manager.
-        physics_system->update(delta);
+        physics_system->update(dt);
         sprite_render_system->update();
         model_render_system->update();
     }

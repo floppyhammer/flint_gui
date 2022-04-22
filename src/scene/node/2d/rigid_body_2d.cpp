@@ -15,13 +15,19 @@ namespace Flint {
         Node::_update(delta);
     }
 
-    void RigidBody2d::update(double delta) {
-        position += velocity * delta;
-        velocity += gravity * delta;
+    void RigidBody2d::update(double dt) {
+        position += velocity * dt;
+        velocity += gravity * dt;
 
-        if (position.x < 0 || position.x > WIDTH)
-            velocity.x *= -1.0f;
-        if (position.y < 0 || position.y > HEIGHT)
-            velocity.y *= -1.0f;
+        if (position.x < 0) {
+            velocity.x = std::abs(velocity.x);
+        } else if (position.x > WIDTH) {
+            velocity.x = -std::abs(velocity.x);
+        }
+        if (position.y < 0) {
+            velocity.y = std::abs(velocity.y);
+        } else if (position.y > HEIGHT) {
+            velocity.y = -std::abs(velocity.y);
+        }
     }
 }

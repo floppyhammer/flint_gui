@@ -12,10 +12,10 @@ namespace Flint {
         Vec2<float> acceleration{0};
         Vec2<float> gravity{0};
 
-        void _update(double delta) override;
+        void _update(double dt) override;
 
     protected:
-        void update(double delta) override;
+        void update(double dt) override;
     };
 }
 

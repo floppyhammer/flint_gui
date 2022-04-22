@@ -1,9 +1,9 @@
 #include "node.h"
 
 namespace Flint {
-    void Node::_update(double delta) {
+    void Node::_update(double dt) {
         for (auto &child: children) {
-            child->_update(delta);
+            child->_update(dt);
         }
     }
 
