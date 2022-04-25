@@ -52,7 +52,7 @@ namespace Flint {
     }
 
     void Sprite2d::update_mvp() {
-        if (material == nullptr) {
+        if (material == nullptr || material->texture == nullptr) {
             return;
         }
 
@@ -72,26 +72,26 @@ namespace Flint {
 
         auto global_position = get_global_position();
 
-        // Prepare UBO data. We use this matrix to convert a full-screen to the control's rect.
-        UniformBufferObject ubo{};
+        // Prepare MVP data. We use this matrix to convert a full-screen to the control's rect.
+        ModelViewProjection mvp{};
 
         // The actual application order of these matrices is reverse.
         // 4.
-        ubo.model = glm::translate(glm::mat4(1.0f),
+        mvp.model = glm::translate(glm::mat4(1.0f),
                                    glm::vec3(global_position.x / viewport_extent.x * 2.0f,
                                              global_position.y / viewport_extent.y * 2.0f,
                                              0.0f));
         // 3.
-        ubo.model = glm::translate(ubo.model, glm::vec3(-1.0, -1.0, 0.0f));
+        mvp.model = glm::translate(mvp.model, glm::vec3(-1.0, -1.0, 0.0f));
         // 2.
-        ubo.model = glm::scale(ubo.model, glm::vec3(scale.x, scale.y, 1.0f));
+        mvp.model = glm::scale(mvp.model, glm::vec3(scale.x, scale.y, 1.0f));
         // 1.
-        ubo.model = glm::scale(ubo.model,
+        mvp.model = glm::scale(mvp.model,
                                glm::vec3(sprite_width / viewport_extent.x * 2.0f,
                                          sprite_height / viewport_extent.y * 2.0f,
                                          1.0f));
 
-        push_constant.model = ubo.model;
+        push_constant.model = mvp.model;
     }
 
     void Sprite2d::_draw(VkCommandBuffer p_command_buffer) {

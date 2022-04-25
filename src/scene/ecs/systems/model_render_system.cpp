@@ -18,32 +18,32 @@ namespace Flint {
             auto &model = coordinator.get_component<ModelComponent>(entity);
             auto &transform = coordinator.get_component<Transform3dComponent>(entity);
 
-            // Prepare UBO data.
-            UniformBufferObject ubo{};
+            // Prepare MVP data.
+            ModelViewProjection mvp{};
 
             // Determined by model transform.
-            ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z));
-            ubo.model = glm::scale(ubo.model, glm::vec3(transform.scale.x, transform.scale.y, transform.scale.z));
-            ubo.model = glm::rotate(ubo.model, (float) Engine::getSingleton().get_elapsed() * glm::radians(90.0f),
+            mvp.model = glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z));
+            mvp.model = glm::scale(mvp.model, glm::vec3(transform.scale.x, transform.scale.y, transform.scale.z));
+            mvp.model = glm::rotate(mvp.model, (float) Engine::getSingleton().get_elapsed() * glm::radians(90.0f),
                                     glm::vec3(0.0f, 0.0f, 1.0f));
 
-            ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
+            mvp.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
                                    glm::vec3(0.0f, 0.0f, 0.0f),
                                    glm::vec3(0.0f, 0.0f, 1.0f));
 
             auto viewport_extent = SwapChain::getSingleton().swapChainExtent;
 
             // Set projection matrix. Determined by viewport.
-            ubo.proj = glm::perspective(glm::radians(45.0f),
+            mvp.proj = glm::perspective(glm::radians(45.0f),
                                         (float) viewport_extent.width / (float) viewport_extent.height,
                                         0.1f,
                                         10.0f);
 
             // GLM was originally designed for OpenGL,
             // where the Y coordinate of the clip coordinates is inverted.
-            ubo.proj[1][1] *= -1;
+            mvp.proj[1][1] *= -1;
 
-            model.push_constant.mvp = ubo.calculate_mvp();
+            model.push_constant.mvp = mvp.calculate_mvp();
         }
     }
 

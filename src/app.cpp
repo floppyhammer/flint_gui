@@ -55,13 +55,15 @@ void App::run() {
     {
         auto node = std::make_shared<Flint::Node>();
         auto node_3d = std::make_shared<Flint::Node3D>();
-        auto mesh_instance_0 = std::make_shared<Flint::Model>();
-        auto mesh_instance_1 = std::make_shared<Flint::Model>();
-        auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
-        auto sub_viewport = std::make_shared<Flint::SubViewport>();
+        //auto mesh_instance_0 = std::make_shared<Flint::Model>();
+        //auto mesh_instance_1 = std::make_shared<Flint::Model>();
+        //auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
+        //auto sub_viewport = std::make_shared<Flint::SubViewport>();
 
         auto tex = Texture::from_file("../assets/duck.png");
+        tex->name = "duck";
         auto material = std::make_shared<Material2d>();
+        material->texture = tex;
         auto mesh = Mesh2d::from_default();
 
         for (int i = 0; i < NODE_SPRITE_COUNT; i++) {
@@ -137,6 +139,7 @@ void App::run() {
         entities.resize(ECS_SPRITE_COUNT);
 
         auto tex = Texture::from_file("../assets/duck.png");
+        tex->name = "duck";
 
         auto material = std::make_shared<Material2d>();
         material->texture = tex;
@@ -189,13 +192,13 @@ void App::run() {
 
         // 3D model.
 //        {
-//            auto meshes = std::vector<std::shared_ptr<Mesh3D>>();
+//            auto meshes = std::vector<std::shared_ptr<Mesh3d>>();
 //            auto desc_sets = std::vector<std::shared_ptr<Mesh3dDescSet>>();
-//            auto materials = std::vector<std::shared_ptr<Material3D>>();
-//            //auto mvp_buffer = std::make_shared<Flint::MvpBuffer>(); // We only need a single mvp buffer.
+//            auto materials = std::vector<std::shared_ptr<Material3d>>();
 //            Flint::ObjImporter::load_file("../assets/viking_room/viking_room.obj", meshes, desc_sets, materials);
 //
 //            auto entity = coordinator.create_entity();
+//            entities.push_back(entity);
 //
 //            coordinator.add_component(
 //                    entity,
@@ -234,8 +237,18 @@ void App::run() {
 
     // Cleanup.
     {
-        // Release node resources.
-        tree.set_root(nullptr);
+        // Clean up the scene.
+        {
+            // Node.
+            tree.set_root(nullptr);
+
+            // ECS.
+            auto coordinator = Flint::Coordinator::get_singleton();
+            for (auto &entity: entities) {
+                coordinator.destroy_entity(entity);
+            }
+            entities.resize(0);
+        }
 
         swap_chain.cleanup();
 

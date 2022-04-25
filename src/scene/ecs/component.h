@@ -41,7 +41,7 @@ namespace Flint {
             entity_to_index_map[entity] = new_index;
             index_to_entity_map[new_index] = entity;
             component_array[new_index] = component;
-            ++size;
+            size++;
         }
 
         void remove_data(Entity entity) {
@@ -63,7 +63,7 @@ namespace Flint {
             entity_to_index_map.erase(entity);
             index_to_entity_map.erase(index_of_last_element);
 
-            --size;
+            size--;
         }
 
         T &get_data(Entity entity) {

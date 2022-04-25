@@ -158,12 +158,12 @@ namespace Flint {
 
     void Viewport::create_pipelines() {
         // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
-        RenderServer::getSingleton().createMeshGraphicsPipeline(
+        RenderServer::getSingleton().createMeshPipeline(
                 renderPass,
                 VkExtent2D{extent.x, extent.y},
                 meshGraphicsPipeline);
 
-        RenderServer::getSingleton().createBlitGraphicsPipeline(
+        RenderServer::getSingleton().createBlitPipeline(
                 renderPass,
                 VkExtent2D{extent.x, extent.y},
                 blitGraphicsPipeline);

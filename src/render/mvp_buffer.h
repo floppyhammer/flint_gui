@@ -18,7 +18,7 @@
 namespace Flint {
     /// MVP, which will be sent to vertex shaders.
     /// Shared by 2D and 3D.
-    struct UniformBufferObject {
+    struct ModelViewProjection {
         glm::mat4 model;
         glm::mat4 view;
         glm::mat4 proj;
@@ -40,7 +40,7 @@ namespace Flint {
          * Update MVP. Update UBOs simply by memory mapping.
          * @param currentImage Current image, which has different meaning from `current frame`.
          */
-        void update_uniform_buffer(UniformBufferObject ubo);
+        void update_uniform_buffer(ModelViewProjection mvp);
 
     private:
         /**

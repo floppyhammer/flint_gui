@@ -8,7 +8,7 @@
 #include "render_server.h"
 
 namespace Flint {
-    glm::mat4 UniformBufferObject::calculate_mvp() const {
+    glm::mat4 ModelViewProjection::calculate_mvp() const {
         return proj * view * model;
     }
 
@@ -23,7 +23,7 @@ namespace Flint {
     void MvpBuffer::create_uniform_buffers() {
         auto &swapChainImages = SwapChain::getSingleton().swapChainImages;
 
-        VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+        VkDeviceSize bufferSize = sizeof(ModelViewProjection);
 
         uniform_buffers.resize(swapChainImages.size());
         uniform_buffers_memory.resize(swapChainImages.size());
@@ -38,13 +38,13 @@ namespace Flint {
         }
     }
 
-    void MvpBuffer::update_uniform_buffer(UniformBufferObject ubo) {
+    void MvpBuffer::update_uniform_buffer(ModelViewProjection mvp) {
         if (uniform_buffers_memory.empty()) return;
 
-        // Copy the UBO data to the current uniform buffer.
-        RenderServer::getSingleton().copyDataToMemory(&ubo,
+        // Copy the MVP data to the current uniform buffer.
+        RenderServer::getSingleton().copyDataToMemory(&mvp,
                                                       uniform_buffers_memory[SwapChain::getSingleton().currentImage],
-                                                      sizeof(ubo));
+                                                      sizeof(mvp));
     }
 
     void MvpBuffer::free_uniform_buffers() {

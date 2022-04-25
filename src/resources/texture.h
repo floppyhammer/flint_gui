@@ -12,6 +12,8 @@
 
 class Texture : public Resource {
 public:
+    std::string name = "";
+
     /// Create an empty texture with specific size.
     static std::shared_ptr<Texture> from_empty(uint32_t p_width, uint32_t p_height);
 

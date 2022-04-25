@@ -8,18 +8,14 @@
 RenderServer::RenderServer() {
     createCommandPool();
 
-    // Create descriptor set layouts.
-    createMeshDescriptorSetLayout();
-    createBlitDescriptorSetLayout();
-
-    // Create pipeline layouts using the created descriptor set layouts.
-    createMeshGraphicsPipelineLayout(meshDescriptorSetLayout, meshPipelineLayout);
-    createBlitGraphicsPipelineLayout(blitDescriptorSetLayout, blitPipelineLayout);
+    // Create descriptor set layouts and pipeline layouts.
+    createMeshLayouts();
+    createBlitLayouts();
 }
 
 void RenderServer::createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
-    createMeshGraphicsPipeline(renderPass, swapChainExtent, meshGraphicsPipeline);
-    createBlitGraphicsPipeline(renderPass, swapChainExtent, blitGraphicsPipeline);
+    createMeshPipeline(renderPass, swapChainExtent, meshGraphicsPipeline);
+    createBlitPipeline(renderPass, swapChainExtent, blitGraphicsPipeline);
 }
 
 void RenderServer::cleanupSwapChainRelatedResources() const {
@@ -475,8 +471,10 @@ void RenderServer::draw_mesh(VkCommandBuffer commandBuffer,
     vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 }
 
-void RenderServer::createMeshDescriptorSetLayout() {
-    // MVP uniform binding.
+void RenderServer::createMeshLayouts() {
+    // Descriptor set layout.
+    {
+        // MVP uniform binding.
 //    // ------------------------------
 //    VkDescriptorSetLayoutBinding uboLayoutBinding{};
 //    uboLayoutBinding.binding = 0;
@@ -494,31 +492,60 @@ void RenderServer::createMeshDescriptorSetLayout() {
 //    uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
 //    // ------------------------------
 
-    // Image sampler uniform binding.
-    // ------------------------------
-    VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-    samplerLayoutBinding.binding = 0;
-    samplerLayoutBinding.descriptorCount = 1;
-    samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    samplerLayoutBinding.pImmutableSamplers = nullptr;
-    samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    // ------------------------------
+        // Image sampler uniform binding.
+        // ------------------------------
+        VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+        samplerLayoutBinding.binding = 0;
+        samplerLayoutBinding.descriptorCount = 1;
+        samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        samplerLayoutBinding.pImmutableSamplers = nullptr;
+        samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        // ------------------------------
 
-    std::array<VkDescriptorSetLayoutBinding, 1> bindings = {samplerLayoutBinding};
-    VkDescriptorSetLayoutCreateInfo layoutInfo{};
-    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-    layoutInfo.pBindings = bindings.data();
+        std::array<VkDescriptorSetLayoutBinding, 1> bindings = {samplerLayoutBinding};
+        VkDescriptorSetLayoutCreateInfo layoutInfo{};
+        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+        layoutInfo.pBindings = bindings.data();
 
-    if (vkCreateDescriptorSetLayout(Platform::getSingleton().device, &layoutInfo, nullptr,
-                                    &meshDescriptorSetLayout) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create descriptor set layout!");
+        if (vkCreateDescriptorSetLayout(Platform::getSingleton().device, &layoutInfo, nullptr,
+                                        &meshDescriptorSetLayout) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to create descriptor set layout!");
+        }
+    }
+
+    // Pipeline layout, which depends on a descriptor set layout.
+    {
+        // Push constant.
+        VkPushConstantRange pushConstant;
+        {
+            pushConstant.offset = 0;
+            pushConstant.size = sizeof(Mesh3dPushConstant);
+            pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        }
+
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutInfo.setLayoutCount = 1;
+        pipelineLayoutInfo.pSetLayouts = &meshDescriptorSetLayout;
+        pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
+        pipelineLayoutInfo.pushConstantRangeCount = 1;
+
+        // Create pipeline layout.
+        if (vkCreatePipelineLayout(Platform::getSingleton().device,
+                                   &pipelineLayoutInfo,
+                                   nullptr,
+                                   &meshPipelineLayout) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to create pipeline layout!");
+        }
     }
 }
 
-void RenderServer::createBlitDescriptorSetLayout() {
-    // MVP uniform binding. (We use PushConstant instead.)
-    // ------------------------------
+void RenderServer::createBlitLayouts() {
+    // Descriptor set layout.
+    {
+        // MVP uniform binding. (We use PushConstant instead.)
+        // ------------------------------
 //    VkDescriptorSetLayoutBinding uboLayoutBinding{};
 //    uboLayoutBinding.binding = 0;
 //    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -533,33 +560,60 @@ void RenderServer::createBlitDescriptorSetLayout() {
 //
 //    // The pImmutableSamplers field is only relevant for image sampling related descriptors.
 //    uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
-    // ------------------------------
+        // ------------------------------
 
-    // Image sampler uniform binding.
-    // ------------------------------
-    VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-    samplerLayoutBinding.binding = 0;
-    samplerLayoutBinding.descriptorCount = 1;
-    samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    samplerLayoutBinding.pImmutableSamplers = nullptr;
-    samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-    // ------------------------------
+        // Image sampler uniform binding.
+        // ------------------------------
+        VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+        samplerLayoutBinding.binding = 0;
+        samplerLayoutBinding.descriptorCount = 1;
+        samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        samplerLayoutBinding.pImmutableSamplers = nullptr;
+        samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        // ------------------------------
 
-    std::array<VkDescriptorSetLayoutBinding, 1> bindings = {samplerLayoutBinding};
-    VkDescriptorSetLayoutCreateInfo layoutInfo{};
-    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-    layoutInfo.pBindings = bindings.data();
+        std::array<VkDescriptorSetLayoutBinding, 1> bindings = {samplerLayoutBinding};
+        VkDescriptorSetLayoutCreateInfo layoutInfo{};
+        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+        layoutInfo.pBindings = bindings.data();
 
-    if (vkCreateDescriptorSetLayout(Platform::getSingleton().device, &layoutInfo, nullptr,
-                                    &blitDescriptorSetLayout) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create descriptor set layout!");
+        if (vkCreateDescriptorSetLayout(Platform::getSingleton().device, &layoutInfo, nullptr,
+                                        &blitDescriptorSetLayout) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to create descriptor set layout!");
+        }
+    }
+
+    // Pipeline layout.
+    {
+        // Push constant.
+        VkPushConstantRange pushConstant;
+        {
+            pushConstant.offset = 0;
+            pushConstant.size = sizeof(Mesh2dPushConstant);
+            pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        }
+
+        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipelineLayoutInfo.setLayoutCount = 1;
+        pipelineLayoutInfo.pSetLayouts = &blitDescriptorSetLayout;
+        pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
+        pipelineLayoutInfo.pushConstantRangeCount = 1;
+
+        // Create pipeline layout.
+        if (vkCreatePipelineLayout(Platform::getSingleton().device,
+                                   &pipelineLayoutInfo,
+                                   nullptr,
+                                   &blitPipelineLayout) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to create pipeline layout!");
+        }
     }
 }
 
-void RenderServer::createMeshGraphicsPipeline(VkRenderPass renderPass,
-                                              VkExtent2D viewportExtent,
-                                              VkPipeline &graphicsPipeline) {
+void RenderServer::createMeshPipeline(VkRenderPass renderPass,
+                                      VkExtent2D viewportExtent,
+                                      VkPipeline &pipeline) {
     auto vertShaderCode = readFile("../src/shaders/mesh_instance_vert.spv");
     auto fragShaderCode = readFile("../src/shaders/mesh_instance_frag.spv");
 
@@ -686,7 +740,7 @@ void RenderServer::createMeshGraphicsPipeline(VkRenderPass renderPass,
                                   1,
                                   &pipelineInfo,
                                   nullptr,
-                                  &graphicsPipeline) != VK_SUCCESS) {
+                                  &pipeline) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create graphics pipeline!");
     }
 
@@ -695,61 +749,9 @@ void RenderServer::createMeshGraphicsPipeline(VkRenderPass renderPass,
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
-void RenderServer::createMeshGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
-                                                    VkPipelineLayout &graphicsPipelineLayout) {
-    // Push constant.
-    VkPushConstantRange pushConstant;
-    {
-        pushConstant.offset = 0;
-        pushConstant.size = sizeof(Mesh3dPushConstant);
-        pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    }
-
-    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 1;
-    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
-    pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
-    pipelineLayoutInfo.pushConstantRangeCount = 1;
-
-    // Create pipeline layout.
-    if (vkCreatePipelineLayout(Platform::getSingleton().device,
-                               &pipelineLayoutInfo,
-                               nullptr,
-                               &graphicsPipelineLayout) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create pipeline layout!");
-    }
-}
-
-void RenderServer::createBlitGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
-                                                    VkPipelineLayout &pipelineLayout) {
-    // Push constant.
-    VkPushConstantRange pushConstant;
-    {
-        pushConstant.offset = 0;
-        pushConstant.size = sizeof(Mesh2dPushConstant);
-        pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-    }
-
-    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 1;
-    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
-    pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
-    pipelineLayoutInfo.pushConstantRangeCount = 1;
-
-    // Create pipeline layout.
-    if (vkCreatePipelineLayout(Platform::getSingleton().device,
-                               &pipelineLayoutInfo,
-                               nullptr,
-                               &pipelineLayout) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create pipeline layout!");
-    }
-}
-
-void RenderServer::createBlitGraphicsPipeline(VkRenderPass renderPass,
-                                              VkExtent2D viewportExtent,
-                                              VkPipeline &graphicsPipeline) {
+void RenderServer::createBlitPipeline(VkRenderPass renderPass,
+                                      VkExtent2D viewportExtent,
+                                      VkPipeline &pipeline) {
     auto vertShaderCode = readFile("../src/shaders/blit_vert.spv");
     auto fragShaderCode = readFile("../src/shaders/blit_frag.spv");
 
@@ -886,7 +888,7 @@ void RenderServer::createBlitGraphicsPipeline(VkRenderPass renderPass,
                                   1,
                                   &pipelineInfo,
                                   nullptr,
-                                  &graphicsPipeline) != VK_SUCCESS) {
+                                  &pipeline) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create graphics pipeline!");
     }
 

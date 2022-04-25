@@ -33,13 +33,13 @@ namespace Flint {
     }
 
     void Node3D::update_mvp() {
-        // Prepare UBO data.
-        UniformBufferObject ubo{};
+        // Prepare MVP data.
+        ModelViewProjection mvp{};
 
         // Determined by model transform.
-        ubo.model = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, position.z));
-        ubo.model = glm::scale(ubo.model, glm::vec3(scale.x, scale.y, scale.z));
-        ubo.model = glm::rotate(ubo.model, (float) Engine::getSingleton().get_elapsed() * glm::radians(90.0f),
+        mvp.model = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, position.z));
+        mvp.model = glm::scale(mvp.model, glm::vec3(scale.x, scale.y, scale.z));
+        mvp.model = glm::rotate(mvp.model, (float) Engine::getSingleton().get_elapsed() * glm::radians(90.0f),
                                 glm::vec3(0.0f, 0.0f, 1.0f));
 
         // FIXME: Should get camera from the viewport.
@@ -47,7 +47,7 @@ namespace Flint {
         Camera3D camera;
         camera.position = glm::vec3(2.0f, 2.0f, 2.0f);
 
-        ubo.view = glm::lookAt(camera.position,
+        mvp.view = glm::lookAt(camera.position,
                                glm::vec3(0.0f, 0.0f, 0.0f),
                                camera.get_up_direction());
 
@@ -57,30 +57,29 @@ namespace Flint {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
 
             // Set projection matrix. Determined by viewport.
-            ubo.proj = glm::perspective(glm::radians(viewport->fov),
+            mvp.proj = glm::perspective(glm::radians(viewport->fov),
                                         (float) viewport->get_extent().x / (float) viewport->get_extent().y,
                                         viewport->z_near,
                                         viewport->z_far);
 
             // GLM was originally designed for OpenGL,
             // where the Y coordinate of the clip coordinates is inverted.
-            ubo.proj[1][1] *= -1;
+            mvp.proj[1][1] *= -1;
         } else {
             auto viewport_extent = SwapChain::getSingleton().swapChainExtent;
 
             // Set projection matrix. Determined by viewport.
-            ubo.proj = glm::perspective(glm::radians(45.0f),
+            mvp.proj = glm::perspective(glm::radians(45.0f),
                                         (float) viewport_extent.width / (float) viewport_extent.height,
                                         0.1f,
                                         10.0f);
 
             // GLM was originally designed for OpenGL,
             // where the Y coordinate of the clip coordinates is inverted.
-            ubo.proj[1][1] *= -1;
+            mvp.proj[1][1] *= -1;
         }
 
-        push_constant.mvp = ubo.calculate_mvp();
-        //mvp_buffer->update_uniform_buffer(ubo);
+        push_constant.mvp = mvp.calculate_mvp();
     }
 
     void Node3D::_notify(Signal signal) {

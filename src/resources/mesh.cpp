@@ -93,7 +93,7 @@ void Mesh3dDescSet::updateDescriptorSet(const std::shared_ptr<Material>& p_mater
 //        VkDescriptorBufferInfo bufferInfo{};
 //        bufferInfo.buffer = uniformBuffers[i];
 //        bufferInfo.offset = 0;
-//        bufferInfo.range = sizeof(Flint::UniformBufferObject);
+//        bufferInfo.range = sizeof(Flint::ModelViewProjection);
 
         VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

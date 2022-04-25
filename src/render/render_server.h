@@ -174,30 +174,6 @@ public:
     VkPipeline blitGraphicsPipeline;
 
     /**
-     * Create a descriptor set layout for mesh drawing.
-     * @dependency None.
-     */
-    void createMeshDescriptorSetLayout();
-
-    /**
-     * Create pipeline layout. Must do this before creating pipelines.
-     * @param descriptorSetLayout Layout for the descriptor set of the pipeline.
-     * @param graphicsPipelineLayout OUTPUT
-     * @dependency VkDescriptorSetLayout
-     */
-    void createMeshGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
-                                      VkPipelineLayout &graphicsPipelineLayout);
-
-    /**
-     * Create pipeline layout. Must do this before creating pipelines.
-     * @param descriptorSetLayout Layout for the descriptor set of the pipeline.
-     * @param graphicsPipelineLayout OUTPUT
-     * @dependency VkDescriptorSetLayout
-     */
-    void createBlitGraphicsPipelineLayout(const VkDescriptorSetLayout &descriptorSetLayout,
-                                      VkPipelineLayout &graphicsPipelineLayout);
-
-    /**
      * Set up shaders, viewport, blend state, etc.
      * @param renderPass Target render pass.
      * @param viewportExtent Target viewport size.
@@ -205,9 +181,9 @@ public:
      * @note We only need one pipeline for a specific rendering process despite of the existence of multiple swap chains.
      * @dependency Descriptor set layout, render pass, viewport extent.
      */
-    void createMeshGraphicsPipeline(VkRenderPass renderPass,
+    void createMeshPipeline(VkRenderPass renderPass,
                                     VkExtent2D viewportExtent,
-                                    VkPipeline &graphicsPipeline);
+                                    VkPipeline &pipeline);
 
     /**
      * Draw a single mesh.
@@ -235,17 +211,28 @@ public:
 
     VkCommandPool commandPool;
 
-    void createBlitGraphicsPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &graphicsPipeline);
-
-    void createBlitDescriptorSetLayout();
+    void createBlitPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
 
     void createIndexBuffer(std::vector<uint32_t> &indices,
-                                  VkBuffer &p_index_buffer,
-                                  VkDeviceMemory &p_index_buffer_memory);
+                           VkBuffer &p_index_buffer,
+                           VkDeviceMemory &p_index_buffer_memory);
 
     void createVertexBuffer(std::vector<Vertex> &vertices,
-                                   VkBuffer &p_vertex_buffer,
-                                   VkDeviceMemory &p_vertex_buffer_memory);
+                            VkBuffer &p_vertex_buffer,
+                            VkDeviceMemory &p_vertex_buffer_memory);
+
+private:
+    /**
+     * Create descriptor set layout and pipeline layout for mesh drawing.
+     * @dependency None.
+     */
+    void createMeshLayouts();
+
+    /**
+     * Create descriptor set layout and pipeline layout for blit drawing.
+     * @dependency None.
+     */
+    void createBlitLayouts();
 };
 
 #endif //FLINT_RENDER_SERVER_H
