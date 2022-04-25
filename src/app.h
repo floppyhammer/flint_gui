@@ -15,7 +15,7 @@
 #include <cstring>
 #include <queue>
 
-#include "resources/mesh.h"
+#include "resources/surface.h"
 #include "resources/texture.h"
 #include "core/scene_tree.h"
 

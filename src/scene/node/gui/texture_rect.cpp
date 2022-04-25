@@ -13,21 +13,17 @@
 namespace Flint {
     TextureRect::TextureRect() {
         type = NodeType::TextureRect;
-
-        init_default_mesh();
     }
 
     void TextureRect::set_texture(std::shared_ptr<Texture> p_texture) {
-        material->texture = p_texture;
+        mesh->surface->get_material()->set_texture(p_texture);
 
         size.x = (float) p_texture->width;
         size.y = (float) p_texture->height;
-
-        desc_set->updateDescriptorSet(material);
     }
 
     std::shared_ptr<Texture> TextureRect::get_texture() const {
-        return material->texture;
+        return mesh->surface->get_material()->get_texture();
     }
 
     void TextureRect::_update(double delta) {
@@ -57,13 +53,13 @@ namespace Flint {
             pipeline = viewport->viewport->blitGraphicsPipeline;
         }
 
-        VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
+        VkBuffer vertexBuffers[] = {mesh->surface->vertexBuffer};
         RenderServer::getSingleton().blit(
                 p_command_buffer,
                 pipeline,
-                desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
                 vertexBuffers,
-                mesh->indexBuffer,
-                mesh->indices_count);
+                mesh->surface->indexBuffer,
+                mesh->surface->indices_count);
     }
 }

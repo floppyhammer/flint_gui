@@ -7,8 +7,6 @@ namespace Flint {
         type = NodeType::Node2D;
 
         mesh = DefaultResource::get_singleton().default_mesh_2d;
-        material = std::make_shared<Material2d>();
-        desc_set = std::make_shared<Mesh2dDescSet>();
     }
 
     Vec2<float> Node2d::get_global_position() const {

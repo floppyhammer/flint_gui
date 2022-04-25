@@ -3,7 +3,7 @@
 
 #include "node_gui.h"
 #include "../../../resources/texture.h"
-#include "../../../resources/mesh.h"
+#include "../../../resources/surface.h"
 
 #include <memory>
 

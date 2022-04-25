@@ -9,16 +9,12 @@
 namespace Flint {
     SubViewportContainer::SubViewportContainer() {
         type = NodeType::SubViewportContainer;
-
-        init_default_mesh();
     }
 
     void SubViewportContainer::set_viewport(std::shared_ptr<SubViewport> p_viewport) {
         viewport = std::move(p_viewport);
 
-        material->texture = viewport->get_texture();
-
-        //mesh->updateDescriptorSets(material, mvp_buffer->uniform_buffers);
+        mesh->surface->get_material()->set_texture(viewport->get_texture());
     }
 
     void SubViewportContainer::_update(double delta) {
@@ -60,7 +56,7 @@ namespace Flint {
             pipeline = viewport->viewport->blitGraphicsPipeline;
         }
 
-        VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
+        VkBuffer vertexBuffers[] = {mesh->surface->vertexBuffer};
 //        RenderServer::getSingleton().blit(
 //                p_command_buffer,
 //                pipeline,

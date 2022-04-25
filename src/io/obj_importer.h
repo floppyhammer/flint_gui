@@ -1,7 +1,7 @@
 #ifndef FLINT_OBJ_IMPORTER_H
 #define FLINT_OBJ_IMPORTER_H
 
-#include "../resources/mesh.h"
+#include "../resources/surface.h"
 #include "../render/mvp_buffer.h"
 
 #include <vector>
@@ -11,9 +11,7 @@ namespace Flint {
     class ObjImporter {
     public:
         static void load_file(const std::string &filename,
-                              std::vector<std::shared_ptr<Mesh3d>> &meshes,
-                              std::vector<std::shared_ptr<Mesh3dDescSet>> &desc_sets,
-                              std::vector<std::shared_ptr<Material3d>> &materials);
+                              std::vector<std::shared_ptr<Surface3d>> &surfaces);
     };
 }
 

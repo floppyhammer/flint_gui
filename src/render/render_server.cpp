@@ -2,7 +2,7 @@
 #include <set>
 
 #include "render_server.h"
-#include "../resources/mesh.h"
+#include "../resources/surface.h"
 #include "../common/io.h"
 
 RenderServer::RenderServer() {
@@ -520,7 +520,7 @@ void RenderServer::createMeshLayouts() {
         VkPushConstantRange pushConstant;
         {
             pushConstant.offset = 0;
-            pushConstant.size = sizeof(Mesh3dPushConstant);
+            pushConstant.size = sizeof(Surface3dPushConstant);
             pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
         }
 
@@ -590,7 +590,7 @@ void RenderServer::createBlitLayouts() {
         VkPushConstantRange pushConstant;
         {
             pushConstant.offset = 0;
-            pushConstant.size = sizeof(Mesh2dPushConstant);
+            pushConstant.size = sizeof(Surface2dPushConstant);
             pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
         }
 

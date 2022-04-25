@@ -4,7 +4,7 @@
 #include "../coordinator.h"
 #include "../../../render/swap_chain.h"
 #include "../../../core/engine.h"
-#include "../../../resources/mesh.h"
+#include "../../../resources/surface.h"
 #include "../../../render/mvp_buffer.h"
 
 #include "glm/glm.hpp"
@@ -59,20 +59,17 @@ namespace Flint {
             // Upload the model matrix to the GPU via push constants.
             vkCmdPushConstants(command_buffer, pipeline_layout,
                                VK_SHADER_STAGE_VERTEX_BIT, 0,
-                               sizeof(Mesh2dPushConstant), &model.push_constant.mvp);
+                               sizeof(Surface2dPushConstant), &model.push_constant.mvp);
 
-            for (int i = 0; i < model.meshes.size(); i++) {
-                const auto &mesh = model.meshes[i];
-                const auto &desc_set = model.desc_sets[i];
-
-                VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
+            for (auto &surface: model.mesh->surfaces) {
+                VkBuffer vertexBuffers[] = {surface->vertexBuffer};
                 RenderServer::getSingleton().draw_mesh(
                         command_buffer,
                         pipeline,
-                        desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                        surface->material->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
                         vertexBuffers,
-                        mesh->indexBuffer,
-                        mesh->indices_count);
+                        surface->indexBuffer,
+                        surface->indices_count);
             }
         }
     }

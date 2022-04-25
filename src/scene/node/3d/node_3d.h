@@ -3,7 +3,7 @@
 
 #include "../node.h"
 #include "../../../render/render_server.h"
-#include "../../../resources/mesh.h"
+#include "../../../resources/surface.h"
 #include "../../../render/mvp_buffer.h"
 
 #include "glm/glm.hpp"
@@ -49,7 +49,7 @@ namespace Flint {
                                       VkBuffer &p_index_buffer,
                                       VkDeviceMemory &p_index_buffer_memory);
 
-        Mesh3dPushConstant push_constant;
+        Surface3dPushConstant push_constant;
     };
 }
 

@@ -2,6 +2,7 @@
 
 #include "../../../common/io.h"
 #include "../../../io/obj_importer.h"
+#include "../../../resources/resource_manager.h"
 #include "../../../render/swap_chain.h"
 #include "../sub_viewport.h"
 
@@ -45,24 +46,23 @@ namespace Flint {
         // Upload the model matrix to the GPU via push constants.
         vkCmdPushConstants(p_command_buffer, pipeline_layout,
                            VK_SHADER_STAGE_VERTEX_BIT, 0,
-                           sizeof(Mesh3dPushConstant), &push_constant);
+                           sizeof(Surface3dPushConstant), &push_constant);
 
-        for (int i = 0; i < meshes.size(); i++) {
-            const auto &mesh = meshes[i];
-            const auto &desc_set = desc_sets[i];
+        for (auto &surface: mesh->surfaces) {
+            const auto &desc_set = surface->material->get_desc_set();
 
-            VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
+            VkBuffer vertexBuffers[] = {surface->vertexBuffer};
             RenderServer::getSingleton().draw_mesh(
                     p_command_buffer,
                     pipeline,
                     desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
                     vertexBuffers,
-                    mesh->indexBuffer,
-                    mesh->indices_count);
+                    surface->indexBuffer,
+                    surface->indices_count);
         }
     }
 
-    void Model::load_file(const std::string &filename) {
-        ObjImporter::load_file(filename, meshes, desc_sets, materials);
+    void Model::load_file(const std::string &path) {
+        mesh = ResourceManager::get_singleton().load<Mesh3d>(path);
     }
 }

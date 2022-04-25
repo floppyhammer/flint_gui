@@ -4,6 +4,7 @@
 #include "render/swap_chain.h"
 #include "render/render_server.h"
 #include "resources/texture.h"
+#include "resources/mesh.h"
 #include "resources/resource_manager.h"
 #include "core/engine.h"
 #include "core/input_event.h"
@@ -60,8 +61,6 @@ void App::run() {
         //auto mesh_instance_1 = std::make_shared<Flint::Model>();
         //auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         //auto sub_viewport = std::make_shared<Flint::SubViewport>();
-
-        auto mesh = Mesh2d::from_default();
 
         for (int i = 0; i < NODE_SPRITE_COUNT; i++) {
             auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
@@ -141,14 +140,11 @@ void App::run() {
             // Render components.
             {
                 auto material = std::make_shared<Material2d>();
-                material->texture = ResourceManager::get_singleton().load<Texture>("../assets/duck.png");
-
-                auto desc_set = std::make_shared<Mesh2dDescSet>();
-                desc_set->updateDescriptorSet(material);
+                material->set_texture(ResourceManager::get_singleton().load<Texture>("../assets/duck.png"));
 
                 coordinator.add_component(
                         entity,
-                        Flint::Sprite2dComponent{DefaultResource::get_singleton().default_mesh_2d, desc_set, material});
+                        Flint::Sprite2dComponent{DefaultResource::get_singleton().default_mesh_2d, material});
 
                 coordinator.add_component(
                         entity,
@@ -181,17 +177,14 @@ void App::run() {
 
         // 3D model.
 //        {
-//            auto meshes = std::vector<std::shared_ptr<Mesh3d>>();
-//            auto desc_sets = std::vector<std::shared_ptr<Mesh3dDescSet>>();
-//            auto materials = std::vector<std::shared_ptr<Material3d>>();
-//            Flint::ObjImporter::load_file("../assets/viking_room/viking_room.obj", meshes, desc_sets, materials);
+//            auto mesh = ResourceManager::get_singleton().load<Mesh3d>("../assets/viking_room/viking_room.obj");
 //
 //            auto entity = coordinator.create_entity();
 //            entities.push_back(entity);
 //
 //            coordinator.add_component(
 //                    entity,
-//                    Flint::ModelComponent{meshes, desc_sets, materials});
+//                    Flint::ModelComponent{mesh});
 //
 //            Flint::Transform3dComponent transform;
 //            transform.position.x = 0.5;

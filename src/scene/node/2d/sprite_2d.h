@@ -29,7 +29,7 @@ namespace Flint {
 
         void update_mvp();
 
-        Mesh2dPushConstant push_constant;
+        Surface2dPushConstant push_constant;
     };
 }
 

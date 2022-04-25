@@ -27,9 +27,7 @@ namespace std {
 
 namespace Flint {
     void ObjImporter::load_file(const std::string &filename,
-                                std::vector<std::shared_ptr<Mesh3d>> &meshes,
-                                std::vector<std::shared_ptr<Mesh3dDescSet>> &desc_sets,
-                                std::vector<std::shared_ptr<Material3d>> &materials) {
+                                std::vector<std::shared_ptr<Surface3d>> &surfaces) {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> obj_materials;
@@ -45,6 +43,7 @@ namespace Flint {
         }
 
         // Load materials.
+        std::vector<std::shared_ptr<Material3d>> materials;
         if (obj_materials.empty()) {
             Logger::warn("No material found in the .mtl file or no .mtl file found at " + file_directory,
                          "OBJ Importer");
@@ -55,17 +54,19 @@ namespace Flint {
             for (const auto &obj_material: obj_materials) {
                 auto material = std::make_shared<Material3d>();
                 material->name = obj_material.name;
-                material->diffuse_texture = ResourceManager::get_singleton().load<Texture>(file_directory + "/" + obj_material.diffuse_texname);
+                material->set_diffuse_texture(ResourceManager::get_singleton().load<Texture>(file_directory + "/" + obj_material.diffuse_texname));
                 materials.push_back(material);
             }
         }
 
+        int32_t material_id = -1;
+
         // Iterate over the vertices and dump them straight into our vertices vector.
         for (const auto &shape: shapes) {
-            auto mesh = std::make_shared<Mesh3d>();
+            auto surface = std::make_shared<Surface3d>();
 
-            mesh->name = shape.name;
-            mesh->material_id = shape.mesh.material_ids[0];
+            surface->name = shape.name;
+            material_id = shape.mesh.material_ids[0];
 
             // Staging vectors.
             std::vector<Vertex> vertices;
@@ -106,22 +107,16 @@ namespace Flint {
                 indices.push_back(uniqueVertices[vertex]);
             }
 
-            mesh->indices_count = indices.size();
+            surface->indices_count = indices.size();
 
-            RenderServer::getSingleton().createVertexBuffer(vertices, mesh->vertexBuffer, mesh->vertexBufferMemory);
-            RenderServer::getSingleton().createIndexBuffer(indices, mesh->indexBuffer, mesh->indexBufferMemory);
+            RenderServer::getSingleton().createVertexBuffer(vertices, surface->vertexBuffer, surface->vertexBufferMemory);
+            RenderServer::getSingleton().createIndexBuffer(indices, surface->indexBuffer, surface->indexBufferMemory);
 
-            auto desc_set = std::make_shared<Mesh3dDescSet>();
-            if (mesh->material_id > 0 && mesh->material_id < materials.size()) {
-                desc_set->updateDescriptorSet(materials[mesh->material_id]);
-            } else {
-                mesh->material_id = 0;
-                desc_set->updateDescriptorSet(materials[0]);
-                //throw std::runtime_error("Invalid material id!");
+            if (material_id > 0 && material_id < materials.size()) {
+                surface->material = materials[material_id];
             }
 
-            meshes.push_back(mesh);
-            desc_sets.push_back(desc_set);
+            surfaces.push_back(surface);
         }
     }
 }

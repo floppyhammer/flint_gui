@@ -3,7 +3,7 @@
 #include "../components/components.h"
 #include "../coordinator.h"
 #include "../../../render/swap_chain.h"
-#include "../../../resources/mesh.h"
+#include "../../../resources/surface.h"
 #include "../../../render/mvp_buffer.h"
 
 #include "glm/glm.hpp"
@@ -56,16 +56,16 @@ namespace Flint {
             // Upload the model matrix to the GPU via push constants.
             vkCmdPushConstants(command_buffer, pipeline_layout,
                                VK_SHADER_STAGE_VERTEX_BIT, 0,
-                               sizeof(Mesh2dPushConstant), &sprite.push_constant.model);
+                               sizeof(Surface2dPushConstant), &sprite.push_constant.model);
 
-            VkBuffer vertexBuffers[] = {sprite.mesh->vertexBuffer};
+            VkBuffer vertexBuffers[] = {sprite.mesh->surface->vertexBuffer};
             RenderServer::getSingleton().blit(
                     command_buffer,
                     pipeline,
-                    sprite.desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                    sprite.mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
                     vertexBuffers,
-                    sprite.mesh->indexBuffer,
-                    sprite.mesh->indices_count);
+                    sprite.mesh->surface->indexBuffer,
+                    sprite.mesh->surface->indices_count);
         }
     }
 
@@ -78,8 +78,8 @@ namespace Flint {
             //auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
             auto &sort_z = coordinator.get_component<ZSort2d>(entity);
 
-            float sprite_width = sprite.material->texture->width * transform.scale.x;
-            float sprite_height = sprite.material->texture->height * transform.scale.y;
+            float sprite_width = sprite.material->get_texture()->width * transform.scale.x;
+            float sprite_height = sprite.material->get_texture()->height * transform.scale.y;
 
             // Default to swap chain image.
             auto extent = SwapChain::getSingleton().swapChainExtent;
@@ -120,16 +120,16 @@ namespace Flint {
             // Upload the model matrix to the GPU via push constants.
             vkCmdPushConstants(command_buffer, pipeline_layout,
                                VK_SHADER_STAGE_VERTEX_BIT, 0,
-                               sizeof(Mesh2dPushConstant), &sprite.push_constant.model);
+                               sizeof(Surface2dPushConstant), &sprite.push_constant.model);
 
-            VkBuffer vertexBuffers[] = {sprite.mesh->vertexBuffer};
+            VkBuffer vertexBuffers[] = {sprite.mesh->surface->vertexBuffer};
             RenderServer::getSingleton().blit(
                     command_buffer,
                     pipeline,
-                    sprite.desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                    sprite.mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
                     vertexBuffers,
-                    sprite.mesh->indexBuffer,
-                    sprite.mesh->indices_count);
+                    sprite.mesh->surface->indexBuffer,
+                    sprite.mesh->surface->indices_count);
         }
     }
 }

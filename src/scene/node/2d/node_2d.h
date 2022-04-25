@@ -23,10 +23,6 @@ namespace Flint {
 
     protected:
         std::shared_ptr<Mesh2d> mesh;
-
-        std::shared_ptr<Mesh2dDescSet> desc_set;
-
-        std::shared_ptr<Material2d> material;
     };
 }
 

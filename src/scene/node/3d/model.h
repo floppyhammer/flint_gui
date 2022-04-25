@@ -15,9 +15,7 @@ namespace Flint {
         void _draw(VkCommandBuffer p_command_buffer) override;
 
     protected:
-        std::vector<std::shared_ptr<Mesh3d>> meshes;
-        std::vector<std::shared_ptr<Mesh3dDescSet>> desc_sets;
-        std::vector<std::shared_ptr<Material3d>> materials;
+        std::shared_ptr<Mesh3d> mesh;
 
         void draw(VkCommandBuffer p_command_buffer) override;
 

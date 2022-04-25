@@ -31,13 +31,7 @@ namespace Flint {
 
         std::shared_ptr<Mesh2d> mesh;
 
-        std::shared_ptr<Mesh2dDescSet> desc_set;
-
-        std::shared_ptr<Material2d> material;
-
         std::shared_ptr<MvpBuffer> mvp_buffer;
-
-        void init_default_mesh();
     };
 }
 

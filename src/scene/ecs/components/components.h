@@ -4,7 +4,7 @@
 #include "../../../common/math/vec2.h"
 #include "../../../common/math/vec3.h"
 #include "../../../common/math/quaternion.h"
-#include "../../../resources/mesh.h"
+#include "../../../resources/surface.h"
 #include "../../../resources/material.h"
 #include "../../../resources/default_resource.h"
 #include "../../../render/mvp_buffer.h"
@@ -57,9 +57,8 @@ namespace Flint {
     // -----------------------------
     struct Sprite2dComponent {
         std::shared_ptr<Mesh2d> mesh;
-        std::shared_ptr<Mesh2dDescSet> desc_set;
         std::shared_ptr<Material2d> material;
-        Mesh2dPushConstant push_constant;
+        Surface2dPushConstant push_constant;
     };
 
     struct ZSort2d {
@@ -79,10 +78,8 @@ namespace Flint {
     };
 
     struct ModelComponent {
-        std::vector<std::shared_ptr<Mesh3d>> meshes;
-        std::vector<std::shared_ptr<Mesh3dDescSet>> desc_sets;
-        std::vector<std::shared_ptr<Material3d>> materials;
-        Mesh3dPushConstant push_constant;
+        std::shared_ptr<Mesh3d> mesh;
+        Surface3dPushConstant push_constant;
     };
 
     /**

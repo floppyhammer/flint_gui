@@ -15,18 +15,11 @@ namespace Flint {
     }
 
     void Sprite2d::set_texture(std::shared_ptr<Texture> p_texture) {
-        if (material == nullptr) {
-            Logger::warn("No material set for Sprite 2D!");
-            return;
-        }
-
-        material->texture = p_texture;
-
-        desc_set->updateDescriptorSet(material);
+        mesh->surface->get_material()->set_texture(p_texture);
     }
 
     std::shared_ptr<Texture> Sprite2d::get_texture() const {
-        return material->texture;
+        return mesh->surface->get_material()->get_texture();
     }
 
     void Sprite2d::set_mesh(const std::shared_ptr<Mesh2d>& p_mesh) {
@@ -34,9 +27,7 @@ namespace Flint {
     }
 
     void Sprite2d::set_material(const std::shared_ptr<Material2d>& p_material) {
-        material = p_material;
-
-        desc_set->updateDescriptorSet(material);
+        mesh->surface->set_material(p_material);
     }
 
     void Sprite2d::_update(double delta) {
@@ -52,7 +43,7 @@ namespace Flint {
     }
 
     void Sprite2d::update_mvp() {
-        if (material == nullptr || material->texture == nullptr) {
+        if (mesh == nullptr || mesh->surface == nullptr) {
             return;
         }
 
@@ -67,8 +58,8 @@ namespace Flint {
             viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
         }
 
-        float sprite_width = material->texture->width * scale.x;
-        float sprite_height = material->texture->height * scale.y;
+        float sprite_width = mesh->surface->get_material()->get_texture()->width * scale.x;
+        float sprite_height = mesh->surface->get_material()->get_texture()->height * scale.y;
 
         auto global_position = get_global_position();
 
@@ -101,8 +92,8 @@ namespace Flint {
     }
 
     void Sprite2d::draw(VkCommandBuffer p_command_buffer) {
-        if (mesh == nullptr || material == nullptr) {
-            Logger::warn("No valid mesh or material set for Sprite 2D!");
+        if (mesh == nullptr) {
+            Logger::warn("No valid mesh set for Sprite 2D!");
             return;
         }
 
@@ -119,15 +110,15 @@ namespace Flint {
         // Upload the model matrix to the GPU via push constants.
         vkCmdPushConstants(p_command_buffer, pipeline_layout,
                            VK_SHADER_STAGE_VERTEX_BIT, 0,
-                           sizeof(Mesh2dPushConstant), &push_constant);
+                           sizeof(Surface2dPushConstant), &push_constant);
 
-        VkBuffer vertexBuffers[] = {mesh->vertexBuffer};
+        VkBuffer vertexBuffers[] = {mesh->surface->vertexBuffer};
         RenderServer::getSingleton().blit(
                 p_command_buffer,
                 pipeline,
-                desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
                 vertexBuffers,
-                mesh->indexBuffer,
-                mesh->indices_count);
+                mesh->surface->indexBuffer,
+                mesh->surface->indices_count);
     }
 }
