@@ -2,6 +2,7 @@
 
 #include "../common/io.h"
 #include "../common/logger.h"
+#include "../resources/resource_manager.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 
@@ -54,7 +55,7 @@ namespace Flint {
             for (const auto &obj_material: obj_materials) {
                 auto material = std::make_shared<Material3d>();
                 material->name = obj_material.name;
-                material->diffuse_texture = Texture::from_file(file_directory + "/" + obj_material.diffuse_texname);
+                material->diffuse_texture = ResourceManager::get_singleton().load<Texture>(file_directory + "/" + obj_material.diffuse_texname);
                 materials.push_back(material);
             }
         }

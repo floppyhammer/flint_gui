@@ -95,33 +95,29 @@ std::shared_ptr<Texture> Texture::from_empty(uint32_t p_width, uint32_t p_height
     return texture;
 }
 
-std::shared_ptr<Texture> Texture::from_file(const std::string &filename) {
+Texture::Texture(const std::string &path) : Resource(path) {
     // The STBI_rgb_alpha value forces the image to be loaded with an alpha channel,
     // even if it doesn't have one, which is nice for consistency with other textures in the future.
     int tex_width, tex_height, tex_channels;
-    stbi_uc *pixels = stbi_load(filename.c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
+    stbi_uc *pixels = stbi_load(path.c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
 
     if (!pixels) {
-        Flint::Logger::warn("Failed to load image file " + filename, "Texture");
-        return Texture::from_empty(4, 4);
-        //throw std::runtime_error("Failed to load texture image!");
+        Flint::Logger::warn("Failed to load image file " + path, "Texture");
+        //return Texture::from_empty(4, 4);
+        throw std::runtime_error("Failed to load texture image!");
     }
 
-    auto texture = std::make_shared<Texture>();
-
     // Create image and image memory.
-    texture->create_image_from_bytes(pixels, tex_width, tex_height);
+    create_image_from_bytes(pixels, tex_width, tex_height);
 
     // Clean up the original pixel array.
     stbi_image_free(pixels);
 
     // Create image view.
-    texture->imageView = RenderServer::getSingleton().createImageView(texture->image,
+    imageView = RenderServer::getSingleton().createImageView(image,
                                                             VK_FORMAT_R8G8B8A8_SRGB,
                                                             VK_IMAGE_ASPECT_COLOR_BIT);
 
     // Create sampler.
-    RenderServer::getSingleton().createTextureSampler(texture->sampler);
-
-    return texture;
+    RenderServer::getSingleton().createTextureSampler(sampler);
 }

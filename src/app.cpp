@@ -4,6 +4,7 @@
 #include "render/swap_chain.h"
 #include "render/render_server.h"
 #include "resources/texture.h"
+#include "resources/resource_manager.h"
 #include "core/engine.h"
 #include "core/input_event.h"
 #include "io/obj_importer.h"
@@ -41,8 +42,8 @@ void App::run() {
     auto swap_chain = SwapChain::getSingleton();
     // ---------------------------------------------------
 
-    uint32_t NODE_SPRITE_COUNT = 000;
-    uint32_t ECS_SPRITE_COUNT = 5000;
+    uint32_t NODE_SPRITE_COUNT = 1000;
+    uint32_t ECS_SPRITE_COUNT = 1000;
 
     std::default_random_engine generator;
     std::uniform_real_distribution<float> rand_position(0.0f, 400.0f);
@@ -60,19 +61,17 @@ void App::run() {
         //auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         //auto sub_viewport = std::make_shared<Flint::SubViewport>();
 
-        auto tex = Texture::from_file("../assets/duck.png");
-        tex->name = "duck";
-        auto material = std::make_shared<Material2d>();
-        material->texture = tex;
         auto mesh = Mesh2d::from_default();
 
         for (int i = 0; i < NODE_SPRITE_COUNT; i++) {
             auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
+            rigid_body_2d->position = {400, 0};
             rigid_body_2d->velocity = {rand_velocity(generator), rand_velocity(generator)};
             auto sprite_2d = std::make_shared<Flint::Sprite2d>();
             sprite_2d->set_mesh(mesh);
+            auto material = std::make_shared<Material2d>();
+            material->texture = ResourceManager::get_singleton().load<Texture>("../assets/duck.png");
             sprite_2d->set_material(material);
-            sprite_2d->set_texture(tex);
             rigid_body_2d->add_child(sprite_2d);
             node->add_child(rigid_body_2d);
         }
@@ -138,11 +137,6 @@ void App::run() {
         // Allocate space for entities.
         entities.resize(ECS_SPRITE_COUNT);
 
-        auto tex = Texture::from_file("../assets/duck.png");
-        tex->name = "duck";
-
-        auto material = std::make_shared<Material2d>();
-        material->texture = tex;
         auto mesh = Mesh2d::from_default();
 
         // 2D sprites.
@@ -152,7 +146,8 @@ void App::run() {
 
             // Render components.
             {
-                //auto mvp_buffer = std::make_shared<Flint::MvpBuffer>();
+                auto material = std::make_shared<Material2d>();
+                material->texture = ResourceManager::get_singleton().load<Texture>("../assets/duck.png");
 
                 auto desc_set = std::make_shared<Mesh2dDescSet>();
                 desc_set->updateDescriptorSet(material);

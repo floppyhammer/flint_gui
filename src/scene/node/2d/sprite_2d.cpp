@@ -37,6 +37,8 @@ namespace Flint {
 
     void Sprite2d::set_material(const std::shared_ptr<Material2d>& p_material) {
         material = p_material;
+
+        desc_set->updateDescriptorSet(material);
     }
 
     void Sprite2d::_update(double delta) {

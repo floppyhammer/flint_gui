@@ -21,8 +21,6 @@ public:
     ~Mesh();
 
 public:
-    std::string name;
-
     /// Material index in a material vector/list/set as different meshes can use the same material.
     int32_t material_id = -1;
 

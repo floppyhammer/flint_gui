@@ -12,17 +12,17 @@
 
 class Texture : public Resource {
 public:
-    std::string name = "";
+    Texture() = default;
+
+    /// Create a texture from file.
+    explicit Texture(const std::string &path);
+
+    ~Texture() override;
 
     /// Create an empty texture with specific size.
     static std::shared_ptr<Texture> from_empty(uint32_t p_width, uint32_t p_height);
 
-    /// Create a texture from file.
-    static std::shared_ptr<Texture> from_file(const std::string &filename);
-
-    Texture() = default;
-
-    ~Texture();
+    //static std::shared_ptr<Texture> from_bytes(const std::string &filename);
 
 public:
     uint32_t width = 0;
