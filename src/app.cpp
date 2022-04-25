@@ -68,10 +68,7 @@ void App::run() {
             rigid_body_2d->position = {400, 0};
             rigid_body_2d->velocity = {rand_velocity(generator), rand_velocity(generator)};
             auto sprite_2d = std::make_shared<Flint::Sprite2d>();
-            sprite_2d->set_mesh(mesh);
-            auto material = std::make_shared<Material2d>();
-            material->texture = ResourceManager::get_singleton().load<Texture>("../assets/duck.png");
-            sprite_2d->set_material(material);
+            sprite_2d->set_texture(ResourceManager::get_singleton().load<Texture>("../assets/duck.png"));
             rigid_body_2d->add_child(sprite_2d);
             node->add_child(rigid_body_2d);
         }
@@ -120,7 +117,6 @@ void App::run() {
             Flint::Signature signature;
             signature.set(coordinator.get_component_type<Flint::Sprite2dComponent>());
             signature.set(coordinator.get_component_type<Flint::Transform2dComponent>());
-            //signature.set(coordinator.get_component_type<Flint::MvpComponent>());
             signature.set(coordinator.get_component_type<Flint::ZSort2d>());
             coordinator.set_system_signature<Flint::Sprite2dRenderSystem>(signature);
         }
@@ -137,8 +133,6 @@ void App::run() {
         // Allocate space for entities.
         entities.resize(ECS_SPRITE_COUNT);
 
-        auto mesh = Mesh2d::from_default();
-
         // 2D sprites.
         int z = 0;
         for (auto &entity: entities) {
@@ -154,7 +148,7 @@ void App::run() {
 
                 coordinator.add_component(
                         entity,
-                        Flint::Sprite2dComponent{mesh, desc_set, material});
+                        Flint::Sprite2dComponent{DefaultResource::get_singleton().default_mesh_2d, desc_set, material});
 
                 coordinator.add_component(
                         entity,

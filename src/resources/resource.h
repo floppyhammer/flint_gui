@@ -8,7 +8,8 @@
 class Resource {
 public:
     Resource() = default;
-    Resource(const std::string &path) { name = path;}
+
+    Resource(const std::string &path) { name = path; }
 
     virtual ~Resource() = default;
 

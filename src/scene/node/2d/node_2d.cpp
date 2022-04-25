@@ -1,10 +1,14 @@
 #include "node_2d.h"
 
+#include "../../../resources/default_resource.h"
+
 namespace Flint {
     Node2d::Node2d() {
         type = NodeType::Node2D;
 
-        //mvp_buffer = std::make_shared<MvpBuffer>();
+        mesh = DefaultResource::get_singleton().default_mesh_2d;
+        material = std::make_shared<Material2d>();
+        desc_set = std::make_shared<Mesh2dDescSet>();
     }
 
     Vec2<float> Node2d::get_global_position() const {
@@ -15,12 +19,5 @@ namespace Flint {
         }
 
         return position;
-    }
-
-    // FIXME: Should make these resources shared by nodes.
-    void Node2d::init_default_mesh() {
-        //mesh = Mesh2D::from_default();
-        desc_set = std::make_shared<Mesh2dDescSet>();
-        //material = std::make_shared<Material2D>();
     }
 }

@@ -9,7 +9,6 @@
 
 class ResourceManager {
 public:
-public:
     static ResourceManager &get_singleton() {
         static ResourceManager singleton;
         return singleton;

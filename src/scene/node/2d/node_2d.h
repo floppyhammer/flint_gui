@@ -27,8 +27,6 @@ namespace Flint {
         std::shared_ptr<Mesh2dDescSet> desc_set;
 
         std::shared_ptr<Material2d> material;
-
-        void init_default_mesh();
     };
 }
 

@@ -6,6 +6,7 @@
 #include "../../../common/math/quaternion.h"
 #include "../../../resources/mesh.h"
 #include "../../../resources/material.h"
+#include "../../../resources/default_resource.h"
 #include "../../../render/mvp_buffer.h"
 #include "../../../render/viewport.h"
 #include "../../../core/input_event.h"

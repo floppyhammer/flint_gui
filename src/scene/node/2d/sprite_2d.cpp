@@ -12,8 +12,6 @@
 namespace Flint {
     Sprite2d::Sprite2d() {
         type = NodeType::Sprite2D;
-
-        init_default_mesh();
     }
 
     void Sprite2d::set_texture(std::shared_ptr<Texture> p_texture) {
