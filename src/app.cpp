@@ -233,6 +233,8 @@ void App::run() {
                 coordinator.destroy_entity(entity);
             }
             entities.resize(0);
+
+            DefaultResource::get_singleton().cleanup();
         }
 
         swap_chain.cleanup();

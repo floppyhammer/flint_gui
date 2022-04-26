@@ -28,6 +28,10 @@ public:
         return singleton;
     }
 
+    inline void cleanup() {
+        default_surface_2d_gou_resources.reset();
+    }
+
     /**
      * Same GPU vertex and index buffers will be shared by all 2D meshes instanced this way.
      * @return
