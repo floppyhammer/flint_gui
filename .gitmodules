@@ -2,3 +2,8 @@
 	path = external/glfw
 	url = https://github.com/glfw/glfw.git
 	branch = "3.3-stable"
+
+[submodule "libeigen"]
+	path = external/eigen
+	url = https://gitlab.com/libeigen/eigen
+	branch = "3.4"

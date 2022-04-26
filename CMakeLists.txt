@@ -10,7 +10,7 @@ find_package(Vulkan REQUIRED FATAL_ERROR)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp src/*.h)
 
 # Include external and third party headers.
-include_directories(external third_party)
+include_directories(external/eigen third_party)
 
 # GLFW library.
 include_directories(external/glfw/include)

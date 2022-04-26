@@ -42,4 +42,4 @@ cmake-build-release
 *.app
 
 # Submodules
-external/glfw/
+external/

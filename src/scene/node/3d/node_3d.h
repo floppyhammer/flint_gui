@@ -7,6 +7,7 @@
 #include "../../../render/mvp_buffer.h"
 
 #include "glm/glm.hpp"
+#include <Eigen/Geometry>
 
 namespace Flint {
     class Node3D : public Node {
@@ -20,6 +21,7 @@ namespace Flint {
         glm::vec3 position{0};
 
         glm::vec3 rotation{0};
+        Eigen::Quaternionf quaternion;
 
         glm::vec3 scale{1};
         // ------------------------------------------
