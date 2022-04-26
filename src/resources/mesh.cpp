@@ -2,9 +2,6 @@
 
 #include "../io/obj_importer.h"
 
-Mesh2d::Mesh2d() {
-}
-
 Mesh2d::Mesh2d(const std::string &path) : Resource(path) {
 
 }

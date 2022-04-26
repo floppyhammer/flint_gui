@@ -1,8 +1,5 @@
 #include "surface.h"
 
-#include "../render/platform.h"
-#include "../render/swap_chain.h"
-#include "../render/mvp_buffer.h"
 #include "default_resource.h"
 
 Surface::~Surface() {
@@ -89,4 +86,26 @@ std::shared_ptr<Material2d> Surface2d::get_material() const {
 
 void Surface2d::set_material(const std::shared_ptr<Material2d>& p_material) {
     material = p_material;
+}
+
+std::shared_ptr<Surface2d> Surface2d::from_default() {
+    auto surface = std::make_shared<Surface2d>();
+
+    surface->create_vertex_buffer();
+
+    surface->create_index_buffer();
+
+    return surface;
+}
+
+void Surface3d::set_material(const std::shared_ptr<Material3d> &p_material) {
+    material = p_material;
+}
+
+std::shared_ptr<Material3d> Surface3d::get_material() const {
+    if (material == nullptr) {
+        return DefaultResource::get_singleton().default_material_3d;
+    }
+
+    return material;
 }

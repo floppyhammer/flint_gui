@@ -9,13 +9,8 @@
 #include <utility>
 
 namespace Flint {
-    const std::string MODEL_NAME = "../assets/viking_room/viking_room.obj";
-
     Model::Model() {
         type = NodeType::Model;
-
-        // Load model.
-        load_file(MODEL_NAME);
     }
 
     void Model::_update(double delta) {
@@ -49,7 +44,7 @@ namespace Flint {
                            sizeof(Surface3dPushConstant), &push_constant);
 
         for (auto &surface: mesh->surfaces) {
-            const auto &desc_set = surface->material->get_desc_set();
+            const auto &desc_set = surface->get_material()->get_desc_set();
 
             VkBuffer vertexBuffers[] = {surface->vertexBuffer};
             RenderServer::getSingleton().draw_mesh(
@@ -62,7 +57,7 @@ namespace Flint {
         }
     }
 
-    void Model::load_file(const std::string &path) {
-        mesh = ResourceManager::get_singleton().load<Mesh3d>(path);
+    void Model::set_mesh(std::shared_ptr<Mesh3d> p_mesh) {
+        mesh = std::move(p_mesh);
     }
 }

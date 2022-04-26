@@ -5,9 +5,11 @@
 #include "surface.h"
 #include "material.h"
 
+/// A mesh consists of one or multiple surfaces and is managed by the resource manager.
+
 class Mesh2d : public Resource {
 public:
-    Mesh2d();
+    Mesh2d() = default;
     explicit Mesh2d(const std::string &path);
 
     std::shared_ptr<Surface2d> surface;

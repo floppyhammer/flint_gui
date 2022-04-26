@@ -12,7 +12,16 @@
 #include <vector>
 #include <array>
 
-/// Mesh Resources
+struct Surface2dPushConstant {
+    glm::mat4 model;
+};
+
+// TODO: We might need to push model, view and projection separately.
+struct Surface3dPushConstant {
+    glm::mat4 mvp;
+};
+
+/// A surface may contain a material, which may be shared by other surfaces.
 
 class Surface {
 public:
@@ -33,15 +42,6 @@ public:
     uint32_t indices_count = 0;
 };
 
-struct Surface2dPushConstant {
-    glm::mat4 model;
-};
-
-// TODO: We might need to push model, view and projection separately.
-struct Surface3dPushConstant {
-    glm::mat4 mvp;
-};
-
 class Surface2d : public Surface {
 public:
     Surface2d() = default;
@@ -49,15 +49,7 @@ public:
     /**
      * Default quad surface.
      */
-    static std::shared_ptr<Surface2d> from_default() {
-        auto surface = std::make_shared<Surface2d>();
-
-        surface->create_vertex_buffer();
-
-        surface->create_index_buffer();
-
-        return surface;
-    }
+    static std::shared_ptr<Surface2d> from_default();
 
     // Default vertices and indices data for 2D quad surface.
     const std::vector<Vertex> vertices = {
@@ -100,6 +92,11 @@ public:
         return std::make_shared<Surface3d>();
     }
 
+    void set_material(const std::shared_ptr<Material3d> &p_material);
+
+    std::shared_ptr<Material3d> get_material() const;
+
+private:
     std::shared_ptr<Material3d> material;
 };
 

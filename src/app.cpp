@@ -57,10 +57,11 @@ void App::run() {
     {
         auto node = std::make_shared<Flint::Node>();
         auto node_3d = std::make_shared<Flint::Node3D>();
-        //auto mesh_instance_0 = std::make_shared<Flint::Model>();
-        //auto mesh_instance_1 = std::make_shared<Flint::Model>();
-        //auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
-        //auto sub_viewport = std::make_shared<Flint::SubViewport>();
+        auto model0 = std::make_shared<Flint::Model>();
+        model0->set_mesh(ResourceManager::get_singleton().load<Mesh3d>("../assets/viking_room/viking_room.obj"));
+        auto model1 = std::make_shared<Flint::Model>();
+        auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
+        auto sub_viewport = std::make_shared<Flint::SubViewport>();
 
         for (int i = 0; i < NODE_SPRITE_COUNT; i++) {
             auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
@@ -72,7 +73,7 @@ void App::run() {
             node->add_child(rigid_body_2d);
         }
 
-//        node->add_child(mesh_instance_0);
+        node->add_child(model0);
 //        node->add_child(sub_viewport_c);
 //        sub_viewport_c->add_child(sub_viewport);
 //        sub_viewport_c->set_viewport(sub_viewport);

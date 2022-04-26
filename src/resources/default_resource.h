@@ -13,6 +13,9 @@ public:
 
         default_material_2d = std::make_shared<Material2d>();
         default_material_2d->set_texture(Texture::from_empty(4, 4));
+
+        default_material_3d = std::make_shared<Material3d>();
+        default_material_3d->set_diffuse_texture(Texture::from_empty(4, 4));
     }
 
     static DefaultResource &get_singleton() {
@@ -26,6 +29,8 @@ public:
     std::shared_ptr<Mesh2d> default_mesh_2d;
 
     std::shared_ptr<Material2d> default_material_2d;
+
+    std::shared_ptr<Material3d> default_material_3d;
 };
 
 #endif //FLINT_DEFAULT_RESOURCE_H

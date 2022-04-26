@@ -26,19 +26,18 @@ namespace std {
 }
 
 namespace Flint {
-    void ObjImporter::load_file(const std::string &filename,
-                                std::vector<std::shared_ptr<Surface3d>> &surfaces) {
+    void ObjImporter::load_file(const std::string &path, std::vector<std::shared_ptr<Surface3d>> &surfaces) {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
         std::vector<tinyobj::material_t> obj_materials;
         std::string warn, err;
 
-        // Get file base.
+        // Get the directory the file is in.
         std::string file_directory;
-        split_filename(filename, file_directory);
+        split_path(path, file_directory);
 
         if (!tinyobj::LoadObj(&attrib, &shapes, &obj_materials,
-                              &warn, &err, filename.c_str(), file_directory.c_str())) {
+                              &warn, &err, path.c_str(), file_directory.c_str())) {
             throw std::runtime_error(warn + err);
         }
 
@@ -47,9 +46,6 @@ namespace Flint {
         if (obj_materials.empty()) {
             Logger::warn("No material found in the .mtl file or no .mtl file found at " + file_directory,
                          "OBJ Importer");
-
-            // Default material.
-            materials.push_back(Material3d::from_default());
         } else {
             for (const auto &obj_material: obj_materials) {
                 auto material = std::make_shared<Material3d>();
@@ -59,14 +55,12 @@ namespace Flint {
             }
         }
 
-        int32_t material_id = -1;
-
         // Iterate over the vertices and dump them straight into our vertices vector.
         for (const auto &shape: shapes) {
             auto surface = std::make_shared<Surface3d>();
 
             surface->name = shape.name;
-            material_id = shape.mesh.material_ids[0];
+            int32_t material_id = shape.mesh.material_ids[0];
 
             // Staging vectors.
             std::vector<Vertex> vertices;
@@ -112,8 +106,8 @@ namespace Flint {
             RenderServer::getSingleton().createVertexBuffer(vertices, surface->vertexBuffer, surface->vertexBufferMemory);
             RenderServer::getSingleton().createIndexBuffer(indices, surface->indexBuffer, surface->indexBufferMemory);
 
-            if (material_id > 0 && material_id < materials.size()) {
-                surface->material = materials[material_id];
+            if (material_id >= 0 && material_id < materials.size()) {
+                surface->set_material(materials[material_id]);
             }
 
             surfaces.push_back(surface);

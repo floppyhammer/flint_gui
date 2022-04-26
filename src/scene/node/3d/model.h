@@ -14,12 +14,12 @@ namespace Flint {
 
         void _draw(VkCommandBuffer p_command_buffer) override;
 
+        void set_mesh(std::shared_ptr<Mesh3d> p_mesh);
+
     protected:
         std::shared_ptr<Mesh3d> mesh;
 
         void draw(VkCommandBuffer p_command_buffer) override;
-
-        void load_file(const std::string &filename);
     };
 }
 

@@ -18,7 +18,7 @@ inline std::vector<char> readFile(const std::string &filename) {
     return bytes;
 }
 
-inline void split_filename(const std::string &str, std::string &file_directory) {
+inline void split_path(const std::string &str, std::string &file_directory) {
     size_t found = str.find_last_of("/\\");
 
 //    std::cout << "Splitting: " << str << std::endl;
