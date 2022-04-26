@@ -73,7 +73,7 @@ class Material2d : public Material {
 public:
     Material2d();
 
-    void set_texture(std::shared_ptr<Texture> p_texture);
+    void set_texture(const std::shared_ptr<Texture>& p_texture);
     std::shared_ptr<Texture> get_texture();
 
     std::shared_ptr<Material2dDescSet> get_desc_set() {

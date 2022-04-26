@@ -191,6 +191,24 @@ void Material2dDescSet::updateDescriptorSet(const std::shared_ptr<Texture> &p_te
     }
 }
 
+Material2d::Material2d() {
+    desc_set = std::make_shared<Material2dDescSet>();
+}
+
+void Material2d::set_texture(const std::shared_ptr<Texture>& p_texture) {
+    texture = p_texture;
+
+    desc_set->updateDescriptorSet(p_texture);
+}
+
+std::shared_ptr<Texture> Material2d::get_texture() {
+    return texture;
+}
+
+Material3d::Material3d() {
+    desc_set = std::make_shared<Material3dDescSet>();
+}
+
 std::shared_ptr<Material3d> Material3d::from_default() {
     auto material = std::make_shared<Material3d>();
     material->diffuse_texture = Texture::from_empty(4, 4);
@@ -202,22 +220,4 @@ void Material3d::set_diffuse_texture(std::shared_ptr<Texture> p_texture) {
     diffuse_texture = p_texture;
 
     desc_set->updateDescriptorSet(p_texture);
-}
-
-void Material2d::set_texture(std::shared_ptr<Texture> p_texture) {
-    texture = p_texture;
-
-    desc_set->updateDescriptorSet(p_texture);
-}
-
-std::shared_ptr<Texture> Material2d::get_texture() {
-    return texture;
-}
-
-Material2d::Material2d() {
-    desc_set = std::make_shared<Material2dDescSet>();
-}
-
-Material3d::Material3d() {
-    desc_set = std::make_shared<Material3dDescSet>();
 }

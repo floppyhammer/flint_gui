@@ -101,10 +101,7 @@ namespace Flint {
                 indices.push_back(uniqueVertices[vertex]);
             }
 
-            surface->indices_count = indices.size();
-
-            RenderServer::getSingleton().createVertexBuffer(vertices, surface->vertexBuffer, surface->vertexBufferMemory);
-            RenderServer::getSingleton().createIndexBuffer(indices, surface->indexBuffer, surface->indexBufferMemory);
+            surface->set_gpu_resources(std::make_shared<SurfaceGpuResources>(vertices, indices));
 
             if (material_id >= 0 && material_id < materials.size()) {
                 surface->set_material(materials[material_id]);

@@ -57,7 +57,6 @@ namespace Flint {
     // -----------------------------
     struct Sprite2dComponent {
         std::shared_ptr<Mesh2d> mesh;
-        std::shared_ptr<Material2d> material;
         Surface2dPushConstant push_constant;
     };
 

@@ -6,7 +6,7 @@ namespace Flint {
     Node2d::Node2d() {
         type = NodeType::Node2D;
 
-        mesh = DefaultResource::get_singleton().default_mesh_2d;
+        mesh = DefaultResource::get_singleton().new_default_mesh_2d();
     }
 
     Vec2<float> Node2d::get_global_position() const {

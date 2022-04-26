@@ -62,14 +62,14 @@ namespace Flint {
                                sizeof(Surface2dPushConstant), &model.push_constant.mvp);
 
             for (auto &surface: model.mesh->surfaces) {
-                VkBuffer vertexBuffers[] = {surface->vertexBuffer};
+                VkBuffer vertexBuffers[] = {surface->get_vertex_buffer()};
                 RenderServer::getSingleton().draw_mesh(
                         command_buffer,
                         pipeline,
                         surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
                         vertexBuffers,
-                        surface->indexBuffer,
-                        surface->indices_count);
+                        surface->get_index_buffer(),
+                        surface->get_index_count());
             }
         }
     }

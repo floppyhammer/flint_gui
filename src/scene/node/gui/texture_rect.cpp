@@ -53,13 +53,13 @@ namespace Flint {
             pipeline = viewport->viewport->blitGraphicsPipeline;
         }
 
-        VkBuffer vertexBuffers[] = {mesh->surface->vertexBuffer};
+        VkBuffer vertexBuffers[] = {mesh->surface->get_vertex_buffer()};
         RenderServer::getSingleton().blit(
                 p_command_buffer,
                 pipeline,
                 mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
                 vertexBuffers,
-                mesh->surface->indexBuffer,
-                mesh->surface->indices_count);
+                mesh->surface->get_index_buffer(),
+                mesh->surface->get_index_count());
     }
 }

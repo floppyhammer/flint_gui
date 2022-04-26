@@ -60,6 +60,7 @@ void App::run() {
         auto model0 = std::make_shared<Flint::Model>();
         model0->set_mesh(ResourceManager::get_singleton().load<Mesh3d>("../assets/viking_room/viking_room.obj"));
         auto model1 = std::make_shared<Flint::Model>();
+        model1->set_mesh(ResourceManager::get_singleton().load<Mesh3d>("../assets/viking_room/viking_room.obj"));
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
 
@@ -74,11 +75,11 @@ void App::run() {
         }
 
         node->add_child(model0);
-//        node->add_child(sub_viewport_c);
-//        sub_viewport_c->add_child(sub_viewport);
-//        sub_viewport_c->set_viewport(sub_viewport);
-//        sub_viewport->add_child(node_3d);
-//        node_3d->add_child(mesh_instance_1);
+        node->add_child(sub_viewport_c);
+        sub_viewport_c->add_child(sub_viewport);
+        sub_viewport_c->set_viewport(sub_viewport);
+        sub_viewport->add_child(node_3d);
+        node_3d->add_child(model1);
         tree.set_root(node);
     }
 
@@ -140,12 +141,13 @@ void App::run() {
 
             // Render components.
             {
-                auto material = std::make_shared<Material2d>();
-                material->set_texture(ResourceManager::get_singleton().load<Texture>("../assets/duck.png"));
+                auto mesh = DefaultResource::get_singleton().new_default_mesh_2d();
+                mesh->surface->get_material()->set_texture(
+                        ResourceManager::get_singleton().load<Texture>("../assets/duck.png"));
 
                 coordinator.add_component(
                         entity,
-                        Flint::Sprite2dComponent{DefaultResource::get_singleton().default_mesh_2d, material});
+                        Flint::Sprite2dComponent{mesh});
 
                 coordinator.add_component(
                         entity,

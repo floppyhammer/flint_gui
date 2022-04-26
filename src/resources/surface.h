@@ -23,15 +23,11 @@ struct Surface3dPushConstant {
 
 /// A surface may contain a material, which may be shared by other surfaces.
 
-class Surface {
-public:
-    Surface() = default;
+struct SurfaceGpuResources {
+    SurfaceGpuResources(const std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices);
 
-    ~Surface();
+    ~SurfaceGpuResources();
 
-    std::string name;
-
-public:
     /// Vertex buffer.
     VkBuffer vertexBuffer{};
     VkDeviceMemory vertexBufferMemory{};
@@ -40,6 +36,27 @@ public:
     VkBuffer indexBuffer{};
     VkDeviceMemory indexBufferMemory{};
     uint32_t indices_count = 0;
+
+private:
+    void create_vertex_buffer(const std::vector<Vertex> &vertices);
+
+    void create_index_buffer(const std::vector<uint32_t> &indices);
+};
+
+class Surface {
+public:
+    Surface() = default;
+
+    std::string name;
+
+    VkBuffer get_vertex_buffer();
+    VkBuffer get_index_buffer();
+    uint32_t get_index_count();
+
+    void set_gpu_resources(std::shared_ptr<SurfaceGpuResources> p_gpu_resources);
+
+private:
+    std::shared_ptr<SurfaceGpuResources> gpu_resources;
 };
 
 class Surface2d : public Surface {
@@ -51,27 +68,11 @@ public:
      */
     static std::shared_ptr<Surface2d> from_default();
 
-    // Default vertices and indices data for 2D quad surface.
-    const std::vector<Vertex> vertices = {
-            {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-            {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
-            {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-            {{0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
-    };
-
-    // For index buffer. (Front is counter-clockwise.)
-    const std::vector<uint32_t> indices = {
-            0, 2, 1, 2, 0, 3
-    };
-
     void set_material(const std::shared_ptr<Material2d> &p_material);
 
     std::shared_ptr<Material2d> get_material() const;
 
 private:
-    void create_vertex_buffer();
-
-    void create_index_buffer();
 
     std::shared_ptr<Material2d> material;
 };

@@ -46,14 +46,14 @@ namespace Flint {
         for (auto &surface: mesh->surfaces) {
             const auto &desc_set = surface->get_material()->get_desc_set();
 
-            VkBuffer vertexBuffers[] = {surface->vertexBuffer};
+            VkBuffer vertexBuffers[] = {surface->get_vertex_buffer()};
             RenderServer::getSingleton().draw_mesh(
                     p_command_buffer,
                     pipeline,
                     desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
                     vertexBuffers,
-                    surface->indexBuffer,
-                    surface->indices_count);
+                    surface->get_index_buffer(),
+                    surface->get_index_count());
         }
     }
 

@@ -58,14 +58,14 @@ namespace Flint {
                                VK_SHADER_STAGE_VERTEX_BIT, 0,
                                sizeof(Surface2dPushConstant), &sprite.push_constant.model);
 
-            VkBuffer vertexBuffers[] = {sprite.mesh->surface->vertexBuffer};
+            VkBuffer vertexBuffers[] = {sprite.mesh->surface->get_vertex_buffer()};
             RenderServer::getSingleton().blit(
                     command_buffer,
                     pipeline,
                     sprite.mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
                     vertexBuffers,
-                    sprite.mesh->surface->indexBuffer,
-                    sprite.mesh->surface->indices_count);
+                    sprite.mesh->surface->get_index_buffer(),
+                    sprite.mesh->surface->get_index_count());
         }
     }
 
@@ -75,11 +75,13 @@ namespace Flint {
         for (auto const &entity: entities) {
             auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
             auto &transform = coordinator.get_component<Transform2dComponent>(entity);
-            //auto &mvp_component = coordinator.get_component<MvpComponent>(entity);
             auto &sort_z = coordinator.get_component<ZSort2d>(entity);
 
-            float sprite_width = sprite.material->get_texture()->width * transform.scale.x;
-            float sprite_height = sprite.material->get_texture()->height * transform.scale.y;
+            auto texture = sprite.mesh->surface->get_material()->get_texture();
+            if (texture == nullptr) continue;
+
+            float sprite_width = texture->width * transform.scale.x;
+            float sprite_height = texture->height * transform.scale.y;
 
             // Default to swap chain image.
             auto extent = SwapChain::getSingleton().swapChainExtent;
@@ -114,6 +116,9 @@ namespace Flint {
         for (auto const &entity: entities) {
             auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
 
+            auto texture = sprite.mesh->surface->get_material()->get_texture();
+            if (texture == nullptr) continue;
+
             VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
             VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
 
@@ -122,14 +127,14 @@ namespace Flint {
                                VK_SHADER_STAGE_VERTEX_BIT, 0,
                                sizeof(Surface2dPushConstant), &sprite.push_constant.model);
 
-            VkBuffer vertexBuffers[] = {sprite.mesh->surface->vertexBuffer};
+            VkBuffer vertexBuffers[] = {sprite.mesh->surface->get_vertex_buffer()};
             RenderServer::getSingleton().blit(
                     command_buffer,
                     pipeline,
                     sprite.mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
                     vertexBuffers,
-                    sprite.mesh->surface->indexBuffer,
-                    sprite.mesh->surface->indices_count);
+                    sprite.mesh->surface->get_index_buffer(),
+                    sprite.mesh->surface->get_index_count());
         }
     }
 }

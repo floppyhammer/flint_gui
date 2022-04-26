@@ -2,6 +2,7 @@
 
 #include "../sub_viewport.h"
 #include "../../../render/swap_chain.h"
+#include "../../../resources/default_resource.h"
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
@@ -12,7 +13,7 @@ namespace Flint {
     NodeGui::NodeGui() {
         type = NodeType::NodeGui;
 
-        mvp_buffer = std::make_shared<MvpBuffer>();
+        mesh = DefaultResource::get_singleton().new_default_mesh_2d();
     }
 
     void NodeGui::_update(double delta) {
@@ -58,6 +59,6 @@ namespace Flint {
                                          size.y / viewport_extent.y * 2.0f,
                                          1.0f));
 
-        mvp_buffer->update_uniform_buffer(mvp);
+        push_constant.model = mvp.model;
     }
 }
