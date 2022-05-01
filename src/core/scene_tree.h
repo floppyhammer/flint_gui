@@ -2,7 +2,7 @@
 #define FLINT_SCENE_TREE_H
 
 #include "../scene/node/node.h"
-#include "input_event.h"
+#include "../servers/input_server.h"
 
 #define GLFW_INCLUDE_VULKAN
 

@@ -6,8 +6,10 @@
 #include "../node.h"
 #include "../../../common/vec2.h"
 #include "../../../resources/mesh.h"
-#include "../../../render/render_server.h"
 #include "../../../render/mvp_buffer.h"
+#include "../../../render/render_server.h"
+#include "../../../servers/input_server.h"
+#include "../../../servers/vector_server.h"
 
 namespace Flint {
     class NodeGui : public Node {
@@ -28,6 +30,10 @@ namespace Flint {
         void update(double delta) override;
 
         void update_mvp();
+
+        virtual void input(std::vector<InputEvent> &input_queue) {};
+
+        virtual Vec2<float> calculate_minimum_size() const { return size; };
 
         std::shared_ptr<Mesh2d> mesh;
 

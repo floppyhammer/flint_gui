@@ -19,8 +19,13 @@ namespace Flint {
 
         // GUI.
         NodeGui,
+        Label,
+        Button,
         TextureRect,
+        Container,
         SubViewportContainer,
+        HBoxContainer,
+        VBoxContainer,
 
         // 2D.
         Node2D,

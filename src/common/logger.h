@@ -7,20 +7,20 @@
 #define FLINT_LOG_TAG "Flint"
 #ifdef __ANDROID__
 #include <android/log.h>
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, FLINT_LOG_TAG, __VA_ARGS__)
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG  , FLINT_LOG_TAG, __VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO   , FLINT_LOG_TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN   , FLINT_LOG_TAG, __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR  , FLINT_LOG_TAG, __VA_ARGS__)
+#define FLINT_LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, FLINT_LOG_TAG, __VA_ARGS__)
+#define FLINT_LOGD(...) __android_log_print(ANDROID_LOG_DEBUG  , FLINT_LOG_TAG, __VA_ARGS__)
+#define FLINT_LOGI(...) __android_log_print(ANDROID_LOG_INFO   , FLINT_LOG_TAG, __VA_ARGS__)
+#define FLINT_LOGW(...) __android_log_print(ANDROID_LOG_WARN   , FLINT_LOG_TAG, __VA_ARGS__)
+#define FLINT_LOGE(...) __android_log_print(ANDROID_LOG_ERROR  , FLINT_LOG_TAG, __VA_ARGS__)
 #else
 
 #include <cstdio>
 
-#define LOGV(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
-#define LOGD(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
-#define LOGI(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
-#define LOGW(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
-#define LOGE(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
+#define FLINT_LOGV(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
+#define FLINT_LOGD(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
+#define FLINT_LOGI(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
+#define FLINT_LOGW(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
+#define FLINT_LOGE(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
 #endif
 
 namespace Flint {
@@ -45,31 +45,31 @@ namespace Flint {
 
         static void verbose(const std::string &label, const std::string &module = "") {
             if (get_singleton().level <= Level::VERBOSE) {
-                LOGV("[VERBOSE][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
+                FLINT_LOGV("[VERBOSE][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void debug(const std::string &label, const std::string &module = "") {
             if (get_singleton().level <= Level::DEBUG) {
-                LOGD("[DEBUG][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
+                FLINT_LOGD("[DEBUG][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void info(const std::string &label, const std::string &module = "") {
             if (get_singleton().level <= Level::INFO) {
-                LOGI("[INFO][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
+                FLINT_LOGI("[INFO][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void warn(const std::string &label, const std::string &module = "") {
             if (get_singleton().level <= Level::WARN) {
-                LOGW("[WARN][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
+                FLINT_LOGW("[WARN][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void error(const std::string &label, const std::string &module = "") {
             if (get_singleton().level <= Level::ERROR) {
-                LOGE("[ERROR][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
+                FLINT_LOGE("[ERROR][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 

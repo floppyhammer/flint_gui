@@ -7,3 +7,8 @@
 	path = external/eigen
 	url = https://gitlab.com/libeigen/eigen
 	branch = "3.4"
+
+[submodule "libpathfinder"]
+	path = external/pathfinder-cpp
+	url = https://github.com/floppyhammer/pathfinder-cpp.git
+	branch = "master"

@@ -23,6 +23,7 @@
 #include "scene/ecs/systems/sprite_render_system.h"
 #include "scene/ecs/systems/model_render_system.h"
 #include "scene/ecs/systems/physics_system.h"
+#include "scene/node/gui/label.h"
 
 class App {
 public:
@@ -30,6 +31,8 @@ public:
 
 private:
     Flint::SceneTree tree;
+
+    std::shared_ptr<Flint::Label> label;
 
     std::queue<Flint::InputEvent> input_queue;
 

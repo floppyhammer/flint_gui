@@ -7,12 +7,15 @@
 #include "resources/mesh.h"
 #include "resources/resource_manager.h"
 #include "core/engine.h"
-#include "core/input_event.h"
+#include "servers/input_server.h"
+#include "servers/vector_server.h"
 #include "io/obj_importer.h"
+#include "common/io.h"
 
 #include "scene/node/gui/sub_viewport_container.h"
 #include "scene/node/3d/model.h"
 #include "scene/node/gui/texture_rect.h"
+#include "scene/node/gui/label.h"
 #include "scene/node/sub_viewport.h"
 #include "scene/node/2d/sprite_2d.h"
 #include "scene/node/2d/rigid_body_2d.h"
@@ -36,15 +39,27 @@ void App::run() {
     // 1. Initialize hardware.
     auto platform = Platform::getSingleton();
 
-    // 2. Initialize rendering server.
+    // 2. Initialize render server.
     auto render_server = RenderServer::getSingleton();
 
     // 3. Initialize swap chain.
     auto swap_chain = SwapChain::getSingleton();
     // ---------------------------------------------------
 
-    uint32_t NODE_SPRITE_COUNT = 1000;
-    uint32_t ECS_SPRITE_COUNT = 1000;
+    // 4. Initialize vector server.
+    //auto vector_server = Flint::VectorServer::get_singleton();
+    std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(platform.device, platform.physicalDevice, platform.graphicsQueue, platform.graphicsQueue, render_server.commandPool);
+    //vector_server.init(driver, WIDTH, HEIGHT, readFile("../assets/area-lut.png"));
+
+    Flint::VectorServer::get_singleton().init(driver,
+                                                   WIDTH,
+                                                   HEIGHT,
+                                                   readFile("../assets/area-lut.png"));
+
+    auto vector_server2 = Flint::VectorServer::get_singleton();
+
+    uint32_t NODE_SPRITE_COUNT = 000;
+    uint32_t ECS_SPRITE_COUNT = 000;
 
     std::default_random_engine generator;
     std::uniform_real_distribution<float> rand_position(0.0f, 400.0f);
@@ -63,6 +78,18 @@ void App::run() {
         model1->set_mesh(ResourceManager::get_singleton().load<Mesh3d>("../assets/viking_room/viking_room.obj"));
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
+        label = std::make_shared<Flint::Label>();
+        label->set_font(ResourceManager::get_singleton().load<Flint::Font>("../assets/OpenSans-Regular.ttf"));
+        label->set_text("Hello Flint");
+        auto vector_layer = std::make_shared<Flint::TextureRect>();
+        auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server2.canvas->get_dest_texture().get());
+        auto texture = std::make_shared<Texture>();
+        texture->image = texture_vk->get_image();
+        texture->imageView = texture_vk->get_image_view();
+        texture->sampler = texture_vk->get_sampler();
+        texture->width = texture_vk->get_width();
+        texture->height = texture_vk->get_height();
+        //vector_layer->set_texture(texture);
 
         for (int i = 0; i < NODE_SPRITE_COUNT; i++) {
             auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
@@ -76,6 +103,7 @@ void App::run() {
 
         node->add_child(model0);
         node->add_child(sub_viewport_c);
+        node->add_child(label);
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
@@ -203,7 +231,7 @@ void App::run() {
         auto cursor_position_callback = [](GLFWwindow *window, double x_pos, double y_pos) {
             Flint::InputEvent input_event{};
             input_event.type = Flint::InputEventType::MouseMotion;
-            input_event.args.mouse_motion.position = {x_pos, y_pos};
+            input_event.args.mouse_motion.position = {(float) x_pos, (float) y_pos};
             //Flint::Logger::verbose("Cursor movement", "InputEvent");
         };
         glfwSetCursorPosCallback(Platform::getSingleton().window, cursor_position_callback);
@@ -327,6 +355,14 @@ void App::draw_frame() {
         sprite_render_system->update();
         model_render_system->update();
     }
+
+    auto vector_server = Flint::VectorServer::get_singleton();
+
+    vector_server.canvas->clear();
+
+    label->draw(SwapChain::getSingleton().commandBuffers[imageIndex]);
+
+    vector_server.canvas->build_and_render();
 
     // Record draw calls.
     record_commands(SwapChain::getSingleton().commandBuffers, imageIndex);

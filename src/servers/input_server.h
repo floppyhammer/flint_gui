@@ -1,9 +1,10 @@
-#ifndef FLINT_INPUT_EVENT_H
-#define FLINT_INPUT_EVENT_H
+#ifndef FLINT_INPUT_SERVER_H
+#define FLINT_INPUT_SERVER_H
 
 #include "../common/math/vec2.h"
 
 #include <cstdint>
+#include <vector>
 
 namespace Flint {
     enum class InputEventType {
@@ -30,17 +31,31 @@ namespace Flint {
             struct {
                 uint8_t button;
                 bool pressed;
-                Vec2<double> position;
+                Vec2<float> position;
             } mouse_button;
             struct {
-                double delta;
+                float delta;
             } mouse_scroll;
             struct {
-                Vec2<double> relative;
-                Vec2<double> position;
+                Vec2<float> relative;
+                Vec2<float> position;
             } mouse_motion;
         } args;
     };
+
+    class InputServer {
+    public:
+        static InputServer &get_singleton() {
+            static InputServer singleton;
+            return singleton;
+        }
+
+        Vec2<float> cursor_position;
+
+        std::vector<InputEvent> input_queue;
+
+        void clear_queue();
+    };
 }
 
-#endif //FLINT_INPUT_EVENT_H
+#endif //FLINT_INPUT_SERVER_H

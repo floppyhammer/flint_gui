@@ -9,7 +9,7 @@
 #include "../../../resources/default_resource.h"
 #include "../../../render/mvp_buffer.h"
 #include "../../../render/viewport.h"
-#include "../../../core/input_event.h"
+#include "../../../servers/input_server.h"
 
 #define GLFW_INCLUDE_VULKAN
 

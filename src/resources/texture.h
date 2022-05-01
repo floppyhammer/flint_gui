@@ -24,6 +24,8 @@ public:
 
     //static std::shared_ptr<Texture> from_bytes(const std::string &filename);
 
+    bool resource_ownership = true;
+
 public:
     uint32_t width = 0;
     uint32_t height = 0;

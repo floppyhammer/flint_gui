@@ -8,6 +8,8 @@
 #include "stb_image.h"
 
 Texture::~Texture() {
+    if (!resource_ownership) return;
+
     auto device = Platform::getSingleton().device;
 
     vkDestroySampler(device, sampler, nullptr);
@@ -34,37 +36,39 @@ void Texture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t
     VkDeviceMemory stagingBufferMemory;
 
     RenderServer::getSingleton().createBuffer(imageSize,
-                                    VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                    stagingBuffer,
-                                    stagingBufferMemory);
+                                              VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                              VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                              stagingBuffer,
+                                              stagingBufferMemory);
 
     // Copy the pixel values that we got from the image loading library to the buffer.
     RenderServer::getSingleton().copyDataToMemory(pixels, stagingBufferMemory, imageSize);
 
     RenderServer::getSingleton().createImage(width, height,
-                                   VK_FORMAT_R8G8B8A8_SRGB,
-                                   VK_IMAGE_TILING_OPTIMAL,
-                                   VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                                   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                   image,
-                                   imageMemory);
+                                             VK_FORMAT_R8G8B8A8_SRGB,
+                                             VK_IMAGE_TILING_OPTIMAL,
+                                             VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT |
+                                             VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+                                             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                                             image,
+                                             imageMemory);
 
     // Transition the texture image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL.
     RenderServer::getSingleton().transitionImageLayout(image,
-                                             VK_FORMAT_R8G8B8A8_SRGB,
-                                             VK_IMAGE_LAYOUT_UNDEFINED,
-                                             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+                                                       VK_FORMAT_R8G8B8A8_SRGB,
+                                                       VK_IMAGE_LAYOUT_UNDEFINED,
+                                                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     // Execute the buffer to image copy operation.
     RenderServer::getSingleton().copyBufferToImage(stagingBuffer, image, static_cast<uint32_t>(width),
-                                         static_cast<uint32_t>(height));
+                                                   static_cast<uint32_t>(height));
 
     // To be able to start sampling from the texture image in the shader, we need one last transition to prepare it for shader access.
     RenderServer::getSingleton().transitionImageLayout(image,
-                                             VK_FORMAT_R8G8B8A8_SRGB,
-                                             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+                                                       VK_FORMAT_R8G8B8A8_SRGB,
+                                                       VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                                       VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     // Clean up staging stuff.
     vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
@@ -86,8 +90,8 @@ std::shared_ptr<Texture> Texture::from_empty(uint32_t p_width, uint32_t p_height
 
     // Create image view.
     texture->imageView = RenderServer::getSingleton().createImageView(texture->image,
-                                                            VK_FORMAT_R8G8B8A8_SRGB,
-                                                            VK_IMAGE_ASPECT_COLOR_BIT);
+                                                                      VK_FORMAT_R8G8B8A8_SRGB,
+                                                                      VK_IMAGE_ASPECT_COLOR_BIT);
 
     // Create sampler.
     RenderServer::getSingleton().createTextureSampler(texture->sampler);
@@ -115,8 +119,8 @@ Texture::Texture(const std::string &path) : Resource(path) {
 
     // Create image view.
     imageView = RenderServer::getSingleton().createImageView(image,
-                                                            VK_FORMAT_R8G8B8A8_SRGB,
-                                                            VK_IMAGE_ASPECT_COLOR_BIT);
+                                                             VK_FORMAT_R8G8B8A8_SRGB,
+                                                             VK_IMAGE_ASPECT_COLOR_BIT);
 
     // Create sampler.
     RenderServer::getSingleton().createTextureSampler(sampler);
