@@ -2,6 +2,7 @@
 
 #include "../sub_viewport.h"
 #include "../../../render/swap_chain.h"
+#include "../../../resources/default_resource.h"
 
 #include <utility>
 #include <array>
@@ -9,6 +10,8 @@
 namespace Flint {
     SubViewportContainer::SubViewportContainer() {
         type = NodeType::SubViewportContainer;
+
+        mesh = DefaultResource::get_singleton().new_default_mesh_2d();
     }
 
     void SubViewportContainer::set_viewport(std::shared_ptr<SubViewport> p_viewport) {
@@ -19,7 +22,7 @@ namespace Flint {
 
     void SubViewportContainer::_update(double delta) {
         // Update self.
-        NodeGui::update(delta);
+        Control::update(delta);
 
         // Update children.
         Node::_update(delta);

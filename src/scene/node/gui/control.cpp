@@ -1,4 +1,4 @@
-#include "node_gui.h"
+#include "control.h"
 
 #include "../sub_viewport.h"
 #include "../../../render/swap_chain.h"
@@ -10,13 +10,11 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace Flint {
-    NodeGui::NodeGui() {
-        type = NodeType::NodeGui;
-
-        mesh = DefaultResource::get_singleton().new_default_mesh_2d();
+    Control::Control() {
+        type = NodeType::Control;
     }
 
-    void NodeGui::_update(double delta) {
+    void Control::_update(double delta) {
         // Update self.
         update(delta);
 
@@ -24,11 +22,15 @@ namespace Flint {
         Node::_update(delta);
     }
 
-    void NodeGui::update(double delta) {
+    Vec2<float> Control::calculate_minimum_size() const {
+        return minimum_size;
+    }
+
+    void Control::update(double delta) {
         update_mvp();
     }
 
-    void NodeGui::update_mvp() {
+    void Control::update_mvp() {
         Node *viewport_node = get_viewport();
 
         Vec2<uint32_t> viewport_extent;

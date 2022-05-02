@@ -17,7 +17,7 @@
 
 #include "resources/surface.h"
 #include "resources/texture.h"
-#include "core/scene_tree.h"
+#include "scene/node/scene_tree.h"
 
 #include "scene/ecs/entity.h"
 #include "scene/ecs/systems/sprite_render_system.h"

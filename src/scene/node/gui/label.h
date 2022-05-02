@@ -1,7 +1,7 @@
 #ifndef FLIN_LABEL_H
 #define FLIN_LABEL_H
 
-#include "node_gui.h"
+#include "control.h"
 #include "../../../resources/style_box.h"
 #include "../../../resources/font.h"
 #include "../../../common/math/rect.h"
@@ -38,7 +38,7 @@ namespace Flint {
         Pathfinder::Shape shape; // Glyph shape.
     };
 
-    class Label : public NodeGui {
+    class Label : public Control {
     public:
         Label() {
             type = NodeType::Label;

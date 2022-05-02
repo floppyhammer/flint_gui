@@ -1,14 +1,14 @@
 #ifndef FLINT_TEXTURE_RECT_H
 #define FLINT_TEXTURE_RECT_H
 
-#include "node_gui.h"
+#include "control.h"
 #include "../../../resources/texture.h"
 #include "../../../resources/surface.h"
 
 #include <memory>
 
 namespace Flint {
-    class TextureRect : public NodeGui {
+    class TextureRect : public Control {
     public:
         TextureRect();
 
@@ -23,6 +23,8 @@ namespace Flint {
         void update(double delta) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
+
+        std::shared_ptr<Mesh2d> mesh;
     };
 }
 

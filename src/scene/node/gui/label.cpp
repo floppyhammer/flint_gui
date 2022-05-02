@@ -139,7 +139,7 @@ namespace Flint {
     }
 
     void Label::update(double delta) {
-        NodeGui::update(delta);
+        Control::update(delta);
 
         if (need_to_remeasure) {
             measure();

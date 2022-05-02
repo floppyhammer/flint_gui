@@ -1,11 +1,11 @@
 #ifndef FLINT_SUB_VIEWPORT_CONTAINER_H
 #define FLINT_SUB_VIEWPORT_CONTAINER_H
 
-#include "node_gui.h"
+#include "container.h"
 #include "../sub_viewport.h"
 
 namespace Flint {
-    class SubViewportContainer : public NodeGui {
+    class SubViewportContainer : public Container {
     public:
         SubViewportContainer();
 
@@ -22,6 +22,8 @@ namespace Flint {
         void update(double delta) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
+
+        std::shared_ptr<Mesh2d> mesh;
     };
 }
 

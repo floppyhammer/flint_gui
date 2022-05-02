@@ -1,7 +1,5 @@
 #include "scene_tree.h"
 
-#include "../render/render_server.h"
-
 #include <array>
 #include <utility>
 
@@ -24,7 +22,8 @@ namespace Flint {
         root->_draw(p_command_buffer);
     }
 
-    void SceneTree::input(const InputEvent &input_event) const {
-
+    void SceneTree::input(std::vector<InputEvent> &input_queue) const {
+        if (root == nullptr) return;
+        root->propagate_input(input_queue);
     }
 }

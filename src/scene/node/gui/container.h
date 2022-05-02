@@ -1,19 +1,19 @@
 #ifndef FLINT_CONTAINER_H
 #define FLINT_CONTAINER_H
 
-#include "node_gui.h"
+#include "control.h"
 
 namespace Flint {
     /**
      * Containers adjust their container children's layouts automatically.
      */
-    class Container : public NodeGui {
+    class Container : public Control {
     public:
         Container() {
             type = NodeType::Container;
         }
 
-        virtual void adjust_layout() = 0;
+        virtual void adjust_layout() {};
     };
 }
 

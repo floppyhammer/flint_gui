@@ -19,16 +19,22 @@ namespace Flint {
         }
     }
 
-    Node *Node::get_viewport() {
-        if (get_parent() != nullptr) {
-            if (get_parent()->type == NodeType::SubViewport) {
-                return get_parent();
-            } else {
-                return get_parent()->get_viewport();
-            }
-        } else {
-            return nullptr;
+    void Node::propagate_input(std::vector<InputEvent> &input_queue) {
+        for (auto &child: children) {
+            child->propagate_input(input_queue);
         }
+    }
+
+    void Node::propagate_cleanup() {
+        for (auto &child: children) {
+            child->propagate_cleanup();
+        }
+    }
+
+    Node *Node::get_viewport() {
+        if (get_parent() == nullptr) return nullptr;
+
+        return get_parent()->type == NodeType::SubViewport ? get_parent() : get_parent()->get_viewport();
     }
 
     Node *Node::get_parent() {
@@ -40,7 +46,7 @@ namespace Flint {
     }
 
     void Node::add_child(const std::shared_ptr<Node> &p_child) {
-        // Set self as parent of the new node.
+        // Set self as the parent of the new node.
         p_child->parent = this;
 
         children.push_back(p_child);
@@ -52,22 +58,16 @@ namespace Flint {
     }
 
     NodeType Node::extended_from_which_base_node() const {
-        if (type < NodeType::NodeGui)
+        if (type < NodeType::Control)
             return NodeType::Node;
         else if (type < NodeType::Node2D)
-            return NodeType::NodeGui;
+            return NodeType::Control;
         else if (type < NodeType::Node3D)
             return NodeType::Node2D;
         else if (type < NodeType::Max)
             return NodeType::Node3D;
         else
             return NodeType::Max;
-    }
-
-    void Node::_cleanup() {
-        for (auto &child: children) {
-            child->_cleanup();
-        }
     }
 
     void Node::update(double delta) {

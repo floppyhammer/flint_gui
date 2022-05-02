@@ -19,7 +19,7 @@ namespace Flint {
         float rotation = 0;
         // ----------------------------
 
-        [[nodiscard]] Vec2<float> get_global_position() const;
+        Vec2<float> get_global_position() const;
 
     protected:
         std::shared_ptr<Mesh2d> mesh;

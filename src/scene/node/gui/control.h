@@ -1,5 +1,5 @@
-#ifndef FLINT_NODE_GUI_H
-#define FLINT_NODE_GUI_H
+#ifndef FLINT_CONTROL_H
+#define FLINT_CONTROL_H
 
 #include <vector>
 
@@ -12,11 +12,11 @@
 #include "../../../servers/vector_server.h"
 
 namespace Flint {
-    class NodeGui : public Node {
+    class Control : public Node {
     public:
-        NodeGui();
+        Control();
 
-        ~NodeGui() = default;
+        ~Control() = default;
 
         void _update(double delta) override;
 
@@ -26,6 +26,11 @@ namespace Flint {
         Vec2<float> pivot_offset{0}; // Top-left as the default pivot.
         float rotation = 0;
 
+        /// Used when being a child of a container.
+        Vec2<float> minimum_size{0};
+
+        virtual Vec2<float> calculate_minimum_size() const;
+
     protected:
         void update(double delta) override;
 
@@ -33,12 +38,8 @@ namespace Flint {
 
         virtual void input(std::vector<InputEvent> &input_queue) {};
 
-        virtual Vec2<float> calculate_minimum_size() const { return size; };
-
-        std::shared_ptr<Mesh2d> mesh;
-
         Surface2dPushConstant push_constant;
     };
 }
 
-#endif //FLINT_NODE_GUI_H
+#endif //FLINT_CONTROL_H

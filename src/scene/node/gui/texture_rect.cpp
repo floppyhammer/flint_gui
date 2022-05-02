@@ -1,11 +1,12 @@
 #include "texture_rect.h"
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
+#include "../sub_viewport.h"
 #include "../../../core/engine.h"
 #include "../../../render/swap_chain.h"
-#include "../sub_viewport.h"
+#include "../../../resources/default_resource.h"
+
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 #include <memory>
 #include <chrono>
@@ -13,6 +14,8 @@
 namespace Flint {
     TextureRect::TextureRect() {
         type = NodeType::TextureRect;
+
+        mesh = DefaultResource::get_singleton().new_default_mesh_2d();
     }
 
     void TextureRect::set_texture(std::shared_ptr<Texture> p_texture) {
@@ -26,12 +29,12 @@ namespace Flint {
         return mesh->surface->get_material()->get_texture();
     }
 
-    void TextureRect::_update(double delta) {
+    void TextureRect::_update(double dt) {
         // Update self.
-        NodeGui::update(delta);
+        Control::update(dt);
 
         // Update children.
-        Node::_update(delta);
+        Node::_update(dt);
     }
 
     void TextureRect::update(double delta) {

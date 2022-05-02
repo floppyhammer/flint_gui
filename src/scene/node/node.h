@@ -3,10 +3,8 @@
 
 #include "../../core/engine.h"
 #include "../../common/logger.h"
-
-#define GLFW_INCLUDE_VULKAN
-
-#include "GLFW/glfw3.h"
+#include "../../servers/input_server.h"
+#include "../../render/render_server.h"
 
 #include <vector>
 #include <memory>
@@ -18,7 +16,7 @@ namespace Flint {
         SubViewport,
 
         // GUI.
-        NodeGui,
+        Control,
         Label,
         Button,
         TextureRect,
@@ -52,7 +50,9 @@ namespace Flint {
 
         virtual void _notify(Signal signal);
 
-        void _cleanup();
+        virtual void propagate_input(std::vector<InputEvent> &input_queue);
+
+        virtual void propagate_cleanup();
 
         virtual void update(double delta);
 

@@ -1,12 +1,12 @@
 #ifndef FLINT_BUTTON_H
 #define FLINT_BUTTON_H
 
-#include "node_gui.h"
+#include "control.h"
 
 #include "../../../resources/style_box.h"
 
 namespace Flint {
-    class Button : public NodeGui {
+    class Button : public Control {
     public:
         Button();
 
