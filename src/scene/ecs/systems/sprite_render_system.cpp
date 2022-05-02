@@ -59,7 +59,7 @@ namespace Flint {
                                sizeof(Surface2dPushConstant), &sprite.push_constant.model);
 
             VkBuffer vertexBuffers[] = {sprite.mesh->surface->get_vertex_buffer()};
-            RenderServer::getSingleton().blit(
+            RenderServer::getSingleton().draw_mesh_2d(
                     command_buffer,
                     pipeline,
                     sprite.mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
@@ -128,7 +128,7 @@ namespace Flint {
                                sizeof(Surface2dPushConstant), &sprite.push_constant.model);
 
             VkBuffer vertexBuffers[] = {sprite.mesh->surface->get_vertex_buffer()};
-            RenderServer::getSingleton().blit(
+            RenderServer::getSingleton().draw_mesh_2d(
                     command_buffer,
                     pipeline,
                     sprite.mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),

@@ -82,14 +82,19 @@ void App::run() {
         label->set_font(ResourceManager::get_singleton().load<Flint::Font>("../assets/OpenSans-Regular.ttf"));
         label->set_text("Hello Flint");
         auto vector_layer = std::make_shared<Flint::TextureRect>();
+        vector_layer->name = "vector_layer";
+        vector_layer->size = {WIDTH, HEIGHT};
         auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server2.canvas->get_dest_texture().get());
         auto texture = std::make_shared<Texture>();
         texture->image = texture_vk->get_image();
+        texture->imageMemory = texture_vk->get_image_memory();
         texture->imageView = texture_vk->get_image_view();
         texture->sampler = texture_vk->get_sampler();
         texture->width = texture_vk->get_width();
         texture->height = texture_vk->get_height();
-        //vector_layer->set_texture(texture);
+        texture->name = "Pathfinder Canvas";
+        texture->resource_ownership = false;
+        vector_layer->set_texture(texture);
 
         for (int i = 0; i < NODE_SPRITE_COUNT; i++) {
             auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
@@ -102,8 +107,9 @@ void App::run() {
         }
 
         node->add_child(model0);
-        node->add_child(sub_viewport_c);
+        //node->add_child(sub_viewport_c);
         node->add_child(label);
+        node->add_child(vector_layer);
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
@@ -362,6 +368,7 @@ void App::draw_frame() {
 
     label->draw(SwapChain::getSingleton().commandBuffers[imageIndex]);
 
+    // Do the vector render pass before the main render pass.
     vector_server.canvas->build_and_render();
 
     // Record draw calls.

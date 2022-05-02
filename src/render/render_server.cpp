@@ -2,6 +2,7 @@
 #include <set>
 
 #include "render_server.h"
+#include "../resources/default_resource.h"
 #include "../resources/surface.h"
 #include "../common/io.h"
 
@@ -397,10 +398,25 @@ void RenderServer::createTextureSampler(VkSampler &textureSampler) const {
 
 void RenderServer::blit(VkCommandBuffer commandBuffer,
                         VkPipeline graphicsPipeline,
-                        const VkDescriptorSet &descriptorSet,
-                        VkBuffer vertexBuffers[],
-                        VkBuffer indexBuffer,
-                        uint32_t indexCount) const {
+                        const VkDescriptorSet &descriptorSet) const {
+    auto default_resources = DefaultResource::get_singleton().get_default_surface_2d_gpu_resources();
+
+    VkBuffer vertexBuffers[] = {default_resources->vertexBuffer};
+
+    draw_mesh_2d(commandBuffer,
+                 graphicsPipeline,
+                 descriptorSet,
+                 vertexBuffers,
+                 default_resources->indexBuffer,
+                 default_resources->indices_count);
+}
+
+void RenderServer::draw_mesh_2d(VkCommandBuffer commandBuffer,
+                                VkPipeline graphicsPipeline,
+                                const VkDescriptorSet &descriptorSet,
+                                VkBuffer vertexBuffers[],
+                                VkBuffer indexBuffer,
+                                uint32_t indexCount) const {
     // Bind pipeline.
     vkCmdBindPipeline(commandBuffer,
                       VK_PIPELINE_BIND_POINT_GRAPHICS,

@@ -22,11 +22,11 @@ namespace Flint {
         return mesh->surface->get_material()->get_texture();
     }
 
-    void Sprite2d::set_mesh(const std::shared_ptr<Mesh2d>& p_mesh) {
+    void Sprite2d::set_mesh(const std::shared_ptr<Mesh2d> &p_mesh) {
         mesh = p_mesh;
     }
 
-    void Sprite2d::set_material(const std::shared_ptr<Material2d>& p_material) {
+    void Sprite2d::set_material(const std::shared_ptr<Material2d> &p_material) {
         mesh->surface->set_material(p_material);
     }
 
@@ -113,7 +113,9 @@ namespace Flint {
                            sizeof(Surface2dPushConstant), &push_constant);
 
         VkBuffer vertexBuffers[] = {mesh->surface->get_vertex_buffer()};
-        RenderServer::getSingleton().blit(
+
+        // Unlike Texture Rect, Sprite 2D should support custom mesh.
+        RenderServer::getSingleton().draw_mesh_2d(
                 p_command_buffer,
                 pipeline,
                 mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),

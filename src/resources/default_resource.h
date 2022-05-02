@@ -20,7 +20,7 @@ public:
                 0, 2, 1, 2, 0, 3
         };
 
-        default_surface_2d_gou_resources = std::make_shared<SurfaceGpuResources>(vertices, indices);
+        default_surface_2d_gpu_resources = std::make_shared<SurfaceGpuResources>(vertices, indices);
     }
 
     static DefaultResource &get_singleton() {
@@ -28,8 +28,12 @@ public:
         return singleton;
     }
 
+    inline std::shared_ptr<SurfaceGpuResources> get_default_surface_2d_gpu_resources() {
+        return default_surface_2d_gpu_resources;
+    }
+
     inline void cleanup() {
-        default_surface_2d_gou_resources.reset();
+        default_surface_2d_gpu_resources.reset();
     }
 
     /**
@@ -42,7 +46,7 @@ public:
 
         auto mesh = std::make_shared<Mesh2d>();
         mesh->surface = surface;
-        mesh->surface->set_gpu_resources(default_surface_2d_gou_resources);
+        mesh->surface->set_gpu_resources(default_surface_2d_gpu_resources);
         mesh->surface->set_material(material);
 
         return mesh;
@@ -50,7 +54,7 @@ public:
 
 private:
     // Default resources should never be modified.
-    std::shared_ptr<SurfaceGpuResources> default_surface_2d_gou_resources;
+    std::shared_ptr<SurfaceGpuResources> default_surface_2d_gpu_resources;
 };
 
 #endif //FLINT_DEFAULT_RESOURCE_H

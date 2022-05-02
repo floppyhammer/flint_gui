@@ -47,19 +47,22 @@ namespace Flint {
         Node *viewport_node = get_viewport();
 
         VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
+        VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
             pipeline = viewport->viewport->blitGraphicsPipeline;
         }
 
-        VkBuffer vertexBuffers[] = {mesh->surface->get_vertex_buffer()};
+        // Upload the model matrix to the GPU via push constants.
+        vkCmdPushConstants(p_command_buffer, pipeline_layout,
+                           VK_SHADER_STAGE_VERTEX_BIT, 0,
+                           sizeof(Surface2dPushConstant), &push_constant);
+
+        // Unlike Sprite 2D, Texture Rect should not support custom mesh.
         RenderServer::getSingleton().blit(
                 p_command_buffer,
                 pipeline,
-                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
-                vertexBuffers,
-                mesh->surface->get_index_buffer(),
-                mesh->surface->get_index_count());
+                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage));
     }
 }

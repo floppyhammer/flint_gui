@@ -182,8 +182,8 @@ public:
      * @dependency Descriptor set layout, render pass, viewport extent.
      */
     void createMeshPipeline(VkRenderPass renderPass,
-                                    VkExtent2D viewportExtent,
-                                    VkPipeline &pipeline);
+                            VkExtent2D viewportExtent,
+                            VkPipeline &pipeline);
 
     /**
      * Draw a single mesh.
@@ -201,8 +201,16 @@ public:
                    VkBuffer indexBuffer,
                    uint32_t indexCount) const;
 
-    void blit(VkCommandBuffer commandBuffer, VkPipeline graphicsPipeline, VkDescriptorSet const &descriptorSet,
-              VkBuffer *vertexBuffers, VkBuffer indexBuffer, uint32_t indexCount) const;
+    void draw_mesh_2d(VkCommandBuffer commandBuffer,
+                      VkPipeline graphicsPipeline,
+                      const VkDescriptorSet &descriptorSet,
+                      VkBuffer vertexBuffers[],
+                      VkBuffer indexBuffer,
+                      uint32_t indexCount) const;
+
+    void blit(VkCommandBuffer commandBuffer,
+              VkPipeline graphicsPipeline,
+              VkDescriptorSet const &descriptorSet) const;
 
     // --------------------------------------------------
     void cleanupSwapChainRelatedResources() const;

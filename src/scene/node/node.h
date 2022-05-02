@@ -44,6 +44,8 @@ namespace Flint {
     public:
         NodeType type = NodeType::Node;
 
+        std::string name;
+
         virtual void _update(double delta);
 
         virtual void _draw(VkCommandBuffer p_command_buffer);

@@ -66,9 +66,6 @@ namespace Flint {
         RenderServer::getSingleton().blit(
                 p_command_buffer,
                 pipeline,
-                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
-                vertexBuffers,
-                mesh->surface->get_index_buffer(),
-                mesh->surface->get_index_count());
+                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage));
     }
 }
