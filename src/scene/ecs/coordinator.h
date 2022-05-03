@@ -10,10 +10,10 @@
 namespace Flint {
     class Coordinator {
     public:
-        static Coordinator &get_singleton() {
-            static Coordinator singleton;
-            return singleton;
-        }
+//        static Coordinator &get_singleton() {
+//            static Coordinator singleton;
+//            return singleton;
+//        }
 
         Coordinator() {
             init();

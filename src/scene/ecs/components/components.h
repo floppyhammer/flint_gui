@@ -108,6 +108,16 @@ namespace Flint {
     };
     // -----------------------------
 
+    // HIERARCHY
+    // -----------------------------
+    struct HierarchicalRelations {
+        std::optional<Entity> first_child;
+        std::optional<Entity> prev_sibling;
+        std::optional<Entity> next_sibling;
+        std::optional<Entity> parent;
+    };
+    // -----------------------------
+
     // CUSTOM
     // -----------------------------
 

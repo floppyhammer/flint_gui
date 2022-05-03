@@ -3,18 +3,19 @@
 
 #include "../system.h"
 #include "../entity.h"
+#include "../coordinator.h"
 
 #include <set>
 
 namespace Flint {
     class Physics2dSystem : public System {
     public:
-        void update(double dt);
+        void update(const std::weak_ptr<Coordinator>& p_coordinator, double dt);
     };
 
     class Physics3dSystem : public System {
     public:
-        void update(double dt);
+        void update(const std::weak_ptr<Coordinator>& p_coordinator, double dt);
     };
 }
 

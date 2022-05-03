@@ -1,7 +1,6 @@
 #include "sprite_render_system.h"
 
 #include "../components/components.h"
-#include "../coordinator.h"
 #include "../../../render/swap_chain.h"
 #include "../../../resources/surface.h"
 #include "../../../render/mvp_buffer.h"
@@ -10,12 +9,12 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace Flint {
-    void SpriteGuiRenderSystem::update() {
-        for (auto const &entity: entities) {
-            auto coordinator = Coordinator::get_singleton();
+    void SpriteGuiRenderSystem::update(const std::weak_ptr<Coordinator>& p_coordinator, double dt) {
+        auto coordinator = p_coordinator.lock();
 
-            auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
-            auto &transform = coordinator.get_component<TransformGuiComponent>(entity);
+        for (auto const &entity: entities) {
+            auto &sprite = coordinator->get_component<Sprite2dComponent>(entity);
+            auto &transform = coordinator->get_component<TransformGuiComponent>(entity);
 
             // Default to swap chain image.
             auto extent = SwapChain::getSingleton().swapChainExtent;
@@ -44,11 +43,11 @@ namespace Flint {
         }
     }
 
-    void SpriteGuiRenderSystem::draw(VkCommandBuffer command_buffer) {
-        auto coordinator = Coordinator::get_singleton();
+    void SpriteGuiRenderSystem::draw(const std::weak_ptr<Coordinator>& p_coordinator, VkCommandBuffer command_buffer) {
+        auto coordinator = p_coordinator.lock();
 
         for (auto const &entity: entities) {
-            auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
+            auto &sprite = coordinator->get_component<Sprite2dComponent>(entity);
 
             VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
             VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
@@ -69,13 +68,13 @@ namespace Flint {
         }
     }
 
-    void Sprite2dRenderSystem::update() {
-        auto coordinator = Coordinator::get_singleton();
+    void Sprite2dRenderSystem::update(const std::weak_ptr<Coordinator>& p_coordinator, double dt) {
+        auto coordinator = p_coordinator.lock();
 
         for (auto const &entity: entities) {
-            auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
-            auto &transform = coordinator.get_component<Transform2dComponent>(entity);
-            auto &sort_z = coordinator.get_component<ZSort2d>(entity);
+            auto &sprite = coordinator->get_component<Sprite2dComponent>(entity);
+            auto &transform = coordinator->get_component<Transform2dComponent>(entity);
+            auto &sort_z = coordinator->get_component<ZSort2d>(entity);
 
             auto texture = sprite.mesh->surface->get_material()->get_texture();
             if (texture == nullptr) continue;
@@ -110,11 +109,11 @@ namespace Flint {
         }
     }
 
-    void Sprite2dRenderSystem::draw(VkCommandBuffer command_buffer) {
-        auto coordinator = Coordinator::get_singleton();
+    void Sprite2dRenderSystem::draw(const std::weak_ptr<Coordinator>& p_coordinator, VkCommandBuffer command_buffer) {
+        auto coordinator = p_coordinator.lock();
 
         for (auto const &entity: entities) {
-            auto &sprite = coordinator.get_component<Sprite2dComponent>(entity);
+            auto &sprite = coordinator->get_component<Sprite2dComponent>(entity);
 
             auto texture = sprite.mesh->surface->get_material()->get_texture();
             if (texture == nullptr) continue;

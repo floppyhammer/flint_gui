@@ -9,8 +9,8 @@
 #define FLINT_ECS_THREADS 4
 
 namespace Flint {
-    void Physics2dSystem::update(double dt) {
-        auto coordinator = Coordinator::get_singleton();
+    void Physics2dSystem::update(const std::weak_ptr<Coordinator>& p_coordinator, double dt) {
+        auto coordinator = p_coordinator.lock();
 
         if (false) {
             std::vector<Entity> v(entities.begin(), entities.end());
@@ -20,9 +20,9 @@ namespace Flint {
             auto task = [&v, &entity_count, &coordinator, &dt](uint32_t index_begin) {
                 for (uint32_t index = index_begin; index < entity_count; index += FLINT_ECS_THREADS) {
                     auto entity = v[index];
-                    auto &rigidBody = coordinator.get_component<RigidBodyComponent>(entity);
-                    auto &transform = coordinator.get_component<Transform2dComponent>(entity);
-                    auto const &gravity = coordinator.get_component<GravityComponent>(entity);
+                    auto &rigidBody = coordinator->get_component<RigidBodyComponent>(entity);
+                    auto &transform = coordinator->get_component<Transform2dComponent>(entity);
+                    auto const &gravity = coordinator->get_component<GravityComponent>(entity);
 
                     transform.position += rigidBody.velocity.xy() * dt;
                     rigidBody.velocity += gravity.force * dt;
@@ -51,9 +51,9 @@ namespace Flint {
             }
         } else {
             for (auto const &entity: entities) {
-                auto &rigidBody = coordinator.get_component<RigidBodyComponent>(entity);
-                auto &transform = coordinator.get_component<Transform2dComponent>(entity);
-                auto const &gravity = coordinator.get_component<GravityComponent>(entity);
+                auto &rigidBody = coordinator->get_component<RigidBodyComponent>(entity);
+                auto &transform = coordinator->get_component<Transform2dComponent>(entity);
+                auto const &gravity = coordinator->get_component<GravityComponent>(entity);
 
                 transform.position += rigidBody.velocity.xy() * dt;
                 rigidBody.velocity += gravity.force * dt;
@@ -72,13 +72,13 @@ namespace Flint {
         }
     }
 
-    void Physics3dSystem::update(double dt) {
-        auto coordinator = Coordinator::get_singleton();
+    void Physics3dSystem::update(const std::weak_ptr<Coordinator>& p_coordinator, double dt) {
+        auto coordinator = p_coordinator.lock();
 
         for (auto const &entity: entities) {
-            auto &rigidBody = coordinator.get_component<RigidBodyComponent>(entity);
-            auto &transform = coordinator.get_component<Transform3dComponent>(entity);
-            auto const &gravity = coordinator.get_component<GravityComponent>(entity);
+            auto &rigidBody = coordinator->get_component<RigidBodyComponent>(entity);
+            auto &transform = coordinator->get_component<Transform3dComponent>(entity);
+            auto const &gravity = coordinator->get_component<GravityComponent>(entity);
 
             transform.position += rigidBody.velocity * dt;
             rigidBody.velocity += gravity.force * dt;

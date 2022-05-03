@@ -19,12 +19,7 @@
 #include "scene/node/sub_viewport.h"
 #include "scene/node/2d/sprite_2d.h"
 #include "scene/node/2d/rigid_body_2d.h"
-
-#include "scene/ecs/coordinator.h"
 #include "scene/ecs/components/components.h"
-#include "scene/ecs/systems/physics_system.h"
-#include "scene/ecs/systems/sprite_render_system.h"
-#include "scene/ecs/systems/model_render_system.h"
 
 #include <cstdint>
 #include <memory>
@@ -48,18 +43,22 @@ void App::run() {
 
     // 4. Initialize vector server.
     //auto vector_server = Flint::VectorServer::get_singleton();
-    std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(platform.device, platform.physicalDevice, platform.graphicsQueue, platform.graphicsQueue, render_server.commandPool);
+    std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(platform.device,
+                                                                                        platform.physicalDevice,
+                                                                                        platform.graphicsQueue,
+                                                                                        platform.graphicsQueue,
+                                                                                        render_server.commandPool);
     //vector_server.init(driver, WIDTH, HEIGHT, readFile("../assets/area-lut.png"));
 
     Flint::VectorServer::get_singleton().init(driver,
-                                                   WIDTH,
-                                                   HEIGHT,
-                                                   readFile("../assets/area-lut.png"));
+                                              WIDTH,
+                                              HEIGHT,
+                                              readFile("../assets/area-lut.png"));
 
     auto vector_server2 = Flint::VectorServer::get_singleton();
 
     uint32_t NODE_SPRITE_COUNT = 000;
-    uint32_t ECS_SPRITE_COUNT = 000;
+    uint32_t ECS_SPRITE_COUNT = 1000;
 
     std::default_random_engine generator;
     std::uniform_real_distribution<float> rand_position(0.0f, 400.0f);
@@ -114,102 +113,31 @@ void App::run() {
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
         node_3d->add_child(model1);
-        tree.set_root(node);
+        //tree.set_root(node);
     }
 
+    // ECS test.
     {
-        // ECS test.
-        // ----------------------------------------------------------
-        auto coordinator = Flint::Coordinator::get_singleton();
+        world = std::make_unique<Flint::World>();
 
-        // Register components.
-        coordinator.register_component<Flint::GravityComponent>();
-        coordinator.register_component<Flint::RigidBodyComponent>();
-        coordinator.register_component<Flint::Transform2dComponent>();
-        coordinator.register_component<Flint::Transform3dComponent>();
-        coordinator.register_component<Flint::TransformGuiComponent>();
-        coordinator.register_component<Flint::Sprite2dComponent>();
-        coordinator.register_component<Flint::Sprite3dComponent>();
-        coordinator.register_component<Flint::ModelComponent>();
-        coordinator.register_component<Flint::ViewportInputComponent>();
-        coordinator.register_component<Flint::ViewportOutputComponent>();
-        coordinator.register_component<Flint::ZSort2d>();
+        // Add some 2D sprites.
+        for (int i = 0; i < ECS_SPRITE_COUNT; i++) {
+            auto mesh = DefaultResource::get_singleton().new_default_mesh_2d();
+            mesh->surface->get_material()->set_texture(
+                    ResourceManager::get_singleton().load<Texture>("../assets/duck.png"));
 
-        // Register systems.
-        physics_system = coordinator.register_system<Flint::Physics2dSystem>();
-        // Set signature.
-        {
-            Flint::Signature signature;
-            signature.set(coordinator.get_component_type<Flint::GravityComponent>());
-            signature.set(coordinator.get_component_type<Flint::RigidBodyComponent>());
-            signature.set(coordinator.get_component_type<Flint::Transform2dComponent>());
-            coordinator.set_system_signature<Flint::Physics2dSystem>(signature);
-        }
-
-        sprite_render_system = coordinator.register_system<Flint::Sprite2dRenderSystem>();
-        // Set signature.
-        {
-            Flint::Signature signature;
-            signature.set(coordinator.get_component_type<Flint::Sprite2dComponent>());
-            signature.set(coordinator.get_component_type<Flint::Transform2dComponent>());
-            signature.set(coordinator.get_component_type<Flint::ZSort2d>());
-            coordinator.set_system_signature<Flint::Sprite2dRenderSystem>(signature);
-        }
-
-        model_render_system = coordinator.register_system<Flint::ModelRenderSystem>();
-        // Set signature.
-        {
-            Flint::Signature signature;
-            signature.set(coordinator.get_component_type<Flint::ModelComponent>());
-            signature.set(coordinator.get_component_type<Flint::Transform3dComponent>());
-            coordinator.set_system_signature<Flint::ModelRenderSystem>(signature);
-        }
-
-        // Allocate space for entities.
-        entities.resize(ECS_SPRITE_COUNT);
-
-        // 2D sprites.
-        int z = 0;
-        for (auto &entity: entities) {
-            entity = coordinator.create_entity();
-
-            // Render components.
-            {
-                auto mesh = DefaultResource::get_singleton().new_default_mesh_2d();
-                mesh->surface->get_material()->set_texture(
-                        ResourceManager::get_singleton().load<Texture>("../assets/duck.png"));
-
-                coordinator.add_component(
-                        entity,
-                        Flint::Sprite2dComponent{mesh});
-
-                coordinator.add_component(
-                        entity,
-                        Flint::ZSort2d{(float) z++ / (float) entities.size()});
-            }
-
-            // Physics components.
-            {
-                coordinator.add_component(
-                        entity,
-                        Flint::Transform2dComponent{
-                                Flint::Vec2<float>(0.0f),
-                                Flint::Vec2<float>(1.0f),
-                                Flint::Vec2<float>(1.0f),
-                                0.0f,
-                        });
-
-                coordinator.add_component(
-                        entity,
-                        Flint::GravityComponent{Flint::Vec3<float>(0.0f)});
-
-                coordinator.add_component(
-                        entity,
-                        Flint::RigidBodyComponent{
-                                Flint::Vec3<float>(rand_velocity(generator), rand_velocity(generator), 0.0f),
-                                Flint::Vec3<float>(0.0f),
-                        });
-            }
+            auto entity = world->spawn();
+            world->add_component(entity, Flint::Sprite2dComponent{mesh});
+            world->add_component(entity, Flint::ZSort2d{(float) i / (float) ECS_SPRITE_COUNT});
+            world->add_component(entity, Flint::Transform2dComponent{
+                    Flint::Vec2<float>(0.0f),
+                    Flint::Vec2<float>(1.0f),
+                    Flint::Vec2<float>(1.0f),
+                    0.0f});
+            world->add_component(entity, Flint::GravityComponent{Flint::Vec3<float>(0.0f)});
+            world->add_component(entity, Flint::RigidBodyComponent{
+                    Flint::Vec3<float>(rand_velocity(generator), rand_velocity(generator), 0.0f),
+                    Flint::Vec3<float>(0.0f)});
         }
 
         // 3D model.
@@ -229,6 +157,42 @@ void App::run() {
 //                    entity,
 //                    transform);
 //        }
+
+        // Hierarchy test.
+//        {
+
+//            auto entity_0 = world->spawn(Flint::Sprite2dComponent{mesh};
+//            auto entity_0_0 = world->spawn(Flint::Sprite2dComponent{mesh};
+//            auto entity_0_1 = world->spawn(Flint::Sprite2dComponent{mesh};
+//            auto entity_0_0_1 = world->spawn(Flint::Sprite2dComponent{mesh};
+//
+//            coordinator.add_component(
+//                    entity_0,
+//                    Flint::HierarchicalRelations{{entity_0_0},
+//                                                 {},
+//                                                 {},
+//                                                 {}});
+//            coordinator.add_component(
+//                    entity_0_0,
+//                    Flint::HierarchicalRelations{{entity_0_0_1},
+//                                                 {},
+//                                                 {entity_0_1},
+//                                                 {entity_0}});
+//            coordinator.add_component(
+//                    entity_0_1,
+//                    Flint::HierarchicalRelations{{},
+//                                                 {entity_0_1},
+//                                                 {},
+//                                                 {entity_0}});
+//            coordinator.add_component(
+//                    entity_0_0_1,
+//                    Flint::HierarchicalRelations{{},
+//                                                 {},
+//                                                 {},
+//                                                 {entity_0_0_1}});
+//        }
+//
+//        hierarchy_system->traverse(entities[0]);
     }
 
     // GLFW input callbacks.
@@ -238,7 +202,9 @@ void App::run() {
             Flint::InputEvent input_event{};
             input_event.type = Flint::InputEventType::MouseMotion;
             input_event.args.mouse_motion.position = {(float) x_pos, (float) y_pos};
-            //Flint::Logger::verbose("Cursor movement", "InputEvent");
+            auto input_server = Flint::InputServer::get_singleton();
+            input_server.cursor_position = {(float) x_pos, (float) y_pos};
+            input_server.input_queue.push_back(input_event);
         };
         glfwSetCursorPosCallback(Platform::getSingleton().window, cursor_position_callback);
 
@@ -247,7 +213,8 @@ void App::run() {
             input_event.type = Flint::InputEventType::MouseButton;
             input_event.args.mouse_button.button = button;
             input_event.args.mouse_button.pressed = action == GLFW_PRESS;
-            Flint::Logger::verbose("Cursor button", "InputEvent");
+            auto input_server = Flint::InputServer::get_singleton();
+            input_server.input_queue.push_back(input_event);
         };
         glfwSetMouseButtonCallback(Platform::getSingleton().window, cursor_button_callback);
     }
@@ -262,11 +229,7 @@ void App::run() {
             tree.set_root(nullptr);
 
             // ECS.
-            auto coordinator = Flint::Coordinator::get_singleton();
-            for (auto &entity: entities) {
-                coordinator.destroy_entity(entity);
-            }
-            entities.resize(0);
+            world.reset();
 
             DefaultResource::get_singleton().cleanup();
         }
@@ -317,9 +280,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
     {
         tree.draw(commandBuffers[imageIndex]);
 
-        sprite_render_system->draw(commandBuffers[imageIndex]);
-
-        model_render_system->draw(commandBuffers[imageIndex]);
+        world->draw(commandBuffers[imageIndex]);
     }
 
     // End render pass.
@@ -357,9 +318,7 @@ void App::draw_frame() {
         tree.update(dt);
 
         // ECS scene manager.
-        physics_system->update(dt);
-        sprite_render_system->update();
-        model_render_system->update();
+        world->update(dt);
     }
 
     auto vector_server = Flint::VectorServer::get_singleton();

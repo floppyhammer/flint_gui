@@ -1,12 +1,9 @@
-//
-// Created by tannh on 4/4/2022.
-//
-
 #ifndef FLINT_SUB_VIEWPORT_SYSTEM_H
 #define FLINT_SUB_VIEWPORT_SYSTEM_H
 
 #include "../system.h"
 #include "../entity.h"
+#include "../coordinator.h"
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -17,12 +14,12 @@
 namespace Flint {
     class SubViewportInputSystem : public System {
     public:
-        void update();
+        void update(const std::weak_ptr<Coordinator>& p_coordinator);
     };
 
     class SubViewportOutSystem : public System {
     public:
-        void update();
+        void update(const std::weak_ptr<Coordinator>& p_coordinator);
     };
 }
 

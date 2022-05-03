@@ -11,12 +11,12 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace Flint {
-    void ModelRenderSystem::update() {
-        auto coordinator = Coordinator::get_singleton();
+    void ModelRenderSystem::update(const std::weak_ptr<Coordinator>& p_coordinator) {
+        auto coordinator = p_coordinator.lock();
 
         for (auto const &entity: entities) {
-            auto &model = coordinator.get_component<ModelComponent>(entity);
-            auto &transform = coordinator.get_component<Transform3dComponent>(entity);
+            auto &model = coordinator->get_component<ModelComponent>(entity);
+            auto &transform = coordinator->get_component<Transform3dComponent>(entity);
 
             // Prepare MVP data.
             ModelViewProjection mvp{};
@@ -47,11 +47,11 @@ namespace Flint {
         }
     }
 
-    void ModelRenderSystem::draw(VkCommandBuffer command_buffer) {
+    void ModelRenderSystem::draw(const std::weak_ptr<Coordinator>& p_coordinator, VkCommandBuffer command_buffer) {
+        auto coordinator = p_coordinator.lock();
+        
         for (auto const &entity: entities) {
-            auto coordinator = Coordinator::get_singleton();
-
-            auto &model = coordinator.get_component<ModelComponent>(entity);
+            auto &model = coordinator->get_component<ModelComponent>(entity);
 
             VkPipeline pipeline = RenderServer::getSingleton().meshGraphicsPipeline;
             VkPipelineLayout pipeline_layout = RenderServer::getSingleton().meshPipelineLayout;

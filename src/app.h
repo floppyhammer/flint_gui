@@ -17,13 +17,12 @@
 
 #include "resources/surface.h"
 #include "resources/texture.h"
+
 #include "scene/node/scene_tree.h"
+#include "scene/node/gui/label.h"
 
 #include "scene/ecs/entity.h"
-#include "scene/ecs/systems/sprite_render_system.h"
-#include "scene/ecs/systems/model_render_system.h"
-#include "scene/ecs/systems/physics_system.h"
-#include "scene/node/gui/label.h"
+#include "scene/ecs/world.h"
 
 class App {
 public:
@@ -36,13 +35,7 @@ private:
 
     std::queue<Flint::InputEvent> input_queue;
 
-    std::vector<Flint::Entity> entities;
-
-    std::shared_ptr<Flint::Sprite2dRenderSystem> sprite_render_system;
-
-    std::shared_ptr<Flint::ModelRenderSystem> model_render_system;
-
-    std::shared_ptr<Flint::Physics2dSystem> physics_system;
+    std::unique_ptr<Flint::World> world;
 
 private:
     void main_loop();

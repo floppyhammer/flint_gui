@@ -13,7 +13,7 @@ namespace Flint {
             type = NodeType::Container;
         }
 
-        virtual void adjust_layout() {};
+        virtual void adjust_layout();
     };
 }
 

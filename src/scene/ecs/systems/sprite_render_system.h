@@ -3,6 +3,7 @@
 
 #include "../system.h"
 #include "../entity.h"
+#include "../coordinator.h"
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -13,23 +14,23 @@
 namespace Flint {
     class SpriteGuiRenderSystem : public System {
     public:
-        void update();
+        void update(const std::weak_ptr<Coordinator>& p_coordinator, double dt);
 
-        void draw(VkCommandBuffer command_buffer);
+        void draw(const std::weak_ptr<Coordinator>& p_coordinator, VkCommandBuffer command_buffer);
     };
 
     class Sprite2dRenderSystem : public System {
     public:
-        void update();
+        void update(const std::weak_ptr<Coordinator>& p_coordinator, double dt);
 
-        void draw(VkCommandBuffer command_buffer);
+        void draw(const std::weak_ptr<Coordinator>& p_coordinator, VkCommandBuffer command_buffer);
     };
 
     class Sprite3dRenderSystem : public System {
     public:
-        void update(double dt);
+        void update(const std::weak_ptr<Coordinator>& p_coordinator, double dt);
 
-        void draw(VkCommandBuffer command_buffer);
+        void draw(std::weak_ptr<Coordinator> p_coordinator, VkCommandBuffer command_buffer);
     };
 }
 

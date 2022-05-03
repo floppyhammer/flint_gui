@@ -3,6 +3,7 @@
 
 #include "../system.h"
 #include "../entity.h"
+#include "../coordinator.h"
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -13,9 +14,9 @@
 namespace Flint {
     class ModelRenderSystem : public System {
     public:
-        void update();
+        void update(const std::weak_ptr<Coordinator>& p_coordinator);
 
-        void draw(VkCommandBuffer command_buffer);
+        void draw(const std::weak_ptr<Coordinator>& p_coordinator, VkCommandBuffer command_buffer);
     };
 }
 

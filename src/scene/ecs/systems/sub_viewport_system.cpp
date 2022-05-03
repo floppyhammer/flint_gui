@@ -5,13 +5,13 @@
 #include "../../../render/swap_chain.h"
 
 namespace Flint {
-    void SubViewportInputSystem::update() {
+    void SubViewportInputSystem::update(const std::weak_ptr<Coordinator>& p_coordinator) {
         auto command_buffer = RenderServer::getSingleton().beginSingleTimeCommands();
 
-        auto coordinator = Coordinator::get_singleton();
+        auto coordinator = p_coordinator.lock();
 
         for (auto const &entity: entities) {
-            auto &viewport_component = coordinator.get_component<ViewportInputComponent>(entity);
+            auto &viewport_component = coordinator->get_component<ViewportInputComponent>(entity);
 
         }
 
@@ -19,5 +19,9 @@ namespace Flint {
 //        vkCmdEndRenderPass(p_command_buffer);
 //
 //        RenderServer::getSingleton().endSingleTimeCommands(sub_viewport_command_buffer);
+    }
+
+    void SubViewportOutSystem::update(const std::weak_ptr<Coordinator> &p_coordinator) {
+
     }
 }
