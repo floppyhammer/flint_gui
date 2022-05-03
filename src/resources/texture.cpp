@@ -46,7 +46,7 @@ void Texture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t
     RenderServer::getSingleton().copyDataToMemory(pixels, stagingBufferMemory, imageSize);
 
     RenderServer::getSingleton().createImage(width, height,
-                                             VK_FORMAT_R8G8B8A8_SRGB,
+                                             VK_FORMAT_R8G8B8A8_UNORM,
                                              VK_IMAGE_TILING_OPTIMAL,
                                              VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT |
                                              VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
@@ -56,7 +56,7 @@ void Texture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t
 
     // Transition the texture image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL.
     RenderServer::getSingleton().transitionImageLayout(image,
-                                                       VK_FORMAT_R8G8B8A8_SRGB,
+                                                       VK_FORMAT_R8G8B8A8_UNORM,
                                                        VK_IMAGE_LAYOUT_UNDEFINED,
                                                        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
@@ -66,7 +66,7 @@ void Texture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t
 
     // To be able to start sampling from the texture image in the shader, we need one last transition to prepare it for shader access.
     RenderServer::getSingleton().transitionImageLayout(image,
-                                                       VK_FORMAT_R8G8B8A8_SRGB,
+                                                       VK_FORMAT_R8G8B8A8_UNORM,
                                                        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
@@ -90,7 +90,7 @@ std::shared_ptr<Texture> Texture::from_empty(uint32_t p_width, uint32_t p_height
 
     // Create image view.
     texture->imageView = RenderServer::getSingleton().createImageView(texture->image,
-                                                                      VK_FORMAT_R8G8B8A8_SRGB,
+                                                                      VK_FORMAT_R8G8B8A8_UNORM,
                                                                       VK_IMAGE_ASPECT_COLOR_BIT);
 
     // Create sampler.
@@ -119,7 +119,7 @@ Texture::Texture(const std::string &path) : Resource(path) {
 
     // Create image view.
     imageView = RenderServer::getSingleton().createImageView(image,
-                                                             VK_FORMAT_R8G8B8A8_SRGB,
+                                                             VK_FORMAT_R8G8B8A8_UNORM,
                                                              VK_IMAGE_ASPECT_COLOR_BIT);
 
     // Create sampler.

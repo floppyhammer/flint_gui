@@ -30,7 +30,7 @@ public:
     uint32_t width = 0;
     uint32_t height = 0;
 
-    VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
+    VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 
     /// GPU memory.
     VkImage image{};
