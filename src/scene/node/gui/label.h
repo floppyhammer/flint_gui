@@ -55,7 +55,11 @@ namespace Flint {
 
         void set_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color);
 
+        void _update(double delta) override;
+
         void update(double delta) override;
+
+        void _draw(VkCommandBuffer p_command_buffer) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
 
@@ -77,7 +81,7 @@ namespace Flint {
 
         std::shared_ptr<Font> font;
 
-        float line_height = 64;
+        float line_height = 32;
 
         bool need_to_remeasure = false;
 
@@ -86,7 +90,7 @@ namespace Flint {
         Rect<float> layout_box;
 
         // Fill
-        ColorU color;
+        ColorU color = ColorU::white();
 
         // Stroke
         float stroke_width = 0;

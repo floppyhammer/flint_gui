@@ -112,7 +112,7 @@ namespace Flint {
     }
 
     void Label::consider_alignment() {
-        Pathfinder::Vec2<float> shift;
+        Vec2<float> shift;
 
         switch (horizontal_alignment) {
             case Alignment::Begin:
@@ -127,15 +127,36 @@ namespace Flint {
                 break;
         }
 
-        for (Glyph &g: glyphs) {
-            g.layout_box.left += shift.x;
-            g.layout_box.right += shift.x;
-
-            g.bbox.left += shift.x;
-            g.bbox.right += shift.x;
-
-            g.shape.translate(shift);
+        switch (vertical_alignment) {
+            case Alignment::Begin:
+                break;
+            case Alignment::Center: {
+                shift.y = size.y * 0.5f - layout_box.center().y;
+            }
+                break;
+            case Alignment::End: {
+                shift.y = size.y - layout_box.height();
+            }
+                break;
         }
+
+        for (Glyph &g: glyphs) {
+            g.layout_box += shift;
+            g.layout_box += shift;
+
+            g.bbox += shift;
+            g.bbox += shift;
+
+            g.shape.translate({shift.x, shift.y});
+        }
+    }
+
+    void Label::_update(double delta) {
+        // Update self.
+        update(delta);
+
+        // Update children;
+        Node::_update(delta);
     }
 
     void Label::update(double delta) {
@@ -160,6 +181,12 @@ namespace Flint {
         need_to_remeasure = true;
     }
 
+    void Label::_draw(VkCommandBuffer p_command_buffer) {
+        draw(p_command_buffer);
+
+        Node::_draw(p_command_buffer);
+    }
+
     void Label::draw(VkCommandBuffer p_command_buffer) {
         auto canvas = VectorServer::get_singleton().canvas;
 
@@ -168,6 +195,8 @@ namespace Flint {
             auto style_box_shape = Pathfinder::Shape();
             style_box_shape.add_rect({0, 0, size.x, size.y}, theme_background.corner_radius);
 
+            auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
+            canvas->set_transform(transform);
             canvas->set_fill_paint(Pathfinder::Paint::from_color(theme_background.bg_color));
             canvas->fill_shape(style_box_shape, Pathfinder::FillRule::Winding);
 
@@ -187,6 +216,11 @@ namespace Flint {
         }
 
         for (Glyph &g: glyphs) {
+            canvas->set_fill_paint(Pathfinder::Paint::from_color(ColorU(color)));
+            auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
+            canvas->set_transform(transform);
+            canvas->fill_shape(g.shape, Pathfinder::FillRule::Winding);
+
             if (debug) {
                 canvas->set_line_width(1);
 
@@ -208,9 +242,6 @@ namespace Flint {
                 canvas->stroke_shape(bbox_shape);
                 // --------------------------------
             }
-
-            canvas->set_fill_paint(Pathfinder::Paint::from_color(ColorU(color)));
-            canvas->fill_shape(g.shape, Pathfinder::FillRule::Winding);
         }
     }
 

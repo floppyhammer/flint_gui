@@ -39,26 +39,23 @@ void App::run() {
 
     // 3. Initialize swap chain.
     auto swap_chain = SwapChain::getSingleton();
-    // ---------------------------------------------------
 
-    // 4. Initialize vector server.
-    //auto vector_server = Flint::VectorServer::get_singleton();
+    // 4. Initialize input server.
+    auto &input_server = Flint::InputServer::get_singleton();
+    input_server.attach_callbacks(platform.window);
+
+    // 5. Initialize vector server.
+    auto &vector_server = Flint::VectorServer::get_singleton();
     std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(platform.device,
                                                                                         platform.physicalDevice,
                                                                                         platform.graphicsQueue,
                                                                                         platform.graphicsQueue,
                                                                                         render_server.commandPool);
-    //vector_server.init(driver, WIDTH, HEIGHT, readFile("../assets/area-lut.png"));
-
-    Flint::VectorServer::get_singleton().init(driver,
-                                              WIDTH,
-                                              HEIGHT,
-                                              readFile("../assets/area-lut.png"));
-
-    auto vector_server2 = Flint::VectorServer::get_singleton();
+    vector_server.init(driver, WIDTH, HEIGHT, readFile("../assets/area-lut.png"));
+    // ---------------------------------------------------
 
     uint32_t NODE_SPRITE_COUNT = 000;
-    uint32_t ECS_SPRITE_COUNT = 1000;
+    uint32_t ECS_SPRITE_COUNT = 000;
 
     std::default_random_engine generator;
     std::uniform_real_distribution<float> rand_position(0.0f, 400.0f);
@@ -80,10 +77,13 @@ void App::run() {
         label = std::make_shared<Flint::Label>();
         label->set_font(ResourceManager::get_singleton().load<Flint::Font>("../assets/OpenSans-Regular.ttf"));
         label->set_text("Hello Flint");
+        label->set_horizontal_alignment(Flint::Alignment::Center);
+        label->set_vertical_alignment(Flint::Alignment::Center);
+        label->position = {400, 0};
         auto vector_layer = std::make_shared<Flint::TextureRect>();
         vector_layer->name = "vector_layer";
         vector_layer->size = {WIDTH, HEIGHT};
-        auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server2.canvas->get_dest_texture().get());
+        auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server.canvas->get_dest_texture().get());
         auto texture = std::make_shared<Texture>();
         texture->image = texture_vk->get_image();
         texture->imageMemory = texture_vk->get_image_memory();
@@ -106,14 +106,14 @@ void App::run() {
         }
 
         node->add_child(model0);
-        //node->add_child(sub_viewport_c);
+        node->add_child(sub_viewport_c);
         node->add_child(label);
         node->add_child(vector_layer);
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
         node_3d->add_child(model1);
-        //tree.set_root(node);
+        tree.set_root(node);
     }
 
     // ECS test.
@@ -195,30 +195,6 @@ void App::run() {
 //        hierarchy_system->traverse(entities[0]);
     }
 
-    // GLFW input callbacks.
-    {
-        // A lambda function that doesn't capture anything can be implicitly converted to a regular function pointer.
-        auto cursor_position_callback = [](GLFWwindow *window, double x_pos, double y_pos) {
-            Flint::InputEvent input_event{};
-            input_event.type = Flint::InputEventType::MouseMotion;
-            input_event.args.mouse_motion.position = {(float) x_pos, (float) y_pos};
-            auto input_server = Flint::InputServer::get_singleton();
-            input_server.cursor_position = {(float) x_pos, (float) y_pos};
-            input_server.input_queue.push_back(input_event);
-        };
-        glfwSetCursorPosCallback(Platform::getSingleton().window, cursor_position_callback);
-
-        auto cursor_button_callback = [](GLFWwindow *window, int button, int action, int mods) {
-            Flint::InputEvent input_event{};
-            input_event.type = Flint::InputEventType::MouseButton;
-            input_event.args.mouse_button.button = button;
-            input_event.args.mouse_button.pressed = action == GLFW_PRESS;
-            auto input_server = Flint::InputServer::get_singleton();
-            input_server.input_queue.push_back(input_event);
-        };
-        glfwSetMouseButtonCallback(Platform::getSingleton().window, cursor_button_callback);
-    }
-
     main_loop();
 
     // Cleanup.
@@ -230,9 +206,9 @@ void App::run() {
 
             // ECS.
             world.reset();
-
-            DefaultResource::get_singleton().cleanup();
         }
+
+        DefaultResource::get_singleton().cleanup();
 
         swap_chain.cleanup();
 
@@ -276,6 +252,10 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
                              VK_SUBPASS_CONTENTS_INLINE);
     }
 
+    auto &vector_server = Flint::VectorServer::get_singleton();
+
+    vector_server.canvas->clear();
+
     // Record commands from the scene manager.
     {
         tree.draw(commandBuffers[imageIndex]);
@@ -285,6 +265,10 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
 
     // End render pass.
     vkCmdEndRenderPass(commandBuffers[imageIndex]);
+
+    // FIXME: When nothing is drawn, the dest image layout will not be set to SHADER_READ_ONLY.
+    // Do the vector render pass before the main render pass.
+    vector_server.canvas->build_and_render();
 
     // End recording.
     if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS) {
@@ -314,21 +298,14 @@ void App::draw_frame() {
 
     // Update the scene.
     {
+        tree.input(Flint::InputServer::get_singleton().input_queue);
+
         // Node scene manager.
         tree.update(dt);
 
         // ECS scene manager.
         world->update(dt);
     }
-
-    auto vector_server = Flint::VectorServer::get_singleton();
-
-    vector_server.canvas->clear();
-
-    label->draw(SwapChain::getSingleton().commandBuffers[imageIndex]);
-
-    // Do the vector render pass before the main render pass.
-    vector_server.canvas->build_and_render();
 
     // Record draw calls.
     record_commands(SwapChain::getSingleton().commandBuffers, imageIndex);

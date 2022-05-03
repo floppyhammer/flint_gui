@@ -3,6 +3,8 @@
 
 #include "../common/math/vec2.h"
 
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 #include <cstdint>
 #include <vector>
 
@@ -49,6 +51,8 @@ namespace Flint {
             static InputServer singleton;
             return singleton;
         }
+
+        void attach_callbacks(GLFWwindow *window);
 
         Vec2<float> cursor_position;
 

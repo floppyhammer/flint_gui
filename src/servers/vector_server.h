@@ -14,6 +14,8 @@ namespace Flint {
             return singleton;
         }
 
+        VectorServer() = default;
+
         void init(const std::shared_ptr<Pathfinder::Driver> &driver,
                   float p_canvas_width,
                   float p_canvas_height,
