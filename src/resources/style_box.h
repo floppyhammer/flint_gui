@@ -3,8 +3,8 @@
 
 #include <pathfinder.h>
 
-using Pathfinder::ColorU;
-using Pathfinder::Vec2;
+#include "../common/color.h"
+#include "../common/math/vec2.h"
 
 namespace Flint {
     struct StyleBox {
@@ -21,6 +21,10 @@ namespace Flint {
         ColorU shadow_color;
         float shadow_size;
         Vec2<float> shadow_offset;
+
+        void add_to_canvas(const Vec2<float> &position,
+                           const Vec2<float> &size,
+                           const std::shared_ptr<Pathfinder::Canvas> &canvas);
     };
 }
 

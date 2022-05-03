@@ -24,8 +24,6 @@ namespace Flint {
         glm::vec3 get_up_direction() const;
 
     protected:
-        void _update(double delta) override;
-
         void update(double delta) override;
 
         bool current = true;

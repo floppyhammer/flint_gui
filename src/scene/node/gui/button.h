@@ -15,7 +15,7 @@ namespace Flint {
 
         void input(std::vector<InputEvent> &input_queue) override;
 
-        void update(double delta) override;
+        void update(double dt) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
 

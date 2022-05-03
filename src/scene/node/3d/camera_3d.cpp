@@ -20,12 +20,6 @@ namespace Flint {
         }
     }
 
-    void Camera3D::_update(double delta) {
-        update(delta);
-
-        Node3D::_update(delta);
-    }
-
     void Camera3D::update(double delta) {
         auto facing = up;
         facing = glm::rotate(facing, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));

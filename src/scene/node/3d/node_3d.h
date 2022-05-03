@@ -26,30 +26,11 @@ namespace Flint {
         glm::vec3 scale{1};
         // ------------------------------------------
 
-        void _notify(Signal signal) override;
-
     protected:
-        void _update(double delta) override;
 
         void update(double delta) override;
 
         void update_mvp();
-
-        /**
-         * Create buffer for vertex data.
-         * @dependency None.
-         */
-        static void createVertexBuffer(std::vector<Vertex> &vertices,
-                                       VkBuffer &p_vertex_buffer,
-                                       VkDeviceMemory &p_vertex_buffer_memory);
-
-        /**
-         * Create buffer for index data.
-         * @dependency None.
-         */
-        static void createIndexBuffer(std::vector<uint32_t> &indices,
-                                      VkBuffer &p_index_buffer,
-                                      VkDeviceMemory &p_index_buffer_memory);
 
         Surface3dPushConstant push_constant;
     };

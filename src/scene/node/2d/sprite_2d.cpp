@@ -30,14 +30,6 @@ namespace Flint {
         mesh->surface->set_material(p_material);
     }
 
-    void Sprite2d::_update(double delta) {
-        // Update self.
-        update(delta);
-
-        // Update children;
-        Node::_update(delta);
-    }
-
     void Sprite2d::update(double delta) {
         update_mvp();
     }
@@ -83,12 +75,6 @@ namespace Flint {
                                          1.0f));
 
         push_constant.model = mvp.model;
-    }
-
-    void Sprite2d::_draw(VkCommandBuffer p_command_buffer) {
-        draw(p_command_buffer);
-
-        Node::_draw(p_command_buffer);
     }
 
     void Sprite2d::draw(VkCommandBuffer p_command_buffer) {

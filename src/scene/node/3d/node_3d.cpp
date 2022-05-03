@@ -22,12 +22,6 @@ namespace Flint {
     Node3D::~Node3D() {
     }
 
-    void Node3D::_update(double delta) {
-        update(delta);
-
-        Node::_update(delta);
-    }
-
     void Node3D::update(double delta) {
         update_mvp();
     }
@@ -80,19 +74,5 @@ namespace Flint {
         }
 
         push_constant.mvp = mvp.calculate_mvp();
-    }
-
-    void Node3D::_notify(Signal signal) {
-        // We can intercept signal here.
-        switch (signal) {
-            case Signal::SwapChainChanged: {
-
-            }
-                break;
-            default:
-                break;
-        }
-
-        Node::_notify(signal);
     }
 }

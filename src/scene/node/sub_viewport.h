@@ -30,10 +30,9 @@ namespace Flint {
         float z_near = 0.1;
         float z_far = 10.0;
 
-        void _draw(VkCommandBuffer p_command_buffer) override;
+        void propagate_draw(VkCommandBuffer p_command_buffer) override;
 
     protected:
-        void _update(double delta) override;
     };
 }
 

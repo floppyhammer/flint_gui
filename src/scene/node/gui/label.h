@@ -1,5 +1,5 @@
-#ifndef FLIN_LABEL_H
-#define FLIN_LABEL_H
+#ifndef FLINT_LABEL_H
+#define FLINT_LABEL_H
 
 #include "control.h"
 #include "../../../resources/style_box.h"
@@ -55,11 +55,7 @@ namespace Flint {
 
         void set_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color);
 
-        void _update(double delta) override;
-
-        void update(double delta) override;
-
-        void _draw(VkCommandBuffer p_command_buffer) override;
+        void update(double dt) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
 
@@ -100,7 +96,7 @@ namespace Flint {
         Alignment horizontal_alignment = Alignment::Begin;
         Alignment vertical_alignment = Alignment::Begin;
 
-        StyleBox theme_background;
+        std::optional<StyleBox> theme_background;
     };
 }
 

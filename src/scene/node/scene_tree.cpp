@@ -14,12 +14,12 @@ namespace Flint {
 
     void SceneTree::update(double dt) const {
         if (root == nullptr) return;
-        root->_update(dt);
+        root->propagate_update(dt);
     }
 
     void SceneTree::draw(VkCommandBuffer p_command_buffer) const {
         if (root == nullptr) return;
-        root->_draw(p_command_buffer);
+        root->propagate_draw(p_command_buffer);
     }
 
     void SceneTree::input(std::vector<InputEvent> &input_queue) const {

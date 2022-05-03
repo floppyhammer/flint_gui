@@ -29,21 +29,8 @@ namespace Flint {
         return mesh->surface->get_material()->get_texture();
     }
 
-    void TextureRect::_update(double dt) {
-        // Update self.
+    void TextureRect::update(double dt) {
         Control::update(dt);
-
-        // Update children.
-        Node::_update(dt);
-    }
-
-    void TextureRect::update(double delta) {
-    }
-
-    void TextureRect::_draw(VkCommandBuffer p_command_buffer) {
-        draw(p_command_buffer);
-
-        Node::_draw(p_command_buffer);
     }
 
     void TextureRect::draw(VkCommandBuffer p_command_buffer) {

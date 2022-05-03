@@ -32,10 +32,12 @@ namespace Flint {
                 }
             }
         }
+
+        Control::input(input_queue);
     }
 
-    void Button::update(double delta) {
-
+    void Button::update(double dt) {
+        Control::update(dt);
     }
 
     void Button::draw(VkCommandBuffer p_command_buffer) {
@@ -48,17 +50,6 @@ namespace Flint {
             active_style_box = theme_normal;
         }
 
-        // Rebuild & draw the style box.
-        auto style_box_shape = Pathfinder::Shape();
-        style_box_shape.add_rect({position.x, position.y, (position + size).x, (position + size).y}, active_style_box.corner_radius);
-
-        canvas->set_fill_paint(Pathfinder::Paint::from_color(active_style_box.bg_color));
-        canvas->fill_shape(style_box_shape, Pathfinder::FillRule::Winding);
-
-        if (active_style_box.border_width > 0) {
-            canvas->set_stroke_paint(Pathfinder::Paint::from_color(active_style_box.border_color));
-            canvas->set_line_width(active_style_box.border_width);
-            canvas->stroke_shape(style_box_shape);
-        }
+        active_style_box.add_to_canvas(position, size, canvas);
     }
 }

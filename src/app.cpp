@@ -16,6 +16,7 @@
 #include "scene/node/3d/model.h"
 #include "scene/node/gui/texture_rect.h"
 #include "scene/node/gui/label.h"
+#include "scene/node/gui/button.h"
 #include "scene/node/sub_viewport.h"
 #include "scene/node/2d/sprite_2d.h"
 #include "scene/node/2d/rigid_body_2d.h"
@@ -74,12 +75,14 @@ void App::run() {
         model1->set_mesh(ResourceManager::get_singleton().load<Mesh3d>("../assets/viking_room/viking_room.obj"));
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
-        label = std::make_shared<Flint::Label>();
+        auto label = std::make_shared<Flint::Label>();
         label->set_font(ResourceManager::get_singleton().load<Flint::Font>("../assets/OpenSans-Regular.ttf"));
         label->set_text("Hello Flint");
         label->set_horizontal_alignment(Flint::Alignment::Center);
         label->set_vertical_alignment(Flint::Alignment::Center);
         label->position = {400, 0};
+        auto button = std::make_shared<Flint::Button>();
+        button->position = {500, 0};
         auto vector_layer = std::make_shared<Flint::TextureRect>();
         vector_layer->name = "vector_layer";
         vector_layer->size = {WIDTH, HEIGHT};
@@ -107,8 +110,11 @@ void App::run() {
 
         node->add_child(model0);
         node->add_child(sub_viewport_c);
-        node->add_child(label);
+
         node->add_child(vector_layer);
+        node->add_child(button);
+        node->add_child(label);
+
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
@@ -309,6 +315,8 @@ void App::draw_frame() {
 
     // Record draw calls.
     record_commands(SwapChain::getSingleton().commandBuffers, imageIndex);
+
+    Flint::InputServer::get_singleton().clear_queue();
 
     // Submit commands for drawing.
     SwapChain::getSingleton().flush(imageIndex);

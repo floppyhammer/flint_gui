@@ -10,10 +10,6 @@ namespace Flint {
     public:
         Model();
 
-        void _update(double delta) override;
-
-        void _draw(VkCommandBuffer p_command_buffer) override;
-
         void set_mesh(std::shared_ptr<Mesh3d> p_mesh);
 
     protected:

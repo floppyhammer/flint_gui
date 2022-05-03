@@ -11,15 +11,13 @@ namespace Flint {
 
         void set_viewport(std::shared_ptr<SubViewport> p_viewport);
 
-        void _update(double delta) override;
-
-        void _draw(VkCommandBuffer p_command_buffer) override;
+        void propagate_draw(VkCommandBuffer p_command_buffer) override;
 
     protected:
         std::shared_ptr<SubViewport> viewport;
 
     private:
-        void update(double delta) override;
+        void update(double dt) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
 

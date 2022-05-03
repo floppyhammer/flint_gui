@@ -20,18 +20,11 @@ namespace Flint {
         mesh->surface->get_material()->set_texture(viewport->get_texture());
     }
 
-    void SubViewportContainer::_update(double delta) {
-        // Update self.
-        Control::update(delta);
-
-        // Update children.
-        Node::_update(delta);
+    void SubViewportContainer::update(double dt) {
+        Control::update(dt);
     }
 
-    void SubViewportContainer::update(double delta) {
-    }
-
-    void SubViewportContainer::_draw(VkCommandBuffer p_command_buffer) {
+    void SubViewportContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
         // Don't call Node::_draw(), so we can break the recursive calling
         // to call the sub-viewport draw function below specifically.
         // Also, we can't interrupt our previous render pass.
@@ -40,7 +33,7 @@ namespace Flint {
 
         // Start sub-viewport render pass.
         if (viewport != nullptr) {
-            viewport->_draw(sub_viewport_command_buffer);
+            viewport->propagate_draw(sub_viewport_command_buffer);
         }
 
         RenderServer::getSingleton().endSingleTimeCommands(sub_viewport_command_buffer);

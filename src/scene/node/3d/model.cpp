@@ -13,20 +13,6 @@ namespace Flint {
         type = NodeType::Model;
     }
 
-    void Model::_update(double delta) {
-        // Update self.
-        Node3D::update(delta);
-
-        // Update children.
-        Node::_update(delta);
-    }
-
-    void Model::_draw(VkCommandBuffer p_command_buffer) {
-        draw(p_command_buffer);
-
-        Node::_draw(p_command_buffer);
-    }
-
     void Model::draw(VkCommandBuffer p_command_buffer) {
         Node *viewport_node = get_viewport();
 

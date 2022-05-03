@@ -151,16 +151,8 @@ namespace Flint {
         }
     }
 
-    void Label::_update(double delta) {
-        // Update self.
-        update(delta);
-
-        // Update children;
-        Node::_update(delta);
-    }
-
-    void Label::update(double delta) {
-        Control::update(delta);
+    void Label::update(double dt) {
+        Control::update(dt);
 
         if (need_to_remeasure) {
             measure();
@@ -181,42 +173,23 @@ namespace Flint {
         need_to_remeasure = true;
     }
 
-    void Label::_draw(VkCommandBuffer p_command_buffer) {
-        draw(p_command_buffer);
-
-        Node::_draw(p_command_buffer);
-    }
-
     void Label::draw(VkCommandBuffer p_command_buffer) {
         auto canvas = VectorServer::get_singleton().canvas;
 
-        {
-            // Rebuild & draw the style box.
-            auto style_box_shape = Pathfinder::Shape();
-            style_box_shape.add_rect({0, 0, size.x, size.y}, theme_background.corner_radius);
-
-            auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
-            canvas->set_transform(transform);
-            canvas->set_fill_paint(Pathfinder::Paint::from_color(theme_background.bg_color));
-            canvas->fill_shape(style_box_shape, Pathfinder::FillRule::Winding);
-
-            if (theme_background.border_width > 0) {
-                canvas->set_stroke_paint(Pathfinder::Paint::from_color(theme_background.border_color));
-                canvas->set_line_width(theme_background.border_width);
-                canvas->stroke_shape(style_box_shape);
-            }
+        if (theme_background.has_value()){
+            theme_background.value().add_to_canvas(position, size, canvas);
         }
 
         // Add stroke.
         for (Glyph &g: glyphs) {
             // Add stroke if needed.
-            canvas->set_stroke_paint(Pathfinder::Paint::from_color(ColorU(stroke_color)));
+            canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(stroke_color.r, stroke_color.g, stroke_color.b, stroke_color.a)));
             canvas->set_line_width(stroke_width);
             canvas->stroke_shape(g.shape);
         }
 
         for (Glyph &g: glyphs) {
-            canvas->set_fill_paint(Pathfinder::Paint::from_color(ColorU(color)));
+            canvas->set_fill_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(color.r, color.g, color.b, color.a)));
             auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
             canvas->set_transform(transform);
             canvas->fill_shape(g.shape, Pathfinder::FillRule::Winding);
@@ -229,7 +202,7 @@ namespace Flint {
                 Pathfinder::Shape layout_shape;
                 layout_shape.add_rect({g.layout_box.left, g.layout_box.top, g.layout_box.right, g.layout_box.bottom});
 
-                canvas->set_stroke_paint(Pathfinder::Paint::from_color(ColorU::green()));
+                canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::green()));
                 canvas->stroke_shape(layout_shape);
                 // --------------------------------
 
@@ -238,7 +211,7 @@ namespace Flint {
                 Pathfinder::Shape bbox_shape;
                 bbox_shape.add_rect({g.bbox.left, g.bbox.top, g.bbox.right, g.bbox.bottom});
 
-                canvas->set_stroke_paint(Pathfinder::Paint::from_color(ColorU::red()));
+                canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::red()));
                 canvas->stroke_shape(bbox_shape);
                 // --------------------------------
             }

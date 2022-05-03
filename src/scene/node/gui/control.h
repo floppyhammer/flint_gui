@@ -18,8 +18,6 @@ namespace Flint {
 
         ~Control() = default;
 
-        void _update(double delta) override;
-
         Vec2<float> position{0};
         Vec2<float> size{128};
         Vec2<float> scale{1};
@@ -32,11 +30,11 @@ namespace Flint {
         virtual Vec2<float> calculate_minimum_size() const;
 
     protected:
-        void update(double delta) override;
+        void update(double dt) override;
 
         void update_mvp();
 
-        virtual void input(std::vector<InputEvent> &input_queue) {};
+        void input(std::vector<InputEvent> &input_queue) override;
 
         Surface2dPushConstant push_constant;
     };

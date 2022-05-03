@@ -11,7 +11,7 @@ namespace Flint {
         viewport = std::make_shared<Viewport>();
     }
 
-    void SubViewport::_draw(VkCommandBuffer p_command_buffer) {
+    void SubViewport::propagate_draw(VkCommandBuffer p_command_buffer) {
         // Begin render pass.
         {
             // It seems not feasible to wrap begin info into rendering Viewport.
@@ -36,14 +36,10 @@ namespace Flint {
         }
 
         // Start recursive calling to draw all node under this sub-viewport.
-        Node::_draw(p_command_buffer);
+        Node::propagate_draw(p_command_buffer);
 
         // End render pass.
         vkCmdEndRenderPass(p_command_buffer);
-    }
-
-    void SubViewport::_update(double delta) {
-        Node::_update(delta);
     }
 
     std::shared_ptr<Texture> SubViewport::get_texture() const {

@@ -9,7 +9,7 @@ namespace Flint {
             Flint::InputEvent input_event{};
             input_event.type = Flint::InputEventType::MouseMotion;
             input_event.args.mouse_motion.position = {(float) x_pos, (float) y_pos};
-            auto input_server = Flint::InputServer::get_singleton();
+            auto &input_server = Flint::InputServer::get_singleton();
             input_server.cursor_position = {(float) x_pos, (float) y_pos};
             input_server.input_queue.push_back(input_event);
         };
@@ -20,7 +20,8 @@ namespace Flint {
             input_event.type = Flint::InputEventType::MouseButton;
             input_event.args.mouse_button.button = button;
             input_event.args.mouse_button.pressed = action == GLFW_PRESS;
-            auto input_server = Flint::InputServer::get_singleton();
+            auto &input_server = Flint::InputServer::get_singleton();
+            input_event.args.mouse_button.position = input_server.cursor_position;
             input_server.input_queue.push_back(input_event);
         };
         glfwSetMouseButtonCallback(window, cursor_button_callback);

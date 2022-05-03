@@ -14,16 +14,23 @@ namespace Flint {
         // General.
         Node = 0,
         SubViewport,
+        CanvasLayer,
 
         // GUI.
         Control,
-        Label,
-        Button,
-        TextureRect,
+
         Container,
-        SubViewportContainer,
+        CenterContainer,
         HBoxContainer,
         VBoxContainer,
+        SubViewportContainer,
+
+        Button,
+        ItemList,
+        Label,
+        Panel,
+        TextureRect,
+        Tree,
 
         // 2D.
         Node2D,
@@ -44,17 +51,21 @@ namespace Flint {
 
         std::string name;
 
-        virtual void _update(double delta);
+        virtual void propagate_update(double delta);
 
-        virtual void _draw(VkCommandBuffer p_command_buffer);
-
-        virtual void _notify(Signal signal);
+        virtual void propagate_notify(Signal signal);
 
         virtual void propagate_input(std::vector<InputEvent> &input_queue);
+
+        virtual void propagate_draw(VkCommandBuffer p_command_buffer);
 
         virtual void propagate_cleanup();
 
         virtual void update(double delta);
+
+        virtual void notify(Signal signal);
+
+        virtual void input(std::vector<InputEvent> &input_queue);
 
         virtual void draw(VkCommandBuffer p_command_buffer);
 

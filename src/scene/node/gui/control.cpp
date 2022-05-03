@@ -3,6 +3,7 @@
 #include "../sub_viewport.h"
 #include "../../../render/swap_chain.h"
 #include "../../../resources/default_resource.h"
+#include "../../../common/math/rect.h"
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
@@ -14,19 +15,11 @@ namespace Flint {
         type = NodeType::Control;
     }
 
-    void Control::_update(double delta) {
-        // Update self.
-        update(delta);
-
-        // Update children.
-        Node::_update(delta);
-    }
-
     Vec2<float> Control::calculate_minimum_size() const {
         return minimum_size;
     }
 
-    void Control::update(double delta) {
+    void Control::update(double dt) {
         update_mvp();
     }
 
@@ -62,5 +55,30 @@ namespace Flint {
                                          1.0f));
 
         push_constant.model = mvp.model;
+    }
+
+    void Control::input(std::vector<InputEvent> &input_queue) {
+        for (auto it = input_queue.begin(); it != input_queue.end();) {
+            switch (it->type) {
+                case InputEventType::MouseMotion: {
+                    if (Rect<float>(position, position + size).contains_point(it->args.mouse_motion.position)) {
+                        it = input_queue.erase(it);
+                    } else {
+                        ++it;
+                    }
+                }
+                    break;
+                case InputEventType::MouseButton: {
+                    if (Rect<float>(position, position + size).contains_point(it->args.mouse_button.position)) {
+                        it = input_queue.erase(it);
+                    } else {
+                        ++it;
+                    }
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

@@ -10,10 +10,6 @@ namespace Flint {
     public:
         Sprite2d();
 
-        void _update(double delta) override;
-
-        void _draw(VkCommandBuffer p_command_buffer) override;
-
         void set_texture(std::shared_ptr<Texture> p_texture);
 
         [[nodiscard]] std::shared_ptr<Texture> get_texture() const;

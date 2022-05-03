@@ -1,34 +1,60 @@
 #include "node.h"
 
 namespace Flint {
-    void Node::_update(double dt) {
+    void Node::propagate_update(double dt) {
+        update(dt);
+
         for (auto &child: children) {
-            child->_update(dt);
+            child->propagate_update(dt);
         }
     }
 
-    void Node::_draw(VkCommandBuffer p_command_buffer) {
+    void Node::propagate_draw(VkCommandBuffer p_command_buffer) {
+        draw(p_command_buffer);
+
         for (auto &child: children) {
-            child->_draw(p_command_buffer);
+            child->propagate_draw(p_command_buffer);
         }
     }
 
-    void Node::_notify(Signal signal) {
+    void Node::propagate_notify(Signal signal) {
+        notify(signal);
+
         for (auto &child: children) {
-            child->_notify(signal);
+            child->propagate_notify(signal);
         }
     }
 
     void Node::propagate_input(std::vector<InputEvent> &input_queue) {
-        for (auto &child: children) {
-            child->propagate_input(input_queue);
+        auto it = children.rbegin();
+        while (it != children.rend()) {
+            (*it)->propagate_input(input_queue);
+            it++;
         }
+
+        input(input_queue);
     }
 
     void Node::propagate_cleanup() {
         for (auto &child: children) {
             child->propagate_cleanup();
         }
+    }
+
+    void Node::input(std::vector<InputEvent> &input_queue) {
+
+    }
+
+    void Node::update(double delta) {
+
+    }
+
+    void Node::notify(Signal signal) {
+
+    }
+
+    void Node::draw(VkCommandBuffer p_command_buffer) {
+
     }
 
     Node *Node::get_viewport() {
@@ -68,11 +94,5 @@ namespace Flint {
             return NodeType::Node3D;
         else
             return NodeType::Max;
-    }
-
-    void Node::update(double delta) {
-    }
-
-    void Node::draw(VkCommandBuffer p_command_buffer) {
     }
 }

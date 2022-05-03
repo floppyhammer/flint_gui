@@ -31,8 +31,6 @@ public:
 private:
     Flint::SceneTree tree;
 
-    std::shared_ptr<Flint::Label> label;
-
     std::queue<Flint::InputEvent> input_queue;
 
     std::unique_ptr<Flint::World> world;

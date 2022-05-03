@@ -7,14 +7,6 @@ namespace Flint {
         type = NodeType::RigidBody2D;
     }
 
-    void RigidBody2d::_update(double delta) {
-        // Update self.
-        update(delta);
-
-        // Update children.
-        Node::_update(delta);
-    }
-
     void RigidBody2d::update(double dt) {
         position += velocity * dt;
         velocity += gravity * dt;
