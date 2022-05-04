@@ -3,6 +3,12 @@
 #include <string>
 
 namespace Flint {
+    Label::Label() {
+        type = NodeType::Label;
+
+        set_font(ResourceManager::get_singleton().load<Flint::Font>("../assets/OpenSans-Regular.ttf"));
+    }
+
     void Label::set_text(const std::string &p_text) {
         // Only update glyphs when text has changed.
         if (text == p_text || font == nullptr) return;
@@ -163,7 +169,7 @@ namespace Flint {
         }
     }
 
-    void Label::set_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color) {
+    void Label::set_text_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color) {
         line_height = p_size;
         color = p_color;
         stroke_width = p_stroke_width;
@@ -176,8 +182,10 @@ namespace Flint {
     void Label::draw(VkCommandBuffer p_command_buffer) {
         auto canvas = VectorServer::get_singleton().canvas;
 
+        auto global_position = get_global_position();
+
         if (theme_background.has_value()){
-            theme_background.value().add_to_canvas(position, size, canvas);
+            theme_background.value().add_to_canvas(global_position, size, canvas);
         }
 
         // Add stroke.
@@ -190,7 +198,7 @@ namespace Flint {
 
         for (Glyph &g: glyphs) {
             canvas->set_fill_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(color.r, color.g, color.b, color.a)));
-            auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
+            auto transform = Pathfinder::Transform2::from_translation({global_position.x, global_position.y});
             canvas->set_transform(transform);
             canvas->fill_shape(g.shape, Pathfinder::FillRule::Winding);
 
@@ -216,6 +224,8 @@ namespace Flint {
                 // --------------------------------
             }
         }
+
+        Control::draw(p_command_buffer);
     }
 
     void Label::set_horizontal_alignment(Alignment alignment) {
@@ -235,6 +245,11 @@ namespace Flint {
     }
 
     Vec2<float> Label::calculate_minimum_size() const {
+        return layout_box.size();
+    }
+
+    Vec2<float> Label::get_text_size() {
+        measure();
         return layout_box.size();
     }
 }

@@ -10,6 +10,17 @@ namespace Flint {
 
         theme_pressed.bg_color = ColorU(70, 70, 70, 255);
         theme_pressed.border_color = ColorU(200, 200, 200, 255);
+
+        // Don't add the label as a child since it's not a normal node but part of the button.
+        label = std::make_shared<Label>();
+        label->set_text("Button");
+        label->set_mouse_filter(MouseFilter::IGNORE);
+        label->set_horizontal_alignment(Alignment::Center);
+        label->set_vertical_alignment(Alignment::Center);
+        label->set_parent(this);
+
+        size = label->get_text_size();
+        label->size = size;
     }
 
     void Button::input(std::vector<InputEvent> &input_queue) {
@@ -38,6 +49,8 @@ namespace Flint {
 
     void Button::update(double dt) {
         Control::update(dt);
+
+        label->update(dt);
     }
 
     void Button::draw(VkCommandBuffer p_command_buffer) {
@@ -51,5 +64,7 @@ namespace Flint {
         }
 
         active_style_box.add_to_canvas(position, size, canvas);
+
+        label->draw(p_command_buffer);
     }
 }

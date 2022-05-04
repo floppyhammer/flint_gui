@@ -10,8 +10,16 @@
 #include "../../../render/render_server.h"
 #include "../../../servers/input_server.h"
 #include "../../../servers/vector_server.h"
+#include "../../../resources/style_box.h"
 
 namespace Flint {
+    /// How should this control node handle mouse input propagation.
+    enum class MouseFilter {
+        STOP,
+        PASS,
+        IGNORE,
+    };
+
     class Control : public Node {
     public:
         Control();
@@ -29,6 +37,12 @@ namespace Flint {
 
         virtual Vec2<float> calculate_minimum_size() const;
 
+        Vec2<float> get_global_position() const;
+
+        void draw(VkCommandBuffer p_command_buffer) override;
+
+        void set_mouse_filter(MouseFilter filter);
+
     protected:
         void update(double dt) override;
 
@@ -36,7 +50,11 @@ namespace Flint {
 
         void input(std::vector<InputEvent> &input_queue) override;
 
+        StyleBox outline;
+
         Surface2dPushConstant push_constant;
+
+        MouseFilter mouse_filter = MouseFilter::STOP;
     };
 }
 

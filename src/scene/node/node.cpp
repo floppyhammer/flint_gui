@@ -67,6 +67,10 @@ namespace Flint {
         return parent;
     }
 
+    void Node::set_parent(Node *node) {
+        parent = node;
+    }
+
     std::vector<std::shared_ptr<Node>> Node::get_children() {
         return children;
     }

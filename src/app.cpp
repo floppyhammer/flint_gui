@@ -76,7 +76,6 @@ void App::run() {
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
         auto label = std::make_shared<Flint::Label>();
-        label->set_font(ResourceManager::get_singleton().load<Flint::Font>("../assets/OpenSans-Regular.ttf"));
         label->set_text("Hello Flint");
         label->set_horizontal_alignment(Flint::Alignment::Center);
         label->set_vertical_alignment(Flint::Alignment::Center);
@@ -88,8 +87,6 @@ void App::run() {
         vector_layer->size = {WIDTH, HEIGHT};
         auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server.canvas->get_dest_texture().get());
         auto texture = std::make_shared<Texture>();
-        texture->image = texture_vk->get_image();
-        texture->imageMemory = texture_vk->get_image_memory();
         texture->imageView = texture_vk->get_image_view();
         texture->sampler = texture_vk->get_sampler();
         texture->width = texture_vk->get_width();

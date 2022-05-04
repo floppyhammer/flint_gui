@@ -79,6 +79,8 @@ namespace Flint {
 
         Node *get_parent();
 
+        void set_parent(Node *node);
+
         std::vector<std::shared_ptr<Node>> get_children();
 
         void remove_child(size_t index);

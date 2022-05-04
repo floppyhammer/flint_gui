@@ -4,6 +4,7 @@
 #include "control.h"
 #include "../../../resources/style_box.h"
 #include "../../../resources/font.h"
+#include "../../../resources/resource_manager.h"
 #include "../../../common/math/rect.h"
 
 #include <cstdint>
@@ -40,9 +41,7 @@ namespace Flint {
 
     class Label : public Control {
     public:
-        Label() {
-            type = NodeType::Label;
-        }
+        Label();
 
         /**
          * Set text context.
@@ -53,7 +52,7 @@ namespace Flint {
 
         void set_font(std::shared_ptr<Font> p_font);
 
-        void set_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color);
+        void set_text_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color);
 
         void update(double dt) override;
 
@@ -66,6 +65,8 @@ namespace Flint {
         void set_vertical_alignment(Alignment alignment);
 
         Vec2<float> calculate_minimum_size() const override;
+
+        Vec2<float> get_text_size();
 
     private:
         void measure();

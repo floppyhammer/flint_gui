@@ -13,10 +13,19 @@
 namespace Flint {
     Control::Control() {
         type = NodeType::Control;
+
+        outline.bg_color = ColorU();
+        outline.corner_radius = 0;
+        outline.border_width = 2;
+        outline.border_color = ColorU(202, 130, 94, 255);
     }
 
     Vec2<float> Control::calculate_minimum_size() const {
         return minimum_size;
+    }
+
+    void Control::draw(VkCommandBuffer p_command_buffer) {
+        outline.add_to_canvas(get_global_position(), size, VectorServer::get_singleton().canvas);
     }
 
     void Control::update(double dt) {
@@ -58,6 +67,9 @@ namespace Flint {
     }
 
     void Control::input(std::vector<InputEvent> &input_queue) {
+        if (mouse_filter != MouseFilter::STOP) return;
+
+        // Stop mouse input propagation.
         for (auto it = input_queue.begin(); it != input_queue.end();) {
             switch (it->type) {
                 case InputEventType::MouseMotion: {
@@ -80,5 +92,19 @@ namespace Flint {
                     break;
             }
         }
+    }
+
+    Vec2<float> Control::get_global_position() const {
+        if (parent != nullptr && parent->extended_from_which_base_node() == NodeType::Control) {
+            auto cast_parent = dynamic_cast<Control *>(parent);
+
+            return cast_parent->get_global_position() + position;
+        }
+
+        return position;
+    }
+
+    void Control::set_mouse_filter(MouseFilter filter) {
+        mouse_filter = filter;
     }
 }

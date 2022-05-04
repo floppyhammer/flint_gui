@@ -2,7 +2,7 @@
 #define FLINT_BUTTON_H
 
 #include "control.h"
-
+#include "label.h"
 #include "../../../resources/style_box.h"
 
 namespace Flint {
@@ -21,6 +21,8 @@ namespace Flint {
 
     protected:
         StyleBox theme_normal, theme_hovered, theme_pressed;
+
+        std::shared_ptr<Label> label;
     };
 }
 
