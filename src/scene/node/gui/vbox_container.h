@@ -10,6 +10,8 @@ namespace Flint {
             type = NodeType::VBoxContainer;
         }
 
+        void update(double dt) override;
+
         void adjust_layout() override;
     };
 }

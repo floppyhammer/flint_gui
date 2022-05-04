@@ -20,15 +20,21 @@ namespace Flint {
         label->set_parent(this);
 
         size = label->get_text_size();
-        label->size = size;
+        label->set_size(size);
+    }
+
+    Vec2<float> Button::calculate_minimum_size() {
+        return label->calculate_minimum_size().max(minimum_size);
     }
 
     void Button::input(std::vector<InputEvent> &input_queue) {
+        auto global_position = get_global_position();
+
         for (auto &event : input_queue) {
             if (event.type == InputEventType::MouseMotion) {
                 auto args = event.args.mouse_motion;
 
-                if (Rect<float>(position, position + size).contains_point(args.position)) {
+                if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
                     hovered = true;
                 } else {
                     hovered = false;
@@ -38,7 +44,7 @@ namespace Flint {
             if (event.type == InputEventType::MouseButton) {
                 auto args = event.args.mouse_button;
 
-                if (Rect<float>(position, position + size).contains_point(args.position)) {
+                if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
                     pressed = args.pressed;
                 }
             }
@@ -63,8 +69,18 @@ namespace Flint {
             active_style_box = theme_normal;
         }
 
-        active_style_box.add_to_canvas(position, size, canvas);
+        active_style_box.add_to_canvas(get_global_position(), size, canvas);
 
         label->draw(p_command_buffer);
+    }
+
+    void Button::set_position(Vec2<float> p_position) {
+        position = p_position;
+    }
+
+    void Button::set_size(Vec2<float> p_size) {
+        size = p_size;
+        label->set_size(p_size);
+        label->need_to_remeasure = true;
     }
 }

@@ -64,9 +64,11 @@ namespace Flint {
 
         void set_vertical_alignment(Alignment alignment);
 
-        Vec2<float> calculate_minimum_size() const override;
+        Vec2<float> calculate_minimum_size() override;
 
         Vec2<float> get_text_size();
+
+        bool need_to_remeasure = false;
 
     private:
         void measure();
@@ -80,11 +82,9 @@ namespace Flint {
 
         float line_height = 32;
 
-        bool need_to_remeasure = false;
-
         std::vector<Glyph> glyphs;
 
-        Rect<float> layout_box;
+        mutable Rect<float> layout_box;
 
         // Fill
         ColorU color = ColorU::white();

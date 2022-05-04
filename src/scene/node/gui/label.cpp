@@ -244,8 +244,8 @@ namespace Flint {
         consider_alignment();
     }
 
-    Vec2<float> Label::calculate_minimum_size() const {
-        return layout_box.size();
+    Vec2<float> Label::calculate_minimum_size() {
+        return get_text_size().max(minimum_size);
     }
 
     Vec2<float> Label::get_text_size() {

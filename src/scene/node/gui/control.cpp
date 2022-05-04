@@ -20,7 +20,7 @@ namespace Flint {
         outline.border_color = ColorU(202, 130, 94, 255);
     }
 
-    Vec2<float> Control::calculate_minimum_size() const {
+    Vec2<float> Control::calculate_minimum_size() {
         return minimum_size;
     }
 
@@ -69,11 +69,13 @@ namespace Flint {
     void Control::input(std::vector<InputEvent> &input_queue) {
         if (mouse_filter != MouseFilter::STOP) return;
 
+        auto global_position = get_global_position();
+
         // Stop mouse input propagation.
         for (auto it = input_queue.begin(); it != input_queue.end();) {
             switch (it->type) {
                 case InputEventType::MouseMotion: {
-                    if (Rect<float>(position, position + size).contains_point(it->args.mouse_motion.position)) {
+                    if (Rect<float>(global_position, global_position + size).contains_point(it->args.mouse_motion.position)) {
                         it = input_queue.erase(it);
                     } else {
                         ++it;
@@ -81,7 +83,7 @@ namespace Flint {
                 }
                     break;
                 case InputEventType::MouseButton: {
-                    if (Rect<float>(position, position + size).contains_point(it->args.mouse_button.position)) {
+                    if (Rect<float>(global_position, global_position + size).contains_point(it->args.mouse_button.position)) {
                         it = input_queue.erase(it);
                     } else {
                         ++it;
@@ -106,5 +108,21 @@ namespace Flint {
 
     void Control::set_mouse_filter(MouseFilter filter) {
         mouse_filter = filter;
+    }
+
+    void Control::set_position(Vec2<float> p_position) {
+        position = p_position;
+    }
+
+    void Control::set_size(Vec2<float> p_size) {
+        size = p_size;
+    }
+
+    Vec2<float> Control::get_position() const {
+        return position;
+    }
+
+    Vec2<float> Control::get_size() const {
+        return size;
     }
 }

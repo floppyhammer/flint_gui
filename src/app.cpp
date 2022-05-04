@@ -17,6 +17,8 @@
 #include "scene/node/gui/texture_rect.h"
 #include "scene/node/gui/label.h"
 #include "scene/node/gui/button.h"
+#include "scene/node/gui/hbox_container.h"
+#include "scene/node/gui/vbox_container.h"
 #include "scene/node/sub_viewport.h"
 #include "scene/node/2d/sprite_2d.h"
 #include "scene/node/2d/rigid_body_2d.h"
@@ -79,12 +81,17 @@ void App::run() {
         label->set_text("Hello Flint");
         label->set_horizontal_alignment(Flint::Alignment::Center);
         label->set_vertical_alignment(Flint::Alignment::Center);
-        label->position = {400, 0};
+        label->set_position({400, 0});
         auto button = std::make_shared<Flint::Button>();
-        button->position = {500, 0};
+        button->set_position({500, 0});
+        auto button2 = std::make_shared<Flint::Button>();
+        button2->set_position({600, 0});
+        auto box_container = std::make_shared<Flint::HBoxContainer>();
+        box_container->set_position({200, 200});
+        box_container->set_size({300, 400});
         auto vector_layer = std::make_shared<Flint::TextureRect>();
         vector_layer->name = "vector_layer";
-        vector_layer->size = {WIDTH, HEIGHT};
+        vector_layer->set_size({WIDTH, HEIGHT});
         auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server.canvas->get_dest_texture().get());
         auto texture = std::make_shared<Texture>();
         texture->imageView = texture_vk->get_image_view();
@@ -109,8 +116,10 @@ void App::run() {
         node->add_child(sub_viewport_c);
 
         node->add_child(vector_layer);
-        node->add_child(button);
-        node->add_child(label);
+        box_container->add_child(button);
+        box_container->add_child(label);
+        box_container->add_child(button2);
+        node->add_child(box_container);
 
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);

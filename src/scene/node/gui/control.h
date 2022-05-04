@@ -26,16 +26,18 @@ namespace Flint {
 
         ~Control() = default;
 
-        Vec2<float> position{0};
-        Vec2<float> size{128};
-        Vec2<float> scale{1};
-        Vec2<float> pivot_offset{0}; // Top-left as the default pivot.
-        float rotation = 0;
+        virtual void set_position(Vec2<float> p_position);
+
+        virtual Vec2<float> get_position() const;
+
+        virtual void set_size(Vec2<float> p_size);
+
+        virtual Vec2<float> get_size() const;
 
         /// Used when being a child of a container.
         Vec2<float> minimum_size{0};
 
-        virtual Vec2<float> calculate_minimum_size() const;
+        virtual Vec2<float> calculate_minimum_size();
 
         Vec2<float> get_global_position() const;
 
@@ -44,6 +46,12 @@ namespace Flint {
         void set_mouse_filter(MouseFilter filter);
 
     protected:
+        Vec2<float> position{0};
+        Vec2<float> size{128};
+        Vec2<float> scale{1};
+        Vec2<float> pivot_offset{0}; // Top-left as the default pivot.
+        float rotation = 0;
+
         void update(double dt) override;
 
         void update_mvp();
