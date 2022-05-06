@@ -43,6 +43,13 @@ namespace Flint {
                 Vec2<float> position;
             } mouse_motion;
         } args;
+
+        void consume ();
+
+        bool is_consumed() const;
+
+    private:
+        bool consumed = false;
     };
 
     class InputServer {

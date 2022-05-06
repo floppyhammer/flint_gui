@@ -30,4 +30,12 @@ namespace Flint {
     void InputServer::clear_queue() {
         input_queue.clear();
     }
+
+    void InputEvent::consume() {
+        consumed = true;
+    }
+
+    bool InputEvent::is_consumed() const {
+        return consumed;
+    }
 }

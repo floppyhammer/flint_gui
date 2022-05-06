@@ -29,6 +29,8 @@ namespace Flint {
         StyleBox theme_normal, theme_hovered, theme_pressed;
 
         std::shared_ptr<Label> label;
+
+        Pathfinder::Shape icon;
     };
 }
 

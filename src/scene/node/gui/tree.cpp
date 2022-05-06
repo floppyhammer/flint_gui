@@ -37,11 +37,13 @@ namespace Flint {
         auto canvas = VectorServer::get_singleton().canvas;
 
         if (theme_panel.has_value()) {
-            theme_panel.value().add_to_canvas(position, size, canvas);
+            theme_panel.value().add_to_canvas(get_global_position(), size, canvas);
         }
 
         float offset_y = 0;
         root->traverse_children(folding_width, 0, p_command_buffer, offset_y, get_global_position());
+
+        outline.add_to_canvas(get_global_position(), size, canvas);
     }
 
     std::shared_ptr<TreeItem> Tree::create_item(const std::shared_ptr<TreeItem> &parent,

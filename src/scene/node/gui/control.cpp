@@ -71,22 +71,18 @@ namespace Flint {
 
         auto global_position = get_global_position();
 
-        // Stop mouse input propagation.
-        for (auto it = input_queue.begin(); it != input_queue.end();) {
-            switch (it->type) {
+        // Handle mouse input propagation.
+        for (auto &event : input_queue) {
+            switch (event.type) {
                 case InputEventType::MouseMotion: {
-                    if (Rect<float>(global_position, global_position + size).contains_point(it->args.mouse_motion.position)) {
-                        it = input_queue.erase(it);
-                    } else {
-                        ++it;
+                    if (Rect<float>(global_position, global_position + size).contains_point(event.args.mouse_motion.position)) {
+                        event.consume();
                     }
                 }
                     break;
                 case InputEventType::MouseButton: {
-                    if (Rect<float>(global_position, global_position + size).contains_point(it->args.mouse_button.position)) {
-                        it = input_queue.erase(it);
-                    } else {
-                        ++it;
+                    if (Rect<float>(global_position, global_position + size).contains_point(event.args.mouse_button.position)) {
+                        event.consume();
                     }
                 }
                     break;

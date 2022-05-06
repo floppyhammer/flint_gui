@@ -34,18 +34,32 @@ namespace Flint {
             if (event.type == InputEventType::MouseMotion) {
                 auto args = event.args.mouse_motion;
 
-                if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
-                    hovered = true;
-                } else {
+                if (event.is_consumed()) {
                     hovered = false;
+                    pressed = false;
+                } else {
+                    if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
+                        hovered = true;
+                        event.consume();
+                    } else {
+                        hovered = false;
+                        pressed = false;
+                    }
                 }
             }
 
             if (event.type == InputEventType::MouseButton) {
                 auto args = event.args.mouse_button;
 
-                if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
-                    pressed = args.pressed;
+                if (event.is_consumed() && !args.pressed) {
+                    if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
+                        pressed = false;
+                    }
+                } else {
+                    if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
+                        pressed = args.pressed;
+                        event.consume();
+                    }
                 }
             }
         }
