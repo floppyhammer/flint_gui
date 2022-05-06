@@ -19,6 +19,7 @@
 #include "scene/node/gui/button.h"
 #include "scene/node/gui/hbox_container.h"
 #include "scene/node/gui/vbox_container.h"
+#include "scene/node/gui/tree.h"
 #include "scene/node/sub_viewport.h"
 #include "scene/node/2d/sprite_2d.h"
 #include "scene/node/2d/rigid_body_2d.h"
@@ -101,6 +102,8 @@ void App::run() {
         texture->name = "Pathfinder Canvas";
         texture->resource_ownership = false;
         vector_layer->set_texture(texture);
+        auto item_tree = std::make_shared<Flint::Tree>();
+        item_tree->set_size({400, 400});
 
         for (int i = 0; i < NODE_SPRITE_COUNT; i++) {
             auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
@@ -120,6 +123,7 @@ void App::run() {
         box_container->add_child(label);
         box_container->add_child(button2);
         node->add_child(box_container);
+        node->add_child(item_tree);
 
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);

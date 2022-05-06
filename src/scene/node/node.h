@@ -18,16 +18,15 @@ namespace Flint {
 
         // GUI.
         Control,
-
         Container,
         CenterContainer,
         HBoxContainer,
         VBoxContainer,
         SubViewportContainer,
-
         Button,
         ItemList,
         Label,
+        TextEdit,
         Panel,
         TextureRect,
         Tree,
