@@ -85,6 +85,11 @@ void App::run() {
         label->set_position({400, 0});
         auto button = std::make_shared<Flint::Button>();
         button->set_position({500, 0});
+        // Callback to clean up staging resources.
+        auto callback = [] {
+            Flint::Logger::verbose("Button pressed");
+        };
+        button->connect_signal("on_pressed", callback);
         auto button2 = std::make_shared<Flint::Button>();
         button2->set_position({600, 0});
         auto box_container = std::make_shared<Flint::HBoxContainer>();

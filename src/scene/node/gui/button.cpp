@@ -37,6 +37,7 @@ namespace Flint {
                 if (event.is_consumed()) {
                     hovered = false;
                     pressed = false;
+                    pressed_inside = false;
                 } else {
                     if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
                         hovered = true;
@@ -44,6 +45,7 @@ namespace Flint {
                     } else {
                         hovered = false;
                         pressed = false;
+                        pressed_inside = false;
                     }
                 }
             }
@@ -54,10 +56,16 @@ namespace Flint {
                 if (event.is_consumed() && !args.pressed) {
                     if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
                         pressed = false;
+                        pressed_inside = false;
                     }
                 } else {
                     if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
                         pressed = args.pressed;
+                        if (pressed) {
+                            pressed_inside = true;
+                        } else {
+                            if (pressed_inside) on_pressed();
+                        }
                         event.consume();
                     }
                 }
@@ -96,5 +104,17 @@ namespace Flint {
         size = p_size;
         label->set_size(p_size);
         label->need_to_remeasure = true;
+    }
+
+    void Button::on_pressed() {
+        for (auto &callback: on_pressed_callbacks) {
+            callback();
+        }
+    }
+
+    void Button::connect_signal(std::string signal, std::function<void()> callback) {
+        if (signal == "on_pressed") {
+            on_pressed_callbacks.push_back(callback);
+        }
     }
 }

@@ -5,6 +5,8 @@
 #include "label.h"
 #include "../../../resources/style_box.h"
 
+#include <functional>
+
 namespace Flint {
     class Button : public Control {
     public:
@@ -12,6 +14,7 @@ namespace Flint {
 
         bool pressed = false;
         bool hovered = false;
+        bool pressed_inside = false;
 
         void input(std::vector<InputEvent> &input_queue) override;
 
@@ -25,12 +28,21 @@ namespace Flint {
 
         Vec2<float> calculate_minimum_size() override;
 
+        void connect_signal(std::string signal, std::function<void()> callback);
+
     protected:
         StyleBox theme_normal, theme_hovered, theme_pressed;
 
         std::shared_ptr<Label> label;
 
         Pathfinder::Shape icon;
+
+        std::vector<std::function<void()>> on_pressed_callbacks;
+        std::vector<std::function<void()>> on_down_callbacks;
+        std::vector<std::function<void()>> on_up_callbacks;
+        std::vector<std::function<void()>> on_hovered_callbacks;
+
+        void on_pressed();
     };
 }
 
