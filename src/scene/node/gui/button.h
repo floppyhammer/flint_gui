@@ -30,6 +30,8 @@ namespace Flint {
 
         void connect_signal(std::string signal, std::function<void()> callback);
 
+        void set_text(const std::string &text);
+
     protected:
         StyleBox theme_normal, theme_hovered, theme_pressed;
 

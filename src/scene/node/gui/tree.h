@@ -2,7 +2,7 @@
 #define FLINT_NODE_TREE_H
 
 #include "control.h"
-#include "label.h"
+#include "button.h"
 #include "../../../resources/style_box.h"
 #include "../../../resources/font.h"
 #include "../../../common/math/rect.h"
@@ -19,7 +19,7 @@ namespace Flint {
 
         bool collapsed = false;
 
-        uint32_t add_child(const std::shared_ptr<TreeItem>& item);
+        uint32_t add_child(const std::shared_ptr<TreeItem> &item);
 
         std::shared_ptr<TreeItem> get_child(uint32_t idx);
 
@@ -29,12 +29,13 @@ namespace Flint {
 
         TreeItem *get_parent();
 
-        void set_text(std::string text);
+        void set_text(const std::string &text);
 
-        void traverse_children(float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y, Vec2<float> global_position);
+        void traverse_children(float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y,
+                               Vec2<float> global_position);
 
     private:
-        std::shared_ptr<Label> label;
+        std::shared_ptr<Button> button;
         TreeItem *parent;
         std::vector<std::shared_ptr<TreeItem>> children;
     };
@@ -42,6 +43,8 @@ namespace Flint {
     class Tree : public Control {
     public:
         Tree();
+
+        void input(std::vector<InputEvent> &input_queue) override;
 
         void update(double delta) override;
 
@@ -54,7 +57,8 @@ namespace Flint {
 
     private:
         std::shared_ptr<TreeItem> root;
-        std::optional<StyleBox> theme_panel;
+        std::optional<StyleBox> theme_bg;
+        std::optional<StyleBox> theme_bg_focused;
     };
 }
 

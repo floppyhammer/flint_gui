@@ -12,9 +12,9 @@ namespace Flint {
         bool draw_center = true;
 
         ColorU border_color = ColorU(67, 67, 67, 255);
-        float border_width = 2;
+        float border_width = 0;
 
-        float corner_radius = 8;
+        float corner_radius = 4;
 
         float margin = 0;
 

@@ -94,7 +94,7 @@ void App::run() {
         button2->set_position({600, 0});
         auto box_container = std::make_shared<Flint::HBoxContainer>();
         box_container->set_position({200, 200});
-        box_container->set_size({300, 400});
+        box_container->set_size({400, 100});
         auto vector_layer = std::make_shared<Flint::TextureRect>();
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WIDTH, HEIGHT});

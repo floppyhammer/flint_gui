@@ -6,6 +6,13 @@ namespace Flint {
     Tree::Tree() {
         type = NodeType::Panel;
 
+        auto panel = StyleBox();
+        panel.bg_color = ColorU(50, 50, 50, 200);
+        panel.corner_radius = 4;
+        theme_bg = std::make_optional(panel);
+        panel.border_width = 2;
+        theme_bg_focused = std::make_optional(panel);
+
         auto root_ = create_item(nullptr);
         auto child0 = create_item(root_);
         auto child0_0 = create_item(child0);
@@ -18,13 +25,17 @@ namespace Flint {
         Control::update(delta);
     }
 
-    void TreeItem::traverse_children(float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y, Vec2<float> global_position) {
+    void TreeItem::traverse_children(float folding_width,
+                                     uint32_t depth,
+                                     VkCommandBuffer p_command_buffer,
+                                     float &offset_y,
+                                Vec2<float> global_position) {
         float offset_x = (float) depth * folding_width;
 
-        float item_height = label->calculate_minimum_size().y;
-        label->set_position(Vec2<float>(offset_x, offset_y) + global_position);
-        label->update(0);
-        label->draw(p_command_buffer);
+        float item_height = button->calculate_minimum_size().y;
+        button->set_position(Vec2<float>(offset_x, offset_y) + global_position);
+        button->update(0);
+        button->draw(p_command_buffer);
 
         offset_y += item_height;
 
@@ -36,8 +47,8 @@ namespace Flint {
     void Tree::draw(VkCommandBuffer p_command_buffer) {
         auto canvas = VectorServer::get_singleton().canvas;
 
-        if (theme_panel.has_value()) {
-            theme_panel.value().add_to_canvas(get_global_position(), size, canvas);
+        if (theme_bg.has_value()) {
+            theme_bg.value().add_to_canvas(get_global_position(), size, canvas);
         }
 
         float offset_y = 0;
@@ -51,7 +62,7 @@ namespace Flint {
         if (parent == nullptr) {
             root = std::make_shared<TreeItem>();
             root->set_text(text);
-            root->label->set_parent(this);
+            root->button->set_parent(this);
             return root;
         }
 
@@ -59,16 +70,22 @@ namespace Flint {
         item->set_text(text);
         parent->add_child(item);
         item->parent = parent.get();
-        item->label->set_parent(this);
+        item->button->set_parent(this);
 
         return item;
     }
 
-    TreeItem::TreeItem() {
-        label = std::make_shared<Label>();
+    void Tree::input(std::vector<InputEvent> &input_queue) {
+        root->button->propagate_input(input_queue);
+
+        Control::input(input_queue);
     }
 
-    uint32_t TreeItem::add_child(const std::shared_ptr<TreeItem>& item) {
+    TreeItem::TreeItem() {
+        button = std::make_shared<Button>();
+    }
+
+    uint32_t TreeItem::add_child(const std::shared_ptr<TreeItem> &item) {
         children.push_back(item);
         return children.size() - 1;
     }
@@ -94,7 +111,7 @@ namespace Flint {
         return parent;
     }
 
-    void TreeItem::set_text(std::string text) {
-        label->set_text(text);
+    void TreeItem::set_text(const std::string &text) {
+        button->set_text(text);
     }
 }

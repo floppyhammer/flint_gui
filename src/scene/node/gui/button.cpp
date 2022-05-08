@@ -7,9 +7,11 @@ namespace Flint {
         type = NodeType::Button;
 
         theme_hovered.border_color = ColorU(200, 200, 200, 255);
+        theme_hovered.border_width = 2;
 
         theme_pressed.bg_color = ColorU(70, 70, 70, 255);
         theme_pressed.border_color = ColorU(200, 200, 200, 255);
+        theme_pressed.border_width = 2;
 
         // Don't add the label as a child since it's not a normal node but part of the button.
         label = std::make_shared<Label>();
@@ -30,7 +32,7 @@ namespace Flint {
     void Button::input(std::vector<InputEvent> &input_queue) {
         auto global_position = get_global_position();
 
-        for (auto &event : input_queue) {
+        for (auto &event: input_queue) {
             if (event.type == InputEventType::MouseMotion) {
                 auto args = event.args.mouse_motion;
 
@@ -116,5 +118,9 @@ namespace Flint {
         if (signal == "on_pressed") {
             on_pressed_callbacks.push_back(callback);
         }
+    }
+
+    void Button::set_text(const std::string &text) {
+        label->set_text(text);
     }
 }
