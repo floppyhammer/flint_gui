@@ -25,22 +25,29 @@ namespace Flint {
         Control::update(delta);
     }
 
-    void TreeItem::traverse_children(float folding_width,
-                                     uint32_t depth,
-                                     VkCommandBuffer p_command_buffer,
-                                     float &offset_y,
-                                Vec2<float> global_position) {
+    void TreeItem::propagate_draw(float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y,
+                                  Vec2<float> global_position) {
+        auto canvas = VectorServer::get_singleton().canvas;
+
         float offset_x = (float) depth * folding_width;
 
-        float item_height = button->calculate_minimum_size().y;
-        button->set_position(Vec2<float>(offset_x, offset_y) + global_position);
-        button->update(0);
-        button->draw(p_command_buffer);
+        float item_height = label->calculate_minimum_size().y;
+
+        position = {offset_x, offset_y};
+
+        if (tree->selected_item == this) {
+            theme_selected.add_to_canvas(Vec2<float>(0, offset_y) + global_position, {tree->get_size().x, item_height}, canvas);
+        }
+
+        // The attached label has no parent.
+        label->set_position(Vec2<float>(offset_x, offset_y) + global_position);
+        label->update(0);
+        label->draw(p_command_buffer);
 
         offset_y += item_height;
 
         for (auto &child: children) {
-            child->traverse_children(folding_width, depth + 1, p_command_buffer, offset_y, global_position);
+            child->propagate_draw(folding_width, depth + 1, p_command_buffer, offset_y, global_position);
         }
     }
 
@@ -52,7 +59,7 @@ namespace Flint {
         }
 
         float offset_y = 0;
-        root->traverse_children(folding_width, 0, p_command_buffer, offset_y, get_global_position());
+        root->propagate_draw(folding_width, 0, p_command_buffer, offset_y, get_global_position());
 
         outline.add_to_canvas(get_global_position(), size, canvas);
     }
@@ -62,7 +69,7 @@ namespace Flint {
         if (parent == nullptr) {
             root = std::make_shared<TreeItem>();
             root->set_text(text);
-            root->button->set_parent(this);
+            root->tree = this;
             return root;
         }
 
@@ -70,19 +77,21 @@ namespace Flint {
         item->set_text(text);
         parent->add_child(item);
         item->parent = parent.get();
-        item->button->set_parent(this);
+        item->tree = this;
 
         return item;
     }
 
     void Tree::input(std::vector<InputEvent> &input_queue) {
-        root->button->propagate_input(input_queue);
+        root->propagate_input(input_queue, get_global_position());
 
         Control::input(input_queue);
     }
 
     TreeItem::TreeItem() {
-        button = std::make_shared<Button>();
+        label = std::make_shared<Label>();
+
+        theme_selected.bg_color = ColorU(100, 100, 100, 150);
     }
 
     uint32_t TreeItem::add_child(const std::shared_ptr<TreeItem> &item) {
@@ -111,7 +120,40 @@ namespace Flint {
         return parent;
     }
 
+    void TreeItem::propagate_input(std::vector<InputEvent> &input_queue,
+                                   Vec2<float> global_position) {
+        auto canvas = VectorServer::get_singleton().canvas;
+
+        auto it = children.rbegin();
+        while (it != children.rend()) {
+            (*it)->propagate_input(input_queue, global_position);
+            it++;
+        }
+
+        input(input_queue, global_position);
+    }
+
+    void TreeItem::input(std::vector<InputEvent> &input_queue,
+                         Vec2<float> global_position) {
+        float item_height = label->calculate_minimum_size().y;
+        auto item_global_rect = (Rect<float>(0, position.y, tree->get_size().x, position.y + item_height) + global_position);
+
+        for (auto &event: input_queue) {
+            if (event.type == InputEventType::MouseButton) {
+                auto button_event = event.args.mouse_button;
+
+                if (!event.is_consumed() && button_event.pressed) {
+                    if (item_global_rect.contains_point(button_event.position)) {
+                        selected = true;
+                        tree->selected_item = this;
+                        Logger::verbose("Item selected: " + label->get_text(), "Tree");
+                    }
+                }
+            }
+        }
+    }
+
     void TreeItem::set_text(const std::string &text) {
-        button->set_text(text);
+        label->set_text(text);
     }
 }

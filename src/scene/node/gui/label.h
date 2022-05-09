@@ -50,6 +50,8 @@ namespace Flint {
          */
         void set_text(const std::string &p_text);
 
+        std::string get_text() const;
+
         void set_font(std::shared_ptr<Font> p_font);
 
         void set_text_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color);

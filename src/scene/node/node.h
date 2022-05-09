@@ -90,7 +90,8 @@ namespace Flint {
         std::vector<std::shared_ptr<Node>> children;
 
         // Don't use a shared pointer as it causes circular references.
-        Node *parent;
+        // Also, we must initialize it.
+        Node *parent{};
     };
 }
 

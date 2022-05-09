@@ -58,9 +58,9 @@ namespace Flint {
     }
 
     Node *Node::get_viewport() {
-        if (get_parent() == nullptr) return nullptr;
+        if (parent == nullptr) return nullptr;
 
-        return get_parent()->type == NodeType::SubViewport ? get_parent() : get_parent()->get_viewport();
+        return parent->type == NodeType::SubViewport ? parent : parent->get_viewport();
     }
 
     Node *Node::get_parent() {

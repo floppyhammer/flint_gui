@@ -18,6 +18,10 @@ namespace Flint {
         need_to_remeasure = true;
     }
 
+    std::string Label::get_text() const {
+        return text;
+    }
+
     void Label::measure() {
         // Get font info. Get font scaling.
         int ascent, descent, line_gap;
@@ -158,8 +162,6 @@ namespace Flint {
     }
 
     void Label::update(double dt) {
-        Control::update(dt);
-
         if (need_to_remeasure) {
             measure();
 

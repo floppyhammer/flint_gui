@@ -17,8 +17,6 @@ namespace Flint {
     public:
         TreeItem();
 
-        bool collapsed = false;
-
         uint32_t add_child(const std::shared_ptr<TreeItem> &item);
 
         std::shared_ptr<TreeItem> get_child(uint32_t idx);
@@ -29,15 +27,32 @@ namespace Flint {
 
         TreeItem *get_parent();
 
+        void propagate_input(std::vector<InputEvent> &input_queue,
+                             Vec2<float> global_position);
+
+        void input(std::vector<InputEvent> &input_queue,
+                   Vec2<float> global_position);
+
+        void propagate_draw(float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y,
+                            Vec2<float> global_position);
+
         void set_text(const std::string &text);
 
-        void traverse_children(float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y,
-                               Vec2<float> global_position);
-
     private:
-        std::shared_ptr<Button> button;
-        TreeItem *parent;
+        bool collapsed = false;
+        bool selected = false;
+
+        // Local position in the tree.
+        Vec2<float> position;
+
+        std::shared_ptr<Label> label;
+
         std::vector<std::shared_ptr<TreeItem>> children;
+        TreeItem *parent;
+
+        Tree *tree;
+
+        StyleBox theme_selected;
     };
 
     class Tree : public Control {
@@ -54,6 +69,8 @@ namespace Flint {
 
         std::shared_ptr<TreeItem> create_item(const std::shared_ptr<TreeItem> &parent,
                                               const std::string &text = "item");
+
+        TreeItem *selected_item{};
 
     private:
         std::shared_ptr<TreeItem> root;
