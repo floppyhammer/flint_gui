@@ -23,4 +23,8 @@ namespace Flint {
             theme_panel.value().add_to_canvas(position, size, canvas);
         }
     }
+
+    void Panel::enable_title_bar(bool enabled) {
+        title_bar = enabled;
+    }
 }

@@ -36,7 +36,7 @@ namespace Flint {
         Control::update(dt);
 
         if (value == max_value) value = min_value;
-        value += dt * 10;
+        value += dt * 10.0;
         value = std::clamp(value, min_value, max_value);
 
         ratio = (value - min_value) / (max_value - min_value);

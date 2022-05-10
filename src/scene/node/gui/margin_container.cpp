@@ -8,19 +8,20 @@ namespace Flint {
         auto cast_parent = dynamic_cast<Control *>(parent);
         set_size(cast_parent->get_size());
 
-        Vec2<float> new_position;
-        new_position.x += margin_left;
-        new_position.y += margin_top;
+        // Child's local position.
+        Vec2<float> child_position;
+        child_position.x += margin_left;
+        child_position.y += margin_top;
 
-        auto new_size = size;
-        new_size.x -= margin_left + margin_right;
-        new_size.y -= margin_top + margin_bottom;
+        auto child_size = size;
+        child_size.x -= margin_left + margin_right;
+        child_size.y -= margin_top + margin_bottom;
 
         for (auto &child: children) {
             if (child->extended_from_which_base_node() == NodeType::Control) {
                 auto cast_child = dynamic_cast<Control *>(child.get());
-                cast_child->set_position(new_position);
-                cast_child->set_size(new_size);
+                cast_child->set_position(child_position);
+                cast_child->set_size(child_size);
             }
         }
     }
