@@ -30,6 +30,7 @@ namespace Flint {
         Panel,
         TextureRect,
         Tree,
+        ProgressBar,
 
         // 2D.
         Node2D,

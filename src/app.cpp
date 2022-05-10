@@ -21,6 +21,7 @@
 #include "scene/node/gui/vbox_container.h"
 #include "scene/node/gui/panel.h"
 #include "scene/node/gui/tree.h"
+#include "scene/node/gui/progress_bar.h"
 #include "scene/node/sub_viewport.h"
 #include "scene/node/2d/sprite_2d.h"
 #include "scene/node/2d/rigid_body_2d.h"
@@ -84,6 +85,9 @@ void App::run() {
         label->set_horizontal_alignment(Flint::Alignment::Center);
         label->set_vertical_alignment(Flint::Alignment::Center);
         label->set_position({400, 0});
+        auto progress_bar = std::make_shared<Flint::ProgressBar>();
+        progress_bar->set_position({0, 600});
+        progress_bar->set_size({256, 32});
         auto button = std::make_shared<Flint::Button>();
         button->set_position({500, 0});
         // Callback to clean up staging resources.
@@ -132,6 +136,7 @@ void App::run() {
         box_container->add_child(button2);
         panel->add_child(box_container);
         node->add_child(panel);
+        node->add_child(progress_bar);
         node->add_child(item_tree);
 
         sub_viewport_c->add_child(sub_viewport);
