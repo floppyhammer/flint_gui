@@ -5,9 +5,6 @@ namespace Flint {
         if (parent->extended_from_which_base_node() != NodeType::Control)
             return;
 
-        auto cast_parent = dynamic_cast<Control *>(parent);
-        set_size(cast_parent->get_size());
-
         // Child's local position.
         Vec2<float> child_position;
         child_position.x += margin_left;

@@ -190,6 +190,8 @@ namespace Flint {
             theme_background.value().add_to_canvas(global_position, size, canvas);
         }
 
+        canvas->set_shadow_blur(0);
+
         // Add stroke.
         for (Glyph &g: glyphs) {
             // Add stroke if needed.

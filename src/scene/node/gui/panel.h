@@ -18,7 +18,7 @@ namespace Flint {
     public:
         Panel();
 
-        void update(double delta) override;
+        void update(double dt) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
 
@@ -30,6 +30,8 @@ namespace Flint {
         bool collapsible = false;
         bool resizable = false;
         bool shrink_title_bar_when_collapsed = false;
+
+        float title_bar_height = 48;
 
         std::shared_ptr<Label> title_label;
 
