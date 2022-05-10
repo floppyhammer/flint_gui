@@ -8,6 +8,9 @@ namespace Flint {
         auto style_box_shape = Pathfinder::Shape();
         style_box_shape.add_rect({0, 0, size.x, size.y}, corner_radius);
 
+        canvas->set_shadow_color({shadow_color.r, shadow_color.g, shadow_color.b, shadow_color.a});
+        canvas->set_shadow_blur(shadow_size);
+
         auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
         canvas->set_transform(transform);
         canvas->set_fill_paint(Pathfinder::Paint::from_color({bg_color.r, bg_color.g, bg_color.b, bg_color.a}));

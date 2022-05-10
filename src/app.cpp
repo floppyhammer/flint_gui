@@ -19,6 +19,7 @@
 #include "scene/node/gui/button.h"
 #include "scene/node/gui/hbox_container.h"
 #include "scene/node/gui/vbox_container.h"
+#include "scene/node/gui/panel.h"
 #include "scene/node/gui/tree.h"
 #include "scene/node/sub_viewport.h"
 #include "scene/node/2d/sprite_2d.h"
@@ -93,8 +94,10 @@ void App::run() {
         auto button2 = std::make_shared<Flint::Button>();
         button2->set_position({600, 0});
         auto box_container = std::make_shared<Flint::HBoxContainer>();
-        box_container->set_position({200, 200});
         box_container->set_size({400, 100});
+        auto panel = std::make_shared<Flint::Panel>();
+        panel->set_position({200, 200});
+        panel->set_size({400, 100});
         auto vector_layer = std::make_shared<Flint::TextureRect>();
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WIDTH, HEIGHT});
@@ -127,7 +130,8 @@ void App::run() {
         box_container->add_child(button);
         box_container->add_child(label);
         box_container->add_child(button2);
-        node->add_child(box_container);
+        panel->add_child(box_container);
+        node->add_child(panel);
         node->add_child(item_tree);
 
         sub_viewport_c->add_child(sub_viewport);
