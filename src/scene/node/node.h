@@ -20,6 +20,7 @@ namespace Flint {
         Control,
         Container,
         CenterContainer,
+        MarginContainer,
         HBoxContainer,
         VBoxContainer,
         SubViewportContainer,

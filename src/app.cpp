@@ -19,6 +19,7 @@
 #include "scene/node/gui/button.h"
 #include "scene/node/gui/hbox_container.h"
 #include "scene/node/gui/vbox_container.h"
+#include "scene/node/gui/margin_container.h"
 #include "scene/node/gui/panel.h"
 #include "scene/node/gui/tree.h"
 #include "scene/node/gui/progress_bar.h"
@@ -87,7 +88,7 @@ void App::run() {
         label->set_position({400, 0});
         auto progress_bar = std::make_shared<Flint::ProgressBar>();
         progress_bar->set_position({0, 600});
-        progress_bar->set_size({256, 32});
+        progress_bar->set_size({256, 24});
         auto button = std::make_shared<Flint::Button>();
         button->set_position({500, 0});
         // Callback to clean up staging resources.
@@ -97,8 +98,9 @@ void App::run() {
         button->connect_signal("on_pressed", callback);
         auto button2 = std::make_shared<Flint::Button>();
         button2->set_position({600, 0});
+        auto margin_container = std::make_shared<Flint::MarginContainer>();
+        margin_container->set_size({400, 100});
         auto box_container = std::make_shared<Flint::HBoxContainer>();
-        box_container->set_size({400, 100});
         auto panel = std::make_shared<Flint::Panel>();
         panel->set_position({200, 200});
         panel->set_size({400, 100});
@@ -134,7 +136,8 @@ void App::run() {
         box_container->add_child(button);
         box_container->add_child(label);
         box_container->add_child(button2);
-        panel->add_child(box_container);
+        margin_container->add_child(box_container);
+        panel->add_child(margin_container);
         node->add_child(panel);
         node->add_child(progress_bar);
         node->add_child(item_tree);

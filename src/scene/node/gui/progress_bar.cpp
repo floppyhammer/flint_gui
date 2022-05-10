@@ -7,7 +7,7 @@ namespace Flint {
         type = NodeType::ProgressBar;
 
         theme_progress = std::optional(StyleBox());
-        theme_progress.value().bg_color = ColorU(100, 100, 100, 255);
+        theme_progress.value().bg_color = ColorU(40, 123, 222, 255);
 
         theme_bg = std::optional(StyleBox());
 
