@@ -15,9 +15,9 @@ namespace Flint {
     }
 
     void SubViewportContainer::set_viewport(std::shared_ptr<SubViewport> p_viewport) {
-        viewport = std::move(p_viewport);
+        sub_viewport = std::move(p_viewport);
 
-        mesh->surface->get_material()->set_texture(viewport->get_texture());
+        mesh->surface->get_material()->set_texture(sub_viewport->get_texture());
     }
 
     void SubViewportContainer::update(double dt) {
@@ -32,8 +32,8 @@ namespace Flint {
         auto sub_viewport_command_buffer = RenderServer::getSingleton().beginSingleTimeCommands();
 
         // Start sub-viewport render pass.
-        if (viewport != nullptr) {
-            viewport->propagate_draw(sub_viewport_command_buffer);
+        if (sub_viewport != nullptr) {
+            sub_viewport->propagate_draw(sub_viewport_command_buffer);
         }
 
         RenderServer::getSingleton().endSingleTimeCommands(sub_viewport_command_buffer);
@@ -50,7 +50,7 @@ namespace Flint {
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-            pipeline = viewport->viewport->blitGraphicsPipeline;
+            pipeline = viewport->render_target->blitGraphicsPipeline;
         }
 
         // Upload the model matrix to the GPU via push constants.

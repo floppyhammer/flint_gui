@@ -1,5 +1,5 @@
-#ifndef FLINT_VIEWPORT_H
-#define FLINT_VIEWPORT_H
+#ifndef FLINT_RENDER_TARGET_H
+#define FLINT_RENDER_TARGET_H
 
 #include "../common/vec2.h"
 #include "../common/color.h"
@@ -8,13 +8,13 @@
 
 namespace Flint {
     /**
-     * Viewport is basically a texture to which you can draw stuff.
+     * RenderTarget is basically a texture to which you can draw stuff.
      */
-    class Viewport {
+    class RenderTarget {
     public:
-        Viewport();
+        RenderTarget();
 
-        ~Viewport();
+        ~RenderTarget();
 
         VkRenderPassBeginInfo &getRenderPassInfo();
 
@@ -64,4 +64,4 @@ namespace Flint {
     };
 }
 
-#endif //FLINT_VIEWPORT_H
+#endif //FLINT_RENDER_TARGET_H

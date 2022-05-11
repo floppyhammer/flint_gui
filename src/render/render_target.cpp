@@ -1,16 +1,16 @@
-#include "viewport.h"
+#include "render_target.h"
 
 #include <array>
 
 namespace Flint {
-    Viewport::Viewport() {
+    RenderTarget::RenderTarget() {
         // Render pass is not extent dependent.
         create_render_pass();
 
         extent_dependent_init();
     }
 
-    Viewport::~Viewport() {
+    RenderTarget::~RenderTarget() {
         auto device = Platform::getSingleton().device;
 
         extent_dependent_cleanup();
@@ -18,7 +18,7 @@ namespace Flint {
         vkDestroyRenderPass(device, renderPass, nullptr);
     }
 
-    void Viewport::create_images() {
+    void RenderTarget::create_images() {
         // Color.
         texture = Texture::from_empty(extent.x, extent.y);
 
@@ -35,7 +35,7 @@ namespace Flint {
                                                                       VK_IMAGE_ASPECT_DEPTH_BIT);
     }
 
-    void Viewport::create_render_pass() {
+    void RenderTarget::create_render_pass() {
         // Color attachment.
         // ----------------------------------------
         VkAttachmentDescription colorAttachment{};
@@ -114,7 +114,7 @@ namespace Flint {
         }
     }
 
-    void Viewport::create_framebuffer() {
+    void RenderTarget::create_framebuffer() {
         // Create framebuffer.
         {
             std::array<VkImageView, 2> attachments = {
@@ -145,7 +145,7 @@ namespace Flint {
         descriptor.sampler = texture->sampler;
     }
 
-    VkRenderPassBeginInfo &Viewport::getRenderPassInfo() {
+    VkRenderPassBeginInfo &RenderTarget::getRenderPassInfo() {
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = renderPass;
@@ -156,7 +156,7 @@ namespace Flint {
         return renderPassInfo;
     }
 
-    void Viewport::create_pipelines() {
+    void RenderTarget::create_pipelines() {
         // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
         RenderServer::getSingleton().createMeshPipeline(
                 renderPass,
@@ -169,7 +169,7 @@ namespace Flint {
                 blitGraphicsPipeline);
     }
 
-    void Viewport::set_extent(Vec2<uint32_t> p_extent) {
+    void RenderTarget::set_extent(Vec2<uint32_t> p_extent) {
         if (extent != p_extent) {
             extent = p_extent;
             extent_dependent_cleanup();
@@ -177,11 +177,11 @@ namespace Flint {
         }
     }
 
-    Vec2<uint32_t> Viewport::get_extent() {
+    Vec2<uint32_t> RenderTarget::get_extent() {
         return extent;
     }
 
-    void Viewport::extent_dependent_init() {
+    void RenderTarget::extent_dependent_init() {
         // Create color & depth images.
         create_images();
 
@@ -190,7 +190,7 @@ namespace Flint {
         create_pipelines();
     }
 
-    void Viewport::extent_dependent_cleanup() const {
+    void RenderTarget::extent_dependent_cleanup() const {
         auto device = Platform::getSingleton().device;
 
         vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);

@@ -21,7 +21,7 @@ namespace Flint {
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-            pipeline = viewport->viewport->meshGraphicsPipeline;
+            pipeline = viewport->render_target->meshGraphicsPipeline;
         }
 
         // Upload the model matrix to the GPU via push constants.

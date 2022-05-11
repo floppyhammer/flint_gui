@@ -8,7 +8,7 @@ namespace Flint {
     SubViewport::SubViewport() {
         type = NodeType::SubViewport;
 
-        viewport = std::make_shared<Viewport>();
+        render_target = std::make_shared<RenderTarget>();
     }
 
     void SubViewport::propagate_draw(VkCommandBuffer p_command_buffer) {
@@ -17,10 +17,10 @@ namespace Flint {
             // It seems not feasible to wrap begin info into rendering Viewport.
             VkRenderPassBeginInfo renderPassInfo{};
             renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            renderPassInfo.renderPass = viewport->renderPass;
-            renderPassInfo.framebuffer = viewport->framebuffer; // Set target framebuffer.
+            renderPassInfo.renderPass = render_target->renderPass;
+            renderPassInfo.framebuffer = render_target->framebuffer; // Set target framebuffer.
             renderPassInfo.renderArea.offset = {0, 0};
-            renderPassInfo.renderArea.extent = VkExtent2D{viewport->get_extent().x, viewport->get_extent().y};
+            renderPassInfo.renderArea.extent = VkExtent2D{render_target->get_extent().x, render_target->get_extent().y};
 
             // Clear color.
             std::array<VkClearValue, 2> clearValues{};
@@ -43,10 +43,10 @@ namespace Flint {
     }
 
     std::shared_ptr<Texture> SubViewport::get_texture() const {
-        return viewport->texture;
+        return render_target->texture;
     }
 
     Vec2<uint32_t> SubViewport::get_extent() const {
-        return viewport->get_extent();
+        return render_target->get_extent();
     }
 }

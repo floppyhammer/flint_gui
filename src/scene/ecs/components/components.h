@@ -8,7 +8,7 @@
 #include "../../../resources/material.h"
 #include "../../../resources/default_resource.h"
 #include "../../../render/mvp_buffer.h"
-#include "../../../render/viewport.h"
+#include "../../../render/render_target.h"
 #include "../../../servers/input_server.h"
 
 #define GLFW_INCLUDE_VULKAN
@@ -85,7 +85,7 @@ namespace Flint {
      * Entities with this component will be drawn to a sub-viewport.
      */
     struct ViewportInputComponent {
-        std::shared_ptr<Viewport> viewport;
+        std::shared_ptr<RenderTarget> viewport;
 
         float fov = 45.0;
 
@@ -97,7 +97,7 @@ namespace Flint {
      * Entities with this component will be used to draw a sub-viewport's content.
      */
     struct ViewportOutputComponent {
-        std::shared_ptr<Viewport> viewport;
+        std::shared_ptr<RenderTarget> viewport;
     };
 
     /**
