@@ -7,7 +7,7 @@ namespace Flint {
         type = NodeType::Panel;
 
         auto panel = StyleBox();
-        panel.bg_color = ColorU(50, 50, 50, 200);
+        panel.bg_color = ColorU(0, 0, 0, 0);
         panel.corner_radius = 4;
         theme_bg = std::make_optional(panel);
         panel.border_width = 2;

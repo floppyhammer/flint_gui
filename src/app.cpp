@@ -146,7 +146,10 @@ void App::run() {
         margin_container->add_child(vbox_container);
         panel->add_child(margin_container);
         node->add_child(panel);
-        scene_panel->add_child(item_tree);
+        auto margin_container2 = std::make_shared<Flint::MarginContainer>();
+        margin_container2->set_size({400, 400});
+        margin_container2->add_child(item_tree);
+        scene_panel->add_child(margin_container2);
         node->add_child(scene_panel);
 
         sub_viewport_c->add_child(sub_viewport);
