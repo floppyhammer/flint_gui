@@ -13,6 +13,8 @@ namespace Flint {
         void update(double dt) override;
 
         void adjust_layout() override;
+
+        Vec2<float> calculate_minimum_size() override;
     };
 }
 

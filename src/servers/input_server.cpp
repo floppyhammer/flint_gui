@@ -10,7 +10,9 @@ namespace Flint {
             input_event.type = Flint::InputEventType::MouseMotion;
             input_event.args.mouse_motion.position = {(float) x_pos, (float) y_pos};
             auto &input_server = Flint::InputServer::get_singleton();
+            input_server.last_cursor_position = input_server.cursor_position;
             input_server.cursor_position = {(float) x_pos, (float) y_pos};
+            input_event.args.mouse_motion.relative = input_server.cursor_position - input_server.last_cursor_position;
             input_server.input_queue.push_back(input_event);
         };
         glfwSetCursorPosCallback(window, cursor_position_callback);

@@ -62,6 +62,7 @@ namespace Flint {
         void attach_callbacks(GLFWwindow *window);
 
         Vec2<float> cursor_position;
+        Vec2<float> last_cursor_position;
 
         std::vector<InputEvent> input_queue;
 

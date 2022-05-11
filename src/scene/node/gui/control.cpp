@@ -111,7 +111,9 @@ namespace Flint {
     }
 
     void Control::set_size(Vec2<float> p_size) {
-        size = p_size;
+        if (size == p_size) return;
+
+        size = p_size.max(calculate_minimum_size());
     }
 
     Vec2<float> Control::get_position() const {

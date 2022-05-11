@@ -100,10 +100,15 @@ void App::run() {
         button2->set_position({600, 0});
         auto margin_container = std::make_shared<Flint::MarginContainer>();
         margin_container->set_size({400, 100});
-        auto box_container = std::make_shared<Flint::HBoxContainer>();
+        auto hbox_container = std::make_shared<Flint::HBoxContainer>();
+        auto vbox_container = std::make_shared<Flint::VBoxContainer>();
         auto panel = std::make_shared<Flint::Panel>();
         panel->set_position({200, 200});
-        panel->set_size({400, 100});
+        panel->set_size({400, 400});
+
+        auto scene_panel = std::make_shared<Flint::Panel>();
+        scene_panel->set_position({0, 100});
+        scene_panel->set_size({400, 400});
         auto vector_layer = std::make_shared<Flint::TextureRect>();
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WIDTH, HEIGHT});
@@ -133,14 +138,16 @@ void App::run() {
         node->add_child(sub_viewport_c);
 
         node->add_child(vector_layer);
-        box_container->add_child(button);
-        box_container->add_child(label);
-        box_container->add_child(button2);
-        margin_container->add_child(box_container);
+        hbox_container->add_child(button);
+        hbox_container->add_child(label);
+        hbox_container->add_child(button2);
+        vbox_container->add_child(hbox_container);
+        vbox_container->add_child(progress_bar);
+        margin_container->add_child(vbox_container);
         panel->add_child(margin_container);
         node->add_child(panel);
-        node->add_child(progress_bar);
-        node->add_child(item_tree);
+        scene_panel->add_child(item_tree);
+        node->add_child(scene_panel);
 
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);

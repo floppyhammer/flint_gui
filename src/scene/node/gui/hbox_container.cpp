@@ -20,4 +20,16 @@ namespace Flint {
 
         Control::update(dt);
     }
+
+    Vec2<float> HBoxContainer::calculate_minimum_size() {
+        Vec2<float> size;
+        for (auto &child: children) {
+            if (child->extended_from_which_base_node() == NodeType::Control) {
+                auto cast_child = dynamic_cast<Control *>(child.get());
+                auto child_size = cast_child->calculate_minimum_size();
+                size += child_size;
+            }
+        }
+        return size.max(minimum_size);
+    }
 }

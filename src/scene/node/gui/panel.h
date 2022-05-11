@@ -18,6 +18,8 @@ namespace Flint {
     public:
         Panel();
 
+        void input(std::vector<InputEvent> &input_queue) override;
+
         void update(double dt) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
@@ -32,6 +34,8 @@ namespace Flint {
         bool shrink_title_bar_when_collapsed = false;
 
         float title_bar_height = 48;
+
+        bool title_bar_pressed = false;
 
         std::shared_ptr<Label> title_label;
 

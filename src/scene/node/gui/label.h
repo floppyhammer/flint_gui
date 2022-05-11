@@ -89,7 +89,7 @@ namespace Flint {
         mutable Rect<float> layout_box;
 
         // Fill
-        ColorU color = ColorU::white();
+        ColorU color{163, 163, 163, 255};
 
         // Stroke
         float stroke_width = 0;

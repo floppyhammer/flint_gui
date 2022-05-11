@@ -20,6 +20,32 @@ namespace Flint {
         IGNORE,
     };
 
+    enum class ControlAnchor {
+        TOP_LEFT,
+        TOP_RIGHT,
+        BOTTOM_RIGHT,
+        BOTTOM_LEFT,
+
+        CENTER_LEFT,
+        CENTER_TOP,
+        CENTER_RIGHT,
+        CENTER_BOTTOM,
+        CENTER,
+
+        LEFT_WIDE,
+        TOP_WIDE,
+        RIGHT_WIDE,
+        BOTTOM_WIDE,
+        VCENTER_WIDE,
+        HCENTER_WIDE,
+
+        FULL_RECT,
+    };
+
+    enum class ContainerSizeFlag {
+
+    };
+
     class Control : public Node {
     public:
         Control();
