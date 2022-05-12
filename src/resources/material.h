@@ -1,7 +1,7 @@
 #ifndef FLINT_MATERIAL_H
 #define FLINT_MATERIAL_H
 
-#include "texture.h"
+#include "image_texture.h"
 
 #include <memory>
 #include <iostream>
@@ -50,7 +50,7 @@ public:
 
     void createDescriptorSet() override;
 
-    void updateDescriptorSet(const std::shared_ptr<Texture>& p_texture);
+    void updateDescriptorSet(const std::shared_ptr<ImageTexture>& p_texture);
 };
 
 class Material3dDescSet : public MaterialDescSet {
@@ -61,7 +61,7 @@ public:
 
     void createDescriptorSet() override;
 
-    void updateDescriptorSet(const std::shared_ptr<Texture>& p_texture);
+    void updateDescriptorSet(const std::shared_ptr<ImageTexture>& p_texture);
 };
 
 /// Material Resources
@@ -73,15 +73,15 @@ class Material2d : public Material {
 public:
     Material2d();
 
-    void set_texture(const std::shared_ptr<Texture>& p_texture);
-    std::shared_ptr<Texture> get_texture();
+    void set_texture(const std::shared_ptr<ImageTexture>& p_texture);
+    std::shared_ptr<ImageTexture> get_texture();
 
     std::shared_ptr<Material2dDescSet> get_desc_set() {
         return desc_set;
     }
 
 private:
-    std::shared_ptr<Texture> texture;
+    std::shared_ptr<ImageTexture> texture;
 
     std::shared_ptr<Material2dDescSet> desc_set;
 };
@@ -92,15 +92,15 @@ public:
 
     static std::shared_ptr<Material3d> from_default();
 
-    void set_diffuse_texture(std::shared_ptr<Texture> p_texture);
+    void set_diffuse_texture(std::shared_ptr<ImageTexture> p_texture);
 
     std::shared_ptr<Material3dDescSet> get_desc_set() {
         return desc_set;
     }
 
 private:
-    std::shared_ptr<Texture> diffuse_texture;
-    std::shared_ptr<Texture> normal_texture;
+    std::shared_ptr<ImageTexture> diffuse_texture;
+    std::shared_ptr<ImageTexture> normal_texture;
 
     std::shared_ptr<Material3dDescSet> desc_set;
 };

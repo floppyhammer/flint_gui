@@ -4,7 +4,7 @@
 #include "node.h"
 #include "../../common/vec2.h"
 #include "../../render/render_server.h"
-#include "../../resources/texture.h"
+#include "../../resources/image_texture.h"
 #include "../../render/render_target.h"
 #include "scene_tree.h"
 #include "../../common/color.h"
@@ -17,7 +17,7 @@ namespace Flint {
     public:
         SubViewport();
 
-        [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
+        [[nodiscard]] std::shared_ptr<ImageTexture> get_texture() const;
 
         [[nodiscard]] Vec2<uint32_t> get_extent() const;
 

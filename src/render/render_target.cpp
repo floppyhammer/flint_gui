@@ -20,7 +20,7 @@ namespace Flint {
 
     void RenderTarget::create_images() {
         // Color.
-        texture = Texture::from_empty(extent.x, extent.y);
+        texture = ImageTexture::from_empty(extent.x, extent.y);
 
         // Depth.
         VkFormat depthFormat = Platform::getSingleton().findDepthFormat();

@@ -10,9 +10,9 @@ namespace Flint {
     public:
         Sprite2d();
 
-        void set_texture(std::shared_ptr<Texture> p_texture);
+        void set_texture(std::shared_ptr<ImageTexture> p_texture);
 
-        [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
+        [[nodiscard]] std::shared_ptr<ImageTexture> get_texture() const;
 
         void set_mesh(const std::shared_ptr<Mesh2d>& p_mesh);
 

@@ -4,7 +4,7 @@
 #include "../common/vec2.h"
 #include "../common/color.h"
 #include "render_server.h"
-#include "../resources/texture.h"
+#include "../resources/image_texture.h"
 
 namespace Flint {
     /**
@@ -18,7 +18,7 @@ namespace Flint {
 
         VkRenderPassBeginInfo &getRenderPassInfo();
 
-        std::shared_ptr<Texture> texture;
+        std::shared_ptr<ImageTexture> texture;
 
         // Pipelines bound with the render pass of this sub viewport.
         // ------------------------------------

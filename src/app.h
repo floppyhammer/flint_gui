@@ -16,7 +16,7 @@
 #include <queue>
 
 #include "resources/surface.h"
-#include "resources/texture.h"
+#include "resources/image_texture.h"
 
 #include "scene/node/scene_tree.h"
 #include "scene/node/gui/label.h"

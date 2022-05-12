@@ -1,5 +1,5 @@
-#ifndef FLINT_TEXTURE_H
-#define FLINT_TEXTURE_H
+#ifndef FLINT_IMAGE_TEXTURE_H
+#define FLINT_IMAGE_TEXTURE_H
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -10,17 +10,17 @@
 
 #include <memory>
 
-class Texture : public Resource {
+class ImageTexture : public Resource {
 public:
-    Texture() = default;
+    ImageTexture() = default;
 
     /// Create a texture from file.
-    explicit Texture(const std::string &path);
+    explicit ImageTexture(const std::string &path);
 
-    ~Texture() override;
+    ~ImageTexture() override;
 
     /// Create an empty texture with specific size.
-    static std::shared_ptr<Texture> from_empty(uint32_t p_width, uint32_t p_height);
+    static std::shared_ptr<ImageTexture> from_empty(uint32_t p_width, uint32_t p_height);
 
     //static std::shared_ptr<Texture> from_bytes(const std::string &filename);
 
@@ -48,4 +48,4 @@ private:
     void create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height);
 };
 
-#endif //FLINT_TEXTURE_H
+#endif //FLINT_IMAGE_TEXTURE_H

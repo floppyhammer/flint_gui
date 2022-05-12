@@ -15,9 +15,9 @@
 namespace Flint {
     /// How should this control node handle mouse input propagation.
     enum class MouseFilter {
-        STOP,
-        PASS,
-        IGNORE,
+        STOP, // Consume input.
+        PASS, // Use then pass input.
+        IGNORE, // Ignore input.
     };
 
     enum class ControlAnchor {
@@ -60,9 +60,6 @@ namespace Flint {
 
         virtual Vec2<float> get_size() const;
 
-        /// Used when being a child of a container.
-        Vec2<float> minimum_size{0};
-
         virtual Vec2<float> calculate_minimum_size();
 
         Vec2<float> get_global_position() const;
@@ -78,15 +75,13 @@ namespace Flint {
         Vec2<float> pivot_offset{0}; // Top-left as the default pivot.
         float rotation = 0;
 
-        void update(double dt) override;
+        Vec2<float> minimum_size{0};
 
-        void update_mvp();
+        void update(double dt) override;
 
         void input(std::vector<InputEvent> &input_queue) override;
 
         StyleBox outline;
-
-        Surface2dPushConstant push_constant;
 
         MouseFilter mouse_filter = MouseFilter::STOP;
     };

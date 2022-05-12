@@ -3,7 +3,7 @@
 #include "render/platform.h"
 #include "render/swap_chain.h"
 #include "render/render_server.h"
-#include "resources/texture.h"
+#include "resources/image_texture.h"
 #include "resources/mesh.h"
 #include "resources/resource_manager.h"
 #include "core/engine.h"
@@ -113,7 +113,7 @@ void App::run() {
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WIDTH, HEIGHT});
         auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server.canvas->get_dest_texture().get());
-        auto texture = std::make_shared<Texture>();
+        auto texture = std::make_shared<ImageTexture>();
         texture->imageView = texture_vk->get_image_view();
         texture->sampler = texture_vk->get_sampler();
         texture->width = texture_vk->get_width();
@@ -129,7 +129,7 @@ void App::run() {
             rigid_body_2d->position = {400, 0};
             rigid_body_2d->velocity = {rand_velocity(generator), rand_velocity(generator)};
             auto sprite_2d = std::make_shared<Flint::Sprite2d>();
-            sprite_2d->set_texture(ResourceManager::get_singleton().load<Texture>("../assets/duck.png"));
+            sprite_2d->set_texture(ResourceManager::get_singleton().load<ImageTexture>("../assets/duck.png"));
             rigid_body_2d->add_child(sprite_2d);
             node->add_child(rigid_body_2d);
         }
@@ -167,7 +167,7 @@ void App::run() {
         for (int i = 0; i < ECS_SPRITE_COUNT; i++) {
             auto mesh = DefaultResource::get_singleton().new_default_mesh_2d();
             mesh->surface->get_material()->set_texture(
-                    ResourceManager::get_singleton().load<Texture>("../assets/duck.png"));
+                    ResourceManager::get_singleton().load<ImageTexture>("../assets/duck.png"));
 
             auto entity = world->spawn();
             world->add_component(entity, Flint::Sprite2dComponent{mesh});

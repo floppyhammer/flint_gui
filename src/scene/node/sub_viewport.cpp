@@ -42,7 +42,7 @@ namespace Flint {
         vkCmdEndRenderPass(p_command_buffer);
     }
 
-    std::shared_ptr<Texture> SubViewport::get_texture() const {
+    std::shared_ptr<ImageTexture> SubViewport::get_texture() const {
         return render_target->texture;
     }
 

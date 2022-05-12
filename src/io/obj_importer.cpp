@@ -50,7 +50,7 @@ namespace Flint {
             for (const auto &obj_material: obj_materials) {
                 auto material = std::make_shared<Material3d>();
                 material->name = obj_material.name;
-                material->set_diffuse_texture(ResourceManager::get_singleton().load<Texture>(file_directory + "/" + obj_material.diffuse_texname));
+                material->set_diffuse_texture(ResourceManager::get_singleton().load<ImageTexture>(file_directory + "/" + obj_material.diffuse_texname));
                 materials.push_back(material);
             }
         }

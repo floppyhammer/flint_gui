@@ -90,6 +90,7 @@ namespace Flint {
 
     TreeItem::TreeItem() {
         label = std::make_shared<Label>();
+        collapse_button = std::make_shared<Button>();
 
         theme_selected.bg_color = ColorU(100, 100, 100, 150);
     }

@@ -21,7 +21,11 @@ namespace Flint {
 
         void draw(VkCommandBuffer p_command_buffer) override;
 
+        void update_mvp();
+
         std::shared_ptr<Mesh2d> mesh;
+
+        Surface2dPushConstant push_constant;
     };
 }
 

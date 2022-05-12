@@ -1,13 +1,13 @@
 #include <stdexcept>
 
-#include "texture.h"
+#include "image_texture.h"
 #include "../common/logger.h"
 
 //#define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
 
-Texture::~Texture() {
+ImageTexture::~ImageTexture() {
     if (!resource_ownership) return;
 
     auto device = Platform::getSingleton().device;
@@ -24,7 +24,7 @@ Texture::~Texture() {
     vkFreeMemory(device, imageMemory, nullptr);
 }
 
-void Texture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height) {
+void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height) {
     width = tex_width;
     height = tex_height;
 
@@ -75,10 +75,10 @@ void Texture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t
     vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
 }
 
-std::shared_ptr<Texture> Texture::from_empty(uint32_t p_width, uint32_t p_height) {
+std::shared_ptr<ImageTexture> ImageTexture::from_empty(uint32_t p_width, uint32_t p_height) {
     assert(p_width != 0 && p_height != 0 && "Creating texture with zero size.");
 
-    auto texture = std::make_shared<Texture>();
+    auto texture = std::make_shared<ImageTexture>();
     texture->width = p_width;
     texture->height = p_height;
 
@@ -99,7 +99,7 @@ std::shared_ptr<Texture> Texture::from_empty(uint32_t p_width, uint32_t p_height
     return texture;
 }
 
-Texture::Texture(const std::string &path) : Resource(path) {
+ImageTexture::ImageTexture(const std::string &path) : Resource(path) {
     // The STBI_rgb_alpha value forces the image to be loaded with an alpha channel,
     // even if it doesn't have one, which is nice for consistency with other textures in the future.
     int tex_width, tex_height, tex_channels;

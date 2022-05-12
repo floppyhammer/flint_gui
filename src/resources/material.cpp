@@ -67,7 +67,7 @@ void Material3dDescSet::createDescriptorSet() {
     }
 }
 
-void Material3dDescSet::updateDescriptorSet(const std::shared_ptr<Texture> &p_texture) {
+void Material3dDescSet::updateDescriptorSet(const std::shared_ptr<ImageTexture> &p_texture) {
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
     auto &descriptorSetLayout = RenderServer::getSingleton().meshDescriptorSetLayout;
     auto device = Platform::getSingleton().device;
@@ -148,7 +148,7 @@ void Material2dDescSet::createDescriptorSet() {
     }
 }
 
-void Material2dDescSet::updateDescriptorSet(const std::shared_ptr<Texture> &p_texture) {
+void Material2dDescSet::updateDescriptorSet(const std::shared_ptr<ImageTexture> &p_texture) {
     auto swapChainImages = SwapChain::getSingleton().swapChainImages;
     auto &descriptorSetLayout = RenderServer::getSingleton().blitDescriptorSetLayout;
     auto device = Platform::getSingleton().device;
@@ -195,13 +195,13 @@ Material2d::Material2d() {
     desc_set = std::make_shared<Material2dDescSet>();
 }
 
-void Material2d::set_texture(const std::shared_ptr<Texture>& p_texture) {
+void Material2d::set_texture(const std::shared_ptr<ImageTexture>& p_texture) {
     texture = p_texture;
 
     desc_set->updateDescriptorSet(p_texture);
 }
 
-std::shared_ptr<Texture> Material2d::get_texture() {
+std::shared_ptr<ImageTexture> Material2d::get_texture() {
     return texture;
 }
 
@@ -211,12 +211,12 @@ Material3d::Material3d() {
 
 std::shared_ptr<Material3d> Material3d::from_default() {
     auto material = std::make_shared<Material3d>();
-    material->diffuse_texture = Texture::from_empty(4, 4);
+    material->diffuse_texture = ImageTexture::from_empty(4, 4);
 
     return material;
 }
 
-void Material3d::set_diffuse_texture(std::shared_ptr<Texture> p_texture) {
+void Material3d::set_diffuse_texture(std::shared_ptr<ImageTexture> p_texture) {
     diffuse_texture = p_texture;
 
     desc_set->updateDescriptorSet(p_texture);

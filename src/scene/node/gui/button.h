@@ -33,17 +33,17 @@ namespace Flint {
         void set_text(const std::string &text);
 
     protected:
-        StyleBox theme_normal, theme_hovered, theme_pressed;
-
         std::shared_ptr<Label> label;
-
-        Pathfinder::Shape icon;
+        std::optional<Pathfinder::Shape> icon;
 
         std::vector<std::function<void()>> on_pressed_callbacks;
         std::vector<std::function<void()>> on_down_callbacks;
         std::vector<std::function<void()>> on_up_callbacks;
         std::vector<std::function<void()>> on_hovered_callbacks;
 
+        StyleBox theme_normal, theme_hovered, theme_pressed;
+
+    protected:
         void on_pressed();
     };
 }

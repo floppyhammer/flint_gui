@@ -14,11 +14,11 @@ namespace Flint {
         type = NodeType::Sprite2D;
     }
 
-    void Sprite2d::set_texture(std::shared_ptr<Texture> p_texture) {
+    void Sprite2d::set_texture(std::shared_ptr<ImageTexture> p_texture) {
         mesh->surface->get_material()->set_texture(p_texture);
     }
 
-    std::shared_ptr<Texture> Sprite2d::get_texture() const {
+    std::shared_ptr<ImageTexture> Sprite2d::get_texture() const {
         return mesh->surface->get_material()->get_texture();
     }
 

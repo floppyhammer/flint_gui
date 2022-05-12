@@ -3,7 +3,7 @@
 
 #include "node_3d.h"
 #include "../../../resources/mesh.h"
-#include "../../../resources/texture.h"
+#include "../../../resources/image_texture.h"
 
 namespace Flint {
     class Model : public Node3D {

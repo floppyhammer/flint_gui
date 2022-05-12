@@ -46,6 +46,7 @@ namespace Flint {
         Vec2<float> position;
 
         std::shared_ptr<Label> label;
+        std::shared_ptr<Button> collapse_button;
 
         std::vector<std::shared_ptr<TreeItem>> children;
         TreeItem *parent;
