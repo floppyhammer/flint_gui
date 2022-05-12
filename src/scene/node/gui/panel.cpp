@@ -77,12 +77,9 @@ namespace Flint {
             if (event.type == InputEventType::MouseMotion) {
                 auto args = event.args.mouse_motion;
 
-                if (event.is_consumed()) {
-                    title_bar_pressed = false;
-                } else {
-                    if (title_bar_pressed) {
-                        set_position(args.relative + position);
-                    }
+                if (title_bar_pressed) {
+                    set_position(title_bar_pressed_position + args.position - title_bar_pressed_mouse_position);
+                    event.consume();
                 }
             }
 
@@ -93,6 +90,11 @@ namespace Flint {
                     if (Rect<float>(global_position - Vec2<float>(0, title_bar_height),
                                     global_position + Vec2<float>(size.x, 0)).contains_point(args.position)) {
                         title_bar_pressed = args.pressed;
+                        if (title_bar_pressed) {
+                            title_bar_pressed_mouse_position = args.position;
+                            title_bar_pressed_position = position;
+                        }
+
                         event.consume();
                     }
                 }

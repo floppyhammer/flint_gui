@@ -43,6 +43,8 @@ namespace Flint {
         float title_bar_height = 48;
 
         bool title_bar_pressed = false;
+        Vec2<float> title_bar_pressed_mouse_position;
+        Vec2<float> title_bar_pressed_position;
 
         std::shared_ptr<Label> title_label;
         std::shared_ptr<Button> collapse_button, close_button;
