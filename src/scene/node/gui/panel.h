@@ -3,6 +3,7 @@
 
 #include "control.h"
 #include "label.h"
+#include "button.h"
 #include "../../../resources/style_box.h"
 #include "../../../resources/font.h"
 #include "../../../common/math/rect.h"
@@ -38,6 +39,7 @@ namespace Flint {
         bool title_bar_pressed = false;
 
         std::shared_ptr<Label> title_label;
+        std::shared_ptr<Button> collapse_button, close_button;
 
         std::optional<StyleBox> theme_panel;
     };

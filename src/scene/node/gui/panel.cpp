@@ -21,6 +21,19 @@ namespace Flint {
         title_label->set_parent(this);
         title_label->set_mouse_filter(MouseFilter::IGNORE);
 
+        StyleIcon close_icon;
+        close_icon.shape.add_line({-8, -8}, {8, 8});
+        close_icon.shape.add_line({-8, 8}, {8, -8});
+        close_button = std::make_shared<Button>();
+        close_button->set_text("");
+        close_button->set_parent(this);
+        close_button->set_icon(close_icon);
+
+        StyleIcon collapse_icon;
+        collapse_button = std::make_shared<Button>();
+        collapse_button->set_text("");
+        collapse_button->set_icon(collapse_icon);
+
         title_bar = true;
     }
 
@@ -62,6 +75,9 @@ namespace Flint {
         title_label->set_size({size.x, title_bar_height});
         title_label->update(dt);
 
+        close_button->set_position({size.x - title_bar_height * 0.5f, -title_bar_height * 0.5f});
+        close_button->update(dt);
+
         Control::update(dt);
     }
 
@@ -81,18 +97,10 @@ namespace Flint {
                 canvas->stroke_shape(shape);
 
                 // Close button.
-                Pathfinder::Shape shape_close;
-                shape_close.add_line({-8, -8}, {8, 8});
-                shape_close.add_line({-8, 8}, {8, -8});
-                canvas->set_shadow_blur(0);
-                canvas->set_stroke_paint(Pathfinder::Paint::from_color({163, 163, 163, 255}));
-                canvas->set_line_width(2);
-                canvas->set_transform(Pathfinder::Transform2::from_translation({global_position.x + size.x - title_bar_height * 0.5f, global_position.y - title_bar_height * 0.5f}));
-                canvas->stroke_shape(shape_close);
+                close_button->draw(p_command_buffer);
             } else {
                 theme_panel.value().add_to_canvas(get_global_position(), size, canvas);
             }
-
         }
 
         if (title_bar) {

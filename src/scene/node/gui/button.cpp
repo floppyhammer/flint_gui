@@ -6,12 +6,16 @@ namespace Flint {
     Button::Button() {
         type = NodeType::Button;
 
-        theme_hovered.border_color = ColorU(200, 200, 200, 255);
-        theme_hovered.border_width = 2;
+        theme_hovered = std::optional(StyleBox());
+        theme_hovered.value().border_color = ColorU(200, 200, 200, 255);
+        theme_hovered.value().border_width = 2;
 
-        theme_pressed.bg_color = ColorU(70, 70, 70, 255);
-        theme_pressed.border_color = ColorU(200, 200, 200, 255);
-        theme_pressed.border_width = 2;
+        theme_pressed = std::optional(StyleBox());
+        theme_pressed.value().bg_color = ColorU(70, 70, 70, 255);
+        theme_pressed.value().border_color = ColorU(200, 200, 200, 255);
+        theme_pressed.value().border_width = 2;
+
+        outline.border_color = ColorU::green();
 
         // Don't add the label as a child since it's not a normal node but part of the button.
         label = std::make_shared<Label>();
@@ -24,14 +28,15 @@ namespace Flint {
         size = label->get_text_size();
         label->set_size(size);
 
-        icon = std::optional(Pathfinder::Shape());
-        icon.value().add_circle({}, 8);
+        icon = std::optional(StyleIcon());
+        icon->color = ColorU::white();
+        icon.value().shape.add_circle({}, 8);
     }
 
     Vec2<float> Button::calculate_minimum_size() {
         auto size = label->calculate_minimum_size();
         if (icon.has_value()) {
-            auto icon_size = icon.value().bounds.size();
+            auto icon_size = icon.value().shape.bounds.size();
             size.x += icon_size.x;
         }
 
@@ -89,13 +94,17 @@ namespace Flint {
     void Button::update(double dt) {
         Control::update(dt);
 
-        label->update(dt);
-        if (icon.has_value()) {
-            auto icon_size = icon.value().bounds.size();
-            label->set_position({icon_size.x, 0});
-        }
-
         set_size(size.max(calculate_minimum_size()));
+
+        if (icon.has_value()) {
+            auto icon_size = icon.value().shape.bounds.size();
+            label->set_size({size.x - icon_size.x, size.y});
+            label->set_position({icon_size.x, 0});
+        } else {
+            label->set_size({size.x, size.y});
+            label->set_position({0, 0});
+        }
+        label->update(dt);
     }
 
     void Button::draw(VkCommandBuffer p_command_buffer) {
@@ -103,22 +112,27 @@ namespace Flint {
 
         auto global_position = get_global_position();
 
-        StyleBox active_style_box;
+        // Draw bg.
+        std::optional<StyleBox> active_style_box;
         if (hovered) {
             active_style_box = pressed ? theme_pressed : theme_hovered;
         } else {
             active_style_box = theme_normal;
         }
 
-        active_style_box.add_to_canvas(global_position, size, canvas);
+        if (active_style_box.has_value()) {
+            active_style_box.value().add_to_canvas(global_position, size, canvas);
+        }
 
-        auto icon_size = icon.value().bounds.size();
-        canvas->set_line_width(2);
-        canvas->set_transform(Pathfinder::Transform2::from_translation({global_position.x + icon_size.x * 0.5f, global_position.y + size.y * 0.5f}));
-        canvas->set_stroke_paint(Pathfinder::Paint::from_color({200, 200, 200, 255}));
-        canvas->stroke_shape(icon.value());
+        // Draw icon.
+        auto icon_size = icon.value().shape.bounds.size();
+        icon.value().add_to_canvas({global_position.x + icon_size.x * 0.5f, global_position.y + size.y * 0.5f},
+                                   canvas);
 
+        // Draw label.
         label->draw(p_command_buffer);
+
+        Control::draw(p_command_buffer);
     }
 
     void Button::set_position(Vec2<float> p_position) {
@@ -147,5 +161,9 @@ namespace Flint {
 
     void Button::set_text(const std::string &text) {
         label->set_text(text);
+    }
+
+    void Button::set_icon(const StyleIcon &p_icon) {
+        icon = std::optional(p_icon);
     }
 }

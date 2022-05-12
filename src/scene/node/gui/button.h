@@ -3,7 +3,9 @@
 
 #include "control.h"
 #include "label.h"
+#include "hbox_container.h"
 #include "../../../resources/style_box.h"
+#include "../../../resources/style_icon.h"
 
 #include <functional>
 
@@ -32,16 +34,19 @@ namespace Flint {
 
         void set_text(const std::string &text);
 
+        void set_icon(const StyleIcon &p_icon);
+
     protected:
         std::shared_ptr<Label> label;
-        std::optional<Pathfinder::Shape> icon;
+        std::optional<StyleIcon> icon;
+        std::shared_ptr<HBoxContainer> container;
 
         std::vector<std::function<void()>> on_pressed_callbacks;
         std::vector<std::function<void()>> on_down_callbacks;
         std::vector<std::function<void()>> on_up_callbacks;
         std::vector<std::function<void()>> on_hovered_callbacks;
 
-        StyleBox theme_normal, theme_hovered, theme_pressed;
+        std::optional<StyleBox> theme_normal, theme_hovered, theme_pressed;
 
     protected:
         void on_pressed();

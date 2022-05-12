@@ -42,6 +42,7 @@ namespace Flint {
         // The attached label has no parent.
         label->set_position(Vec2<float>(offset_x, offset_y) + global_position);
         label->update(0);
+        label->set_size(label->calculate_minimum_size());
         label->draw(p_command_buffer);
 
         offset_y += item_height;

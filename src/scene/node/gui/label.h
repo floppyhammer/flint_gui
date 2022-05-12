@@ -98,6 +98,7 @@ namespace Flint {
         // Layout
         Alignment horizontal_alignment = Alignment::Begin;
         Alignment vertical_alignment = Alignment::Begin;
+        Vec2<float> alignment_shift{0};
 
         std::optional<StyleBox> theme_background;
     };

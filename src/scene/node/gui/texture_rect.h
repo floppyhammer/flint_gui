@@ -8,6 +8,9 @@
 #include <memory>
 
 namespace Flint {
+    /**
+     * TextureRect can be used to draw ImageTexture and VectorTexture.
+     */
     class TextureRect : public Control {
     public:
         TextureRect();

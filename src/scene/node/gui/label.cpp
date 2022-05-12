@@ -6,6 +6,8 @@ namespace Flint {
     Label::Label() {
         type = NodeType::Label;
 
+        outline.border_color = ColorU::red();
+
         set_font(ResourceManager::get_singleton().load<Flint::Font>("../assets/OpenSans-Regular.ttf"));
     }
 
@@ -122,17 +124,15 @@ namespace Flint {
     }
 
     void Label::consider_alignment() {
-        Vec2<float> shift;
-
         switch (horizontal_alignment) {
             case Alignment::Begin:
                 break;
             case Alignment::Center: {
-                shift.x = size.x * 0.5f - layout_box.center().x;
+                alignment_shift.x = size.x * 0.5f - layout_box.center().x;
             }
                 break;
             case Alignment::End: {
-                shift.x = size.x - layout_box.width();
+                alignment_shift.x = size.x - layout_box.width();
             }
                 break;
         }
@@ -141,23 +141,13 @@ namespace Flint {
             case Alignment::Begin:
                 break;
             case Alignment::Center: {
-                shift.y = size.y * 0.5f - layout_box.center().y;
+                alignment_shift.y = size.y * 0.5f - layout_box.center().y;
             }
                 break;
             case Alignment::End: {
-                shift.y = size.y - layout_box.height();
+                alignment_shift.y = size.y - layout_box.height();
             }
                 break;
-        }
-
-        for (Glyph &g: glyphs) {
-            g.layout_box += shift;
-            g.layout_box += shift;
-
-            g.bbox += shift;
-            g.bbox += shift;
-
-            g.shape.translate({shift.x, shift.y});
         }
     }
 
@@ -190,6 +180,10 @@ namespace Flint {
             theme_background.value().add_to_canvas(global_position, size, canvas);
         }
 
+        auto translation = global_position + alignment_shift;
+        auto transform = Pathfinder::Transform2::from_translation({translation.x, translation.y});
+        canvas->set_transform(transform);
+
         canvas->set_shadow_blur(0);
 
         // Add stroke.
@@ -202,8 +196,6 @@ namespace Flint {
 
         for (Glyph &g: glyphs) {
             canvas->set_fill_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(color.r, color.g, color.b, color.a)));
-            auto transform = Pathfinder::Transform2::from_translation({global_position.x, global_position.y});
-            canvas->set_transform(transform);
             canvas->fill_shape(g.shape, Pathfinder::FillRule::Winding);
 
             if (debug) {
