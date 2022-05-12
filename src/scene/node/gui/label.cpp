@@ -24,6 +24,13 @@ namespace Flint {
         return text;
     }
 
+    void Label::set_size(Vec2<float> p_size) {
+        if (size == p_size) return;
+
+        size = p_size;
+        consider_alignment();
+    }
+
     void Label::measure() {
         // Get font info. Get font scaling.
         int ascent, descent, line_gap;
@@ -124,6 +131,8 @@ namespace Flint {
     }
 
     void Label::consider_alignment() {
+        alignment_shift = Vec2<float>(0);
+
         switch (horizontal_alignment) {
             case Alignment::Begin:
                 break;
@@ -155,8 +164,6 @@ namespace Flint {
         if (need_to_remeasure) {
             measure();
 
-            consider_alignment();
-
             need_to_remeasure = false;
         }
     }
@@ -167,7 +174,6 @@ namespace Flint {
         stroke_width = p_stroke_width;
         stroke_color = p_stroke_color;
 
-        // TODO: Don't remeasure here.
         need_to_remeasure = true;
     }
 
