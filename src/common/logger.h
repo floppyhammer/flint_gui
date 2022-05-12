@@ -3,6 +3,8 @@
 
 #include <memory>
 #include <iostream>
+#include <cstdlib>
+#include <cstdio>
 
 #define FLINT_LOG_TAG "Flint"
 #ifdef __ANDROID__
@@ -13,8 +15,6 @@
 #define FLINT_LOGW(...) __android_log_print(ANDROID_LOG_WARN   , FLINT_LOG_TAG, __VA_ARGS__)
 #define FLINT_LOGE(...) __android_log_print(ANDROID_LOG_ERROR  , FLINT_LOG_TAG, __VA_ARGS__)
 #else
-
-#include <cstdio>
 
 #define FLINT_LOGV(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
 #define FLINT_LOGD(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
@@ -45,30 +45,35 @@ namespace Flint {
 
         static void verbose(const std::string &label, const std::string &module = "") {
             if (get_singleton().level <= Level::VERBOSE) {
+                system("Color 07");
                 FLINT_LOGV("[VERBOSE][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void debug(const std::string &label, const std::string &module = "") {
             if (get_singleton().level <= Level::DEBUG) {
+                system("Color 07");
                 FLINT_LOGD("[DEBUG][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void info(const std::string &label, const std::string &module = "") {
             if (get_singleton().level <= Level::INFO) {
+                system("Color 07");
                 FLINT_LOGI("[INFO][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void warn(const std::string &label, const std::string &module = "") {
             if (get_singleton().level <= Level::WARN) {
+                system("Color 06");
                 FLINT_LOGW("[WARN][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void error(const std::string &label, const std::string &module = "") {
             if (get_singleton().level <= Level::ERROR) {
+                system("Color 04");
                 FLINT_LOGE("[ERROR][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
