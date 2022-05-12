@@ -29,14 +29,15 @@ namespace Flint {
         label->set_size(size);
 
         icon = std::optional(StyleIcon());
-        icon->color = ColorU::white();
+        icon->color = ColorU(163, 163, 163, 255);
         icon.value().shape.add_circle({}, 8);
+        icon.value().shape.translate({icon.value().size.x * 0.5f, icon.value().size.y * 0.5f});
     }
 
     Vec2<float> Button::calculate_minimum_size() {
         auto size = label->calculate_minimum_size();
         if (icon.has_value()) {
-            auto icon_size = icon.value().shape.bounds.size();
+            auto icon_size = icon.value().size;
             size.x += icon_size.x;
         }
 
@@ -97,7 +98,7 @@ namespace Flint {
         set_size(size.max(calculate_minimum_size()));
 
         if (icon.has_value()) {
-            auto icon_size = icon.value().shape.bounds.size();
+            auto icon_size = icon.value().size;
             label->set_size({size.x - icon_size.x, size.y});
             label->set_position({icon_size.x, 0});
         } else {
@@ -125,9 +126,8 @@ namespace Flint {
         }
 
         // Draw icon.
-        auto icon_size = icon.value().shape.bounds.size();
-        icon.value().add_to_canvas({global_position.x + icon_size.x * 0.5f, global_position.y + size.y * 0.5f},
-                                   canvas);
+        auto icon_size = icon.value().size;
+        icon.value().add_to_canvas({global_position.x, global_position.y + (size.y - icon_size.y) * 0.5f}, canvas);
 
         // Draw label.
         label->draw(p_command_buffer);

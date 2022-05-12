@@ -163,7 +163,7 @@ namespace Flint {
     void Label::update(double dt) {
         if (need_to_remeasure) {
             measure();
-
+            consider_alignment();
             need_to_remeasure = false;
         }
     }
@@ -252,6 +252,6 @@ namespace Flint {
 
     Vec2<float> Label::get_text_size() {
         measure();
-        return layout_box.size();
+        return layout_box.is_valid() ? layout_box.size() : Vec2<float>(0);
     }
 }

@@ -24,6 +24,7 @@ namespace Flint {
         StyleIcon close_icon;
         close_icon.shape.add_line({-8, -8}, {8, 8});
         close_icon.shape.add_line({-8, 8}, {8, -8});
+        close_icon.shape.translate({24, 24});
         close_button = std::make_shared<Button>();
         close_button->set_text("");
         close_button->set_parent(this);
@@ -75,7 +76,8 @@ namespace Flint {
         title_label->set_size({size.x, title_bar_height});
         title_label->update(dt);
 
-        close_button->set_position({size.x - title_bar_height * 0.5f, -title_bar_height * 0.5f});
+        close_button->set_position({size.x - title_bar_height, -title_bar_height});
+        close_button->set_size({title_bar_height, title_bar_height});
         close_button->update(dt);
 
         Control::update(dt);
