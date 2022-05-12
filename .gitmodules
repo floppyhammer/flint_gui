@@ -3,11 +3,6 @@
 	url = https://github.com/glfw/glfw.git
 	branch = "3.3-stable"
 
-[submodule "libeigen"]
-	path = external/eigen
-	url = https://gitlab.com/libeigen/eigen.git
-	branch = "3.4"
-
 [submodule "libpathfinder"]
 	path = external/pathfinder-cpp
 	url = https://github.com/floppyhammer/pathfinder-cpp.git
