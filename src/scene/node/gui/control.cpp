@@ -11,7 +11,7 @@ namespace Flint {
 
         outline.bg_color = ColorU();
         outline.corner_radius = 0;
-        outline.border_width = 1;
+        outline.border_width = 0;
         outline.border_color = ColorU(202, 130, 94, 255);
     }
 

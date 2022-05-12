@@ -25,33 +25,6 @@ namespace Flint {
         Control::update(delta);
     }
 
-    void TreeItem::propagate_draw(float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y,
-                                  Vec2<float> global_position) {
-        auto canvas = VectorServer::get_singleton().canvas;
-
-        float offset_x = (float) depth * folding_width;
-
-        float item_height = label->calculate_minimum_size().y;
-
-        position = {offset_x, offset_y};
-
-        if (tree->selected_item == this) {
-            theme_selected.add_to_canvas(Vec2<float>(0, offset_y) + global_position, {tree->get_size().x, item_height}, canvas);
-        }
-
-        // The attached label has no parent.
-        label->set_position(Vec2<float>(offset_x, offset_y) + global_position);
-        label->update(0);
-        label->set_size(label->calculate_minimum_size());
-        label->draw(p_command_buffer);
-
-        offset_y += item_height;
-
-        for (auto &child: children) {
-            child->propagate_draw(folding_width, depth + 1, p_command_buffer, offset_y, global_position);
-        }
-    }
-
     void Tree::draw(VkCommandBuffer p_command_buffer) {
         auto canvas = VectorServer::get_singleton().canvas;
 
@@ -91,7 +64,31 @@ namespace Flint {
 
     TreeItem::TreeItem() {
         label = std::make_shared<Label>();
+
+        collapse_icon.shape.move_to(5, -5);
+        collapse_icon.shape.line_to(0, 7);
+        collapse_icon.shape.line_to(-5, -5);
+        collapse_icon.shape.close();
+        collapse_icon.shape.translate({collapse_icon.size.x * 0.5f, collapse_icon.size.y * 0.5f});
+
+        expand_icon.shape.move_to(-5, -5);
+        expand_icon.shape.line_to(7, 0);
+        expand_icon.shape.line_to(-5, 5);
+        expand_icon.shape.close();
+        expand_icon.shape.translate({expand_icon.size.x * 0.5f, expand_icon.size.y * 0.5f});
+
         collapse_button = std::make_shared<Button>();
+        collapse_button->set_icon(collapse_icon);
+        collapse_button->set_text("");
+        auto callback = [this] {
+            collapsed = !collapsed;
+            if (collapsed) {
+                collapse_button->set_icon(expand_icon);
+            } else {
+                collapse_button->set_icon(collapse_icon);
+            }
+        };
+        collapse_button->connect_signal("on_pressed", callback);
 
         theme_selected.bg_color = ColorU(100, 100, 100, 150);
     }
@@ -126,13 +123,54 @@ namespace Flint {
                                    Vec2<float> global_position) {
         auto canvas = VectorServer::get_singleton().canvas;
 
-        auto it = children.rbegin();
-        while (it != children.rend()) {
-            (*it)->propagate_input(input_queue, global_position);
-            it++;
+        if (!children.empty())
+            collapse_button->input(input_queue);
+
+        if (!collapsed) {
+            auto it = children.rbegin();
+            while (it != children.rend()) {
+                (*it)->propagate_input(input_queue, global_position);
+                it++;
+            }
         }
 
         input(input_queue, global_position);
+    }
+
+    void TreeItem::propagate_draw(float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y,
+                                  Vec2<float> global_position) {
+        auto canvas = VectorServer::get_singleton().canvas;
+
+        float offset_x = (float) depth * folding_width;
+
+        float item_height = label->calculate_minimum_size().y;
+
+        position = {offset_x, offset_y};
+
+        if (tree->selected_item == this) {
+            theme_selected.add_to_canvas(Vec2<float>(0, offset_y) + global_position, {tree->get_size().x, item_height}, canvas);
+        }
+
+        collapse_button->set_position(Vec2<float>(offset_x, offset_y) + global_position);
+        collapse_button->set_size({item_height, item_height});
+        collapse_button->update(0);
+        if (!children.empty()) {
+            collapse_button->draw(p_command_buffer);
+        }
+
+        // The attached label has no parent.
+        label->set_position(Vec2<float>(offset_x + collapse_button->get_size().x, offset_y) + global_position);
+        label->set_size(label->calculate_minimum_size());
+        label->update(0);
+        label->draw(p_command_buffer);
+
+        offset_y += item_height;
+
+        if (!collapsed) {
+            for (auto &child: children) {
+                child->propagate_draw(folding_width, depth + 1, p_command_buffer, offset_y, global_position);
+            }
+        }
     }
 
     void TreeItem::input(std::vector<InputEvent> &input_queue,

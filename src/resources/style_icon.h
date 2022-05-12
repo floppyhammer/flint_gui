@@ -10,7 +10,7 @@ namespace Flint {
     struct StyleIcon {
         Pathfinder::Shape shape;
         ColorU color = ColorU(163, 163, 163, 255);
-        Vec2<float> size{48, 48};
+        Vec2<float> size{32, 32};
 
         void add_to_canvas(const Vec2<float> &position,
                            const std::shared_ptr<Pathfinder::Canvas> &canvas);

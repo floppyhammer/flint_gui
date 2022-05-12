@@ -27,6 +27,10 @@ namespace Flint {
 
         void enable_title_bar(bool enabled);
 
+        void propagate_input(std::vector<InputEvent> &input_queue) override;
+
+        void propagate_draw(VkCommandBuffer p_command_buffer) override;
+
     private:
         bool title_bar = false;
         bool closable = false;
@@ -34,12 +38,15 @@ namespace Flint {
         bool resizable = false;
         bool shrink_title_bar_when_collapsed = false;
 
+        bool collapsed = false;
+
         float title_bar_height = 48;
 
         bool title_bar_pressed = false;
 
         std::shared_ptr<Label> title_label;
         std::shared_ptr<Button> collapse_button, close_button;
+        StyleIcon collapse_icon, expand_icon;
 
         std::optional<StyleBox> theme_panel;
     };
