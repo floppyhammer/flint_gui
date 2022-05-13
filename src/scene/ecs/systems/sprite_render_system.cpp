@@ -79,8 +79,8 @@ namespace Flint {
             auto texture = sprite.mesh->surface->get_material()->get_texture();
             if (texture == nullptr) continue;
 
-            float sprite_width = texture->width * transform.scale.x;
-            float sprite_height = texture->height * transform.scale.y;
+            float sprite_width = texture->get_width() * transform.scale.x;
+            float sprite_height = texture->get_height() * transform.scale.y;
 
             // Default to swap chain image.
             auto extent = SwapChain::getSingleton().swapChainExtent;

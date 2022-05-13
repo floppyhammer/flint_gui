@@ -99,7 +99,7 @@ std::shared_ptr<ImageTexture> ImageTexture::from_empty(uint32_t p_width, uint32_
     return texture;
 }
 
-ImageTexture::ImageTexture(const std::string &path) : Resource(path) {
+ImageTexture::ImageTexture(const std::string &path) : Texture(path) {
     // The STBI_rgb_alpha value forces the image to be loaded with an alpha channel,
     // even if it doesn't have one, which is nice for consistency with other textures in the future.
     int tex_width, tex_height, tex_channels;
@@ -124,4 +124,18 @@ ImageTexture::ImageTexture(const std::string &path) : Resource(path) {
 
     // Create sampler.
     RenderServer::getSingleton().createTextureSampler(sampler);
+}
+
+std::shared_ptr<ImageTexture> ImageTexture::from_wrapper(VkImageView p_image_view,
+                                                         VkSampler p_sampler,
+                                                         uint32_t p_width,
+                                                         uint32_t p_height) {
+    auto texture = std::make_shared<ImageTexture>();
+    texture->width = p_width;
+    texture->height = p_height;
+    texture->resource_ownership = false;
+    texture->imageView = p_image_view;
+    texture->sampler = p_sampler;
+
+    return texture;
 }

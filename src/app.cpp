@@ -113,13 +113,10 @@ void App::run() {
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WIDTH, HEIGHT});
         auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server.canvas->get_dest_texture().get());
-        auto texture = std::make_shared<ImageTexture>();
-        texture->imageView = texture_vk->get_image_view();
-        texture->sampler = texture_vk->get_sampler();
-        texture->width = texture_vk->get_width();
-        texture->height = texture_vk->get_height();
-        texture->name = "Pathfinder Canvas";
-        texture->resource_ownership = false;
+        auto texture = ImageTexture::from_wrapper(texture_vk->get_image_view(),
+                                                  texture_vk->get_sampler(),
+                                                  texture_vk->get_width(),
+                                                  texture_vk->get_height());
         vector_layer->set_texture(texture);
         auto item_tree = std::make_shared<Flint::Tree>();
         item_tree->set_size({400, 400});

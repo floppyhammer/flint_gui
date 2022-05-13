@@ -8,11 +8,6 @@
 VectorTexture::~VectorTexture() {
 }
 
-void VectorTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height) {
-    width = tex_width;
-    height = tex_height;
-}
-
 std::shared_ptr<VectorTexture> VectorTexture::from_empty(uint32_t p_width, uint32_t p_height) {
     assert(p_width != 0 && p_height != 0 && "Creating texture with zero size.");
 
@@ -23,6 +18,6 @@ std::shared_ptr<VectorTexture> VectorTexture::from_empty(uint32_t p_width, uint3
     return texture;
 }
 
-VectorTexture::VectorTexture(const std::string &path) : Resource(path) {
+VectorTexture::VectorTexture(const std::string &path) : Texture(path) {
 
 }

@@ -23,8 +23,8 @@ namespace Flint {
     void TextureRect::set_texture(std::shared_ptr<ImageTexture> p_texture) {
         mesh->surface->get_material()->set_texture(p_texture);
 
-        size.x = (float) p_texture->width;
-        size.y = (float) p_texture->height;
+        size.x = (float) p_texture->get_width();
+        size.y = (float) p_texture->get_height();
     }
 
     std::shared_ptr<ImageTexture> TextureRect::get_texture() const {

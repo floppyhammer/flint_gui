@@ -50,8 +50,8 @@ namespace Flint {
             viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
         }
 
-        float sprite_width = mesh->surface->get_material()->get_texture()->width * scale.x;
-        float sprite_height = mesh->surface->get_material()->get_texture()->height * scale.y;
+        float sprite_width = mesh->surface->get_material()->get_texture()->get_width() * scale.x;
+        float sprite_height = mesh->surface->get_material()->get_texture()->get_height() * scale.y;
 
         auto global_position = get_global_position();
 
