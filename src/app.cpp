@@ -33,6 +33,8 @@
 #include <functional>
 #include <random>
 
+using namespace Flint;
+
 void App::run() {
     Flint::Logger::set_level(Flint::Logger::VERBOSE);
 

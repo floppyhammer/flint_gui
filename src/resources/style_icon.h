@@ -7,6 +7,7 @@
 #include "../common/math/vec2.h"
 
 namespace Flint {
+    // Remove this, replace with TextureRect with VectorTexture.
     struct StyleIcon {
         Pathfinder::Shape shape;
         ColorU color = ColorU(163, 163, 163, 255);

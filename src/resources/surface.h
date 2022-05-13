@@ -12,93 +12,97 @@
 #include <vector>
 #include <array>
 
-struct Surface2dPushConstant {
-    glm::mat4 model;
-};
+namespace Flint {
+    struct Surface2dPushConstant {
+        glm::mat4 model;
+    };
 
 // TODO: We might need to push model, view and projection separately.
-struct Surface3dPushConstant {
-    glm::mat4 mvp;
-};
+    struct Surface3dPushConstant {
+        glm::mat4 mvp;
+    };
 
 /// A surface may contain a material, which may be shared by other surfaces.
 
-struct SurfaceGpuResources {
-    SurfaceGpuResources(const std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices);
+    struct SurfaceGpuResources {
+        SurfaceGpuResources(const std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices);
 
-    ~SurfaceGpuResources();
+        ~SurfaceGpuResources();
 
-    /// Vertex buffer.
-    VkBuffer vertexBuffer{};
-    VkDeviceMemory vertexBufferMemory{};
+        /// Vertex buffer.
+        VkBuffer vertexBuffer{};
+        VkDeviceMemory vertexBufferMemory{};
 
-    /// Index buffer.
-    VkBuffer indexBuffer{};
-    VkDeviceMemory indexBufferMemory{};
-    uint32_t indices_count = 0;
+        /// Index buffer.
+        VkBuffer indexBuffer{};
+        VkDeviceMemory indexBufferMemory{};
+        uint32_t indices_count = 0;
 
-private:
-    void create_vertex_buffer(const std::vector<Vertex> &vertices);
+    private:
+        void create_vertex_buffer(const std::vector<Vertex> &vertices);
 
-    void create_index_buffer(const std::vector<uint32_t> &indices);
-};
+        void create_index_buffer(const std::vector<uint32_t> &indices);
+    };
 
-class Surface {
-public:
-    Surface() = default;
+    class Surface {
+    public:
+        Surface() = default;
 
-    std::string name;
+        std::string name;
 
-    VkBuffer get_vertex_buffer();
-    VkBuffer get_index_buffer();
-    uint32_t get_index_count();
+        VkBuffer get_vertex_buffer();
 
-    void set_gpu_resources(std::shared_ptr<SurfaceGpuResources> p_gpu_resources);
+        VkBuffer get_index_buffer();
 
-private:
-    std::shared_ptr<SurfaceGpuResources> gpu_resources;
-};
+        uint32_t get_index_count();
 
-class Surface2d : public Surface {
-public:
-    Surface2d() = default;
+        void set_gpu_resources(std::shared_ptr<SurfaceGpuResources> p_gpu_resources);
 
-    /**
-     * Default quad surface.
-     */
-    static std::shared_ptr<Surface2d> from_default();
+    private:
+        std::shared_ptr<SurfaceGpuResources> gpu_resources;
+    };
 
-    void set_material(const std::shared_ptr<Material2d> &p_material);
+    class Surface2d : public Surface {
+    public:
+        Surface2d() = default;
 
-    std::shared_ptr<Material2d> get_material() const;
+        /**
+         * Default quad surface.
+         */
+        static std::shared_ptr<Surface2d> from_default();
 
-private:
+        void set_material(const std::shared_ptr<Material2d> &p_material);
 
-    std::shared_ptr<Material2d> material;
-};
+        std::shared_ptr<Material2d> get_material() const;
 
-class Surface3d : public Surface {
-public:
-    Surface3d() = default;
+    private:
 
-    static std::shared_ptr<Surface3d> from_plane() {
-        return std::make_shared<Surface3d>();
-    }
+        std::shared_ptr<Material2d> material;
+    };
 
-    static std::shared_ptr<Surface3d> from_cube() {
-        return std::make_shared<Surface3d>();
-    }
+    class Surface3d : public Surface {
+    public:
+        Surface3d() = default;
 
-    static std::shared_ptr<Surface3d> from_sphere() {
-        return std::make_shared<Surface3d>();
-    }
+        static std::shared_ptr<Surface3d> from_plane() {
+            return std::make_shared<Surface3d>();
+        }
 
-    void set_material(const std::shared_ptr<Material3d> &p_material);
+        static std::shared_ptr<Surface3d> from_cube() {
+            return std::make_shared<Surface3d>();
+        }
 
-    std::shared_ptr<Material3d> get_material() const;
+        static std::shared_ptr<Surface3d> from_sphere() {
+            return std::make_shared<Surface3d>();
+        }
 
-private:
-    std::shared_ptr<Material3d> material;
-};
+        void set_material(const std::shared_ptr<Material3d> &p_material);
+
+        std::shared_ptr<Material3d> get_material() const;
+
+    private:
+        std::shared_ptr<Material3d> material;
+    };
+}
 
 #endif //FLINT_SURFACE_H

@@ -3,19 +3,30 @@
 
 #include "resource.h"
 
-class Texture : public Resource {
-public:
-    Texture() = default;
+namespace Flint {
+    enum class TextureType {
+        IMAGE,
+        VECTOR,
+    };
 
-    explicit Texture(const std::string &path);
+    class Texture : public Resource {
+    public:
+        Texture() = default;
 
-    uint32_t get_width();
+        explicit Texture(const std::string &path);
 
-    uint32_t get_height();
+        uint32_t get_width();
 
-protected:
-    uint32_t width = 0;
-    uint32_t height = 0;
-};
+        uint32_t get_height();
+
+        TextureType get_type();
+
+    protected:
+        TextureType type;
+
+        uint32_t width = 0;
+        uint32_t height = 0;
+    };
+}
 
 #endif //FLINT_TEXTURE_H

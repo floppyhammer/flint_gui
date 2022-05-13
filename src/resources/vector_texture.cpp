@@ -5,19 +5,36 @@
 
 #include <cassert>
 
-VectorTexture::~VectorTexture() {
-}
+namespace Flint {
+    VectorTexture::VectorTexture() {
+        type = TextureType::VECTOR;
+    }
 
-std::shared_ptr<VectorTexture> VectorTexture::from_empty(uint32_t p_width, uint32_t p_height) {
-    assert(p_width != 0 && p_height != 0 && "Creating texture with zero size.");
+    VectorTexture::~VectorTexture() {
+    }
 
-    auto texture = std::make_shared<VectorTexture>();
-    texture->width = p_width;
-    texture->height = p_height;
+    std::shared_ptr<VectorTexture> VectorTexture::from_empty(uint32_t p_width, uint32_t p_height) {
+        assert(p_width != 0 && p_height != 0 && "Creating texture with zero size.");
 
-    return texture;
-}
+        auto texture = std::make_shared<VectorTexture>();
+        texture->width = p_width;
+        texture->height = p_height;
 
-VectorTexture::VectorTexture(const std::string &path) : Texture(path) {
+        return texture;
+    }
 
+    VectorTexture::VectorTexture(const std::string &path) : Texture(path) {
+
+    }
+
+    void VectorTexture::add_to_canvas(const Vec2<float> &position,
+                                      const std::shared_ptr<Pathfinder::Canvas> &canvas) {
+        canvas->save_state();
+
+        auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
+        canvas->set_transform(transform);
+
+
+        canvas->restore_state();
+    }
 }

@@ -5,16 +5,18 @@
 #include <memory>
 #include <string>
 
-class Resource {
-public:
-    Resource() = default;
+namespace Flint {
+    class Resource {
+    public:
+        Resource() = default;
 
-    explicit Resource(const std::string &path) { name = path; }
+        explicit Resource(const std::string &path) { name = path; }
 
-    virtual ~Resource() = default;
+        virtual ~Resource() = default;
 
-    // Name for debugging reason.
-    std::string name{};
-};
+        // Name for debugging reason.
+        std::string name{};
+    };
+}
 
 #endif //FLINT_RESOURCE_H
