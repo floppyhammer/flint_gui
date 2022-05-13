@@ -2,21 +2,23 @@
 #define FLINT_TEXTURE_RECT_H
 
 #include "control.h"
-#include "../../../resources/image_texture.h"
+#include "../../../resources/texture.h"
 #include "../../../resources/surface.h"
 
 #include <memory>
 
 namespace Flint {
     /**
-     * TextureRect can be used to draw ImageTexture and VectorTexture.
+     * Used to display an ImageTexture or a VectorTexture.
      */
     class TextureRect : public Control {
     public:
         TextureRect();
 
-        void set_texture(std::shared_ptr<ImageTexture> p_texture);
-        [[nodiscard]] std::shared_ptr<ImageTexture> get_texture() const;
+        void set_texture(const std::shared_ptr<Texture>& p_texture);
+        [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
+
+        virtual Vec2<float> calculate_minimum_size() override;
 
     private:
         void update(double delta) override;
@@ -29,7 +31,7 @@ namespace Flint {
 
         Surface2dPushConstant push_constant;
 
-        std::shared_ptr<ImageTexture> texture;
+        std::shared_ptr<Texture> texture;
     };
 }
 

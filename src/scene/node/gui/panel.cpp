@@ -18,34 +18,53 @@ namespace Flint {
         title_label->set_text("Title");
         title_label->set_horizontal_alignment(Alignment::Center);
         title_label->set_vertical_alignment(Alignment::Center);
-        title_label->set_parent(this);
         title_label->set_mouse_filter(MouseFilter::IGNORE);
 
-        StyleIcon close_icon;
-        close_icon.shape.add_line({-8, -8}, {8, 8});
-        close_icon.shape.add_line({-8, 8}, {8, -8});
-        close_icon.shape.translate({close_icon.size.x * 0.5f, close_icon.size.y * 0.5f});
-        close_button = std::make_shared<Button>();
-        close_button->set_text("");
-        close_button->set_parent(this);
-        close_button->set_icon(close_icon);
+        {
+            auto close_icon = VectorTexture::from_empty(24, 24);
+            SvgShape svg_shape;
+            svg_shape.shape.add_line({-8, -8}, {8, 8});
+            svg_shape.shape.add_line({-8, 8}, {8, -8});
+            svg_shape.shape.translate({close_icon->get_width() * 0.5f, close_icon->get_height() * 0.5f});
+            svg_shape.stroke_color = ColorU(163, 163, 163, 255);
+            svg_shape.stroke_width = 2;
+            close_icon->add_svg_shape(svg_shape);
 
-        collapse_icon.shape.move_to(5, -5);
-        collapse_icon.shape.line_to(0, 7);
-        collapse_icon.shape.line_to(-5, -5);
-        collapse_icon.shape.close();
-        collapse_icon.shape.translate({collapse_icon.size.x * 0.5f, collapse_icon.size.y * 0.5f});
+            close_button = std::make_shared<Button>();
+            close_button->set_text("");
+            close_button->set_parent(this);
+            close_button->set_icon(close_icon);
+        }
 
-        expand_icon.shape.move_to(-5, -5);
-        expand_icon.shape.line_to(7, 0);
-        expand_icon.shape.line_to(-5, 5);
-        expand_icon.shape.close();
-        expand_icon.shape.translate({expand_icon.size.x * 0.5f, expand_icon.size.y * 0.5f});
+        {
+            collapse_icon = VectorTexture::from_empty(24, 24);
+            SvgShape svg_shape;
+            svg_shape.shape.move_to(5, -5);
+            svg_shape.shape.line_to(0, 7);
+            svg_shape.shape.line_to(-5, -5);
+            svg_shape.shape.close();
+            svg_shape.shape.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
+            svg_shape.stroke_color = ColorU(163, 163, 163, 255);
+            svg_shape.stroke_width = 2;
+            collapse_icon->add_svg_shape(svg_shape);
+        }
+
+        {
+            expand_icon = VectorTexture::from_empty(24, 24);
+            SvgShape svg_shape;
+            svg_shape.shape.move_to(-5, -5);
+            svg_shape.shape.line_to(7, 0);
+            svg_shape.shape.line_to(-5, 5);
+            svg_shape.shape.close();
+            svg_shape.shape.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
+            svg_shape.stroke_color = ColorU(163, 163, 163, 255);
+            svg_shape.stroke_width = 2;
+            expand_icon->add_svg_shape(svg_shape);
+        }
 
         collapse_button = std::make_shared<Button>();
         collapse_button->set_text("");
         collapse_button->set_icon(collapse_icon);
-        collapse_button->set_parent(this);
         auto callback = [this] {
             collapsed = !collapsed;
             if (collapsed) {
@@ -56,6 +75,14 @@ namespace Flint {
         };
         collapse_button->connect_signal("on_pressed", callback);
 
+        container = std::make_shared<HBoxContainer>();
+        container->set_parent(this);
+        container->add_child(collapse_button);
+        container->add_child(title_label);
+        container->add_child(close_button);
+        container->set_position({0, -title_bar_height});
+        container->set_size({size.x, title_bar_height});
+
         title_bar = true;
     }
 
@@ -63,6 +90,8 @@ namespace Flint {
         if (!collapsed) {
             Node::propagate_input(input_queue);
         }
+
+        container->propagate_input(input_queue);
 
         input(input_queue);
     }
@@ -109,17 +138,7 @@ namespace Flint {
     }
 
     void Panel::update(double dt) {
-        title_label->set_position({0, -title_bar_height});
-        title_label->set_size({size.x, title_bar_height});
-        title_label->update(dt);
-
-        collapse_button->set_position({0, -title_bar_height});
-        collapse_button->set_size({title_bar_height, title_bar_height});
-        collapse_button->update(dt);
-
-        close_button->set_position({size.x - close_button->get_size().x, -title_bar_height});
-        close_button->set_size({title_bar_height, title_bar_height});
-        close_button->update(dt);
+        container->propagate_update(dt);
 
         Control::update(dt);
     }
@@ -154,11 +173,7 @@ namespace Flint {
                                                       Vec2<float>(size.x, title_bar_height), canvas);
                 }
 
-                // Collapse button.
-                collapse_button->draw(p_command_buffer);
-
-                // Close button.
-                close_button->draw(p_command_buffer);
+                container->propagate_draw(p_command_buffer);
             } else {
                 if (!collapsed) {
                     theme_panel.value().add_to_canvas(get_global_position(), size, canvas);
@@ -167,11 +182,17 @@ namespace Flint {
         }
 
         if (title_bar) {
-            title_label->draw(p_command_buffer);
+            container->propagate_draw(p_command_buffer);
         }
     }
 
     void Panel::enable_title_bar(bool enabled) {
         title_bar = enabled;
+    }
+
+    void Panel::set_size(Vec2<float> p_size) {
+        if (size == p_size) return;
+        size = p_size;
+        container->set_size({size.x, title_bar_height});
     }
 }

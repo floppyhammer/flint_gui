@@ -38,6 +38,12 @@ namespace Flint {
         outline.add_to_canvas(get_global_position(), size, canvas);
     }
 
+    void Tree::input(std::vector<InputEvent> &input_queue) {
+        root->propagate_input(input_queue, get_global_position());
+
+        Control::input(input_queue);
+    }
+
     std::shared_ptr<TreeItem> Tree::create_item(const std::shared_ptr<TreeItem> &parent,
                                                 const std::string &text) {
         if (parent == nullptr) {
@@ -56,26 +62,34 @@ namespace Flint {
         return item;
     }
 
-    void Tree::input(std::vector<InputEvent> &input_queue) {
-        root->propagate_input(input_queue, get_global_position());
-
-        Control::input(input_queue);
-    }
-
     TreeItem::TreeItem() {
         label = std::make_shared<Label>();
 
-        collapse_icon.shape.move_to(5, -5);
-        collapse_icon.shape.line_to(0, 7);
-        collapse_icon.shape.line_to(-5, -5);
-        collapse_icon.shape.close();
-        collapse_icon.shape.translate({collapse_icon.size.x * 0.5f, collapse_icon.size.y * 0.5f});
+        {
+            collapse_icon = VectorTexture::from_empty(24, 24);
+            SvgShape svg_shape;
+            svg_shape.shape.move_to(5, -5);
+            svg_shape.shape.line_to(0, 7);
+            svg_shape.shape.line_to(-5, -5);
+            svg_shape.shape.close();
+            svg_shape.shape.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
+            svg_shape.stroke_color = ColorU(163, 163, 163, 255);
+            svg_shape.stroke_width = 2;
+            collapse_icon->add_svg_shape(svg_shape);
+        }
 
-        expand_icon.shape.move_to(-5, -5);
-        expand_icon.shape.line_to(7, 0);
-        expand_icon.shape.line_to(-5, 5);
-        expand_icon.shape.close();
-        expand_icon.shape.translate({expand_icon.size.x * 0.5f, expand_icon.size.y * 0.5f});
+        {
+            expand_icon = VectorTexture::from_empty(24, 24);
+            SvgShape svg_shape;
+            svg_shape.shape.move_to(-5, -5);
+            svg_shape.shape.line_to(7, 0);
+            svg_shape.shape.line_to(-5, 5);
+            svg_shape.shape.close();
+            svg_shape.shape.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
+            svg_shape.stroke_color = ColorU(163, 163, 163, 255);
+            svg_shape.stroke_width = 2;
+            expand_icon->add_svg_shape(svg_shape);
+        }
 
         collapse_button = std::make_shared<Button>();
         collapse_button->set_icon(collapse_icon);

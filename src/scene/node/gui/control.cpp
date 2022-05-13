@@ -20,7 +20,8 @@ namespace Flint {
     }
 
     void Control::draw(VkCommandBuffer p_command_buffer) {
-        outline.add_to_canvas(get_global_position(), size, VectorServer::get_singleton().canvas);
+        if (size.x > 0 && size.y > 0)
+            outline.add_to_canvas(get_global_position(), size, VectorServer::get_singleton().canvas);
     }
 
     void Control::update(double dt) {

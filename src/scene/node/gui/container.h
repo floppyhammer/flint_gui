@@ -9,9 +9,7 @@ namespace Flint {
      */
     class Container : public Control {
     public:
-        Container() {
-            type = NodeType::Container;
-        }
+        Container();
 
         virtual void adjust_layout();
     };

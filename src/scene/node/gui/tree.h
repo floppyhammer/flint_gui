@@ -5,6 +5,7 @@
 #include "button.h"
 #include "../../../resources/style_box.h"
 #include "../../../resources/font.h"
+#include "../../../resources/vector_texture.h"
 #include "../../../common/math/rect.h"
 
 #include <cstdint>
@@ -47,7 +48,8 @@ namespace Flint {
 
         std::shared_ptr<Label> label;
         std::shared_ptr<Button> collapse_button;
-        StyleIcon collapse_icon, expand_icon;
+        std::shared_ptr<HBoxContainer> container;
+        std::shared_ptr<VectorTexture> collapse_icon, expand_icon;
 
         std::vector<std::shared_ptr<TreeItem>> children;
         TreeItem *parent;

@@ -34,7 +34,16 @@ namespace Flint {
         auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
         canvas->set_transform(transform);
 
+        for (auto &s: svg_shapes) {
+            canvas->set_line_width(s.stroke_width);
+            canvas->set_stroke_paint(Pathfinder::Paint::from_color({s.stroke_color.r, s.stroke_color.g, s.stroke_color.b, s.stroke_color.a}));
+            canvas->stroke_shape(s.shape);
+        }
 
         canvas->restore_state();
+    }
+
+    void VectorTexture::add_svg_shape(SvgShape svg_shape) {
+        svg_shapes.push_back(svg_shape);
     }
 }

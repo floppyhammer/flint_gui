@@ -13,6 +13,10 @@ namespace Flint {
         return height;
     }
 
+    Vec2<uint32_t> Texture::get_size() {
+        return {width, height};
+    }
+
     TextureType Texture::get_type() {
         return type;
     }

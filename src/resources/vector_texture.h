@@ -10,6 +10,14 @@
 #include <memory>
 
 namespace Flint {
+    struct SvgShape {
+        Pathfinder::Shape shape;
+        ColorU fill_color = ColorU();
+        ColorU stroke_color = ColorU();
+        float stroke_width = 0;
+        float opacity = 1;
+    };
+
     class VectorTexture : public Texture {
     public:
         VectorTexture();
@@ -24,8 +32,10 @@ namespace Flint {
 
         void add_to_canvas(const Vec2<float> &position, const std::shared_ptr<Pathfinder::Canvas> &canvas);
 
-    protected:
+        void add_svg_shape(SvgShape svg_shape);
 
+    protected:
+        std::vector<SvgShape> svg_shapes;
     };
 }
 

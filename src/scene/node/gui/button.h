@@ -3,13 +3,16 @@
 
 #include "control.h"
 #include "label.h"
+#include "texture_rect.h"
 #include "hbox_container.h"
 #include "../../../resources/style_box.h"
-#include "../../../resources/style_icon.h"
 
 #include <functional>
 
 namespace Flint {
+    /**
+     * Button[HBoxContainer[TextureRect, Label]]
+     */
     class Button : public Control {
     public:
         Button();
@@ -34,12 +37,12 @@ namespace Flint {
 
         void set_text(const std::string &text);
 
-        void set_icon(const StyleIcon &p_icon);
+        void set_icon(const std::shared_ptr<Texture> &p_icon);
 
     protected:
-        std::shared_ptr<Label> label;
-        std::optional<StyleIcon> icon;
         std::shared_ptr<HBoxContainer> container;
+        std::shared_ptr<TextureRect> icon_rect;
+        std::shared_ptr<Label> label;
 
         std::vector<std::function<void()>> on_pressed_callbacks;
         std::vector<std::function<void()>> on_down_callbacks;

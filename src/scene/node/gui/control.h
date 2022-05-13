@@ -20,6 +20,12 @@ namespace Flint {
         IGNORE, // Ignore input.
     };
 
+    /// Affect how containers organize this control node.
+    enum class LayoutFlag {
+        EXPAND,
+        SHRINK,
+    };
+
     enum class ControlAnchor {
         TOP_LEFT,
         TOP_RIGHT,

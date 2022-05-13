@@ -4,6 +4,8 @@
 #include "../../../core/engine.h"
 #include "../../../render/swap_chain.h"
 #include "../../../resources/default_resource.h"
+#include "../../../resources/image_texture.h"
+#include "../../../resources/vector_texture.h"
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
@@ -20,15 +22,24 @@ namespace Flint {
         mesh = DefaultResource::get_singleton().new_default_mesh_2d();
     }
 
-    void TextureRect::set_texture(std::shared_ptr<ImageTexture> p_texture) {
-        mesh->surface->get_material()->set_texture(p_texture);
+    void TextureRect::set_texture(const std::shared_ptr<Texture> &p_texture) {
+        texture = p_texture;
+
+        if (p_texture->get_type() == TextureType::IMAGE) {
+            auto image_texture = static_cast<ImageTexture *>(p_texture.get());
+            mesh->surface->get_material()->set_texture(std::shared_ptr<ImageTexture>(image_texture));
+        }
 
         size.x = (float) p_texture->get_width();
         size.y = (float) p_texture->get_height();
     }
 
-    std::shared_ptr<ImageTexture> TextureRect::get_texture() const {
-        return mesh->surface->get_material()->get_texture();
+    std::shared_ptr<Texture> TextureRect::get_texture() const {
+        if (texture->get_type() == TextureType::IMAGE) {
+            return mesh->surface->get_material()->get_texture();
+        } else {
+            return texture;
+        }
     }
 
     void TextureRect::update(double dt) {
@@ -36,26 +47,35 @@ namespace Flint {
     }
 
     void TextureRect::draw(VkCommandBuffer p_command_buffer) {
-        Node *viewport_node = get_viewport();
+        if (texture->get_type() == TextureType::IMAGE) {
+            Node *viewport_node = get_viewport();
 
-        VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
-        VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
+            VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
+            VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
 
-        if (viewport_node) {
-            auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-            pipeline = viewport->render_target->blitGraphicsPipeline;
+            if (viewport_node) {
+                auto viewport = dynamic_cast<SubViewport *>(viewport_node);
+                pipeline = viewport->render_target->blitGraphicsPipeline;
+            }
+
+            // Upload the model matrix to the GPU via push constants.
+            vkCmdPushConstants(p_command_buffer, pipeline_layout,
+                               VK_SHADER_STAGE_VERTEX_BIT, 0,
+                               sizeof(Surface2dPushConstant), &push_constant);
+
+            // Unlike Sprite 2D, Texture Rect should not support custom mesh.
+            RenderServer::getSingleton().blit(
+                    p_command_buffer,
+                    pipeline,
+                    mesh->surface->get_material()->get_desc_set()->getDescriptorSet(
+                            SwapChain::getSingleton().currentImage));
+        } else {
+            auto canvas = VectorServer::get_singleton().canvas;
+            auto global_position = get_global_position();
+
+            auto vector_texture = static_cast<VectorTexture *>(texture.get());
+            vector_texture->add_to_canvas(global_position, canvas);
         }
-
-        // Upload the model matrix to the GPU via push constants.
-        vkCmdPushConstants(p_command_buffer, pipeline_layout,
-                           VK_SHADER_STAGE_VERTEX_BIT, 0,
-                           sizeof(Surface2dPushConstant), &push_constant);
-
-        // Unlike Sprite 2D, Texture Rect should not support custom mesh.
-        RenderServer::getSingleton().blit(
-                p_command_buffer,
-                pipeline,
-                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage));
     }
 
     void TextureRect::update_mvp() {
@@ -90,5 +110,9 @@ namespace Flint {
                                          1.0f));
 
         push_constant.model = mvp.model;
+    }
+
+    Vec2<float> TextureRect::calculate_minimum_size() {
+        return minimum_size.max(texture ? Vec2<float>(texture->get_width(), texture->get_height()) : Vec2<float>(0));
     }
 }

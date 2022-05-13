@@ -1,5 +1,6 @@
 #include "button.h"
 
+#include "../../../resources/vector_texture.h"
 #include "../../../common/math/rect.h"
 
 namespace Flint {
@@ -23,25 +24,31 @@ namespace Flint {
         label->set_mouse_filter(MouseFilter::IGNORE);
         label->set_horizontal_alignment(Alignment::Center);
         label->set_vertical_alignment(Alignment::Center);
-        label->set_parent(this);
 
-        size = label->get_text_size();
-        label->set_size(size);
+//        size = label->get_text_size();
+//        label->set_size(size);
 
-        icon = std::optional(StyleIcon());
-        icon->color = ColorU(163, 163, 163, 255);
-        icon.value().shape.add_circle({}, 8);
-        icon.value().shape.translate({icon.value().size.x * 0.5f, icon.value().size.y * 0.5f});
+        icon_rect = std::make_shared<TextureRect>();
+        auto vector_texture = VectorTexture::from_empty(24, 24);
+        SvgShape svg_shape;
+        svg_shape.shape.add_circle({}, 8);
+        svg_shape.shape.translate({vector_texture->get_width() * 0.5f, vector_texture->get_height() * 0.5f});
+        svg_shape.stroke_color = ColorU(163, 163, 163, 255);
+        svg_shape.stroke_width = 2;
+        vector_texture->add_svg_shape(svg_shape);
+        icon_rect->set_texture(vector_texture);
+
+        container = std::make_shared<HBoxContainer>();
+        container->set_parent(this);
+        container->add_child(icon_rect);
+        container->add_child(label);
+        container->set_size(size);
     }
 
     Vec2<float> Button::calculate_minimum_size() {
-        auto size = label->calculate_minimum_size();
-        if (icon.has_value()) {
-            auto icon_size = icon.value().size;
-            size.x += icon_size.x;
-        }
+        auto container_size = container->calculate_minimum_size();
 
-        return size.max(minimum_size);
+        return container_size.max(minimum_size);
     }
 
     void Button::input(std::vector<InputEvent> &input_queue) {
@@ -97,14 +104,16 @@ namespace Flint {
 
         set_size(size.max(calculate_minimum_size()));
 
-        if (icon.has_value()) {
-            auto icon_size = icon.value().size;
-            label->set_size({size.x - icon_size.x, size.y});
-            label->set_position({icon_size.x, 0});
-        } else {
-            label->set_size({size.x, size.y});
-            label->set_position({0, 0});
-        }
+//        if (icon.has_value()) {
+//            auto icon_size = icon.value().size;
+//            label->set_size({size.x - icon_size.x, size.y});
+//            label->set_position({icon_size.x, 0});
+//        } else {
+//            label->set_size({size.x, size.y});
+//            label->set_position({0, 0});
+//        }
+        container->propagate_update(dt);
+
         label->update(dt);
     }
 
@@ -125,12 +134,7 @@ namespace Flint {
             active_style_box.value().add_to_canvas(global_position, size, canvas);
         }
 
-        // Draw icon.
-        auto icon_size = icon.value().size;
-        icon.value().add_to_canvas({global_position.x, global_position.y + (size.y - icon_size.y) * 0.5f}, canvas);
-
-        // Draw label.
-        label->draw(p_command_buffer);
+        container->propagate_draw(p_command_buffer);
 
         Control::draw(p_command_buffer);
     }
@@ -143,8 +147,7 @@ namespace Flint {
         if (size == p_size) return;
 
         size = p_size;
-        label->set_size(p_size);
-        label->need_to_remeasure = true;
+        container->set_size(p_size);
     }
 
     void Button::on_pressed() {
@@ -163,7 +166,7 @@ namespace Flint {
         label->set_text(text);
     }
 
-    void Button::set_icon(const StyleIcon &p_icon) {
-        icon = std::optional(p_icon);
+    void Button::set_icon(const std::shared_ptr<Texture> &p_icon) {
+        icon_rect->set_texture(p_icon);
     }
 }

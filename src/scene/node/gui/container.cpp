@@ -1,6 +1,12 @@
 #include "container.h"
 
 namespace Flint {
+    Container::Container() {
+        type = NodeType::Container;
+
+        outline.border_color = ColorU();
+    }
+
     void Container::adjust_layout() {
         auto max_size = size.max(minimum_size);
         for (auto &child: children) {

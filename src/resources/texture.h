@@ -2,6 +2,7 @@
 #define FLINT_TEXTURE_H
 
 #include "resource.h"
+#include "../common/math/vec2.h"
 
 namespace Flint {
     enum class TextureType {
@@ -18,6 +19,8 @@ namespace Flint {
         uint32_t get_width();
 
         uint32_t get_height();
+
+        Vec2<uint32_t> get_size();
 
         TextureType get_type();
 

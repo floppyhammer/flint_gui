@@ -30,8 +30,9 @@ namespace Flint {
             if (child->extended_from_which_base_node() == NodeType::Control) {
                 auto cast_child = dynamic_cast<Control *>(child.get());
                 auto child_size = cast_child->calculate_minimum_size();
-                size += child_size;
+                size.x += child_size.x;
                 size.x += separation;
+                size.y = std::max(size.y, child_size.y);
                 has_control_child = true;
             }
         }
