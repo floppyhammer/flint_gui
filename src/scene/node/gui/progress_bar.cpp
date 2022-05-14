@@ -24,11 +24,11 @@ namespace Flint {
         label->set_vertical_alignment(Alignment::Center);
         label->set_parent(this);
 
-        size = label->get_text_size();
+        size = label->calculate_minimum_size();
         label->set_size(size);
     }
 
-    Vec2<float> ProgressBar::calculate_minimum_size() {
+    Vec2<float> ProgressBar::calculate_minimum_size() const {
         return label->calculate_minimum_size().max(minimum_size);
     }
 
@@ -63,7 +63,6 @@ namespace Flint {
     void ProgressBar::set_size(Vec2<float> p_size) {
         size = p_size;
         label->set_size(p_size);
-        label->need_to_remeasure = true;
     }
 
     void ProgressBar::value_changed() {

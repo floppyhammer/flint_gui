@@ -99,9 +99,8 @@ void App::run() {
         };
         button->connect_signal("on_pressed", callback);
         auto button2 = std::make_shared<Flint::Button>();
-        button2->set_position({600, 0});
         auto margin_container = std::make_shared<Flint::MarginContainer>();
-        margin_container->set_size({400, 100});
+        margin_container->set_size({400, 400});
         auto hbox_container = std::make_shared<Flint::HBoxContainer>();
         auto vbox_container = std::make_shared<Flint::VBoxContainer>();
         auto panel = std::make_shared<Flint::Panel>();

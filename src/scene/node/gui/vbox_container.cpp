@@ -6,11 +6,10 @@ namespace Flint {
         for (auto &child: children) {
             if (child->extended_from_which_base_node() == NodeType::Control) {
                 auto cast_child = dynamic_cast<Control *>(child.get());
-                auto child_size = cast_child->calculate_minimum_size();
+                auto child_min_size = cast_child->calculate_minimum_size();
                 cast_child->set_position({0, shift_y});
-                auto child_min_height = cast_child->calculate_minimum_size().y;
-                cast_child->set_size({size.x, child_min_height});
-                shift_y += child_min_height;
+                cast_child->set_size({size.x, child_min_size.y});
+                shift_y += child_min_size.y;
             }
 
             shift_y += separation;
@@ -18,25 +17,23 @@ namespace Flint {
     }
 
     void VBoxContainer::update(double dt) {
-        adjust_layout();
-
         Control::update(dt);
     }
 
-    Vec2<float> VBoxContainer::calculate_minimum_size() {
-        Vec2<float> size;
-        bool has_control_child = false;
+    Vec2<float> VBoxContainer::calculate_minimum_size() const {
+        Vec2<float> min_size;
+
+        // Add every child's minimum size.
         for (auto &child: children) {
             if (child->extended_from_which_base_node() == NodeType::Control) {
                 auto cast_child = dynamic_cast<Control *>(child.get());
-                auto child_size = cast_child->calculate_minimum_size();
-                size.y += child_size.y;
-                size.y += separation;
-                size.x = std::max(size.x, child_size.x);
-                has_control_child = true;
+                min_size += cast_child->calculate_minimum_size();
             }
         }
-        if (has_control_child) size.y -= separation;
-        return size.max(minimum_size);
+
+        // Take separations into account.
+        min_size.y += separation * (float) (children.size() - 1);
+
+        return min_size.max(minimum_size);
     }
 }

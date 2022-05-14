@@ -17,7 +17,7 @@ namespace Flint {
 
         text = p_text;
 
-        need_to_remeasure = true;
+        measure();
     }
 
     std::string Label::get_text() const {
@@ -127,7 +127,7 @@ namespace Flint {
 
         if (text.empty()) return;
 
-        need_to_remeasure = true;
+        measure();
     }
 
     void Label::consider_alignment() {
@@ -161,11 +161,6 @@ namespace Flint {
     }
 
     void Label::update(double dt) {
-        if (need_to_remeasure) {
-            measure();
-            consider_alignment();
-            need_to_remeasure = false;
-        }
     }
 
     void Label::set_text_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color) {
@@ -174,7 +169,7 @@ namespace Flint {
         stroke_width = p_stroke_width;
         stroke_color = p_stroke_color;
 
-        need_to_remeasure = true;
+        measure();
     }
 
     void Label::draw(VkCommandBuffer p_command_buffer) {
@@ -246,12 +241,11 @@ namespace Flint {
         consider_alignment();
     }
 
-    Vec2<float> Label::calculate_minimum_size() {
+    Vec2<float> Label::calculate_minimum_size() const {
         return get_text_size().max(minimum_size);
     }
 
-    Vec2<float> Label::get_text_size() {
-        measure();
+    Vec2<float> Label::get_text_size() const {
         return layout_box.is_valid() ? layout_box.size() : Vec2<float>(0);
     }
 }

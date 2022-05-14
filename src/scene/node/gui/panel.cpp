@@ -19,6 +19,7 @@ namespace Flint {
         title_label->set_horizontal_alignment(Alignment::Center);
         title_label->set_vertical_alignment(Alignment::Center);
         title_label->set_mouse_filter(MouseFilter::IGNORE);
+        title_label->sizing_flag = ContainerSizingFlag::EXPAND;
 
         {
             auto close_icon = VectorTexture::from_empty(24, 24);
@@ -34,6 +35,7 @@ namespace Flint {
             close_button->set_text("");
             close_button->set_parent(this);
             close_button->set_icon(close_icon);
+            close_button->set_minimum_size(Vec2<float>(title_bar_height));
         }
 
         {
@@ -74,6 +76,7 @@ namespace Flint {
             }
         };
         collapse_button->connect_signal("on_pressed", callback);
+        collapse_button->set_minimum_size(Vec2<float>(title_bar_height));
 
         container = std::make_shared<HBoxContainer>();
         container->set_parent(this);

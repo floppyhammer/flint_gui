@@ -11,6 +11,8 @@ namespace Flint {
     public:
         Container();
 
+        void set_size(Vec2<float> p_size) override;
+
         virtual void adjust_layout();
     };
 }

@@ -68,16 +68,14 @@ namespace Flint {
 
         void set_vertical_alignment(Alignment alignment);
 
-        Vec2<float> calculate_minimum_size() override;
-
-        Vec2<float> get_text_size();
-
-        bool need_to_remeasure = false;
+        Vec2<float> calculate_minimum_size() const override;
 
     private:
         void measure();
 
         void consider_alignment();
+
+        Vec2<float> get_text_size() const;
 
     private:
         std::string text;

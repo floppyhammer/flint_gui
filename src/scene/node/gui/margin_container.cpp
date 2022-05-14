@@ -2,9 +2,6 @@
 
 namespace Flint {
     void MarginContainer::adjust_layout() {
-        if (parent->extended_from_which_base_node() != NodeType::Control)
-            return;
-
         // Child's local position.
         Vec2<float> child_position;
         child_position.x += margin_left;

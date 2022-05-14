@@ -15,7 +15,7 @@ namespace Flint {
         outline.border_color = ColorU(202, 130, 94, 255);
     }
 
-    Vec2<float> Control::calculate_minimum_size() {
+    Vec2<float> Control::calculate_minimum_size() const {
         return minimum_size;
     }
 
@@ -84,5 +84,13 @@ namespace Flint {
 
     Vec2<float> Control::get_size() const {
         return size;
+    }
+
+    void Control::set_minimum_size(Vec2<float> p_minimum_size) {
+        minimum_size = p_minimum_size;
+    }
+
+    Vec2<float> Control::get_minimum_size() const {
+        return minimum_size;
     }
 }

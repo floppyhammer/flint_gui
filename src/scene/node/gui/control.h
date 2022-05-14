@@ -48,8 +48,9 @@ namespace Flint {
         FULL_RECT,
     };
 
-    enum class ContainerSizeFlag {
-
+    enum class ContainerSizingFlag {
+        EXPAND,
+        SHRINK,
     };
 
     class Control : public Node {
@@ -66,13 +67,19 @@ namespace Flint {
 
         virtual Vec2<float> get_size() const;
 
-        virtual Vec2<float> calculate_minimum_size();
+        virtual void set_minimum_size(Vec2<float> p_minimum_size);
+
+        virtual Vec2<float> get_minimum_size() const;
+
+        virtual Vec2<float> calculate_minimum_size() const;
 
         Vec2<float> get_global_position() const;
 
         void draw(VkCommandBuffer p_command_buffer) override;
 
         void set_mouse_filter(MouseFilter filter);
+
+        ContainerSizingFlag sizing_flag = ContainerSizingFlag::SHRINK;
 
     protected:
         Vec2<float> position{0};

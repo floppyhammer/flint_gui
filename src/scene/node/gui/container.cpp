@@ -4,7 +4,7 @@ namespace Flint {
     Container::Container() {
         type = NodeType::Container;
 
-        outline.border_color = ColorU();
+        //outline.border_color = ColorU();
     }
 
     void Container::adjust_layout() {
@@ -27,5 +27,11 @@ namespace Flint {
                 cast_child->set_size(max_size);
             }
         }
+    }
+
+    void Container::set_size(Vec2<float> p_size) {
+        if (size == p_size) return;
+        size = p_size;
+        adjust_layout();
     }
 }

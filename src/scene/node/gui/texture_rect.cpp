@@ -20,6 +20,8 @@ namespace Flint {
         type = NodeType::TextureRect;
 
         mesh = DefaultResource::get_singleton().new_default_mesh_2d();
+
+        outline.border_color = ColorU::blue();
     }
 
     void TextureRect::set_texture(const std::shared_ptr<Texture> &p_texture) {
@@ -76,6 +78,8 @@ namespace Flint {
             auto vector_texture = static_cast<VectorTexture *>(texture.get());
             vector_texture->add_to_canvas(global_position, canvas);
         }
+
+        Control::draw(p_command_buffer);
     }
 
     void TextureRect::update_mvp() {
@@ -112,7 +116,7 @@ namespace Flint {
         push_constant.model = mvp.model;
     }
 
-    Vec2<float> TextureRect::calculate_minimum_size() {
+    Vec2<float> TextureRect::calculate_minimum_size() const {
         return minimum_size.max(texture ? Vec2<float>(texture->get_width(), texture->get_height()) : Vec2<float>(0));
     }
 }

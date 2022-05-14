@@ -46,6 +46,40 @@ namespace Flint {
         Max,
     };
 
+    const std::array<std::string, 24> NodeTypeName {
+        // General.
+        "Node",
+        "SubViewport",
+        "CanvasLayer",
+
+        // GUI.
+        "Control",
+        "Container",
+        "CenterContainer",
+        "MarginContainer",
+        "HBoxContainer",
+        "VBoxContainer",
+        "SubViewportContainer",
+        "Button",
+        "ItemList",
+        "Label",
+        "TextEdit",
+        "Panel",
+        "TextureRect",
+        "Tree",
+        "ProgressBar",
+
+        // 2D.
+        "Node2D",
+        "Sprite2D",
+        "RigidBody2D",
+
+        // 3D.
+        "Node3D",
+        "Sprite3D",
+        "Model",
+    };
+
     class Node {
     public:
         NodeType type = NodeType::Node;
@@ -87,6 +121,8 @@ namespace Flint {
         void remove_child(size_t index);
 
         NodeType extended_from_which_base_node() const;
+
+        std::string get_node_path() const;
 
     protected:
         std::vector<std::shared_ptr<Node>> children;

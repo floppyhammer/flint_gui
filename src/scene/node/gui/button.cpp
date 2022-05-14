@@ -25,9 +25,6 @@ namespace Flint {
         label->set_horizontal_alignment(Alignment::Center);
         label->set_vertical_alignment(Alignment::Center);
 
-//        size = label->get_text_size();
-//        label->set_size(size);
-
         icon_rect = std::make_shared<TextureRect>();
         auto vector_texture = VectorTexture::from_empty(24, 24);
         SvgShape svg_shape;
@@ -45,7 +42,7 @@ namespace Flint {
         container->set_size(size);
     }
 
-    Vec2<float> Button::calculate_minimum_size() {
+    Vec2<float> Button::calculate_minimum_size() const {
         auto container_size = container->calculate_minimum_size();
 
         return container_size.max(minimum_size);
@@ -102,8 +99,6 @@ namespace Flint {
     void Button::update(double dt) {
         Control::update(dt);
 
-        set_size(size.max(calculate_minimum_size()));
-
 //        if (icon.has_value()) {
 //            auto icon_size = icon.value().size;
 //            label->set_size({size.x - icon_size.x, size.y});
@@ -146,8 +141,13 @@ namespace Flint {
     void Button::set_size(Vec2<float> p_size) {
         if (size == p_size) return;
 
-        size = p_size;
-        container->set_size(p_size);
+        auto path = get_node_path();
+
+        auto final_size = p_size.max(container->calculate_minimum_size());
+        final_size = final_size.max(minimum_size);
+
+        container->set_size(final_size);
+        size = final_size;
     }
 
     void Button::on_pressed() {

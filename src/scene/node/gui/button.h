@@ -31,7 +31,7 @@ namespace Flint {
 
         void set_size(Vec2<float> p_size) override;
 
-        Vec2<float> calculate_minimum_size() override;
+        Vec2<float> calculate_minimum_size() const override;
 
         void connect_signal(std::string signal, std::function<void()> callback);
 

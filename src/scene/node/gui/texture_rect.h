@@ -18,7 +18,14 @@ namespace Flint {
         void set_texture(const std::shared_ptr<Texture>& p_texture);
         [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
 
-        virtual Vec2<float> calculate_minimum_size() override;
+        virtual Vec2<float> calculate_minimum_size() const override;
+
+        enum class StretchMode {
+            SCALE,
+            TILE,
+            KEEP,
+            KEEP_ASPECT,
+        };
 
     private:
         void update(double delta) override;

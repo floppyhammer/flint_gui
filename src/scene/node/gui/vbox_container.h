@@ -14,7 +14,7 @@ namespace Flint {
 
         void adjust_layout() override;
 
-        Vec2<float> calculate_minimum_size() override;
+        Vec2<float> calculate_minimum_size() const override;
 
     protected:
         float separation = 8;
