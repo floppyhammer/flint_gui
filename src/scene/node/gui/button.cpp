@@ -25,7 +25,6 @@ namespace Flint {
         label->set_horizontal_alignment(Alignment::Center);
         label->set_vertical_alignment(Alignment::Center);
 
-        icon_rect = std::make_shared<TextureRect>();
         auto vector_texture = VectorTexture::from_empty(24, 24);
         SvgShape svg_shape;
         svg_shape.shape.add_circle({}, 8);
@@ -33,12 +32,15 @@ namespace Flint {
         svg_shape.stroke_color = ColorU(163, 163, 163, 255);
         svg_shape.stroke_width = 2;
         vector_texture->add_svg_shape(svg_shape);
+        icon_rect = std::make_shared<TextureRect>();
+        icon_rect->sizing_flag = ContainerSizingFlag::EXPAND;
         icon_rect->set_texture(vector_texture);
 
-        container = std::make_shared<HBoxContainer>();
+        container = std::make_shared<BoxContainer>();
         container->set_parent(this);
         container->add_child(icon_rect);
         container->add_child(label);
+        container->set_separation(0);
         container->set_size(size);
     }
 
@@ -52,6 +54,8 @@ namespace Flint {
         auto global_position = get_global_position();
 
         for (auto &event: input_queue) {
+            bool consume_flag = false;
+
             if (event.type == InputEventType::MouseMotion) {
                 auto args = event.args.mouse_motion;
 
@@ -62,7 +66,7 @@ namespace Flint {
                 } else {
                     if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
                         hovered = true;
-                        event.consume();
+                        consume_flag = true;
                     } else {
                         hovered = false;
                         pressed = false;
@@ -87,9 +91,13 @@ namespace Flint {
                         } else {
                             if (pressed_inside) on_pressed();
                         }
-                        event.consume();
+                        consume_flag = true;
                     }
                 }
+            }
+
+            if (consume_flag) {
+                event.consume();
             }
         }
 
@@ -164,6 +172,7 @@ namespace Flint {
 
     void Button::set_text(const std::string &text) {
         label->set_text(text);
+        label->set_visibility(text.empty());
     }
 
     void Button::set_icon(const std::shared_ptr<Texture> &p_icon) {

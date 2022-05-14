@@ -41,9 +41,9 @@ namespace Flint {
         {
             collapse_icon = VectorTexture::from_empty(24, 24);
             SvgShape svg_shape;
-            svg_shape.shape.move_to(5, -5);
+            svg_shape.shape.move_to(6, -6);
             svg_shape.shape.line_to(0, 7);
-            svg_shape.shape.line_to(-5, -5);
+            svg_shape.shape.line_to(-6, -6);
             svg_shape.shape.close();
             svg_shape.shape.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
             svg_shape.stroke_color = ColorU(163, 163, 163, 255);
@@ -54,9 +54,9 @@ namespace Flint {
         {
             expand_icon = VectorTexture::from_empty(24, 24);
             SvgShape svg_shape;
-            svg_shape.shape.move_to(-5, -5);
-            svg_shape.shape.line_to(7, 0);
-            svg_shape.shape.line_to(-5, 5);
+            svg_shape.shape.move_to(-6, -6);
+            svg_shape.shape.line_to(6, 0);
+            svg_shape.shape.line_to(-6, 6);
             svg_shape.shape.close();
             svg_shape.shape.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
             svg_shape.stroke_color = ColorU(163, 163, 163, 255);
@@ -78,13 +78,14 @@ namespace Flint {
         collapse_button->connect_signal("on_pressed", callback);
         collapse_button->set_minimum_size(Vec2<float>(title_bar_height));
 
-        container = std::make_shared<HBoxContainer>();
+        container = std::make_shared<BoxContainer>();
         container->set_parent(this);
         container->add_child(collapse_button);
         container->add_child(title_label);
         container->add_child(close_button);
         container->set_position({0, -title_bar_height});
         container->set_size({size.x, title_bar_height});
+        container->set_mouse_filter(MouseFilter::IGNORE);
 
         title_bar = true;
     }
@@ -106,12 +107,19 @@ namespace Flint {
         close_button->input(input_queue);
 
         for (auto &event: input_queue) {
+            bool consume_flag = false;
+
             if (event.type == InputEventType::MouseMotion) {
                 auto args = event.args.mouse_motion;
 
                 if (title_bar_pressed) {
                     set_position(title_bar_pressed_position + args.position - title_bar_pressed_mouse_position);
-                    event.consume();
+                    consume_flag = true;
+                }
+
+                if (Rect<float>(global_position - Vec2<float>(0, title_bar_height),
+                                global_position + Vec2<float>(size.x, 0)).contains_point(args.position)) {
+                    consume_flag = true;
                 }
             }
 
@@ -122,16 +130,21 @@ namespace Flint {
                     if (Rect<float>(global_position - Vec2<float>(0, title_bar_height),
                                     global_position + Vec2<float>(size.x, 0)).contains_point(args.position)) {
                         title_bar_pressed = args.pressed;
+
                         if (title_bar_pressed) {
                             title_bar_pressed_mouse_position = args.position;
                             title_bar_pressed_position = position;
                         }
 
-                        event.consume();
+                        consume_flag = true;
                     }
                 }
 
                 if (!args.pressed) title_bar_pressed = false;
+
+                if (consume_flag) {
+                    event.consume();
+                }
             }
         }
 

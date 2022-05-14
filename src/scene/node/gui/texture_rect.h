@@ -24,8 +24,9 @@ namespace Flint {
             SCALE,
             TILE,
             KEEP,
+            KEEP_CENTER,
             KEEP_ASPECT,
-        };
+        } stretch_mode = StretchMode::KEEP_CENTER;
 
     private:
         void update(double delta) override;

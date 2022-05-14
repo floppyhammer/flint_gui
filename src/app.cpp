@@ -17,8 +17,7 @@
 #include "scene/node/gui/texture_rect.h"
 #include "scene/node/gui/label.h"
 #include "scene/node/gui/button.h"
-#include "scene/node/gui/hbox_container.h"
-#include "scene/node/gui/vbox_container.h"
+#include "scene/node/gui/box_container.h"
 #include "scene/node/gui/margin_container.h"
 #include "scene/node/gui/panel.h"
 #include "scene/node/gui/tree.h"
@@ -101,8 +100,9 @@ void App::run() {
         auto button2 = std::make_shared<Flint::Button>();
         auto margin_container = std::make_shared<Flint::MarginContainer>();
         margin_container->set_size({400, 400});
-        auto hbox_container = std::make_shared<Flint::HBoxContainer>();
-        auto vbox_container = std::make_shared<Flint::VBoxContainer>();
+        auto h_stack_container = std::make_shared<Flint::BoxContainer>();
+        auto v_stack_container = std::make_shared<Flint::BoxContainer>();
+        v_stack_container->make_vertical();
         auto panel = std::make_shared<Flint::Panel>();
         panel->set_position({200, 200});
         panel->set_size({400, 400});
@@ -136,12 +136,12 @@ void App::run() {
         node->add_child(sub_viewport_c);
 
         node->add_child(vector_layer);
-        hbox_container->add_child(button);
-        hbox_container->add_child(label);
-        hbox_container->add_child(button2);
-        vbox_container->add_child(hbox_container);
-        vbox_container->add_child(progress_bar);
-        margin_container->add_child(vbox_container);
+        h_stack_container->add_child(button);
+        h_stack_container->add_child(label);
+        h_stack_container->add_child(button2);
+        v_stack_container->add_child(h_stack_container);
+        v_stack_container->add_child(progress_bar);
+        margin_container->add_child(v_stack_container);
         panel->add_child(margin_container);
         node->add_child(panel);
         auto margin_container2 = std::make_shared<Flint::MarginContainer>();
@@ -149,6 +149,10 @@ void App::run() {
         margin_container2->add_child(item_tree);
         scene_panel->add_child(margin_container2);
         node->add_child(scene_panel);
+
+//        auto btn1 = std::make_shared<Button>();
+//        btn1->set_text("");
+//        node->add_child(btn1);
 
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);

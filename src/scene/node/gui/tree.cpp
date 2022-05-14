@@ -68,9 +68,9 @@ namespace Flint {
         {
             collapse_icon = VectorTexture::from_empty(24, 24);
             SvgShape svg_shape;
-            svg_shape.shape.move_to(5, -5);
-            svg_shape.shape.line_to(0, 7);
-            svg_shape.shape.line_to(-5, -5);
+            svg_shape.shape.move_to(6, -6);
+            svg_shape.shape.line_to(0, 6);
+            svg_shape.shape.line_to(-6, -6);
             svg_shape.shape.close();
             svg_shape.shape.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
             svg_shape.stroke_color = ColorU(163, 163, 163, 255);
@@ -81,9 +81,9 @@ namespace Flint {
         {
             expand_icon = VectorTexture::from_empty(24, 24);
             SvgShape svg_shape;
-            svg_shape.shape.move_to(-5, -5);
-            svg_shape.shape.line_to(7, 0);
-            svg_shape.shape.line_to(-5, 5);
+            svg_shape.shape.move_to(-6, -6);
+            svg_shape.shape.line_to(6, 0);
+            svg_shape.shape.line_to(-6, 6);
             svg_shape.shape.close();
             svg_shape.shape.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
             svg_shape.stroke_color = ColorU(163, 163, 163, 255);
@@ -94,6 +94,8 @@ namespace Flint {
         collapse_button = std::make_shared<Button>();
         collapse_button->set_icon(collapse_icon);
         collapse_button->set_text("");
+        collapse_button->set_size({24, 24});
+
         auto callback = [this] {
             collapsed = !collapsed;
             if (collapsed) {

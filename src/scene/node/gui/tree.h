@@ -48,7 +48,7 @@ namespace Flint {
 
         std::shared_ptr<Label> label;
         std::shared_ptr<Button> collapse_button;
-        std::shared_ptr<HBoxContainer> container;
+        std::shared_ptr<BoxContainer> container;
         std::shared_ptr<VectorTexture> collapse_icon, expand_icon;
 
         std::vector<std::shared_ptr<TreeItem>> children;

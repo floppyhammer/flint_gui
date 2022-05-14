@@ -4,7 +4,7 @@
 #include "control.h"
 #include "label.h"
 #include "texture_rect.h"
-#include "hbox_container.h"
+#include "box_container.h"
 #include "../../../resources/style_box.h"
 
 #include <functional>
@@ -39,8 +39,10 @@ namespace Flint {
 
         void set_icon(const std::shared_ptr<Texture> &p_icon);
 
+        bool expand_icon = false;
+
     protected:
-        std::shared_ptr<HBoxContainer> container;
+        std::shared_ptr<BoxContainer> container;
         std::shared_ptr<TextureRect> icon_rect;
         std::shared_ptr<Label> label;
 

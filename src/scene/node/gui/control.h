@@ -81,6 +81,10 @@ namespace Flint {
 
         ContainerSizingFlag sizing_flag = ContainerSizingFlag::SHRINK;
 
+        void set_visibility(bool p_visible);
+
+        bool get_visibility() const;
+
     protected:
         Vec2<float> position{0};
         Vec2<float> size{128};
@@ -93,6 +97,8 @@ namespace Flint {
         void update(double dt) override;
 
         void input(std::vector<InputEvent> &input_queue) override;
+
+        bool visible = true;
 
         StyleBox outline;
 

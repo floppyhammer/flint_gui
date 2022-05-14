@@ -52,7 +52,7 @@ namespace Flint {
 
         std::shared_ptr<Label> title_label;
         std::shared_ptr<Button> collapse_button, close_button;
-        std::shared_ptr<HBoxContainer> container;
+        std::shared_ptr<BoxContainer> container;
         std::shared_ptr<VectorTexture> collapse_icon, expand_icon;
 
         std::optional<StyleBox> theme_panel;

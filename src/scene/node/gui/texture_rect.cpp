@@ -31,9 +31,6 @@ namespace Flint {
             auto image_texture = static_cast<ImageTexture *>(p_texture.get());
             mesh->surface->get_material()->set_texture(std::shared_ptr<ImageTexture>(image_texture));
         }
-
-        size.x = (float) p_texture->get_width();
-        size.y = (float) p_texture->get_height();
     }
 
     std::shared_ptr<Texture> TextureRect::get_texture() const {
@@ -76,7 +73,13 @@ namespace Flint {
             auto global_position = get_global_position();
 
             auto vector_texture = static_cast<VectorTexture *>(texture.get());
-            vector_texture->add_to_canvas(global_position, canvas);
+
+            if (stretch_mode == StretchMode::KEEP_CENTER) {
+                auto texture_size = vector_texture->get_size();
+                vector_texture->add_to_canvas(global_position + ((size - Vec2<float>(texture_size.x, texture_size.y)) * 0.5f), canvas);
+            } else {
+                vector_texture->add_to_canvas(global_position, canvas);
+            }
         }
 
         Control::draw(p_command_buffer);

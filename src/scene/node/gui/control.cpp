@@ -35,21 +35,27 @@ namespace Flint {
 
         // Handle mouse input propagation.
         for (auto &event : input_queue) {
+            bool consume_flag = false;
+
             switch (event.type) {
                 case InputEventType::MouseMotion: {
                     if (Rect<float>(global_position, global_position + size).contains_point(event.args.mouse_motion.position)) {
-                        event.consume();
+                        consume_flag = true;
                     }
                 }
                     break;
                 case InputEventType::MouseButton: {
                     if (Rect<float>(global_position, global_position + size).contains_point(event.args.mouse_button.position)) {
-                        event.consume();
+                        consume_flag = true;
                     }
                 }
                     break;
                 default:
                     break;
+            }
+
+            if (consume_flag) {
+                event.consume();
             }
         }
     }
@@ -92,5 +98,13 @@ namespace Flint {
 
     Vec2<float> Control::get_minimum_size() const {
         return minimum_size;
+    }
+
+    void Control::set_visibility(bool p_visible) {
+        visible = p_visible;
+    }
+
+    bool Control::get_visibility() const {
+        return visible;
     }
 }
