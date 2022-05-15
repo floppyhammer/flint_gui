@@ -26,6 +26,8 @@ namespace Flint {
         Button,
         ItemList,
         Label,
+        RichLabel,
+        LineEdit,
         TextEdit,
         Panel,
         TextureRect,
@@ -45,7 +47,7 @@ namespace Flint {
         Max,
     };
 
-    const std::array<std::string, 24> NodeTypeName {
+    const std::array<std::string, 27> NodeTypeName {
         // General.
         "Node",
         "SubViewport",
@@ -61,6 +63,8 @@ namespace Flint {
         "Button",
         "ItemList",
         "Label",
+        "RichLabel",
+        "LineEdit",
         "TextEdit",
         "Panel",
         "TextureRect",

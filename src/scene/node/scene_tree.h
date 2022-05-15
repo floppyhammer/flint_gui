@@ -2,6 +2,20 @@
 #define FLINT_SCENE_TREE_H
 
 #include "node.h"
+#include "gui/sub_viewport_container.h"
+#include "3d/model.h"
+#include "gui/texture_rect.h"
+#include "gui/label.h"
+#include "gui/button.h"
+#include "gui/box_container.h"
+#include "gui/margin_container.h"
+#include "gui/panel.h"
+#include "gui/tree.h"
+#include "gui/progress_bar.h"
+#include "gui/line_edit.h"
+#include "sub_viewport.h"
+#include "2d/sprite_2d.h"
+#include "2d/rigid_body_2d.h"
 
 namespace Flint {
     class SceneTree {

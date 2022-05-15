@@ -6,7 +6,6 @@
 #include "../../render/render_server.h"
 #include "../../resources/image_texture.h"
 #include "../../render/render_target.h"
-#include "scene_tree.h"
 #include "../../common/color.h"
 
 namespace Flint {

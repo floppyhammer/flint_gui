@@ -12,19 +12,6 @@
 #include "io/obj_importer.h"
 #include "common/io.h"
 
-#include "scene/node/gui/sub_viewport_container.h"
-#include "scene/node/3d/model.h"
-#include "scene/node/gui/texture_rect.h"
-#include "scene/node/gui/label.h"
-#include "scene/node/gui/button.h"
-#include "scene/node/gui/box_container.h"
-#include "scene/node/gui/margin_container.h"
-#include "scene/node/gui/panel.h"
-#include "scene/node/gui/tree.h"
-#include "scene/node/gui/progress_bar.h"
-#include "scene/node/sub_viewport.h"
-#include "scene/node/2d/sprite_2d.h"
-#include "scene/node/2d/rigid_body_2d.h"
 #include "scene/ecs/components/components.h"
 
 #include <cstdint>
@@ -107,6 +94,8 @@ void App::run() {
         panel->set_position({200, 200});
         panel->set_size({400, 400});
 
+        auto line_edit = std::make_shared<Flint::LineEdit>();
+
         auto scene_panel = std::make_shared<Flint::Panel>();
         scene_panel->set_position({0, 100});
         scene_panel->set_size({400, 400});
@@ -141,6 +130,7 @@ void App::run() {
         h_stack_container->add_child(button2);
         v_stack_container->add_child(h_stack_container);
         v_stack_container->add_child(progress_bar);
+        v_stack_container->add_child(line_edit);
         margin_container->add_child(v_stack_container);
         panel->add_child(margin_container);
         node->add_child(panel);
