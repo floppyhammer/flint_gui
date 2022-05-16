@@ -27,17 +27,17 @@ include_directories(external/glfw/include)
 add_subdirectory(external/glfw)
 
 # Pathfinder library.
-include_directories( external/pathfinder-cpp/include)
+include_directories(external/pathfinder-cpp/include)
 add_subdirectory(external/pathfinder-cpp)
 
 add_executable(flint ${SOURCE_FILES})
 
 # Windows
 if (WIN32)
-    target_link_libraries(flint glfw Vulkan::Vulkan libpathfinder)
+    target_link_libraries(flint glfw Vulkan::Vulkan pathfinder)
 else () # Linux
     ## sudo apt install libglfw3-dev
     ## sudo apt install libvulkan-dev
     ## sudo apt install libvulkan1 mesa-vulkan-drivers vulkan-utils
-    target_link_libraries(flint -lglfw -lvulkan libpathfinder)
+    target_link_libraries(flint -lglfw -lvulkan -lpathfinder)
 endif ()
