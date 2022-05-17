@@ -2,7 +2,7 @@
 #define FLINT_SUB_VIEWPORT_H
 
 #include "node.h"
-#include "../../common/vec2.h"
+#include "../../common/math/vec2.h"
 #include "../../render/render_server.h"
 #include "../../resources/image_texture.h"
 #include "../../render/render_target.h"

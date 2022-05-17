@@ -26,6 +26,16 @@ namespace Flint {
                            const Vec2<float> &size,
                            const std::shared_ptr<Pathfinder::Canvas> &canvas);
     };
+
+    struct StyleLine {
+        ColorU color = ColorU(163, 163, 163, 255);
+
+        float width = 2;
+
+        void add_to_canvas(const Vec2<float> &start,
+                           const Vec2<float> &end,
+                           const std::shared_ptr<Pathfinder::Canvas> &canvas);
+    };
 }
 
 #endif //FLINT_RESOURCE_STYLE_BOX_H

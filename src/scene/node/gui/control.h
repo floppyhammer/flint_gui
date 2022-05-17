@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "../node.h"
-#include "../../../common/vec2.h"
+#include "../../../common/math/vec2.h"
 #include "../../../resources/mesh.h"
 #include "../../../render/mvp_buffer.h"
 #include "../../../render/render_server.h"

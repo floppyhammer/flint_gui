@@ -14,6 +14,7 @@ namespace Flint {
         MouseMotion,
         MouseScroll,
         Key,
+        Text,
         Max,
     };
 
@@ -42,6 +43,9 @@ namespace Flint {
                 Vec2<float> relative;
                 Vec2<float> position;
             } mouse_motion;
+            struct {
+                uint32_t codepoint;
+            } text;
         } args;
 
         void consume ();
@@ -51,6 +55,8 @@ namespace Flint {
     private:
         bool consumed = false;
     };
+
+    std::string codepoint_to_utf8(char32_t codepoint);
 
     class InputServer {
     public:

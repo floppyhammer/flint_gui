@@ -34,7 +34,7 @@ namespace Flint {
     void Label::measure() {
         // Get font info. Get font scaling.
         int ascent, descent, line_gap;
-        float scale = font->get_metrics(line_height, ascent, descent, line_gap);
+        float scale = font->get_metrics(font_size, ascent, descent, line_gap);
 
         // Convert text string to utf32 string.
         std::u32string utf32_str(text.begin(), text.end());
@@ -62,7 +62,7 @@ namespace Flint {
 
             if (u_codepoint == '\n') {
                 x = 0;
-                y += line_height;
+                y += font_size;
                 glyphs.push_back(g);
                 continue;
             }
@@ -99,19 +99,19 @@ namespace Flint {
             g.shape = font->get_glyph_shape(g.index);
 
             g.shape.scale(Pathfinder::Vec2<float>(scale, -scale));
-            g.shape.translate(Pathfinder::Vec2<float>(x, line_height + descent + y));
+            g.shape.translate(Pathfinder::Vec2<float>(x, font_size + descent + y));
             // --------------------------------
 
             // Layout box.
-            g.layout_box = Rect<float>(x, line_height + descent - ascent + y, x + advance_width * scale,
-                                       line_height + y);
+            g.layout_box = Rect<float>(x, font_size + descent - ascent + y, x + advance_width * scale,
+                                       font_size + y);
 
             // Update text's layout box.
             layout_box = layout_box.union_rect(g.layout_box);
 
             // Bbox.
-            g.bbox = Rect<float>(x + bounding_box.left, line_height + descent + bounding_box.bottom + y,
-                                 x + bounding_box.right, line_height + descent + bounding_box.top + y);
+            g.bbox = Rect<float>(x + bounding_box.left, font_size + descent + bounding_box.bottom + y,
+                                 x + bounding_box.right, font_size + descent + bounding_box.top + y);
 
             // Advance x.
             x += roundf(advance_width * scale);
@@ -164,7 +164,7 @@ namespace Flint {
     }
 
     void Label::set_text_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color) {
-        line_height = p_size;
+        font_size = p_size;
         color = p_color;
         stroke_width = p_stroke_width;
         stroke_color = p_stroke_color;
@@ -247,5 +247,13 @@ namespace Flint {
 
     Vec2<float> Label::get_text_size() const {
         return layout_box.is_valid() ? layout_box.size() : Vec2<float>(0);
+    }
+
+    std::vector<Glyph> &Label::get_glyphs() {
+        return glyphs;
+    }
+
+    float Label::get_font_size() const {
+        return font_size;
     }
 }

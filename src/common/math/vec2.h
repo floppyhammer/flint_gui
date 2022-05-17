@@ -158,6 +158,8 @@ namespace Flint {
     inline Vec2<T> lerp(const Vec2<T> &a, const Vec2<T> &b, float t) {
         return Vec2<T>{a.x + t * (b.x - a.x), a.y + t * (b.y - a.y)};
     }
+
+    typedef Vec2<float> Vec2F;
 }
 
 #endif //FLINT_VEC2_H

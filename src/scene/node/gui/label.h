@@ -70,6 +70,10 @@ namespace Flint {
 
         Vec2<float> calculate_minimum_size() const override;
 
+        std::vector<Glyph> &get_glyphs();
+
+        float get_font_size() const;
+
     private:
         void measure();
 
@@ -82,7 +86,7 @@ namespace Flint {
 
         std::shared_ptr<Font> font;
 
-        float line_height = 32;
+        float font_size = 32;
 
         std::vector<Glyph> glyphs;
 

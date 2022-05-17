@@ -17,6 +17,8 @@ namespace Flint {
 
         std::string get_text() const;
 
+        void input(std::vector<InputEvent> &input_queue) override;
+
         void update(double dt) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
@@ -25,6 +27,11 @@ namespace Flint {
 
     private:
         bool editable = true;
+
+        uint32_t caret_index = 1;
+        Vec2F caret_position;
+
+        StyleLine theme_caret;
 
         std::shared_ptr<Label> label;
 

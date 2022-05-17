@@ -1,7 +1,7 @@
 #ifndef FLINT_RENDER_TARGET_H
 #define FLINT_RENDER_TARGET_H
 
-#include "../common/vec2.h"
+#include "../common/math/vec2.h"
 #include "../common/color.h"
 #include "render_server.h"
 #include "../resources/image_texture.h"

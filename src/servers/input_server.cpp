@@ -1,6 +1,14 @@
 #include "input_server.h"
 
+#include <locale>
+#include <codecvt>
+
 namespace Flint {
+    std::string codepoint_to_utf8(char32_t codepoint) {
+        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
+        return convert.to_bytes(&codepoint, &codepoint + 1);
+    }
+
     void InputServer::attach_callbacks(GLFWwindow *window) {
         // GLFW input callbacks.
 
@@ -27,6 +35,16 @@ namespace Flint {
             input_server.input_queue.push_back(input_event);
         };
         glfwSetMouseButtonCallback(window, cursor_button_callback);
+
+        auto character_callback = [](GLFWwindow* window, unsigned int codepoint) {
+            Flint::InputEvent input_event{};
+            input_event.type = Flint::InputEventType::Text;
+            input_event.args.text.codepoint = codepoint;
+            auto &input_server = Flint::InputServer::get_singleton();
+            input_server.input_queue.push_back(input_event);
+        };
+
+        glfwSetCharCallback(window, character_callback);
     }
 
     void InputServer::clear_queue() {
