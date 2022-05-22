@@ -40,13 +40,19 @@ namespace Flint {
             switch (event.type) {
                 case InputEventType::MouseMotion: {
                     if (Rect<float>(global_position, global_position + size).contains_point(event.args.mouse_motion.position)) {
+                        local_mouse_position = event.args.mouse_motion.position - global_position;
+
                         consume_flag = true;
                     }
                 }
                     break;
                 case InputEventType::MouseButton: {
                     if (Rect<float>(global_position, global_position + size).contains_point(event.args.mouse_button.position)) {
+                        grab_focus();
+
                         consume_flag = true;
+                    } else {
+                        release_focus();
                     }
                 }
                     break;
@@ -106,5 +112,17 @@ namespace Flint {
 
     bool Control::get_visibility() const {
         return visible;
+    }
+
+    Vec2F Control::get_local_mouse_position() const {
+        return local_mouse_position;
+    }
+
+    void Control::grab_focus() {
+        focused = true;
+    }
+
+    void Control::release_focus() {
+
     }
 }

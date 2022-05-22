@@ -85,6 +85,11 @@ namespace Flint {
 
         bool get_visibility() const;
 
+        Vec2F get_local_mouse_position() const;
+
+        virtual void grab_focus();
+        virtual void release_focus();
+
     protected:
         Vec2<float> position{0};
         Vec2<float> size{128};
@@ -92,7 +97,11 @@ namespace Flint {
         Vec2<float> pivot_offset{0}; // Top-left as the default pivot.
         float rotation = 0;
 
+        bool focused = false;
+
         Vec2<float> minimum_size{0};
+
+        Vec2F local_mouse_position;
 
         void update(double dt) override;
 

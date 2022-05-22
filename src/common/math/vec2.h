@@ -160,6 +160,7 @@ namespace Flint {
     }
 
     typedef Vec2<float> Vec2F;
+    typedef Vec2<int> Vec2I;
 }
 
 #endif //FLINT_VEC2_H

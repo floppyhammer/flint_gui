@@ -25,10 +25,13 @@ namespace Flint {
 
         Vec2<float> calculate_minimum_size() const override;
 
+        void grab_focus() override;
+        void release_focus() override;
+
     private:
         bool editable = true;
 
-        uint32_t caret_index = 1;
+        int32_t caret_index = -1;
         Vec2F caret_position;
 
         StyleLine theme_caret;
