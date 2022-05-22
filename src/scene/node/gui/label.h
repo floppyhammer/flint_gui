@@ -52,6 +52,8 @@ namespace Flint {
 
         std::string get_text() const;
 
+        void insert_text(uint32_t position, const std::string &p_text);
+
         void set_size(Vec2<float> p_size) override;
 
         void set_font(std::shared_ptr<Font> p_font);
@@ -82,7 +84,7 @@ namespace Flint {
         Vec2<float> get_text_size() const;
 
     private:
-        std::string text;
+        std::wstring text;
 
         std::shared_ptr<Font> font;
 

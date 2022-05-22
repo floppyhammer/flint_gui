@@ -56,7 +56,14 @@ namespace Flint {
         bool consumed = false;
     };
 
-    std::string codepoint_to_utf8(char32_t codepoint);
+    /// Unicode codepoint to UTF8 string.
+    std::string cpp11_codepoint_to_utf8(char32_t codepoint);
+
+    /// wstring to UTF8 string.
+    std::string ws_to_utf8(std::wstring const &s);
+
+    /// UTF8 string to wstring.
+    std::wstring utf8_to_ws(std::string const &utf8);
 
     class InputServer {
     public:

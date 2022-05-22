@@ -37,10 +37,10 @@ namespace Flint {
                 case InputEventType::Text: {
                     if (!focused) continue;
 
-                    auto text = codepoint_to_utf8(event.args.text.codepoint);
-                    std::cout << text << std::endl;
-
-                    label->set_text(label->get_text() + text);
+                    if (caret_index < label->get_glyphs().size()) {
+                        label->insert_text(caret_index + 1, cpp11_codepoint_to_utf8(event.args.text.codepoint));
+                        caret_index++;
+                    }
 
                     consume_flag = true;
                 }

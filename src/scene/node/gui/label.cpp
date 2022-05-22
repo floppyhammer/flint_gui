@@ -8,20 +8,30 @@ namespace Flint {
 
         outline.border_color = ColorU::red();
 
-        set_font(ResourceManager::get_singleton().load<Flint::Font>("../assets/OpenSans-Regular.ttf"));
+        set_font(ResourceManager::get_singleton().load<Flint::Font>("../assets/unifont-14.0.03.ttf"));
     }
 
     void Label::set_text(const std::string &p_text) {
-        // Only update glyphs when text has changed.
-        if (text == p_text || font == nullptr) return;
+        auto ws_text = utf8_to_ws(p_text);
 
-        text = p_text;
+        // Only update glyphs when text has changed.
+        if (text == ws_text || font == nullptr) return;
+
+        text = ws_text;
+
+        measure();
+    }
+
+    void Label::insert_text(uint32_t position, const std::string &p_text) {
+        if (p_text.empty()) return;
+
+        text.insert(position, utf8_to_ws(p_text));
 
         measure();
     }
 
     std::string Label::get_text() const {
-        return text;
+        return ws_to_utf8(text);
     }
 
     void Label::set_size(Vec2<float> p_size) {

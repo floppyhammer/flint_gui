@@ -4,9 +4,40 @@
 #include <codecvt>
 
 namespace Flint {
-    std::string codepoint_to_utf8(char32_t codepoint) {
-        std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
-        return convert.to_bytes(&codepoint, &codepoint + 1);
+    std::string cpp11_codepoint_to_utf8(char32_t codepoint) {
+        char utf8[4];
+        char *end_of_utf8;
+
+        char32_t const *from = &codepoint;
+
+        std::mbstate_t mbs;
+        std::codecvt_utf8<char32_t> ccv;
+
+        if (ccv.out(mbs, from, from + 1, from, utf8, utf8 + 4, end_of_utf8)) {
+            throw std::runtime_error("Bad codepoint-to-utf8 conversion!");
+        }
+
+        return {utf8, end_of_utf8};
+    }
+
+    // This should convert to whatever the system-wide character encoding
+    // is for the platform (UTF-32/Linux - UCS-2/Windows)
+    std::string ws_to_utf8(std::wstring const &s) {
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> cnv;
+        std::string utf8 = cnv.to_bytes(s);
+        if (cnv.converted() < s.size()) {
+            throw std::runtime_error("Incomplete wstring-to-utf8 conversion!");
+        }
+        return utf8;
+    }
+
+    std::wstring utf8_to_ws(std::string const &utf8) {
+        std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> cnv;
+        std::wstring s = cnv.from_bytes(utf8);
+        if (cnv.converted() < utf8.size()) {
+            throw std::runtime_error("Incomplete utf8-to-wstring conversion!");
+        }
+        return s;
     }
 
     void InputServer::attach_callbacks(GLFWwindow *window) {
@@ -36,7 +67,7 @@ namespace Flint {
         };
         glfwSetMouseButtonCallback(window, cursor_button_callback);
 
-        auto character_callback = [](GLFWwindow* window, unsigned int codepoint) {
+        auto character_callback = [](GLFWwindow *window, unsigned int codepoint) {
             Flint::InputEvent input_event{};
             input_event.type = Flint::InputEventType::Text;
             input_event.args.text.codepoint = codepoint;
