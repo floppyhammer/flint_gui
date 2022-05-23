@@ -145,7 +145,7 @@ namespace Flint {
         descriptor.sampler = texture->sampler;
     }
 
-    VkRenderPassBeginInfo &RenderTarget::getRenderPassInfo() {
+    VkRenderPassBeginInfo RenderTarget::getRenderPassInfo() {
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = renderPass;

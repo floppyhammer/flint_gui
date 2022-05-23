@@ -16,7 +16,7 @@ namespace Flint {
 
         ~RenderTarget();
 
-        VkRenderPassBeginInfo &getRenderPassInfo();
+        VkRenderPassBeginInfo getRenderPassInfo();
 
         std::shared_ptr<ImageTexture> texture;
 
