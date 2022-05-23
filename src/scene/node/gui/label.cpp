@@ -30,6 +30,14 @@ namespace Flint {
         measure();
     }
 
+    void Label::remove_text(uint32_t position) {
+        if (position == -1) return;
+
+        text.erase(position);
+
+        measure();
+    }
+
     std::string Label::get_text() const {
         return ws_to_utf8(text);
     }

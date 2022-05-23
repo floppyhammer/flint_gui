@@ -54,6 +54,8 @@ namespace Flint {
 
         void insert_text(uint32_t position, const std::string &p_text);
 
+        void remove_text(uint32_t position);
+
         void set_size(Vec2<float> p_size) override;
 
         void set_font(std::shared_ptr<Font> p_font);

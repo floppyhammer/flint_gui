@@ -19,7 +19,8 @@ namespace Flint {
     };
 
     enum class KeyCode {
-
+        UNKNOWN,
+        BACKSPACE
     };
 
     class InputEvent {

@@ -37,12 +37,24 @@ namespace Flint {
                 case InputEventType::Text: {
                     if (!focused) continue;
 
-                    if (caret_index < label->get_glyphs().size()) {
+                    auto &glyphs = label->get_glyphs();
+                    auto glyph_count = glyphs.size();
+
+                    if (caret_index < (int32_t) glyph_count) {
                         label->insert_text(caret_index + 1, cpp11_codepoint_to_utf8(event.args.text.codepoint));
                         caret_index++;
                     }
 
                     consume_flag = true;
+                }
+                    break;
+                case InputEventType::Key: {
+                    auto key_args = event.args.key;
+
+                    if (key_args.key == KeyCode::BACKSPACE && key_args.pressed && caret_index > -1) {
+                        label->remove_text(caret_index);
+                        caret_index--;
+                    }
                 }
                     break;
                 default:
