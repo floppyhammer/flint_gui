@@ -46,39 +46,41 @@ namespace Flint {
     }
 
     void TextureRect::draw(VkCommandBuffer p_command_buffer) {
-        if (texture->get_type() == TextureType::IMAGE) {
-            Node *viewport_node = get_viewport();
+        if (texture) {
+            if (texture->get_type() == TextureType::IMAGE) {
+                Node *viewport_node = get_viewport();
 
-            VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
-            VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
+                VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
+                VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
 
-            if (viewport_node) {
-                auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-                pipeline = viewport->render_target->blitGraphicsPipeline;
-            }
+                if (viewport_node) {
+                    auto viewport = dynamic_cast<SubViewport *>(viewport_node);
+                    pipeline = viewport->render_target->blitGraphicsPipeline;
+                }
 
-            // Upload the model matrix to the GPU via push constants.
-            vkCmdPushConstants(p_command_buffer, pipeline_layout,
-                               VK_SHADER_STAGE_VERTEX_BIT, 0,
-                               sizeof(Surface2dPushConstant), &push_constant);
+                // Upload the model matrix to the GPU via push constants.
+                vkCmdPushConstants(p_command_buffer, pipeline_layout,
+                                   VK_SHADER_STAGE_VERTEX_BIT, 0,
+                                   sizeof(Surface2dPushConstant), &push_constant);
 
-            // Unlike Sprite 2D, Texture Rect should not support custom mesh.
-            RenderServer::getSingleton().blit(
-                    p_command_buffer,
-                    pipeline,
-                    mesh->surface->get_material()->get_desc_set()->getDescriptorSet(
-                            SwapChain::getSingleton().currentImage));
-        } else {
-            auto canvas = VectorServer::get_singleton().canvas;
-            auto global_position = get_global_position();
-
-            auto vector_texture = static_cast<VectorTexture *>(texture.get());
-
-            if (stretch_mode == StretchMode::KEEP_CENTER) {
-                auto texture_size = vector_texture->get_size();
-                vector_texture->add_to_canvas(global_position + ((size - Vec2<float>(texture_size.x, texture_size.y)) * 0.5f), canvas);
+                // Unlike Sprite 2D, Texture Rect should not support custom mesh.
+                RenderServer::getSingleton().blit(
+                        p_command_buffer,
+                        pipeline,
+                        mesh->surface->get_material()->get_desc_set()->getDescriptorSet(
+                                SwapChain::getSingleton().currentImage));
             } else {
-                vector_texture->add_to_canvas(global_position, canvas);
+                auto canvas = VectorServer::get_singleton().canvas;
+                auto global_position = get_global_position();
+
+                auto vector_texture = static_cast<VectorTexture *>(texture.get());
+
+                if (stretch_mode == StretchMode::KEEP_CENTER) {
+                    auto texture_size = vector_texture->get_size();
+                    vector_texture->add_to_canvas(global_position + ((size - Vec2<float>(texture_size.x, texture_size.y)) * 0.5f), canvas);
+                } else {
+                    vector_texture->add_to_canvas(global_position, canvas);
+                }
             }
         }
 

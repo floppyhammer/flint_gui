@@ -632,8 +632,8 @@ namespace Flint {
     void RenderServer::createMeshPipeline(VkRenderPass renderPass,
                                           VkExtent2D viewportExtent,
                                           VkPipeline &pipeline) {
-        auto vertShaderCode = readFile("../src/shaders/mesh_instance_vert.spv");
-        auto fragShaderCode = readFile("../src/shaders/mesh_instance_frag.spv");
+        auto vertShaderCode = load_file_as_bytes("../src/shaders/mesh_instance_vert.spv");
+        auto fragShaderCode = load_file_as_bytes("../src/shaders/mesh_instance_frag.spv");
 
         VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -771,8 +771,8 @@ namespace Flint {
     void RenderServer::createBlitPipeline(VkRenderPass renderPass,
                                           VkExtent2D viewportExtent,
                                           VkPipeline &pipeline) {
-        auto vertShaderCode = readFile("../src/shaders/blit_vert.spv");
-        auto fragShaderCode = readFile("../src/shaders/blit_frag.spv");
+        auto vertShaderCode = load_file_as_bytes("../src/shaders/blit_vert.spv");
+        auto fragShaderCode = load_file_as_bytes("../src/shaders/blit_frag.spv");
 
         VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);

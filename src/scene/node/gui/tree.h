@@ -39,6 +39,8 @@ namespace Flint {
 
         void set_text(const std::string &text);
 
+        void set_icon(const std::shared_ptr<Texture> &texture);
+
     private:
         bool collapsed = false;
         bool selected = false;
@@ -46,10 +48,14 @@ namespace Flint {
         // Local position in the tree.
         Vec2<float> position;
 
-        std::shared_ptr<Label> label;
         std::shared_ptr<Button> collapse_button;
-        std::shared_ptr<BoxContainer> container;
         std::shared_ptr<VectorTexture> collapse_icon, expand_icon;
+
+        std::shared_ptr<TextureRect> icon;
+
+        std::shared_ptr<Label> label;
+
+        std::shared_ptr<BoxContainer> container;
 
         std::vector<std::shared_ptr<TreeItem>> children;
         TreeItem *parent;

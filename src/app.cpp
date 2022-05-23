@@ -46,7 +46,7 @@ void App::run() {
                                                                                         platform.graphicsQueue,
                                                                                         platform.graphicsQueue,
                                                                                         render_server.commandPool);
-    vector_server.init(driver, WIDTH, HEIGHT, readFile("../assets/area-lut.png"));
+    vector_server.init(driver, WIDTH, HEIGHT, load_file_as_bytes("../assets/area-lut.png"));
     // ---------------------------------------------------
 
     uint32_t NODE_SPRITE_COUNT = 000;

@@ -123,6 +123,8 @@ namespace Flint {
     }
 
     void Button::draw(VkCommandBuffer p_command_buffer) {
+        if (!visible) return;
+
         auto canvas = VectorServer::get_singleton().canvas;
 
         auto global_position = get_global_position();

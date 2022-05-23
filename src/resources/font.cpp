@@ -12,7 +12,7 @@
 
 namespace Flint {
     Font::Font(const std::string &path) {
-        auto bytes = readFile(path);
+        auto bytes = load_file_as_bytes(path.c_str());
 
         auto byte_size = bytes.size() * sizeof(unsigned char);
         buffer = static_cast<unsigned char *>(malloc(byte_size));
