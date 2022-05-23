@@ -7,13 +7,13 @@ namespace Flint {
         type = NodeType::ProgressBar;
 
         theme_progress = std::optional(StyleBox());
-        theme_progress.value().bg_color = ColorU(40, 123, 222, 255);
+        theme_progress.value().bg_color = ColorU(199, 84, 80);
 
         theme_bg = std::optional(StyleBox());
 
         theme_fg = std::optional(StyleBox());
         theme_fg->bg_color = ColorU();
-        theme_fg->border_color = ColorU(150, 150, 150, 255);
+        theme_fg->border_color = ColorU(150, 150, 150);
         theme_fg->border_width = 2;
 
         // Don't add the label as a child since it's not a normal node but part of the button.

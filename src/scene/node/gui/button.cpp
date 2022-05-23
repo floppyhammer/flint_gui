@@ -78,10 +78,12 @@ namespace Flint {
             if (event.type == InputEventType::MouseButton) {
                 auto args = event.args.mouse_button;
 
-                if (event.is_consumed() && !args.pressed) {
-                    if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
-                        pressed = false;
-                        pressed_inside = false;
+                if (event.is_consumed()) {
+                    if (!args.pressed) {
+                        if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
+                            pressed = false;
+                            pressed_inside = false;
+                        }
                     }
                 } else {
                     if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {

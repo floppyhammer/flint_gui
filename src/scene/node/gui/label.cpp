@@ -9,6 +9,8 @@ namespace Flint {
         outline.border_color = ColorU::red();
 
         set_font(ResourceManager::get_singleton().load<Flint::Font>("../assets/unifont-14.0.03.ttf"));
+
+        set_text("Label");
     }
 
     void Label::set_text(const std::string &p_text) {

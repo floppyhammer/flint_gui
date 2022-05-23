@@ -70,7 +70,6 @@ void App::run() {
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
         auto label = std::make_shared<Flint::Label>();
-        label->set_text("Hello Flint");
         label->set_horizontal_alignment(Flint::Alignment::Center);
         label->set_vertical_alignment(Flint::Alignment::Center);
         label->set_position({400, 0});

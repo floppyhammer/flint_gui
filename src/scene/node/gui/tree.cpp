@@ -13,12 +13,12 @@ namespace Flint {
         panel.border_width = 2;
         theme_bg_focused = std::make_optional(panel);
 
-        auto root_ = create_item(nullptr);
-        auto child0 = create_item(root_);
-        auto child0_0 = create_item(child0);
-        auto child1 = create_item(root_);
-
-        root->set_text("root");
+        auto root_ = create_item(nullptr, "Node");
+        auto child_control = create_item(root_, "Control");
+        auto child_node_2d = create_item(root_, "Node2D");
+        auto child_node_3d = create_item(root_, "Node3D");
+        auto child_label = create_item(child_control, "Label");
+        auto child_line_edit = create_item(child_control, "LineEdit");
     }
 
     void Tree::update(double delta) {

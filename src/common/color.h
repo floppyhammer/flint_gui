@@ -53,6 +53,8 @@ namespace Flint {
 
         ColorU(uint8_t p_r, uint8_t p_g, uint8_t p_b, uint8_t p_a);
 
+        ColorU(uint8_t p_r, uint8_t p_g, uint8_t p_b);
+
         uint32_t to_u32() const;
 
         ColorF to_f32() const;

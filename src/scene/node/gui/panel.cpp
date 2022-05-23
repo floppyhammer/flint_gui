@@ -71,8 +71,12 @@ namespace Flint {
             collapsed = !collapsed;
             if (collapsed) {
                 collapse_button->set_icon(expand_icon);
+
+                Logger::verbose("Collapsed", "Panel");
             } else {
                 collapse_button->set_icon(collapse_icon);
+
+                Logger::verbose("Expanded", "Panel");
             }
         };
         collapse_button->connect_signal("on_pressed", callback);
@@ -91,20 +95,17 @@ namespace Flint {
     }
 
     void Panel::propagate_input(std::vector<InputEvent> &input_queue) {
-        if (!collapsed) {
-            Node::propagate_input(input_queue);
-        }
-
         container->propagate_input(input_queue);
 
-        input(input_queue);
+        if (collapsed) {
+            input(input_queue);
+        } else {
+            Node::propagate_input(input_queue);
+        }
     }
 
     void Panel::input(std::vector<InputEvent> &input_queue) {
         auto global_position = get_global_position();
-
-        collapse_button->input(input_queue);
-        close_button->input(input_queue);
 
         for (auto &event: input_queue) {
             bool consume_flag = false;
@@ -118,7 +119,7 @@ namespace Flint {
                 }
 
                 if (Rect<float>(global_position - Vec2<float>(0, title_bar_height),
-                                global_position + Vec2<float>(size.x, 0)).contains_point(args.position)) {
+                                global_position + size + Vec2<float>(0, title_bar_height)).contains_point(args.position)) {
                     consume_flag = true;
                 }
             }
@@ -141,10 +142,10 @@ namespace Flint {
                 }
 
                 if (!args.pressed) title_bar_pressed = false;
+            }
 
-                if (consume_flag) {
-                    event.consume();
-                }
+            if (consume_flag) {
+                event.consume();
             }
         }
 
