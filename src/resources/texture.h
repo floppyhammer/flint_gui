@@ -8,6 +8,7 @@ namespace Flint {
     enum class TextureType {
         IMAGE,
         VECTOR,
+        MAX,
     };
 
     class Texture : public Resource {
@@ -25,7 +26,7 @@ namespace Flint {
         TextureType get_type();
 
     protected:
-        TextureType type;
+        TextureType type = TextureType::MAX;
 
         uint32_t width = 0;
         uint32_t height = 0;

@@ -1,11 +1,12 @@
-#include <stdexcept>
-
 #include "image_texture.h"
 #include "../common/logger.h"
 
+// Already defined in Pathfinder.
 //#define STB_IMAGE_IMPLEMENTATION
 
 #include "stb_image.h"
+
+#include <stdexcept>
 
 namespace Flint {
     ImageTexture::ImageTexture() {
@@ -15,7 +16,7 @@ namespace Flint {
     ImageTexture::~ImageTexture() {
         if (!resource_ownership) return;
 
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         vkDestroySampler(device, sampler, nullptr);
 
@@ -40,7 +41,7 @@ namespace Flint {
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingBufferMemory;
 
-        RenderServer::getSingleton().createBuffer(imageSize,
+        RenderServer::getSingleton()->createBuffer(imageSize,
                                                   VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -48,9 +49,9 @@ namespace Flint {
                                                   stagingBufferMemory);
 
         // Copy the pixel values that we got from the image loading library to the buffer.
-        RenderServer::getSingleton().copyDataToMemory(pixels, stagingBufferMemory, imageSize);
+        RenderServer::getSingleton()->copyDataToMemory(pixels, stagingBufferMemory, imageSize);
 
-        RenderServer::getSingleton().createImage(width, height,
+        RenderServer::getSingleton()->createImage(width, height,
                                                  VK_FORMAT_R8G8B8A8_UNORM,
                                                  VK_IMAGE_TILING_OPTIMAL,
                                                  VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT |
@@ -60,24 +61,24 @@ namespace Flint {
                                                  imageMemory);
 
         // Transition the texture image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL.
-        RenderServer::getSingleton().transitionImageLayout(image,
+        RenderServer::getSingleton()->transitionImageLayout(image,
                                                            VK_FORMAT_R8G8B8A8_UNORM,
                                                            VK_IMAGE_LAYOUT_UNDEFINED,
                                                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         // Execute the buffer to image copy operation.
-        RenderServer::getSingleton().copyBufferToImage(stagingBuffer, image, static_cast<uint32_t>(width),
+        RenderServer::getSingleton()->copyBufferToImage(stagingBuffer, image, static_cast<uint32_t>(width),
                                                        static_cast<uint32_t>(height));
 
         // To be able to start sampling from the texture image in the shader, we need one last transition to prepare it for shader access.
-        RenderServer::getSingleton().transitionImageLayout(image,
+        RenderServer::getSingleton()->transitionImageLayout(image,
                                                            VK_FORMAT_R8G8B8A8_UNORM,
                                                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                                            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
         // Clean up staging stuff.
-        vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
-        vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
+        vkDestroyBuffer(Platform::getSingleton()->device, stagingBuffer, nullptr);
+        vkFreeMemory(Platform::getSingleton()->device, stagingBufferMemory, nullptr);
     }
 
     std::shared_ptr<ImageTexture> ImageTexture::from_empty(uint32_t p_width, uint32_t p_height) {
@@ -94,12 +95,12 @@ namespace Flint {
         texture->create_image_from_bytes(pixels.data(), p_width, p_height);
 
         // Create image view.
-        texture->imageView = RenderServer::getSingleton().createImageView(texture->image,
+        texture->imageView = RenderServer::getSingleton()->createImageView(texture->image,
                                                                           VK_FORMAT_R8G8B8A8_UNORM,
                                                                           VK_IMAGE_ASPECT_COLOR_BIT);
 
         // Create sampler.
-        RenderServer::getSingleton().createTextureSampler(texture->sampler);
+        RenderServer::getSingleton()->createTextureSampler(texture->sampler);
 
         return texture;
     }
@@ -123,12 +124,12 @@ namespace Flint {
         stbi_image_free(pixels);
 
         // Create image view.
-        imageView = RenderServer::getSingleton().createImageView(image,
+        imageView = RenderServer::getSingleton()->createImageView(image,
                                                                  VK_FORMAT_R8G8B8A8_UNORM,
                                                                  VK_IMAGE_ASPECT_COLOR_BIT);
 
         // Create sampler.
-        RenderServer::getSingleton().createTextureSampler(sampler);
+        RenderServer::getSingleton()->createTextureSampler(sampler);
     }
 
     std::shared_ptr<ImageTexture> ImageTexture::from_wrapper(VkImageView p_image_view,

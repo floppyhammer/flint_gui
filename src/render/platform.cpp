@@ -375,7 +375,7 @@ VkFormat Platform::findSupportedFormat(const std::vector<VkFormat> &candidates,
                                      VkFormatFeatureFlags features) const {
     for (VkFormat format: candidates) {
         VkFormatProperties props;
-        vkGetPhysicalDeviceFormatProperties(Platform::getSingleton().physicalDevice, format, &props);
+        vkGetPhysicalDeviceFormatProperties(Platform::getSingleton()->physicalDevice, format, &props);
 
         if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
             return format;

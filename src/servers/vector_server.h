@@ -9,9 +9,9 @@ namespace Flint {
      */
     class VectorServer {
     public:
-        static VectorServer &get_singleton() {
+        static VectorServer *get_singleton() {
             static VectorServer singleton;
-            return singleton;
+            return &singleton;
         }
 
         VectorServer() = default;

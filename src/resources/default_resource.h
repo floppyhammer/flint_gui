@@ -24,9 +24,9 @@ namespace Flint {
             default_surface_2d_gpu_resources = std::make_shared<SurfaceGpuResources>(vertices, indices);
         }
 
-        static DefaultResource &get_singleton() {
+        static DefaultResource *get_singleton() {
             static DefaultResource singleton;
-            return singleton;
+            return &singleton;
         }
 
         inline std::shared_ptr<SurfaceGpuResources> get_default_surface_2d_gpu_resources() {

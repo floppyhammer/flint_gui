@@ -6,7 +6,7 @@
 
 namespace Flint {
     void SubViewportInputSystem::update(const std::weak_ptr<Coordinator>& p_coordinator) {
-        auto command_buffer = RenderServer::getSingleton().beginSingleTimeCommands();
+        auto command_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
 
         auto coordinator = p_coordinator.lock();
 
@@ -18,7 +18,7 @@ namespace Flint {
 //        // End render pass.
 //        vkCmdEndRenderPass(p_command_buffer);
 //
-//        RenderServer::getSingleton().endSingleTimeCommands(sub_viewport_command_buffer);
+//        RenderServer::getSingleton()->endSingleTimeCommands(sub_viewport_command_buffer);
     }
 
     void SubViewportOutSystem::update(const std::weak_ptr<Coordinator> &p_coordinator) {

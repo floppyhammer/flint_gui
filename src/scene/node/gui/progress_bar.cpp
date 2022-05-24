@@ -46,7 +46,7 @@ namespace Flint {
     }
 
     void ProgressBar::draw(VkCommandBuffer p_command_buffer) {
-        auto canvas = VectorServer::get_singleton().canvas;
+        auto canvas = VectorServer::get_singleton()->canvas;
 
         if (theme_bg.has_value()) theme_bg.value().add_to_canvas(get_global_position(), size, canvas);
         if (theme_progress.has_value())

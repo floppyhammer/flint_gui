@@ -19,7 +19,7 @@ namespace Flint {
     TextureRect::TextureRect() {
         type = NodeType::TextureRect;
 
-        mesh = DefaultResource::get_singleton().new_default_mesh_2d();
+        mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
 
         outline.border_color = ColorU::blue();
     }
@@ -50,8 +50,8 @@ namespace Flint {
             if (texture->get_type() == TextureType::IMAGE) {
                 Node *viewport_node = get_viewport();
 
-                VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
-                VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
+                VkPipeline pipeline = RenderServer::getSingleton()->blitGraphicsPipeline;
+                VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blitPipelineLayout;
 
                 if (viewport_node) {
                     auto viewport = dynamic_cast<SubViewport *>(viewport_node);
@@ -64,13 +64,13 @@ namespace Flint {
                                    sizeof(Surface2dPushConstant), &push_constant);
 
                 // Unlike Sprite 2D, Texture Rect should not support custom mesh.
-                RenderServer::getSingleton().blit(
+                RenderServer::getSingleton()->blit(
                         p_command_buffer,
                         pipeline,
                         mesh->surface->get_material()->get_desc_set()->getDescriptorSet(
-                                SwapChain::getSingleton().currentImage));
+                                SwapChain::getSingleton()->currentImage));
             } else {
-                auto canvas = VectorServer::get_singleton().canvas;
+                auto canvas = VectorServer::get_singleton()->canvas;
                 auto global_position = get_global_position();
 
                 auto vector_texture = static_cast<VectorTexture *>(texture.get());
@@ -95,7 +95,7 @@ namespace Flint {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
             viewport_extent = viewport->get_extent();
         } else { // Default to swap chain image.
-            auto extent = SwapChain::getSingleton().swapChainExtent;
+            auto extent = SwapChain::getSingleton()->swapChainExtent;
             viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
         }
 

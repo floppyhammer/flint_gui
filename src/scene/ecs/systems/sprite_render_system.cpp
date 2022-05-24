@@ -17,7 +17,7 @@ namespace Flint {
             auto &transform = coordinator->get_component<TransformGuiComponent>(entity);
 
             // Default to swap chain image.
-            auto extent = SwapChain::getSingleton().swapChainExtent;
+            auto extent = SwapChain::getSingleton()->swapChainExtent;
             Vec2<uint32_t> viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
 
             // Prepare MVP data. We use this matrix to convert a full-screen to the control's rect.
@@ -49,8 +49,8 @@ namespace Flint {
         for (auto const &entity: entities) {
             auto &sprite = coordinator->get_component<Sprite2dComponent>(entity);
 
-            VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
-            VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
+            VkPipeline pipeline = RenderServer::getSingleton()->blitGraphicsPipeline;
+            VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blitPipelineLayout;
 
             // Upload the model matrix to the GPU via push constants.
             vkCmdPushConstants(command_buffer, pipeline_layout,
@@ -58,10 +58,10 @@ namespace Flint {
                                sizeof(Surface2dPushConstant), &sprite.push_constant.model);
 
             VkBuffer vertexBuffers[] = {sprite.mesh->surface->get_vertex_buffer()};
-            RenderServer::getSingleton().draw_mesh_2d(
+            RenderServer::getSingleton()->draw_mesh_2d(
                     command_buffer,
                     pipeline,
-                    sprite.mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                    sprite.mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage),
                     vertexBuffers,
                     sprite.mesh->surface->get_index_buffer(),
                     sprite.mesh->surface->get_index_count());
@@ -83,7 +83,7 @@ namespace Flint {
             float sprite_height = texture->get_height() * transform.scale.y;
 
             // Default to swap chain image.
-            auto extent = SwapChain::getSingleton().swapChainExtent;
+            auto extent = SwapChain::getSingleton()->swapChainExtent;
             Vec2<uint32_t> viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
 
             // Prepare MVP data. We use this matrix to convert a full-screen to the control's rect.
@@ -118,8 +118,8 @@ namespace Flint {
             auto texture = sprite.mesh->surface->get_material()->get_texture();
             if (texture == nullptr) continue;
 
-            VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
-            VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
+            VkPipeline pipeline = RenderServer::getSingleton()->blitGraphicsPipeline;
+            VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blitPipelineLayout;
 
             // Upload the model matrix to the GPU via push constants.
             vkCmdPushConstants(command_buffer, pipeline_layout,
@@ -127,10 +127,10 @@ namespace Flint {
                                sizeof(Surface2dPushConstant), &sprite.push_constant.model);
 
             VkBuffer vertexBuffers[] = {sprite.mesh->surface->get_vertex_buffer()};
-            RenderServer::getSingleton().draw_mesh_2d(
+            RenderServer::getSingleton()->draw_mesh_2d(
                     command_buffer,
                     pipeline,
-                    sprite.mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                    sprite.mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage),
                     vertexBuffers,
                     sprite.mesh->surface->get_index_buffer(),
                     sprite.mesh->surface->get_index_count());

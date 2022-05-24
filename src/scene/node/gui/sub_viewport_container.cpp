@@ -16,7 +16,7 @@ namespace Flint {
     SubViewportContainer::SubViewportContainer() {
         type = NodeType::SubViewportContainer;
 
-        mesh = DefaultResource::get_singleton().new_default_mesh_2d();
+        mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
     }
 
     void SubViewportContainer::set_viewport(std::shared_ptr<SubViewport> p_viewport) {
@@ -34,14 +34,14 @@ namespace Flint {
         // to call the sub-viewport draw function below specifically.
         // Also, we can't interrupt our previous render pass.
 
-        auto sub_viewport_command_buffer = RenderServer::getSingleton().beginSingleTimeCommands();
+        auto sub_viewport_command_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
 
         // Start sub-viewport render pass.
         if (sub_viewport != nullptr) {
             sub_viewport->propagate_draw(sub_viewport_command_buffer);
         }
 
-        RenderServer::getSingleton().endSingleTimeCommands(sub_viewport_command_buffer);
+        RenderServer::getSingleton()->endSingleTimeCommands(sub_viewport_command_buffer);
 
         // Now draw the rendered sub-viewport texture.
         draw(p_command_buffer);
@@ -50,8 +50,8 @@ namespace Flint {
     void SubViewportContainer::draw(VkCommandBuffer p_command_buffer) {
         Node *viewport_node = get_viewport();
 
-        VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
-        VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
+        VkPipeline pipeline = RenderServer::getSingleton()->blitGraphicsPipeline;
+        VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blitPipelineLayout;
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
@@ -64,10 +64,10 @@ namespace Flint {
                            sizeof(Surface2dPushConstant), &push_constant);
 
         VkBuffer vertexBuffers[] = {mesh->surface->get_vertex_buffer()};
-        RenderServer::getSingleton().blit(
+        RenderServer::getSingleton()->blit(
                 p_command_buffer,
                 pipeline,
-                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage));
+                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage));
     }
 
     void SubViewportContainer::update_mvp() {
@@ -78,7 +78,7 @@ namespace Flint {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
             viewport_extent = viewport->get_extent();
         } else { // Default to swap chain image.
-            auto extent = SwapChain::getSingleton().swapChainExtent;
+            auto extent = SwapChain::getSingleton()->swapChainExtent;
             viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
         }
 

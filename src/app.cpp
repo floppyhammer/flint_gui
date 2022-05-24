@@ -36,17 +36,17 @@ void App::run() {
     auto swap_chain = SwapChain::getSingleton();
 
     // 4. Initialize input server.
-    auto &input_server = Flint::InputServer::get_singleton();
-    input_server.attach_callbacks(platform.window);
+    auto input_server = Flint::InputServer::get_singleton();
+    input_server->attach_callbacks(platform->window);
 
     // 5. Initialize vector server.
-    auto &vector_server = Flint::VectorServer::get_singleton();
-    std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(platform.device,
-                                                                                        platform.physicalDevice,
-                                                                                        platform.graphicsQueue,
-                                                                                        platform.graphicsQueue,
-                                                                                        render_server.commandPool);
-    vector_server.init(driver, WIDTH, HEIGHT, load_file_as_bytes("../assets/area-lut.png"));
+    auto vector_server = Flint::VectorServer::get_singleton();
+    std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(platform->device,
+                                                                                        platform->physicalDevice,
+                                                                                        platform->graphicsQueue,
+                                                                                        platform->graphicsQueue,
+                                                                                        render_server->commandPool);
+    vector_server->init(driver, WIDTH, HEIGHT, load_file_as_bytes("../assets/area-lut.png"));
     // ---------------------------------------------------
 
     uint32_t NODE_SPRITE_COUNT = 000;
@@ -64,9 +64,9 @@ void App::run() {
         auto node = std::make_shared<Flint::Node>();
         auto node_3d = std::make_shared<Flint::Node3D>();
         auto model0 = std::make_shared<Flint::Model>();
-        model0->set_mesh(ResourceManager::get_singleton().load<Mesh3d>("../assets/viking_room/viking_room.obj"));
+        model0->set_mesh(ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj"));
         auto model1 = std::make_shared<Flint::Model>();
-        model1->set_mesh(ResourceManager::get_singleton().load<Mesh3d>("../assets/viking_room/viking_room.obj"));
+        model1->set_mesh(ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj"));
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
         auto label = std::make_shared<Flint::Label>();
@@ -101,7 +101,7 @@ void App::run() {
         auto vector_layer = std::make_shared<Flint::TextureRect>();
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WIDTH, HEIGHT});
-        auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server.canvas->get_dest_texture().get());
+        auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server->canvas->get_dest_texture().get());
         auto texture = ImageTexture::from_wrapper(texture_vk->get_image_view(),
                                                   texture_vk->get_sampler(),
                                                   texture_vk->get_width(),
@@ -115,7 +115,7 @@ void App::run() {
             rigid_body_2d->position = {400, 0};
             rigid_body_2d->velocity = {rand_velocity(generator), rand_velocity(generator)};
             auto sprite_2d = std::make_shared<Flint::Sprite2d>();
-            sprite_2d->set_texture(ResourceManager::get_singleton().load<ImageTexture>("../assets/duck.png"));
+            sprite_2d->set_texture(ResourceManager::get_singleton()->load<ImageTexture>("../assets/duck.png"));
             rigid_body_2d->add_child(sprite_2d);
             node->add_child(rigid_body_2d);
         }
@@ -156,9 +156,9 @@ void App::run() {
 
         // Add some 2D sprites.
         for (int i = 0; i < ECS_SPRITE_COUNT; i++) {
-            auto mesh = DefaultResource::get_singleton().new_default_mesh_2d();
+            auto mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
             mesh->surface->get_material()->set_texture(
-                    ResourceManager::get_singleton().load<ImageTexture>("../assets/duck.png"));
+                    ResourceManager::get_singleton()->load<ImageTexture>("../assets/duck.png"));
 
             auto entity = world->spawn();
             world->add_component(entity, Flint::Sprite2dComponent{mesh});
@@ -176,7 +176,7 @@ void App::run() {
 
         // 3D model.
 //        {
-//            auto mesh = ResourceManager::get_singleton().load<Mesh3d>("../assets/viking_room/viking_room.obj");
+//            auto mesh = ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj");
 //
 //            auto entity = coordinator.create_entity();
 //            entities.push_back(entity);
@@ -242,13 +242,13 @@ void App::run() {
             world.reset();
         }
 
-        DefaultResource::get_singleton().cleanup();
+        DefaultResource::get_singleton()->cleanup();
 
-        swap_chain.cleanup();
+        swap_chain->cleanup();
 
-        render_server.cleanup();
+        render_server->cleanup();
 
-        platform.cleanup();
+        platform->cleanup();
     }
 }
 
@@ -268,10 +268,10 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
     {
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = SwapChain::getSingleton().renderPass;
-        renderPassInfo.framebuffer = SwapChain::getSingleton().swapChainFramebuffers[imageIndex]; // Set target framebuffer.
+        renderPassInfo.renderPass = SwapChain::getSingleton()->renderPass;
+        renderPassInfo.framebuffer = SwapChain::getSingleton()->swapChainFramebuffers[imageIndex]; // Set target framebuffer.
         renderPassInfo.renderArea.offset = {0, 0};
-        renderPassInfo.renderArea.extent = SwapChain::getSingleton().swapChainExtent; // Has to be larger than the area we're going to draw.
+        renderPassInfo.renderArea.extent = SwapChain::getSingleton()->swapChainExtent; // Has to be larger than the area we're going to draw.
 
         // Clear color.
         std::array<VkClearValue, 2> clearValues{};
@@ -286,9 +286,9 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
                              VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    auto &vector_server = Flint::VectorServer::get_singleton();
+    auto vector_server = Flint::VectorServer::get_singleton();
 
-    vector_server.canvas->clear();
+    vector_server->canvas->clear();
 
     // Record commands from the scene manager.
     {
@@ -302,7 +302,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
 
     // FIXME: When nothing is drawn, the dest image layout will not be set to SHADER_READ_ONLY.
     // Do the vector render pass before the main render pass.
-    vector_server.canvas->build_and_render();
+    vector_server->canvas->build_and_render();
 
     // End recording.
     if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS) {
@@ -311,28 +311,28 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
 }
 
 void App::main_loop() {
-    while (!glfwWindowShouldClose(Platform::getSingleton().window)) {
+    while (!glfwWindowShouldClose(Platform::getSingleton()->window)) {
         glfwPollEvents();
         draw_frame();
     }
 
     // Wait on the host for the completion of outstanding queue operations for all queues on a given logical device.
-    vkDeviceWaitIdle(Platform::getSingleton().device);
+    vkDeviceWaitIdle(Platform::getSingleton()->device);
 }
 
 void App::draw_frame() {
     // Engine processing.
-    Flint::Engine::getSingleton().tick();
-    auto dt = Flint::Engine::getSingleton().get_delta();
+    Flint::Engine::getSingleton()->tick();
+    auto dt = Flint::Engine::getSingleton()->get_delta();
 
     // Acquire next image.
     // We should do this before updating scene as we need to modify different buffers according to the current image index.
     uint32_t imageIndex;
-    if (!SwapChain::getSingleton().acquireSwapChainImage(imageIndex)) return;
+    if (!SwapChain::getSingleton()->acquireSwapChainImage(imageIndex)) return;
 
     // Update the scene.
     {
-        tree.input(Flint::InputServer::get_singleton().input_queue);
+        tree.input(Flint::InputServer::get_singleton()->input_queue);
 
         // Node scene manager.
         tree.update(dt);
@@ -342,10 +342,10 @@ void App::draw_frame() {
     }
 
     // Record draw calls.
-    record_commands(SwapChain::getSingleton().commandBuffers, imageIndex);
+    record_commands(SwapChain::getSingleton()->commandBuffers, imageIndex);
 
-    Flint::InputServer::get_singleton().clear_queue();
+    Flint::InputServer::get_singleton()->clear_queue();
 
     // Submit commands for drawing.
-    SwapChain::getSingleton().flush(imageIndex);
+    SwapChain::getSingleton()->flush(imageIndex);
 }

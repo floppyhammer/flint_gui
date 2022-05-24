@@ -11,10 +11,10 @@ namespace Flint {
 
     class Engine {
     public:
-        static Engine &getSingleton() {
+        static Engine *getSingleton() {
             static Engine singleton;
 
-            return singleton;
+            return &singleton;
         }
 
         Engine();

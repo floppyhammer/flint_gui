@@ -32,7 +32,7 @@ namespace Flint {
         VkDeviceMemory stagingBufferMemory; // In CPU
 
         // Create the GPU buffer and link it with the CPU memory.
-        RenderServer::getSingleton().createBuffer(bufferSize,
+        RenderServer::getSingleton()->createBuffer(bufferSize,
                                                   VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -40,21 +40,21 @@ namespace Flint {
                                                   stagingBufferMemory);
 
         // Copy data to the CPU memory.
-        RenderServer::getSingleton().copyDataToMemory((void *) vertices.data(), stagingBufferMemory, bufferSize);
+        RenderServer::getSingleton()->copyDataToMemory((void *) vertices.data(), stagingBufferMemory, bufferSize);
 
         // Create the vertex buffer (GPU) and bind it to the vertex memory (CPU).
-        RenderServer::getSingleton().createBuffer(bufferSize,
+        RenderServer::getSingleton()->createBuffer(bufferSize,
                                                   VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
                                                   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                                   vertexBuffer,
                                                   vertexBufferMemory);
 
         // Copy buffer (GPU).
-        RenderServer::getSingleton().copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+        RenderServer::getSingleton()->copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
 
         // Clean up staging buffer and memory.
-        vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
-        vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
+        vkDestroyBuffer(Platform::getSingleton()->device, stagingBuffer, nullptr);
+        vkFreeMemory(Platform::getSingleton()->device, stagingBufferMemory, nullptr);
     }
 
     void SurfaceGpuResources::create_index_buffer(const std::vector<uint32_t> &indices) {
@@ -65,28 +65,28 @@ namespace Flint {
 
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingBufferMemory;
-        RenderServer::getSingleton().createBuffer(bufferSize,
+        RenderServer::getSingleton()->createBuffer(bufferSize,
                                                   VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
                                                   stagingBuffer,
                                                   stagingBufferMemory);
 
-        RenderServer::getSingleton().copyDataToMemory((void *) indices.data(),
+        RenderServer::getSingleton()->copyDataToMemory((void *) indices.data(),
                                                       stagingBufferMemory,
                                                       bufferSize);
 
-        RenderServer::getSingleton().createBuffer(bufferSize,
+        RenderServer::getSingleton()->createBuffer(bufferSize,
                                                   VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
                                                   VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                                   indexBuffer,
                                                   indexBufferMemory);
 
         // Copy data from staging buffer to index buffer.
-        RenderServer::getSingleton().copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+        RenderServer::getSingleton()->copyBuffer(stagingBuffer, indexBuffer, bufferSize);
 
-        vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
-        vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
+        vkDestroyBuffer(Platform::getSingleton()->device, stagingBuffer, nullptr);
+        vkFreeMemory(Platform::getSingleton()->device, stagingBufferMemory, nullptr);
     }
 
     SurfaceGpuResources::SurfaceGpuResources(const std::vector<Vertex> &vertices,
@@ -96,7 +96,7 @@ namespace Flint {
     }
 
     SurfaceGpuResources::~SurfaceGpuResources() {
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         // Clean up index buffer.
         vkDestroyBuffer(device, indexBuffer, nullptr);

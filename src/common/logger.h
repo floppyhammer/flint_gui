@@ -26,9 +26,9 @@
 namespace Flint {
     class Logger {
     public:
-        static Logger &get_singleton() {
+        static Logger *get_singleton() {
             static Logger singleton;
-            return singleton;
+            return &singleton;
         }
 
         enum Level {
@@ -40,39 +40,39 @@ namespace Flint {
         } level = Level::INFO;
 
         static void set_level(Level p_level) {
-            get_singleton().level = p_level;
+            get_singleton()->level = p_level;
         }
 
         static void verbose(const std::string &label, const std::string &module = "") {
-            if (get_singleton().level <= Level::VERBOSE) {
+            if (get_singleton()->level <= Level::VERBOSE) {
                 system("Color 07");
                 FLINT_LOGV("[VERBOSE][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void debug(const std::string &label, const std::string &module = "") {
-            if (get_singleton().level <= Level::DEBUG) {
+            if (get_singleton()->level <= Level::DEBUG) {
                 system("Color 07");
                 FLINT_LOGD("[DEBUG][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void info(const std::string &label, const std::string &module = "") {
-            if (get_singleton().level <= Level::INFO) {
+            if (get_singleton()->level <= Level::INFO) {
                 system("Color 07");
                 FLINT_LOGI("[INFO][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void warn(const std::string &label, const std::string &module = "") {
-            if (get_singleton().level <= Level::WARN) {
+            if (get_singleton()->level <= Level::WARN) {
                 system("Color 06");
                 FLINT_LOGW("[WARN][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }
         }
 
         static void error(const std::string &label, const std::string &module = "") {
-            if (get_singleton().level <= Level::ERROR) {
+            if (get_singleton()->level <= Level::ERROR) {
                 system("Color 04");
                 FLINT_LOGE("[ERROR][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
             }

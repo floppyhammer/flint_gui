@@ -8,9 +8,9 @@ namespace Flint {
     public:
         SwapChain();
 
-        static SwapChain &getSingleton() {
+        static SwapChain *getSingleton() {
             static SwapChain singleton;
-            return singleton;
+            return &singleton;
         }
 
         VkSwapchainKHR swapChain;

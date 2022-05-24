@@ -62,9 +62,9 @@ namespace Flint {
 
     class RenderServer {
     public:
-        static RenderServer &getSingleton() {
+        static RenderServer *getSingleton() {
             static RenderServer singleton;
-            return singleton;
+            return &singleton;
         }
 
         RenderServer();

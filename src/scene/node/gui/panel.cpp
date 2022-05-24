@@ -169,7 +169,7 @@ namespace Flint {
     }
 
     void Panel::draw(VkCommandBuffer p_command_buffer) {
-        auto canvas = VectorServer::get_singleton().canvas;
+        auto canvas = VectorServer::get_singleton()->canvas;
 
         auto global_position = get_global_position();
 

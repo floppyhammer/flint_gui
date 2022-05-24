@@ -11,7 +11,7 @@ namespace Flint {
     }
 
     RenderTarget::~RenderTarget() {
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         extent_dependent_cleanup();
 
@@ -23,15 +23,15 @@ namespace Flint {
         texture = ImageTexture::from_empty(extent.x, extent.y);
 
         // Depth.
-        VkFormat depthFormat = Platform::getSingleton().findDepthFormat();
-        RenderServer::getSingleton().createImage(extent.x, extent.y,
+        VkFormat depthFormat = Platform::getSingleton()->findDepthFormat();
+        RenderServer::getSingleton()->createImage(extent.x, extent.y,
                                                  depthFormat,
                                                  VK_IMAGE_TILING_OPTIMAL,
                                                  VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
                                                  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
                                                  depthImage,
                                                  depthImageMemory);
-        depthImageView = RenderServer::getSingleton().createImageView(depthImage, depthFormat,
+        depthImageView = RenderServer::getSingleton()->createImageView(depthImage, depthFormat,
                                                                       VK_IMAGE_ASPECT_DEPTH_BIT);
     }
 
@@ -56,7 +56,7 @@ namespace Flint {
         // Depth attachment.
         // ----------------------------------------
         VkAttachmentDescription depthAttachment{};
-        depthAttachment.format = Platform::getSingleton().findDepthFormat();
+        depthAttachment.format = Platform::getSingleton()->findDepthFormat();
         depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
         depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -109,7 +109,7 @@ namespace Flint {
         renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
         renderPassInfo.pDependencies = dependencies.data();
 
-        if (vkCreateRenderPass(Platform::getSingleton().device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
+        if (vkCreateRenderPass(Platform::getSingleton()->device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create render pass!");
         }
     }
@@ -131,7 +131,7 @@ namespace Flint {
             framebufferInfo.height = extent.y;
             framebufferInfo.layers = 1;
 
-            if (vkCreateFramebuffer(Platform::getSingleton().device,
+            if (vkCreateFramebuffer(Platform::getSingleton()->device,
                                     &framebufferInfo,
                                     nullptr,
                                     &framebuffer) != VK_SUCCESS) {
@@ -158,12 +158,12 @@ namespace Flint {
 
     void RenderTarget::create_pipelines() {
         // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
-        RenderServer::getSingleton().createMeshPipeline(
+        RenderServer::getSingleton()->createMeshPipeline(
                 renderPass,
                 VkExtent2D{extent.x, extent.y},
                 meshGraphicsPipeline);
 
-        RenderServer::getSingleton().createBlitPipeline(
+        RenderServer::getSingleton()->createBlitPipeline(
                 renderPass,
                 VkExtent2D{extent.x, extent.y},
                 blitGraphicsPipeline);
@@ -191,7 +191,7 @@ namespace Flint {
     }
 
     void RenderTarget::extent_dependent_cleanup() const {
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
         vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);

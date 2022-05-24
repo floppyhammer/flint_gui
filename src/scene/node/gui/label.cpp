@@ -8,7 +8,7 @@ namespace Flint {
 
         outline.border_color = ColorU::red();
 
-        set_font(ResourceManager::get_singleton().load<Flint::Font>("../assets/unifont-14.0.03.ttf"));
+        set_font(ResourceManager::get_singleton()->load<Flint::Font>("../assets/unifont-14.0.03.ttf"));
 
         set_text("Label");
     }
@@ -193,7 +193,7 @@ namespace Flint {
     }
 
     void Label::draw(VkCommandBuffer p_command_buffer) {
-        auto canvas = VectorServer::get_singleton().canvas;
+        auto canvas = VectorServer::get_singleton()->canvas;
 
         auto global_position = get_global_position();
 

@@ -16,8 +16,8 @@ namespace Flint {
     void Model::draw(VkCommandBuffer p_command_buffer) {
         Node *viewport_node = get_viewport();
 
-        VkPipeline pipeline = RenderServer::getSingleton().meshGraphicsPipeline;
-        VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
+        VkPipeline pipeline = RenderServer::getSingleton()->meshGraphicsPipeline;
+        VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blitPipelineLayout;
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
@@ -33,10 +33,10 @@ namespace Flint {
             const auto &desc_set = surface->get_material()->get_desc_set();
 
             VkBuffer vertexBuffers[] = {surface->get_vertex_buffer()};
-            RenderServer::getSingleton().draw_mesh(
+            RenderServer::getSingleton()->draw_mesh(
                     p_command_buffer,
                     pipeline,
-                    desc_set->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                    desc_set->getDescriptorSet(SwapChain::getSingleton()->currentImage),
                     vertexBuffers,
                     surface->get_index_buffer(),
                     surface->get_index_count());

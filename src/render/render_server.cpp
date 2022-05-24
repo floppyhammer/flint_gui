@@ -21,7 +21,7 @@ namespace Flint {
     }
 
     void RenderServer::cleanupSwapChainRelatedResources() const {
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         // Graphics pipeline resources.
         vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
@@ -29,7 +29,7 @@ namespace Flint {
     }
 
     void RenderServer::cleanup() {
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         // Pipeline layouts.
         vkDestroyPipelineLayout(device, meshPipelineLayout, nullptr);
@@ -45,7 +45,7 @@ namespace Flint {
     uint32_t RenderServer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const {
         VkPhysicalDeviceMemoryProperties memProperties;
         // Reports memory information for the specified physical device.
-        vkGetPhysicalDeviceMemoryProperties(Platform::getSingleton().physicalDevice, &memProperties);
+        vkGetPhysicalDeviceMemoryProperties(Platform::getSingleton()->physicalDevice, &memProperties);
 
         for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
             if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
@@ -63,7 +63,7 @@ namespace Flint {
         createInfo.pCode = reinterpret_cast<const uint32_t *>(code.data());
 
         VkShaderModule shaderModule;
-        if (vkCreateShaderModule(Platform::getSingleton().device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+        if (vkCreateShaderModule(Platform::getSingleton()->device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create shader module!");
         }
 
@@ -71,21 +71,21 @@ namespace Flint {
     }
 
     void RenderServer::createCommandPool() {
-        QueueFamilyIndices qfIndices = Platform::getSingleton().findQueueFamilies(
-                Platform::getSingleton().physicalDevice);
+        QueueFamilyIndices qfIndices = Platform::getSingleton()->findQueueFamilies(
+                Platform::getSingleton()->physicalDevice);
 
         VkCommandPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
         poolInfo.queueFamilyIndex = qfIndices.graphicsFamily.value();
         poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // So we can reset command buffers.
 
-        if (vkCreateCommandPool(Platform::getSingleton().device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
+        if (vkCreateCommandPool(Platform::getSingleton()->device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create command pool!");
         }
     }
 
     VkCommandBuffer RenderServer::beginSingleTimeCommands() const {
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         // Allocate a command buffer.
         // ----------------------------------------
@@ -122,12 +122,12 @@ namespace Flint {
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &commandBuffer;
 
-        vkQueueSubmit(Platform::getSingleton().graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-        vkQueueWaitIdle(Platform::getSingleton().graphicsQueue);
+        vkQueueSubmit(Platform::getSingleton()->graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+        vkQueueWaitIdle(Platform::getSingleton()->graphicsQueue);
         // ----------------------------------------
 
         // Free the command buffer.
-        vkFreeCommandBuffers(Platform::getSingleton().device, commandPool, 1, &commandBuffer);
+        vkFreeCommandBuffers(Platform::getSingleton()->device, commandPool, 1, &commandBuffer);
     }
 
     void RenderServer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout,
@@ -254,7 +254,7 @@ namespace Flint {
     void RenderServer::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
                                    VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage &image,
                                    VkDeviceMemory &imageMemory) const {
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         VkImageCreateInfo imageInfo{};
         imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -297,7 +297,7 @@ namespace Flint {
     VkImageView RenderServer::createImageView(VkImage image,
                                               VkFormat format,
                                               VkImageAspectFlags aspectFlags) const {
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         VkImageViewCreateInfo viewInfo{};
         viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -321,7 +321,7 @@ namespace Flint {
     void RenderServer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                                     VkMemoryPropertyFlags properties,
                                     VkBuffer &buffer, VkDeviceMemory &bufferMemory) const {
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         // Structure specifying the parameters of a newly created buffer object.
         VkBufferCreateInfo bufferInfo{};
@@ -355,7 +355,7 @@ namespace Flint {
     }
 
     void RenderServer::copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize) const {
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         void *data;
         vkMapMemory(device, bufferMemory, 0, dataSize, 0, &data);
@@ -374,7 +374,7 @@ namespace Flint {
         samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
         VkPhysicalDeviceProperties properties{};
-        vkGetPhysicalDeviceProperties(Platform::getSingleton().physicalDevice, &properties);
+        vkGetPhysicalDeviceProperties(Platform::getSingleton()->physicalDevice, &properties);
 
         samplerInfo.anisotropyEnable = VK_TRUE;
         samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
@@ -393,7 +393,7 @@ namespace Flint {
         samplerInfo.minLod = 0.0f;
         samplerInfo.maxLod = 0.0f;
 
-        if (vkCreateSampler(Platform::getSingleton().device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
+        if (vkCreateSampler(Platform::getSingleton()->device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create texture sampler!");
         }
     }
@@ -401,7 +401,7 @@ namespace Flint {
     void RenderServer::blit(VkCommandBuffer commandBuffer,
                             VkPipeline graphicsPipeline,
                             const VkDescriptorSet &descriptorSet) const {
-        auto default_resources = DefaultResource::get_singleton().get_default_surface_2d_gpu_resources();
+        auto default_resources = DefaultResource::get_singleton()->get_default_surface_2d_gpu_resources();
 
         VkBuffer vertexBuffers[] = {default_resources->vertexBuffer};
 
@@ -526,7 +526,7 @@ namespace Flint {
             layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
             layoutInfo.pBindings = bindings.data();
 
-            if (vkCreateDescriptorSetLayout(Platform::getSingleton().device, &layoutInfo, nullptr,
+            if (vkCreateDescriptorSetLayout(Platform::getSingleton()->device, &layoutInfo, nullptr,
                                             &meshDescriptorSetLayout) != VK_SUCCESS) {
                 throw std::runtime_error("Failed to create descriptor set layout!");
             }
@@ -550,7 +550,7 @@ namespace Flint {
             pipelineLayoutInfo.pushConstantRangeCount = 1;
 
             // Create pipeline layout.
-            if (vkCreatePipelineLayout(Platform::getSingleton().device,
+            if (vkCreatePipelineLayout(Platform::getSingleton()->device,
                                        &pipelineLayoutInfo,
                                        nullptr,
                                        &meshPipelineLayout) != VK_SUCCESS) {
@@ -596,7 +596,7 @@ namespace Flint {
             layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
             layoutInfo.pBindings = bindings.data();
 
-            if (vkCreateDescriptorSetLayout(Platform::getSingleton().device, &layoutInfo, nullptr,
+            if (vkCreateDescriptorSetLayout(Platform::getSingleton()->device, &layoutInfo, nullptr,
                                             &blitDescriptorSetLayout) != VK_SUCCESS) {
                 throw std::runtime_error("Failed to create descriptor set layout!");
             }
@@ -620,7 +620,7 @@ namespace Flint {
             pipelineLayoutInfo.pushConstantRangeCount = 1;
 
             // Create pipeline layout.
-            if (vkCreatePipelineLayout(Platform::getSingleton().device,
+            if (vkCreatePipelineLayout(Platform::getSingleton()->device,
                                        &pipelineLayoutInfo,
                                        nullptr,
                                        &blitPipelineLayout) != VK_SUCCESS) {
@@ -751,7 +751,7 @@ namespace Flint {
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
         pipelineInfo.pDepthStencilState = &depthStencil;
 
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         // Create pipeline.
         if (vkCreateGraphicsPipelines(device,
@@ -900,7 +900,7 @@ namespace Flint {
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
         pipelineInfo.pDepthStencilState = &depthStencil;
 
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         // Create pipeline.
         if (vkCreateGraphicsPipelines(device,
@@ -946,8 +946,8 @@ namespace Flint {
         copyBuffer(stagingBuffer, p_vertex_buffer, bufferSize);
 
         // Clean up staging buffer and memory.
-        vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
-        vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
+        vkDestroyBuffer(Platform::getSingleton()->device, stagingBuffer, nullptr);
+        vkFreeMemory(Platform::getSingleton()->device, stagingBufferMemory, nullptr);
     }
 
     void RenderServer::createIndexBuffer(std::vector<uint32_t> &indices,
@@ -976,7 +976,7 @@ namespace Flint {
         // Copy data from staging buffer to index buffer.
         copyBuffer(stagingBuffer, p_index_buffer, bufferSize);
 
-        vkDestroyBuffer(Platform::getSingleton().device, stagingBuffer, nullptr);
-        vkFreeMemory(Platform::getSingleton().device, stagingBufferMemory, nullptr);
+        vkDestroyBuffer(Platform::getSingleton()->device, stagingBuffer, nullptr);
+        vkFreeMemory(Platform::getSingleton()->device, stagingBufferMemory, nullptr);
     }
 }

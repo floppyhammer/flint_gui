@@ -44,9 +44,9 @@ class Platform {
 public:
     Platform();
 
-    static Platform &getSingleton() {
+    static Platform *getSingleton() {
         static Platform singleton;
-        return singleton;
+        return &singleton;
     }
 
     GLFWwindow *window;

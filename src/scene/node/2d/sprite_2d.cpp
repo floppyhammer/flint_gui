@@ -46,7 +46,7 @@ namespace Flint {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
             viewport_extent = viewport->get_extent();
         } else { // Default to swap chain image.
-            auto extent = SwapChain::getSingleton().swapChainExtent;
+            auto extent = SwapChain::getSingleton()->swapChainExtent;
             viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
         }
 
@@ -85,8 +85,8 @@ namespace Flint {
 
         Node *viewport_node = get_viewport();
 
-        VkPipeline pipeline = RenderServer::getSingleton().blitGraphicsPipeline;
-        VkPipelineLayout pipeline_layout = RenderServer::getSingleton().blitPipelineLayout;
+        VkPipeline pipeline = RenderServer::getSingleton()->blitGraphicsPipeline;
+        VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blitPipelineLayout;
 
         if (viewport_node) {
             auto viewport = dynamic_cast<SubViewport *>(viewport_node);
@@ -101,10 +101,10 @@ namespace Flint {
         VkBuffer vertexBuffers[] = {mesh->surface->get_vertex_buffer()};
 
         // Unlike Texture Rect, Sprite 2D should support custom mesh.
-        RenderServer::getSingleton().draw_mesh_2d(
+        RenderServer::getSingleton()->draw_mesh_2d(
                 p_command_buffer,
                 pipeline,
-                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage),
                 vertexBuffers,
                 mesh->surface->get_index_buffer(),
                 mesh->surface->get_index_count());

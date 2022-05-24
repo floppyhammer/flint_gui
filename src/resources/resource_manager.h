@@ -10,9 +10,9 @@
 namespace Flint {
     class ResourceManager {
     public:
-        static ResourceManager &get_singleton() {
+        static ResourceManager *get_singleton() {
             static ResourceManager singleton;
-            return singleton;
+            return &singleton;
         }
 
         template<typename T>

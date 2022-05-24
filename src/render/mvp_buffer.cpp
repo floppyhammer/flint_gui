@@ -21,7 +21,7 @@ namespace Flint {
     }
 
     void MvpBuffer::create_uniform_buffers() {
-        auto &swapChainImages = SwapChain::getSingleton().swapChainImages;
+        auto &swapChainImages = SwapChain::getSingleton()->swapChainImages;
 
         VkDeviceSize bufferSize = sizeof(ModelViewProjection);
 
@@ -29,7 +29,7 @@ namespace Flint {
         uniform_buffers_memory.resize(swapChainImages.size());
 
         for (size_t i = 0; i < swapChainImages.size(); i++) {
-            RenderServer::getSingleton().createBuffer(bufferSize,
+            RenderServer::getSingleton()->createBuffer(bufferSize,
                                                       VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
                                                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                                                       VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -42,14 +42,14 @@ namespace Flint {
         if (uniform_buffers_memory.empty()) return;
 
         // Copy the MVP data to the current uniform buffer.
-        RenderServer::getSingleton().copyDataToMemory(&mvp,
-                                                      uniform_buffers_memory[SwapChain::getSingleton().currentImage],
+        RenderServer::getSingleton()->copyDataToMemory(&mvp,
+                                                      uniform_buffers_memory[SwapChain::getSingleton()->currentImage],
                                                       sizeof(mvp));
     }
 
     void MvpBuffer::free_uniform_buffers() {
-        auto device = Platform::getSingleton().device;
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
+        auto device = Platform::getSingleton()->device;
+        auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
 
         // Clean up uniform buffers.
         for (size_t i = 0; i < swapChainImages.size(); i++) {

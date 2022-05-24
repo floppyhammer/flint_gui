@@ -24,14 +24,14 @@ namespace Flint {
             // Determined by model transform.
             mvp.model = glm::translate(glm::mat4(1.0f), glm::vec3(transform.position.x, transform.position.y, transform.position.z));
             mvp.model = glm::scale(mvp.model, glm::vec3(transform.scale.x, transform.scale.y, transform.scale.z));
-            mvp.model = glm::rotate(mvp.model, (float) Engine::getSingleton().get_elapsed() * glm::radians(90.0f),
+            mvp.model = glm::rotate(mvp.model, (float) Engine::getSingleton()->get_elapsed() * glm::radians(90.0f),
                                     glm::vec3(0.0f, 0.0f, 1.0f));
 
             mvp.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
                                    glm::vec3(0.0f, 0.0f, 0.0f),
                                    glm::vec3(0.0f, 0.0f, 1.0f));
 
-            auto viewport_extent = SwapChain::getSingleton().swapChainExtent;
+            auto viewport_extent = SwapChain::getSingleton()->swapChainExtent;
 
             // Set projection matrix. Determined by viewport.
             mvp.proj = glm::perspective(glm::radians(45.0f),
@@ -53,8 +53,8 @@ namespace Flint {
         for (auto const &entity: entities) {
             auto &model = coordinator->get_component<ModelComponent>(entity);
 
-            VkPipeline pipeline = RenderServer::getSingleton().meshGraphicsPipeline;
-            VkPipelineLayout pipeline_layout = RenderServer::getSingleton().meshPipelineLayout;
+            VkPipeline pipeline = RenderServer::getSingleton()->meshGraphicsPipeline;
+            VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->meshPipelineLayout;
 
             // Upload the model matrix to the GPU via push constants.
             vkCmdPushConstants(command_buffer, pipeline_layout,
@@ -63,10 +63,10 @@ namespace Flint {
 
             for (auto &surface: model.mesh->surfaces) {
                 VkBuffer vertexBuffers[] = {surface->get_vertex_buffer()};
-                RenderServer::getSingleton().draw_mesh(
+                RenderServer::getSingleton()->draw_mesh(
                         command_buffer,
                         pipeline,
-                        surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton().currentImage),
+                        surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage),
                         vertexBuffers,
                         surface->get_index_buffer(),
                         surface->get_index_count());

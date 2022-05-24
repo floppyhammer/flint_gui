@@ -24,14 +24,14 @@ namespace Flint {
     }
 
     MaterialDescSet::~MaterialDescSet() {
-        auto device = Platform::getSingleton().device;
+        auto device = Platform::getSingleton()->device;
 
         // When we destroy the pool, the sets inside are destroyed as well.
         vkDestroyDescriptorPool(device, descriptorPool, nullptr);
     }
 
     void Material3dDescSet::createDescriptorPool() {
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
+        auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
 
         std::array<VkDescriptorPoolSize, 1> poolSizes{};
 //    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -45,16 +45,16 @@ namespace Flint {
         poolInfo.pPoolSizes = poolSizes.data();
         poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
 
-        if (vkCreateDescriptorPool(Platform::getSingleton().device, &poolInfo, nullptr, &descriptorPool) !=
+        if (vkCreateDescriptorPool(Platform::getSingleton()->device, &poolInfo, nullptr, &descriptorPool) !=
             VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor pool!");
         }
     }
 
     void Material3dDescSet::createDescriptorSet() {
-        auto device = Platform::getSingleton().device;
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-        auto &descriptorSetLayout = RenderServer::getSingleton().meshDescriptorSetLayout;
+        auto device = Platform::getSingleton()->device;
+        auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
+        auto &descriptorSetLayout = RenderServer::getSingleton()->meshDescriptorSetLayout;
 
         std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
@@ -70,9 +70,9 @@ namespace Flint {
     }
 
     void Material3dDescSet::updateDescriptorSet(const std::shared_ptr<ImageTexture> &p_texture) {
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-        auto &descriptorSetLayout = RenderServer::getSingleton().meshDescriptorSetLayout;
-        auto device = Platform::getSingleton().device;
+        auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
+        auto &descriptorSetLayout = RenderServer::getSingleton()->meshDescriptorSetLayout;
+        auto device = Platform::getSingleton()->device;
 
         for (size_t i = 0; i < swapChainImages.size(); i++) {
 //        VkDescriptorBufferInfo bufferInfo{};
@@ -113,7 +113,7 @@ namespace Flint {
     }
 
     void Material2dDescSet::createDescriptorPool() {
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
+        auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
 
         std::array<VkDescriptorPoolSize, 1> poolSizes{};
 //    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -127,16 +127,16 @@ namespace Flint {
         poolInfo.pPoolSizes = poolSizes.data();
         poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
 
-        if (vkCreateDescriptorPool(Platform::getSingleton().device, &poolInfo, nullptr, &descriptorPool) !=
+        if (vkCreateDescriptorPool(Platform::getSingleton()->device, &poolInfo, nullptr, &descriptorPool) !=
             VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor pool!");
         }
     }
 
     void Material2dDescSet::createDescriptorSet() {
-        auto device = Platform::getSingleton().device;
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-        auto &descriptorSetLayout = RenderServer::getSingleton().blitDescriptorSetLayout;
+        auto device = Platform::getSingleton()->device;
+        auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
+        auto &descriptorSetLayout = RenderServer::getSingleton()->blitDescriptorSetLayout;
 
         std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
@@ -152,9 +152,9 @@ namespace Flint {
     }
 
     void Material2dDescSet::updateDescriptorSet(const std::shared_ptr<ImageTexture> &p_texture) {
-        auto swapChainImages = SwapChain::getSingleton().swapChainImages;
-        auto &descriptorSetLayout = RenderServer::getSingleton().blitDescriptorSetLayout;
-        auto device = Platform::getSingleton().device;
+        auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
+        auto &descriptorSetLayout = RenderServer::getSingleton()->blitDescriptorSetLayout;
+        auto device = Platform::getSingleton()->device;
 
         for (size_t i = 0; i < swapChainImages.size(); i++) {
 //        VkDescriptorBufferInfo bufferInfo{};

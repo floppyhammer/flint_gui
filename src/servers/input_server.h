@@ -4,6 +4,7 @@
 #include "../common/math/vec2.h"
 
 #define GLFW_INCLUDE_VULKAN
+
 #include <GLFW/glfw3.h>
 #include <cstdint>
 #include <vector>
@@ -49,7 +50,7 @@ namespace Flint {
             } text;
         } args;
 
-        void consume ();
+        void consume();
 
         bool is_consumed() const;
 
@@ -68,9 +69,9 @@ namespace Flint {
 
     class InputServer {
     public:
-        static InputServer &get_singleton() {
+        static InputServer *get_singleton() {
             static InputServer singleton;
-            return singleton;
+            return &singleton;
         }
 
         void attach_callbacks(GLFWwindow *window);

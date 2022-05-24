@@ -76,7 +76,7 @@ namespace Flint {
     }
 
     void LineEdit::draw(VkCommandBuffer p_command_buffer) {
-        auto canvas = VectorServer::get_singleton().canvas;
+        auto canvas = VectorServer::get_singleton()->canvas;
 
         auto global_position = get_global_position();
 
@@ -88,7 +88,7 @@ namespace Flint {
 
         // Blink caret.
         if (focused) {
-            theme_caret.color.a = 255 * std::ceil(std::sin(Engine::getSingleton().get_elapsed() * 5.0));
+            theme_caret.color.a = 255 * std::ceil(std::sin(Engine::getSingleton()->get_elapsed() * 5.0));
 
             auto current_glyph_box = Rect<float>({0, 0}, {0, label->get_font_size()});
             if (caret_index > -1 && caret_index < label->get_glyphs().size()) {
