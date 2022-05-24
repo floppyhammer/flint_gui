@@ -31,7 +31,7 @@ namespace Flint {
         svg_shape.shape.translate({vector_texture->get_width() * 0.5f, vector_texture->get_height() * 0.5f});
         svg_shape.stroke_color = ColorU(163, 163, 163, 255);
         svg_shape.stroke_width = 2;
-        vector_texture->add_svg_shape(svg_shape);
+        vector_texture->set_svg_shapes({svg_shape});
         icon_rect = std::make_shared<TextureRect>();
         icon_rect->sizing_flag = ContainerSizingFlag::EXPAND;
         icon_rect->set_texture(vector_texture);

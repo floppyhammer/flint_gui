@@ -83,7 +83,7 @@ namespace Flint {
             svg_shape.shape.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
             svg_shape.stroke_color = ColorU(163, 163, 163, 255);
             svg_shape.stroke_width = 2;
-            collapse_icon->add_svg_shape(svg_shape);
+            collapse_icon->set_svg_shapes({svg_shape});
         }
 
         {
@@ -96,7 +96,7 @@ namespace Flint {
             svg_shape.shape.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
             svg_shape.stroke_color = ColorU(163, 163, 163, 255);
             svg_shape.stroke_width = 2;
-            expand_icon->add_svg_shape(svg_shape);
+            expand_icon->set_svg_shapes({svg_shape});
         }
 
         collapse_button = std::make_shared<Button>();

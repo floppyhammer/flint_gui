@@ -10,6 +10,7 @@
 #include <memory>
 
 namespace Flint {
+    /// A thin wrapper over Pathfinder shape.
     struct SvgShape {
         Pathfinder::Shape shape;
         ColorU fill_color = ColorU();
@@ -27,12 +28,14 @@ namespace Flint {
 
         ~VectorTexture() override;
 
-        /// Create an empty texture with specific size.
+        /// Create an empty texture with a specific size.
         static std::shared_ptr<VectorTexture> from_empty(uint32_t p_width, uint32_t p_height);
 
+        /// Draw shapes.
         void add_to_canvas(const Vec2<float> &position, const std::shared_ptr<Pathfinder::Canvas> &canvas);
 
-        void add_svg_shape(SvgShape svg_shape);
+        /// Replace shapes.
+        void set_svg_shapes(std::vector<SvgShape> p_svg_shapes);
 
     protected:
         std::vector<SvgShape> svg_shapes;

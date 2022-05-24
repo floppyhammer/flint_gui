@@ -7,6 +7,7 @@
 #include <nanosvg.h>
 
 #include <cassert>
+#include <utility>
 
 namespace Flint {
     VectorTexture::VectorTexture() {
@@ -43,8 +44,8 @@ namespace Flint {
         }
 
         char buffer[100];
-        snprintf(buffer, sizeof(buffer), "SVG image size: (%.1f, %.1f)", image->width, image->height);
-        Logger::info(std::string(buffer), "load_svg_from_file");
+        snprintf(buffer, sizeof(buffer), "Loaded SVG image with size: (%.1f, %.1f)", image->width, image->height);
+        Logger::verbose(std::string(buffer), "VectorTexture");
 
         width = image->width;
         height = image->height;
@@ -109,7 +110,7 @@ namespace Flint {
         canvas->restore_state();
     }
 
-    void VectorTexture::add_svg_shape(SvgShape svg_shape) {
-        svg_shapes.push_back(svg_shape);
+    void VectorTexture::set_svg_shapes(std::vector<SvgShape> p_svg_shapes) {
+        svg_shapes = std::move(p_svg_shapes);
     }
 }
