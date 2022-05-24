@@ -9,10 +9,10 @@ namespace Flint {
     Control::Control() {
         type = NodeType::Control;
 
-        outline.bg_color = ColorU();
-        outline.corner_radius = 0;
-        outline.border_width = 0;
-        outline.border_color = ColorU(202, 130, 94, 255);
+        debug_size_box.bg_color = ColorU();
+        debug_size_box.corner_radius = 0;
+        debug_size_box.border_width = 0;
+        debug_size_box.border_color = ColorU(202, 130, 94, 255);
     }
 
     Vec2<float> Control::calculate_minimum_size() const {
@@ -20,8 +20,9 @@ namespace Flint {
     }
 
     void Control::draw(VkCommandBuffer p_command_buffer) {
-        if (size.x > 0 && size.y > 0)
-            outline.add_to_canvas(get_global_position(), size, VectorServer::get_singleton()->canvas);
+        if (size.x > 0 && size.y > 0) {
+            debug_size_box.add_to_canvas(get_global_position(), size, VectorServer::get_singleton()->canvas);
+        }
     }
 
     void Control::update(double dt) {

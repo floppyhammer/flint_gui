@@ -41,7 +41,7 @@ namespace Flint {
         float offset_y = 0;
         root->propagate_draw(folding_width, 0, p_command_buffer, offset_y, get_global_position());
 
-        outline.add_to_canvas(get_global_position(), size, canvas);
+        debug_size_box.add_to_canvas(get_global_position(), size, canvas);
     }
 
     void Tree::input(std::vector<InputEvent> &input_queue) {

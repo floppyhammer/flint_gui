@@ -109,7 +109,8 @@ namespace Flint {
 
         bool visible = true;
 
-        StyleBox outline;
+        /// Visualize the node's size.
+        StyleBox debug_size_box;
 
         MouseFilter mouse_filter = MouseFilter::STOP;
     };

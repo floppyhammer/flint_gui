@@ -16,7 +16,7 @@ namespace Flint {
         theme_pressed.value().border_color = ColorU(200, 200, 200, 255);
         theme_pressed.value().border_width = 2;
 
-        outline.border_color = ColorU::green();
+        debug_size_box.border_color = ColorU::green();
 
         // Don't add the label as a child since it's not a normal node but part of the button.
         label = std::make_shared<Label>();

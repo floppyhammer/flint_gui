@@ -6,7 +6,7 @@ namespace Flint {
     Label::Label() {
         type = NodeType::Label;
 
-        outline.border_color = ColorU::red();
+        debug_size_box.border_color = ColorU::red();
 
         set_font(ResourceManager::get_singleton()->load<Flint::Font>("../assets/unifont-14.0.03.ttf"));
 

@@ -21,7 +21,7 @@ namespace Flint {
 
         mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
 
-        outline.border_color = ColorU::blue();
+        debug_size_box.border_color = ColorU::blue();
     }
 
     void TextureRect::set_texture(const std::shared_ptr<Texture> &p_texture) {
