@@ -20,12 +20,8 @@ namespace Flint {
         IGNORE, // Ignore input.
     };
 
-    /// Affect how containers organize this control node.
-    enum class LayoutFlag {
-        EXPAND,
-        SHRINK,
-    };
-
+    /// Control anchor only takes effect when the control node is not a child of a container
+    /// (but a child of a normal control node).
     enum class ControlAnchor {
         TOP_LEFT,
         TOP_RIGHT,
@@ -46,8 +42,11 @@ namespace Flint {
         HCENTER_WIDE,
 
         FULL_RECT,
+
+        MAX,
     };
 
+    /// Affect how containers organize this control node.
     enum class ContainerSizingFlag {
         EXPAND,
         SHRINK,
@@ -102,6 +101,8 @@ namespace Flint {
         Vec2<float> minimum_size{0};
 
         Vec2F local_mouse_position;
+
+        ControlAnchor anchor_mode = ControlAnchor::MAX;
 
         void update(double dt) override;
 
