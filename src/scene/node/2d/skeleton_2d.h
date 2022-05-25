@@ -40,17 +40,21 @@ namespace Flint {
         Transform2 get_global_transform();
     };
 
+    struct BoneVertex {
+        Vertex v; // Info on this vertex: position, color etc.
+        std::vector<float> weights;	// Weight for each bone connected.
+        std::vector<Bone2d *> bones; // Pointer to connected bones.
+    };
+
+    struct Skeleton2dMesh {
+        std::vector<BoneVertex> vertexes;
+        // Triangles made up of vertexes.
+        std::vector<uint32_t> triangles;
+    };
+
     class Skeleton2d : public Node2d {
     public:
         Skeleton2d();
-
-        void set_texture(std::shared_ptr<ImageTexture> p_texture);
-
-        [[nodiscard]] std::shared_ptr<ImageTexture> get_texture() const;
-
-        void set_mesh(const std::shared_ptr<Mesh2d>& p_mesh);
-
-        void set_material(const std::shared_ptr<Material2d>& p_material);
 
     private:
         std::shared_ptr<Bone2d> base_bone;
@@ -58,10 +62,6 @@ namespace Flint {
         void update(double delta) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
-
-        void update_mvp();
-
-        Surface2dPushConstant push_constant;
     };
 }
 

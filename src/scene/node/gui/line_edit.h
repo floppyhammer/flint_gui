@@ -9,6 +9,9 @@
 #include <memory>
 
 namespace Flint {
+    /**
+     * Single-Line text input field.
+     */
     class LineEdit : public Control {
     public:
         LineEdit();

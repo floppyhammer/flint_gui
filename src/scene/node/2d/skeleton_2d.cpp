@@ -173,66 +173,7 @@ namespace Flint {
         right_leg_bone->add_child(right_foot_bone);
     }
 
-    void Skeleton2d::set_texture(std::shared_ptr<ImageTexture> p_texture) {
-        mesh->surface->get_material()->set_texture(p_texture);
-    }
-
-    std::shared_ptr<ImageTexture> Skeleton2d::get_texture() const {
-        return mesh->surface->get_material()->get_texture();
-    }
-
-    void Skeleton2d::set_mesh(const std::shared_ptr<Mesh2d> &p_mesh) {
-        mesh = p_mesh;
-    }
-
-    void Skeleton2d::set_material(const std::shared_ptr<Material2d> &p_material) {
-        mesh->surface->set_material(p_material);
-    }
-
     void Skeleton2d::update(double delta) {
-    }
-
-    void Skeleton2d::update_mvp() {
-        if (mesh == nullptr || mesh->surface == nullptr) {
-            return;
-        }
-
-        Node *viewport_node = get_viewport();
-
-        Vec2<uint32_t> viewport_extent;
-        if (viewport_node) {
-            auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-            viewport_extent = viewport->get_extent();
-        } else { // Default to swap chain image.
-            auto extent = SwapChain::getSingleton()->swapChainExtent;
-            viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
-        }
-
-        float sprite_width = mesh->surface->get_material()->get_texture()->get_width() * scale.x;
-        float sprite_height = mesh->surface->get_material()->get_texture()->get_height() * scale.y;
-
-        auto global_position = get_global_position();
-
-        // Prepare MVP data. We use this matrix to convert a full-screen to the control's rect.
-        ModelViewProjection mvp{};
-
-        // The actual application order of these matrices is reverse.
-        // 4.
-        mvp.model = glm::translate(glm::mat4(1.0f),
-                                   glm::vec3(global_position.x / viewport_extent.x * 2.0f,
-                                             global_position.y / viewport_extent.y * 2.0f,
-                                             0.0f));
-        // 3.
-        mvp.model = glm::translate(mvp.model, glm::vec3(-1.0, -1.0, 0.0f));
-        // 2.
-        mvp.model = glm::scale(mvp.model, glm::vec3(scale.x, scale.y, 1.0f));
-        // 1.
-        mvp.model = glm::scale(mvp.model,
-                               glm::vec3(sprite_width / viewport_extent.x * 2.0f,
-                                         sprite_height / viewport_extent.y * 2.0f,
-                                         1.0f));
-
-        push_constant.model = mvp.model;
     }
 
     void Skeleton2d::draw(VkCommandBuffer p_command_buffer) {
