@@ -56,6 +56,7 @@ namespace Flint {
         std::shared_ptr<VectorTexture> collapse_icon, expand_icon;
 
         std::optional<StyleBox> theme_panel;
+        std::optional<StyleLine> theme_title_bar_line;
     };
 }
 

@@ -194,6 +194,7 @@ namespace Flint {
 
     void Label::draw(VkCommandBuffer p_command_buffer) {
         auto canvas = VectorServer::get_singleton()->canvas;
+        canvas->save_state();
 
         auto global_position = get_global_position();
 
@@ -241,6 +242,8 @@ namespace Flint {
                 // --------------------------------
             }
         }
+
+        canvas->restore_state();
 
         Control::draw(p_command_buffer);
     }

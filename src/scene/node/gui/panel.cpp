@@ -14,6 +14,9 @@ namespace Flint {
         theme_panel.value().corner_radius = 8;
         theme_panel.value().border_color = {50, 50, 50, 255};
 
+        theme_title_bar_line = std::make_optional(StyleLine());
+        theme_title_bar_line.value().color = {50, 50, 50, 255};
+
         title_label = std::make_shared<Label>();
         title_label->set_text("Title");
         title_label->set_horizontal_alignment(Alignment::Center);
@@ -23,13 +26,13 @@ namespace Flint {
 
         {
             auto close_icon = VectorTexture::from_empty(24, 24);
-            SvgShape svg_shape;
-            svg_shape.shape.add_line({-8, -8}, {8, 8});
-            svg_shape.shape.add_line({-8, 8}, {8, -8});
-            svg_shape.shape.translate({close_icon->get_width() * 0.5f, close_icon->get_height() * 0.5f});
-            svg_shape.stroke_color = ColorU(163, 163, 163, 255);
-            svg_shape.stroke_width = 2;
-            close_icon->set_svg_shapes({svg_shape});
+            VShape vshape;
+            vshape.shape.add_line({-8, -8}, {8, 8});
+            vshape.shape.add_line({-8, 8}, {8, -8});
+            vshape.shape.translate({close_icon->get_width() * 0.5f, close_icon->get_height() * 0.5f});
+            vshape.stroke_color = ColorU(163, 163, 163, 255);
+            vshape.stroke_width = 2;
+            close_icon->set_vshapes({vshape});
 
             close_button = std::make_shared<Button>();
             close_button->set_text("");
@@ -40,28 +43,28 @@ namespace Flint {
 
         {
             collapse_icon = VectorTexture::from_empty(24, 24);
-            SvgShape svg_shape;
-            svg_shape.shape.move_to(6, -6);
-            svg_shape.shape.line_to(0, 7);
-            svg_shape.shape.line_to(-6, -6);
-            svg_shape.shape.close();
-            svg_shape.shape.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
-            svg_shape.stroke_color = ColorU(163, 163, 163, 255);
-            svg_shape.stroke_width = 2;
-            collapse_icon->set_svg_shapes({svg_shape});
+            VShape vshape;
+            vshape.shape.move_to(6, -6);
+            vshape.shape.line_to(0, 7);
+            vshape.shape.line_to(-6, -6);
+            vshape.shape.close();
+            vshape.shape.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
+            vshape.stroke_color = ColorU(163, 163, 163, 255);
+            vshape.stroke_width = 2;
+            collapse_icon->set_vshapes({vshape});
         }
 
         {
             expand_icon = VectorTexture::from_empty(24, 24);
-            SvgShape svg_shape;
-            svg_shape.shape.move_to(-6, -6);
-            svg_shape.shape.line_to(6, 0);
-            svg_shape.shape.line_to(-6, 6);
-            svg_shape.shape.close();
-            svg_shape.shape.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
-            svg_shape.stroke_color = ColorU(163, 163, 163, 255);
-            svg_shape.stroke_width = 2;
-            expand_icon->set_svg_shapes({svg_shape});
+            VShape vshape;
+            vshape.shape.move_to(-6, -6);
+            vshape.shape.line_to(6, 0);
+            vshape.shape.line_to(-6, 6);
+            vshape.shape.close();
+            vshape.shape.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
+            vshape.stroke_color = ColorU(163, 163, 163, 255);
+            vshape.stroke_width = 2;
+            expand_icon->set_vshapes({vshape});
         }
 
         collapse_button = std::make_shared<Button>();
@@ -179,12 +182,7 @@ namespace Flint {
                     theme_panel.value().add_to_canvas(get_global_position() - Vec2<float>(0, title_bar_height),
                                                       size + Vec2<float>(0, title_bar_height), canvas);
 
-                    Pathfinder::Shape shape;
-                    shape.add_line({}, {size.x, 0});
-                    canvas->set_stroke_paint(Pathfinder::Paint::from_color({50, 50, 50, 255}));
-                    canvas->set_line_width(2);
-                    canvas->set_transform(Pathfinder::Transform2::from_translation({global_position.x, global_position.y}));
-                    canvas->stroke_shape(shape);
+                    theme_title_bar_line->add_to_canvas({global_position.x, global_position.y}, {global_position.x + size.x, global_position.y}, canvas);
                 } else {
                     theme_panel.value().add_to_canvas(get_global_position() - Vec2<float>(0, title_bar_height),
                                                       Vec2<float>(size.x, title_bar_height), canvas);

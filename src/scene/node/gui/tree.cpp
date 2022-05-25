@@ -75,28 +75,28 @@ namespace Flint {
 
         {
             collapse_icon = VectorTexture::from_empty(24, 24);
-            SvgShape svg_shape;
-            svg_shape.shape.move_to(6, -6);
-            svg_shape.shape.line_to(0, 6);
-            svg_shape.shape.line_to(-6, -6);
-            svg_shape.shape.close();
-            svg_shape.shape.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
-            svg_shape.stroke_color = ColorU(163, 163, 163, 255);
-            svg_shape.stroke_width = 2;
-            collapse_icon->set_svg_shapes({svg_shape});
+            VShape vshape;
+            vshape.shape.move_to(6, -6);
+            vshape.shape.line_to(0, 6);
+            vshape.shape.line_to(-6, -6);
+            vshape.shape.close();
+            vshape.shape.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
+            vshape.stroke_color = ColorU(163, 163, 163, 255);
+            vshape.stroke_width = 2;
+            collapse_icon->set_vshapes({vshape});
         }
 
         {
             expand_icon = VectorTexture::from_empty(24, 24);
-            SvgShape svg_shape;
-            svg_shape.shape.move_to(-6, -6);
-            svg_shape.shape.line_to(6, 0);
-            svg_shape.shape.line_to(-6, 6);
-            svg_shape.shape.close();
-            svg_shape.shape.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
-            svg_shape.stroke_color = ColorU(163, 163, 163, 255);
-            svg_shape.stroke_width = 2;
-            expand_icon->set_svg_shapes({svg_shape});
+            VShape vshape;
+            vshape.shape.move_to(-6, -6);
+            vshape.shape.line_to(6, 0);
+            vshape.shape.line_to(-6, 6);
+            vshape.shape.close();
+            vshape.shape.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
+            vshape.stroke_color = ColorU(163, 163, 163, 255);
+            vshape.stroke_width = 2;
+            expand_icon->set_vshapes({vshape});
         }
 
         collapse_button = std::make_shared<Button>();

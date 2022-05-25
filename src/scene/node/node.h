@@ -38,6 +38,7 @@ namespace Flint {
         Node2D,
         Sprite2D,
         RigidBody2D,
+        Skeleton2D,
 
         // 3D.
         Node3D,

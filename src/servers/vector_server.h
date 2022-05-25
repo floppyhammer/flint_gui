@@ -3,7 +3,20 @@
 
 #include <pathfinder.h>
 
+#include "../common/math/vec2.h"
+#include "../common/color.h"
+#include "../common/math/transform2.h"
+
 namespace Flint {
+    /// A thin wrapper over Pathfinder shape.
+    struct VShape {
+        Pathfinder::Shape shape;
+        ColorU fill_color = ColorU();
+        ColorU stroke_color = ColorU();
+        float stroke_width = 0;
+        float opacity = 1;
+    };
+
     /**
      * All visible shapes will be collected by the vector server and drawn at once.
      */
@@ -20,6 +33,12 @@ namespace Flint {
                   float p_canvas_width,
                   float p_canvas_height,
                   const std::vector<char> &area_lut_input);
+
+        void draw_line(Vec2F start, Vec2F end, float width, ColorU color);
+
+        void draw_circle(Vec2F center, float radius, float line_width, bool fill, ColorU color);
+
+        void draw_vshape(const VShape &vshape, Transform2 transform);
 
         std::shared_ptr<Pathfinder::Canvas> canvas;
     };

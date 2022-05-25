@@ -120,8 +120,12 @@ void App::run() {
             node->add_child(rigid_body_2d);
         }
 
+        auto skeleton = std::make_shared<Skeleton2d>();
+        skeleton->position = {1000, 300};
+
         node->add_child(model0);
         node->add_child(sub_viewport_c);
+        node->add_child(skeleton);
 
         node->add_child(vector_layer);
         h_stack_container->add_child(button);

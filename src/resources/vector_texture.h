@@ -4,21 +4,13 @@
 #include "texture.h"
 #include "../common/color.h"
 #include "../common/math/vec2.h"
+#include "../servers/vector_server.h"
 
 #include <pathfinder.h>
 
 #include <memory>
 
 namespace Flint {
-    /// A thin wrapper over Pathfinder shape.
-    struct SvgShape {
-        Pathfinder::Shape shape;
-        ColorU fill_color = ColorU();
-        ColorU stroke_color = ColorU();
-        float stroke_width = 0;
-        float opacity = 1;
-    };
-
     class VectorTexture : public Texture {
     public:
         VectorTexture();
@@ -31,14 +23,14 @@ namespace Flint {
         /// Create an empty texture with a specific size.
         static std::shared_ptr<VectorTexture> from_empty(uint32_t p_width, uint32_t p_height);
 
-        /// Draw shapes.
+        /// Draw vector shapes.
         void add_to_canvas(const Vec2<float> &position, const std::shared_ptr<Pathfinder::Canvas> &canvas);
 
-        /// Replace shapes.
-        void set_svg_shapes(std::vector<SvgShape> p_svg_shapes);
+        /// Replace vector shapes.
+        void set_vshapes(std::vector<VShape> p_vshapes);
 
     protected:
-        std::vector<SvgShape> svg_shapes;
+        std::vector<VShape> vshapes;
     };
 }
 
