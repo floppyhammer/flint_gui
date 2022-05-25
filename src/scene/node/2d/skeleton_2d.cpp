@@ -16,9 +16,34 @@ namespace Flint {
         child->parent = this;
     }
 
-    void Bone2d::draw() {
-        auto global_position = get_global_position();
+    Transform2 Bone2d::get_transform() {
+        Transform2 transform;
+        transform.vector = position;
 
+        // Local rotation in Cartesian coordinates.
+        float cartesian_rotation = rotation;
+//        if (parent) {
+//            auto normalized = position / position.length();
+//            cartesian_rotation += atan2(normalized.y, normalized.x);
+//        }
+
+        transform = transform.rotate(cartesian_rotation);
+        return transform;
+    }
+
+    Transform2 Bone2d::get_global_transform() {
+        if (parent) {
+            return parent->get_global_transform() * get_transform();
+        } else {
+            if (skeleton) {
+                return Transform2::from_translation(skeleton->get_global_position()) * get_transform();
+            } else {
+                return get_transform();
+            }
+        }
+    }
+
+    void Bone2d::draw() {
         VShape vshape_start;
 
         // Bone starting point.
@@ -26,14 +51,14 @@ namespace Flint {
         vshape_start.stroke_color = ColorU(200, 200, 200, 255);
         vshape_start.stroke_width = 3;
 
-        Transform2 start_transform = Transform2::from_translation(global_position);
+        Transform2 start_transform = get_global_transform();
         VectorServer::get_singleton()->draw_vshape(vshape_start, start_transform);
 
         // Draw bone to parent connection.
         if (parent) {
             // Draw in global coordinates.
-            auto parent_global_position = parent->get_global_position();
-            auto distance_to_parent = (global_position - parent_global_position).length();
+            auto parent_global_transform = parent->get_global_transform();
+            auto distance_to_parent = (start_transform.vector - parent_global_transform.vector).length();
 
             // If the bone is too short, don't draw the bone body.
             if (distance_to_parent > 3) {
@@ -44,10 +69,17 @@ namespace Flint {
                 vshape.shape.line_to(12, 6);
                 vshape.shape.close();
                 vshape.fill_color = ColorU(200, 200, 200, 255);
+                vshape.stroke_color = ColorU(0, 0, 0, 150);
+                vshape.stroke_width = 1;
 
-                Transform2 transform = Transform2::from_translation(parent_global_position);
-                transform = transform.rotate(rotation);
-                VectorServer::get_singleton()->draw_vshape(vshape, transform);
+                // Local rotation in Cartesian coordinates.
+                float cartesian_rotation = rotation;
+                if (parent) {
+                    auto normalized = position / position.length();
+                    cartesian_rotation += atan2(normalized.y, normalized.x);
+                }
+                auto rot_transform = Transform2::from_rotation(cartesian_rotation);
+                VectorServer::get_singleton()->draw_vshape(vshape, parent_global_transform * rot_transform);
             }
         }
 
@@ -62,6 +94,8 @@ namespace Flint {
                 vshape.shape.line_to(12, 6);
                 vshape.shape.close();
                 vshape.fill_color = ColorU(200, 200, 200, 255);
+                vshape.stroke_color = ColorU(0, 0, 0, 150);
+                vshape.stroke_width = 1;
 
                 VectorServer::get_singleton()->draw_vshape(vshape, start_transform);
             }
@@ -70,28 +104,6 @@ namespace Flint {
                 bone->draw();
             }
         }
-    }
-
-    Vec2F Bone2d::get_global_position() {
-        if (parent) {
-            return position + parent->get_global_position();
-        }
-
-        if (skeleton) {
-            return position + skeleton->get_global_position();
-        }
-
-        // TODO: Should also consider the skeleton's global position.
-        return position;
-    }
-
-    float Bone2d::get_global_rotation() {
-        if (parent) {
-            return parent->get_global_rotation();
-        }
-
-        // TODO: Should also consider the skeleton's global rotation.
-        return rotation;
     }
 
     Skeleton2d::Skeleton2d() {

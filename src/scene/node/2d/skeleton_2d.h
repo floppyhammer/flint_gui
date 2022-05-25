@@ -12,12 +12,15 @@ namespace Flint {
     struct Bone2d {
         // For clarity.
         std::string name;
-        // Starting point, which is relative to parent.
+        // Starting point, which is relative to parent. This doesn't change once the rest pose is set.
         Vec2F position;
-        // Rotation in radians, which is relative to parent. Always zero at rest pose.
+        // Rotation in radians, which is relative to parent.
+        // Zero when the bone points to the same direction of the parent-to-self arrow.
         float rotation;
-        // Length of the bone.
+        // Length of the bone. Only for terminal bones.
         float length = 48;
+        // Parent transform cache.
+        Transform2 parent_transform;
         // Bone flags, 8 bits should be sufficient for now.
         uint8_t flags;
         // Number of children.
@@ -32,9 +35,9 @@ namespace Flint {
 
         void draw();
 
-        Vec2F get_global_position();
+        Transform2 get_transform();
 
-        float get_global_rotation();
+        Transform2 get_global_transform();
     };
 
     class Skeleton2d : public Node2d {
