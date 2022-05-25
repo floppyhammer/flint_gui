@@ -27,27 +27,27 @@ namespace Flint {
         vshape_start.stroke_width = 3;
 
         Transform2 start_transform = Transform2::from_translation(global_position);
-
         VectorServer::get_singleton()->draw_vshape(vshape_start, start_transform);
 
         // Draw bone to parent connection.
         if (parent) {
             // Draw in global coordinates.
             auto parent_global_position = parent->get_global_position();
-            auto real_length = (global_position - parent_global_position).length();
+            auto distance_to_parent = (global_position - parent_global_position).length();
 
             // If the bone is too short, don't draw the bone body.
-            if (real_length > 3) {
+            if (distance_to_parent > 3) {
                 VShape vshape;
                 vshape.shape.move_to(6, 0);
                 vshape.shape.line_to(12, -6);
-                vshape.shape.line_to(real_length, 0);
+                vshape.shape.line_to(distance_to_parent, 0);
                 vshape.shape.line_to(12, 6);
                 vshape.shape.close();
-
                 vshape.fill_color = ColorU(200, 200, 200, 255);
 
-                VectorServer::get_singleton()->draw_vshape(vshape, start_transform);
+                Transform2 transform = Transform2::from_translation(parent_global_position);
+                transform = transform.rotate(rotation);
+                VectorServer::get_singleton()->draw_vshape(vshape, transform);
             }
         }
 
@@ -61,7 +61,6 @@ namespace Flint {
                 vshape.shape.line_to(length, 0);
                 vshape.shape.line_to(12, 6);
                 vshape.shape.close();
-
                 vshape.fill_color = ColorU(200, 200, 200, 255);
 
                 VectorServer::get_singleton()->draw_vshape(vshape, start_transform);
