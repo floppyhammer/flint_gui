@@ -76,10 +76,9 @@ namespace Flint {
         {
             collapse_icon = VectorTexture::from_empty(24, 24);
             VShape vshape;
-            vshape.shape.move_to(6, -6);
-            vshape.shape.line_to(0, 6);
-            vshape.shape.line_to(-6, -6);
-            vshape.shape.close();
+            vshape.shape.move_to(-6, -3);
+            vshape.shape.line_to(0, 3);
+            vshape.shape.line_to(6, -3);
             vshape.shape.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
             vshape.stroke_color = ColorU(163, 163, 163, 255);
             vshape.stroke_width = 2;
@@ -89,10 +88,9 @@ namespace Flint {
         {
             expand_icon = VectorTexture::from_empty(24, 24);
             VShape vshape;
-            vshape.shape.move_to(-6, -6);
-            vshape.shape.line_to(6, 0);
-            vshape.shape.line_to(-6, 6);
-            vshape.shape.close();
+            vshape.shape.move_to(-3, -6);
+            vshape.shape.line_to(3, 0);
+            vshape.shape.line_to(-3, 6);
             vshape.shape.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
             vshape.stroke_color = ColorU(163, 163, 163, 255);
             vshape.stroke_width = 2;

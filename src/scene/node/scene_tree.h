@@ -16,6 +16,9 @@
 #include "sub_viewport.h"
 #include "2d/sprite_2d.h"
 #include "2d/rigid_body_2d.h"
+#include "gui/label.h"
+#include "2d/skeleton_2d.h"
+#include "gui/spin_box.h"
 
 namespace Flint {
     class SceneTree {

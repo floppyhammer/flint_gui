@@ -7,51 +7,42 @@ namespace Flint {
     SpinBox::SpinBox() {
         type = NodeType::SpinBox;
 
-        theme_hovered = std::optional(StyleBox());
-        theme_hovered.value().border_color = ColorU(200, 200, 200, 255);
-        theme_hovered.value().border_width = 2;
+        theme_normal = std::optional(StyleBox());
 
-        theme_pressed = std::optional(StyleBox());
-        theme_pressed.value().bg_color = ColorU(70, 70, 70, 255);
-        theme_pressed.value().border_color = ColorU(200, 200, 200, 255);
-        theme_pressed.value().border_width = 2;
+        theme_focused = std::optional(StyleBox());
+        theme_focused.value().border_color = ColorU(200, 200, 200, 255);
+        theme_focused.value().border_width = 2;
 
         debug_size_box.border_color = ColorU::green();
 
         // Don't add the label as a child since it's not a normal node but part of the SpinBox.
         label = std::make_shared<Label>();
-        label->set_text("SpinBox");
         label->set_mouse_filter(MouseFilter::IGNORE);
         label->set_horizontal_alignment(Alignment::Center);
         label->set_vertical_alignment(Alignment::Center);
+        set_value(0);
 
-        auto vector_texture = VectorTexture::from_empty(24, 24);
-        VShape vshape;
-        vshape.shape.add_circle({}, 8);
-        vshape.shape.translate({vector_texture->get_width() * 0.5f, vector_texture->get_height() * 0.5f});
-        vshape.stroke_color = ColorU(163, 163, 163, 255);
-        vshape.stroke_width = 2;
-        vector_texture->set_vshapes({vshape});
-        icon_rect = std::make_shared<TextureRect>();
-        icon_rect->sizing_flag = ContainerSizingFlag::EXPAND;
-        icon_rect->set_texture(vector_texture);
+        container_v = std::make_shared<BoxContainer>();
+        container_v->make_vertical();
 
-        container = std::make_shared<BoxContainer>();
-        container->set_parent(this);
-        container->add_child(icon_rect);
-        container->add_child(label);
-        container->set_separation(0);
-        container->set_size(size);
+        container_h = std::make_shared<BoxContainer>();
+        container_h->make_horizontal();
+        container_h->set_parent(this);
+        container_h->add_child(label);
+        container_h->add_child(container_v);
+        container_h->set_separation(0);
+        container_h->set_size(size);
     }
 
     Vec2<float> SpinBox::calculate_minimum_size() const {
-        auto container_size = container->calculate_minimum_size();
+        auto container_size = container_h->calculate_minimum_size();
 
         return container_size.max(minimum_size);
     }
 
     void SpinBox::input(std::vector<InputEvent> &input_queue) {
         auto global_position = get_global_position();
+        auto active_rect = Rect<float>(global_position, global_position + size);
 
         for (auto &event: input_queue) {
             bool consume_flag = false;
@@ -59,19 +50,12 @@ namespace Flint {
             if (event.type == InputEventType::MouseMotion) {
                 auto args = event.args.mouse_motion;
 
-                if (event.is_consumed()) {
-                    hovered = false;
-                    pressed = false;
-                    pressed_inside = false;
-                } else {
-                    if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
-                        hovered = true;
-                        consume_flag = true;
-                    } else {
-                        hovered = false;
-                        pressed = false;
-                        pressed_inside = false;
-                    }
+                if (pressed_inside) {
+                    set_value(value + args.relative.x * step);
+                }
+
+                if (active_rect.contains_point(args.position)) {
+                    consume_flag = true;
                 }
             }
 
@@ -79,21 +63,19 @@ namespace Flint {
                 auto args = event.args.mouse_button;
 
                 if (event.is_consumed()) {
-                    if (!args.pressed) {
-                        if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
-                            pressed = false;
-                            pressed_inside = false;
-                        }
-                    }
+                    focused = false;
+                    pressed_inside = false;
                 } else {
-                    if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
-                        pressed = args.pressed;
-                        if (pressed) {
+                    if (active_rect.contains_point(args.position)) {
+                        if (args.pressed) {
+                            focused = true;
                             pressed_inside = true;
                         } else {
-                            if (pressed_inside) on_pressed();
+                            pressed_inside = false;
                         }
                         consume_flag = true;
+                    } else {
+                        focused = false;
                     }
                 }
             }
@@ -117,7 +99,7 @@ namespace Flint {
 //            label->set_size({size.x, size.y});
 //            label->set_position({0, 0});
 //        }
-        container->propagate_update(dt);
+        container_h->propagate_update(dt);
 
         label->update(dt);
     }
@@ -131,17 +113,13 @@ namespace Flint {
 
         // Draw bg.
         std::optional<StyleBox> active_style_box;
-        if (hovered) {
-            active_style_box = pressed ? theme_pressed : theme_hovered;
-        } else {
-            active_style_box = theme_normal;
-        }
+        active_style_box = focused ? theme_focused : theme_normal;
 
         if (active_style_box.has_value()) {
             active_style_box.value().add_to_canvas(global_position, size, canvas);
         }
 
-        container->propagate_draw(p_command_buffer);
+        container_h->propagate_draw(p_command_buffer);
 
         Control::draw(p_command_buffer);
     }
@@ -155,31 +133,37 @@ namespace Flint {
 
         auto path = get_node_path();
 
-        auto final_size = p_size.max(container->calculate_minimum_size());
+        auto final_size = p_size.max(container_h->calculate_minimum_size());
         final_size = final_size.max(minimum_size);
 
-        container->set_size(final_size);
+        container_h->set_size(final_size);
         size = final_size;
     }
 
-    void SpinBox::on_pressed() {
-        for (auto &callback: on_pressed_callbacks) {
+    void SpinBox::on_focused() {
+        for (auto &callback: on_focused_callbacks) {
             callback();
         }
     }
 
     void SpinBox::connect_signal(std::string signal, std::function<void()> callback) {
-        if (signal == "on_pressed") {
-            on_pressed_callbacks.push_back(callback);
+        if (signal == "on_focused") {
+            on_focused_callbacks.push_back(callback);
         }
     }
 
-    void SpinBox::set_text(const std::string &text) {
-        label->set_text(text);
-        label->set_visibility(text.empty());
-    }
+    void SpinBox::set_value(float p_value) {
+        if (clamped) {
+            value = std::clamp(p_value, min_value, max_value);
+        } else {
+            value = p_value;
+        }
 
-    void SpinBox::set_icon(const std::shared_ptr<Texture> &p_icon) {
-        icon_rect->set_texture(p_icon);
+        if (is_integer) {
+            int32_t value_int = std::round(p_value);
+            label->set_text(std::to_string(value_int));
+        } else {
+            label->set_text(std::to_string(p_value));
+        }
     }
 }

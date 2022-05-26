@@ -265,7 +265,10 @@ namespace Flint {
     }
 
     Vec2<float> Label::calculate_minimum_size() const {
-        return get_text_size().max(minimum_size);
+        auto min_size = get_text_size();
+        min_size.y = font_size;
+
+        return min_size.max(minimum_size);
     }
 
     Vec2<float> Label::get_text_size() const {

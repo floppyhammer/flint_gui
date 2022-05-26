@@ -19,8 +19,6 @@
 #include "resources/image_texture.h"
 
 #include "scene/node/scene_tree.h"
-#include "scene/node/gui/label.h"
-#include "scene/node/2d/skeleton_2d.h"
 
 #include "scene/ecs/entity.h"
 #include "scene/ecs/world.h"

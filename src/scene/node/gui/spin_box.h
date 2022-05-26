@@ -36,38 +36,35 @@ namespace Flint {
 
         void connect_signal(std::string signal, std::function<void()> callback);
 
-        void set_text(const std::string &text);
-
-        void set_icon(const std::shared_ptr<Texture> &p_icon);
-
-        bool expand_icon = false;
+        void set_value(float p_value);
 
     protected:
         float value = 0;
 
         /// Only for display, the real value will not be rounded.
-        bool rounding_digits = 0;
+        uint32_t rounding_digits = 6;
 
         bool is_integer = false;
 
-        float step = 0;
+        bool clamped = false;
+
+        float min_value = 0;
+        float max_value = 100;
+
+        float step = 1;
 
         bool focused = false;
 
-        std::shared_ptr<BoxContainer> container;
+        std::shared_ptr<BoxContainer> container_h, container_v;
         std::shared_ptr<Button> increase_button, decrease_button;
-        std::shared_ptr<TextureRect> icon_rect;
         std::shared_ptr<Label> label;
 
-        std::vector<std::function<void()>> on_pressed_callbacks;
-        std::vector<std::function<void()>> on_down_callbacks;
-        std::vector<std::function<void()>> on_up_callbacks;
-        std::vector<std::function<void()>> on_hovered_callbacks;
+        std::vector<std::function<void()>> on_focused_callbacks;
 
-        std::optional<StyleBox> theme_normal, theme_hovered, theme_pressed;
+        std::optional<StyleBox> theme_normal, theme_focused;
 
     protected:
-        void on_pressed();
+        void on_focused();
     };
 }
 

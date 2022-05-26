@@ -122,6 +122,7 @@ void App::run() {
 
         auto skeleton = std::make_shared<Skeleton2d>();
         skeleton->position = {1000, 300};
+        auto spin_box = std::make_shared<SpinBox>();
 
         //node->add_child(model0);
         node->add_child(sub_viewport_c);
@@ -134,6 +135,7 @@ void App::run() {
         v_stack_container->add_child(h_stack_container);
         v_stack_container->add_child(progress_bar);
         v_stack_container->add_child(line_edit);
+        v_stack_container->add_child(spin_box);
         margin_container->add_child(v_stack_container);
         panel->add_child(margin_container);
         node->add_child(panel);
