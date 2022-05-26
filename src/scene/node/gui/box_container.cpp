@@ -116,11 +116,13 @@ namespace Flint {
         }
 
         // Take separations into account.
-        float total_separation_size = separation * (float) (visible_child_count - 1);
-        if (horizontal) {
-            min_size.x += total_separation_size;
-        } else {
-            min_size.y += total_separation_size;
+        if (visible_child_count > 0) {
+            float total_separation_size = separation * (float) (visible_child_count - 1);
+            if (horizontal) {
+                min_size.x += total_separation_size;
+            } else {
+                min_size.y += total_separation_size;
+            }
         }
 
         return min_size.max(minimum_size);
