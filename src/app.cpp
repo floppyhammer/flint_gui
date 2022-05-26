@@ -89,15 +89,17 @@ void App::run() {
         auto h_stack_container = std::make_shared<Flint::BoxContainer>();
         auto v_stack_container = std::make_shared<Flint::BoxContainer>();
         v_stack_container->make_vertical();
-        auto panel = std::make_shared<Flint::Panel>();
-        panel->set_position({200, 200});
-        panel->set_size({400, 400});
+        auto inspector_panel = std::make_shared<Flint::Panel>();
+        inspector_panel->set_position({200, 200});
+        inspector_panel->set_title("Inspector");
+        inspector_panel->set_size({400, 400});
 
         auto line_edit = std::make_shared<Flint::LineEdit>();
 
-        auto scene_panel = std::make_shared<Flint::Panel>();
-        scene_panel->set_position({0, 100});
-        scene_panel->set_size({400, 400});
+        auto node_panel = std::make_shared<Flint::Panel>();
+        node_panel->set_position({0, 100});
+        node_panel->set_title("Create New Node");
+        node_panel->set_size({400, 400});
         auto vector_layer = std::make_shared<Flint::TextureRect>();
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WIDTH, HEIGHT});
@@ -137,13 +139,13 @@ void App::run() {
         v_stack_container->add_child(line_edit);
         v_stack_container->add_child(spin_box);
         margin_container->add_child(v_stack_container);
-        panel->add_child(margin_container);
-        node->add_child(panel);
+        inspector_panel->add_child(margin_container);
+        node->add_child(inspector_panel);
         auto margin_container2 = std::make_shared<Flint::MarginContainer>();
         margin_container2->set_size({400, 400});
         margin_container2->add_child(item_tree);
-        scene_panel->add_child(margin_container2);
-        node->add_child(scene_panel);
+        node_panel->add_child(margin_container2);
+        node->add_child(node_panel);
 
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);

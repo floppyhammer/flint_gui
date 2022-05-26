@@ -92,16 +92,13 @@ namespace Flint {
 
                 float new_width = container->calculate_minimum_size().x;
 
-                container->set_size({new_width, title_bar_height});
-
-                size.x = new_width;
+                set_size({new_width, size.y});
 
                 Logger::verbose("Collapsed", "Panel");
             } else {
                 collapse_button->set_icon(collapse_icon);
 
-                container->set_size({expanded_width, title_bar_height});
-                size.x = expanded_width;
+                set_size({expanded_width, size.y});
 
                 Logger::verbose("Expanded", "Panel");
             }
@@ -228,5 +225,9 @@ namespace Flint {
         if (size == p_size) return;
         size = p_size;
         container->set_size({size.x, title_bar_height});
+    }
+
+    void Panel::set_title(std::string title) {
+        title_label->set_text(title);
     }
 }

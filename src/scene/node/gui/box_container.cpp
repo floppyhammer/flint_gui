@@ -62,24 +62,20 @@ namespace Flint {
                     cast_child->set_position({shift, 0});
                     auto child_min_size = cast_child->calculate_minimum_size();
 
-                    float min_wh = horizontal ? child_min_size.x : child_min_size.y;
+                    float min_width_or_height = horizontal ? child_min_size.x : child_min_size.y;
 
                     if (std::find(expanding_children.begin(), expanding_children.end(), cast_child) !=
                         expanding_children.end()) {
-                        if (min_wh > extra_space_for_each_expanding_child) {
-
-                        } else {
-                            min_wh += extra_space_for_each_expanding_child;
-                        }
+                        min_width_or_height += extra_space_for_each_expanding_child;
                     }
 
                     if (horizontal) {
-                        cast_child->set_size({min_wh, size.y});
+                        cast_child->set_size({min_width_or_height, size.y});
                     } else {
-                        cast_child->set_size({size.x, min_wh});
+                        cast_child->set_size({size.x, min_width_or_height});
                     }
 
-                    shift += min_wh;
+                    shift += min_width_or_height;
                 }
 
                 shift += separation;

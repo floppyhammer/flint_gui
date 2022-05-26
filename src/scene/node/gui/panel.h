@@ -35,6 +35,9 @@ namespace Flint {
 
         void set_size(Vec2<float> p_size) override;
 
+        /// Set title text.
+        void set_title(std::string title);
+
     private:
         bool title_bar = false;
         bool closable = false;

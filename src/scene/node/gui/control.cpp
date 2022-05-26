@@ -11,7 +11,7 @@ namespace Flint {
 
         debug_size_box.bg_color = ColorU();
         debug_size_box.corner_radius = 0;
-        debug_size_box.border_width = 0;
+        debug_size_box.border_width = 1;
         debug_size_box.border_color = ColorU(202, 130, 94, 255);
     }
 
