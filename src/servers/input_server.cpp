@@ -40,6 +40,24 @@ namespace Flint {
         return s;
     }
 
+    void InputEvent::consume() {
+        consumed = true;
+    }
+
+    bool InputEvent::is_consumed() const {
+        return consumed;
+    }
+
+    InputServer::InputServer() {
+        // All remaining cursors are destroyed when glfwTerminate is called.
+        arrow_cursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+        ibeam_cursor = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+        crosshair_cursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
+        hand_cursor = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
+        resize_cursor_h = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+        resize_cursor_v = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
+    }
+
     void InputServer::attach_callbacks(GLFWwindow *window) {
         // GLFW input callbacks.
 
@@ -97,11 +115,48 @@ namespace Flint {
         input_queue.clear();
     }
 
-    void InputEvent::consume() {
-        consumed = true;
+    void InputServer::set_cursor(CursorShape shape) {
+        GLFWcursor *current_cursor{};
+
+        switch (shape) {
+            case CursorShape::ARROW: {
+                current_cursor = arrow_cursor;
+            }
+                break;
+            case CursorShape::IBEAM: {
+                current_cursor = ibeam_cursor;
+            }
+                break;
+            case CursorShape::CROSSHAIR: {
+                current_cursor = crosshair_cursor;
+            }
+                break;
+            case CursorShape::HAND: {
+                current_cursor = hand_cursor;
+            }
+                break;
+            case CursorShape::HRESIZE: {
+                current_cursor = resize_cursor_h;
+            }
+                break;
+            case CursorShape::VRESIZE: {
+                current_cursor = resize_cursor_v;
+            }
+                break;
+        }
+
+        glfwSetCursor(current_window, current_cursor);
     }
 
-    bool InputEvent::is_consumed() const {
-        return consumed;
+    void InputServer::capture_cursor() {
+        glfwSetInputMode(current_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    }
+
+    void InputServer::hide_cursor() {
+        glfwSetInputMode(current_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    }
+
+    void InputServer::restore_cursor() {
+        glfwSetInputMode(current_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 }

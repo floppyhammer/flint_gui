@@ -67,12 +67,29 @@ namespace Flint {
     /// UTF8 string to wstring.
     std::wstring utf8_to_ws(std::string const &utf8);
 
+    enum class CursorShape {
+        // The regular arrow cursor.
+        ARROW,
+        // The text input I-beam cursor shape.
+        IBEAM,
+        // The crosshair shape.
+        CROSSHAIR,
+        // The hand shape.
+        HAND,
+        // The horizontal resize arrow shape.
+        HRESIZE,
+        // The vertical resize arrow shape.
+        VRESIZE,
+    };
+
     class InputServer {
     public:
         static InputServer *get_singleton() {
             static InputServer singleton;
             return &singleton;
         }
+
+        InputServer();
 
         void attach_callbacks(GLFWwindow *window);
 
@@ -81,7 +98,20 @@ namespace Flint {
 
         std::vector<InputEvent> input_queue;
 
+        GLFWwindow *current_window{};
+
         void clear_queue();
+
+        void capture_cursor();
+
+        void hide_cursor();
+
+        void restore_cursor();
+
+        void set_cursor(CursorShape shape);
+
+    private:
+        GLFWcursor *arrow_cursor, *ibeam_cursor, *crosshair_cursor, *hand_cursor, *resize_cursor_h, *resize_cursor_v;
     };
 }
 
