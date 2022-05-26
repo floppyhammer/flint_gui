@@ -31,6 +31,8 @@ namespace Flint {
         Bone2d *parent;
         Skeleton2d *skeleton;
 
+        bool selected = false;
+
         void add_child(std::shared_ptr<Bone2d> child);
 
         void draw();

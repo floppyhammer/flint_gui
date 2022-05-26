@@ -126,4 +126,13 @@ namespace Flint {
     void Control::release_focus() {
 
     }
+
+    ColorF Control::get_global_modulate() {
+        if (parent && parent->extended_from_which_base_node() == NodeType::Control) {
+            auto cast_parent = dynamic_cast<Control *>(parent);
+            return modulate * cast_parent->get_global_modulate();
+        } else {
+            return {1, 1, 1, 1};
+        }
+    }
 }

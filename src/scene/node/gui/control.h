@@ -89,6 +89,11 @@ namespace Flint {
         virtual void grab_focus();
         virtual void release_focus();
 
+        ColorF get_global_modulate();
+
+        ColorF modulate;
+        ColorF self_modulate;
+
     protected:
         Vec2<float> position{0};
         Vec2<float> size{128};

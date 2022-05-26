@@ -100,7 +100,7 @@ namespace Flint {
         collapse_button = std::make_shared<Button>();
         collapse_button->set_icon(collapse_icon);
         collapse_button->set_text("");
-        collapse_button->set_size({24, 24});
+        collapse_button->set_minimum_size({24, 24});
 
         auto callback = [this] {
             collapsed = !collapsed;
@@ -182,7 +182,9 @@ namespace Flint {
         }
 
         if (children.empty()) {
-            collapse_button->set_visibility(false);
+            // We should make the button invisible by changing the alpha value instead of the visibility.
+            //collapse_button->set_visibility(false);
+            collapse_button->set_icon(nullptr);
         }
 
         container->set_position(Vec2<float>(offset_x, offset_y) + global_position);

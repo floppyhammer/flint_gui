@@ -27,6 +27,8 @@ namespace Flint {
     void TextureRect::set_texture(const std::shared_ptr<Texture> &p_texture) {
         texture = p_texture;
 
+        if (!texture) return;
+
         if (p_texture->get_type() == TextureType::IMAGE) {
             auto image_texture = static_cast<ImageTexture *>(p_texture.get());
             mesh->surface->get_material()->set_texture(std::shared_ptr<ImageTexture>(image_texture));
@@ -34,6 +36,8 @@ namespace Flint {
     }
 
     std::shared_ptr<Texture> TextureRect::get_texture() const {
+        if (!texture) return nullptr;
+
         if (texture->get_type() == TextureType::IMAGE) {
             return mesh->surface->get_material()->get_texture();
         } else {
