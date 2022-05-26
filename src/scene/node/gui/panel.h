@@ -44,6 +44,8 @@ namespace Flint {
 
         bool collapsed = false;
 
+        float expanded_width = 0;
+
         float title_bar_height = 48;
 
         bool title_bar_pressed = false;

@@ -8,38 +8,12 @@ namespace Flint {
 
         theme_panel = std::make_optional(StyleBox());
         theme_panel.value().bg_color = ColorU(27, 27, 27, 255);
-        //theme_panel.value().shadow_size = 8;
-        //theme_panel.value().shadow_color = ColorU::black();
+        theme_panel.value().border_color = {50, 50, 50, 255};
         theme_panel.value().border_width = 2;
         theme_panel.value().corner_radius = 8;
-        theme_panel.value().border_color = {50, 50, 50, 255};
 
         theme_title_bar_line = std::make_optional(StyleLine());
         theme_title_bar_line.value().color = {50, 50, 50, 255};
-
-        title_label = std::make_shared<Label>();
-        title_label->set_text("Title");
-        title_label->set_horizontal_alignment(Alignment::Center);
-        title_label->set_vertical_alignment(Alignment::Center);
-        title_label->set_mouse_filter(MouseFilter::IGNORE);
-        title_label->sizing_flag = ContainerSizingFlag::EXPAND;
-
-        {
-            auto close_icon = VectorTexture::from_empty(24, 24);
-            VShape vshape;
-            vshape.shape.add_line({-8, -8}, {8, 8});
-            vshape.shape.add_line({-8, 8}, {8, -8});
-            vshape.shape.translate({close_icon->get_width() * 0.5f, close_icon->get_height() * 0.5f});
-            vshape.stroke_color = ColorU(163, 163, 163, 255);
-            vshape.stroke_width = 2;
-            close_icon->set_vshapes({vshape});
-
-            close_button = std::make_shared<Button>();
-            close_button->set_text("");
-            close_button->set_parent(this);
-            close_button->set_icon(close_icon);
-            close_button->set_minimum_size(Vec2<float>(title_bar_height));
-        }
 
         {
             collapse_icon = VectorTexture::from_empty(24, 24);
@@ -67,22 +41,35 @@ namespace Flint {
             expand_icon->set_vshapes({vshape});
         }
 
+        {
+            title_label = std::make_shared<Label>();
+            title_label->set_text("Panel");
+            title_label->set_horizontal_alignment(Alignment::Center);
+            title_label->set_vertical_alignment(Alignment::Center);
+            title_label->set_mouse_filter(MouseFilter::IGNORE);
+            title_label->sizing_flag = ContainerSizingFlag::EXPAND;
+        }
+
+        {
+            auto close_icon = VectorTexture::from_empty(24, 24);
+            VShape vshape;
+            vshape.shape.add_line({-8, -8}, {8, 8});
+            vshape.shape.add_line({-8, 8}, {8, -8});
+            vshape.shape.translate({close_icon->get_width() * 0.5f, close_icon->get_height() * 0.5f});
+            vshape.stroke_color = ColorU(163, 163, 163, 255);
+            vshape.stroke_width = 2;
+            close_icon->set_vshapes({vshape});
+
+            close_button = std::make_shared<Button>();
+            close_button->set_text("");
+            close_button->set_parent(this);
+            close_button->set_icon(close_icon);
+            close_button->set_minimum_size(Vec2<float>(title_bar_height));
+        }
+
         collapse_button = std::make_shared<Button>();
         collapse_button->set_text("");
         collapse_button->set_icon(collapse_icon);
-        auto callback = [this] {
-            collapsed = !collapsed;
-            if (collapsed) {
-                collapse_button->set_icon(expand_icon);
-
-                Logger::verbose("Collapsed", "Panel");
-            } else {
-                collapse_button->set_icon(collapse_icon);
-
-                Logger::verbose("Expanded", "Panel");
-            }
-        };
-        collapse_button->connect_signal("on_pressed", callback);
         collapse_button->set_minimum_size(Vec2<float>(title_bar_height));
 
         container = std::make_shared<BoxContainer>();
@@ -93,6 +80,33 @@ namespace Flint {
         container->set_position({0, -title_bar_height});
         container->set_size({size.x, title_bar_height});
         container->set_mouse_filter(MouseFilter::IGNORE);
+
+        // Connect signals.
+        auto callback = [this] {
+            collapsed = !collapsed;
+            if (collapsed) {
+                collapse_button->set_icon(expand_icon);
+
+                // Store width.
+                expanded_width = size.x;
+
+                float new_width = container->calculate_minimum_size().x;
+
+                container->set_size({new_width, title_bar_height});
+
+                size.x = new_width;
+
+                Logger::verbose("Collapsed", "Panel");
+            } else {
+                collapse_button->set_icon(collapse_icon);
+
+                container->set_size({expanded_width, title_bar_height});
+                size.x = expanded_width;
+
+                Logger::verbose("Expanded", "Panel");
+            }
+        };
+        collapse_button->connect_signal("on_pressed", callback);
 
         title_bar = true;
     }
@@ -121,8 +135,13 @@ namespace Flint {
                     consume_flag = true;
                 }
 
-                if (Rect<float>(global_position - Vec2<float>(0, title_bar_height),
-                                global_position + size + Vec2<float>(0, title_bar_height)).contains_point(args.position)) {
+                Rect<float> active_rect;
+                active_rect.left = global_position.x;
+                active_rect.top = -title_bar_height;
+                active_rect.right = size.x;
+                active_rect.bottom = collapsed ? title_bar_height : size.y + title_bar_height;
+
+                if (active_rect.contains_point(args.position)) {
                     consume_flag = true;
                 }
             }

@@ -75,8 +75,8 @@ namespace Flint {
                 }
             }
 
-            if (event.type == InputEventType::MouseSpinBox) {
-                auto args = event.args.mouse_SpinBox;
+            if (event.type == InputEventType::MouseButton) {
+                auto args = event.args.mouse_button;
 
                 if (event.is_consumed()) {
                     if (!args.pressed) {

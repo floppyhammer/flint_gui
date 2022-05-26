@@ -123,7 +123,7 @@ void App::run() {
         auto skeleton = std::make_shared<Skeleton2d>();
         skeleton->position = {1000, 300};
 
-        node->add_child(model0);
+        //node->add_child(model0);
         node->add_child(sub_viewport_c);
         node->add_child(skeleton);
 
@@ -142,10 +142,6 @@ void App::run() {
         margin_container2->add_child(item_tree);
         scene_panel->add_child(margin_container2);
         node->add_child(scene_panel);
-
-//        auto btn1 = std::make_shared<Button>();
-//        btn1->set_text("");
-//        node->add_child(btn1);
 
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);

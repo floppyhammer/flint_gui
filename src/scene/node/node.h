@@ -33,6 +33,7 @@ namespace Flint {
         TextureRect,
         Tree,
         ProgressBar,
+        SpinBox,
 
         // 2D.
         Node2D,
