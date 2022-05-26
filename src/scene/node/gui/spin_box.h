@@ -42,7 +42,7 @@ namespace Flint {
         float value = 0;
 
         /// Only for display, the real value will not be rounded.
-        uint32_t rounding_digits = 6;
+        uint32_t rounding_digits = 3;
 
         bool is_integer = false;
 
@@ -51,7 +51,7 @@ namespace Flint {
         float min_value = 0;
         float max_value = 100;
 
-        float step = 1;
+        float step = 1.4;
 
         bool focused = false;
 

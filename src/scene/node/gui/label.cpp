@@ -208,17 +208,16 @@ namespace Flint {
 
         canvas->set_shadow_blur(0);
 
-        // Add stroke.
+        // Draw glyphs.
         for (Glyph &g: glyphs) {
+            // Add fill.
+            canvas->set_fill_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(color.r, color.g, color.b, color.a)));
+            canvas->fill_shape(g.shape, Pathfinder::FillRule::Winding);
+
             // Add stroke if needed.
             canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(stroke_color.r, stroke_color.g, stroke_color.b, stroke_color.a)));
             canvas->set_line_width(stroke_width);
             canvas->stroke_shape(g.shape);
-        }
-
-        for (Glyph &g: glyphs) {
-            canvas->set_fill_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(color.r, color.g, color.b, color.a)));
-            canvas->fill_shape(g.shape, Pathfinder::FillRule::Winding);
 
             if (debug) {
                 canvas->set_line_width(1);

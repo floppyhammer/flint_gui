@@ -10,10 +10,11 @@ namespace Flint {
         label = std::make_shared<Label>();
         label->set_parent(this);
 
-        StyleBox normal;
-        normal.border_color = ColorU(163, 163, 163, 255);
-        normal.border_width = 2;
-        theme_normal = std::optional(normal);
+        theme_normal = std::optional(StyleBox());
+
+        theme_focused = std::optional(StyleBox());
+        theme_focused.value().border_color = ColorU(163, 163, 163, 255);
+        theme_focused.value().border_width = 2;
 
         theme_caret.width = 2;
 
@@ -80,8 +81,11 @@ namespace Flint {
 
         auto global_position = get_global_position();
 
-        if (theme_normal.has_value()) {
-            theme_normal.value().add_to_canvas(global_position, size, canvas);
+        std::optional<StyleBox> active_style_box;
+        active_style_box = focused ? theme_focused : theme_normal;
+
+        if (active_style_box.has_value()) {
+            active_style_box.value().add_to_canvas(global_position, size, canvas);
         }
 
         label->draw(p_command_buffer);

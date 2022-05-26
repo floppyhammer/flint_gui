@@ -90,6 +90,8 @@ namespace Flint {
 
         std::shared_ptr<Font> font;
 
+        bool clip = false;
+
         float font_size = 32;
 
         std::vector<Glyph> glyphs;

@@ -3,6 +3,9 @@
 #include "../../../resources/vector_texture.h"
 #include "../../../common/math/rect.h"
 
+#include <iostream>
+#include <iomanip>
+
 namespace Flint {
     SpinBox::SpinBox() {
         type = NodeType::SpinBox;
@@ -62,6 +65,10 @@ namespace Flint {
             if (event.type == InputEventType::MouseButton) {
                 auto args = event.args.mouse_button;
 
+                if (!args.pressed) {
+                    pressed_inside = false;
+                }
+
                 if (event.is_consumed()) {
                     focused = false;
                     pressed_inside = false;
@@ -70,9 +77,8 @@ namespace Flint {
                         if (args.pressed) {
                             focused = true;
                             pressed_inside = true;
-                        } else {
-                            pressed_inside = false;
                         }
+
                         consume_flag = true;
                     } else {
                         focused = false;
@@ -163,7 +169,9 @@ namespace Flint {
             int32_t value_int = std::round(p_value);
             label->set_text(std::to_string(value_int));
         } else {
-            label->set_text(std::to_string(p_value));
+            std::ostringstream string_stream;
+            string_stream << std::setprecision(rounding_digits) << p_value;
+            label->set_text(string_stream.str());
         }
     }
 }
