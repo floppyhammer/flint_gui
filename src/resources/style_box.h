@@ -8,7 +8,7 @@
 
 namespace Flint {
     struct StyleBox {
-        ColorU bg_color = ColorU(32, 32, 32, 255);
+        ColorU bg_color = ColorU(27, 27, 27, 255);
         bool draw_center = true;
 
         ColorU border_color = ColorU(67, 67, 67, 255);

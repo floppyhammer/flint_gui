@@ -69,36 +69,86 @@ void App::run() {
         model1->set_mesh(ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj"));
         auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
         auto sub_viewport = std::make_shared<Flint::SubViewport>();
-        auto label = std::make_shared<Flint::Label>();
-        label->set_horizontal_alignment(Flint::Alignment::Center);
-        label->set_vertical_alignment(Flint::Alignment::Center);
-        label->set_position({400, 0});
+
         auto progress_bar = std::make_shared<Flint::ProgressBar>();
-        progress_bar->set_position({0, 600});
         progress_bar->set_size({256, 24});
         auto button = std::make_shared<Flint::Button>();
-        button->set_position({500, 0});
         // Callback to clean up staging resources.
         auto callback = [] {
             Flint::Logger::verbose("Button pressed");
         };
         button->connect_signal("on_pressed", callback);
         auto button2 = std::make_shared<Flint::Button>();
-        auto margin_container = std::make_shared<Flint::MarginContainer>();
-        margin_container->set_size({400, 400});
-        auto h_stack_container = std::make_shared<Flint::BoxContainer>();
-        auto v_stack_container = std::make_shared<Flint::BoxContainer>();
-        v_stack_container->make_vertical();
+
+        auto hbox_container = std::make_shared<Flint::BoxContainer>();
+        auto vbox_container = std::make_shared<Flint::BoxContainer>();
+        vbox_container->make_vertical();
+
+        // Inspector.
+        // ------------------------------------------
         auto inspector_panel = std::make_shared<Flint::Panel>();
-        inspector_panel->set_position({200, 200});
+        inspector_panel->set_position({50, 600});
         inspector_panel->set_title("Inspector");
         inspector_panel->set_size({400, 400});
 
+        auto margin_container = std::make_shared<Flint::MarginContainer>();
+        margin_container->set_size({400, 400});
+        margin_container->add_child(vbox_container);
+        inspector_panel->add_child(margin_container);
+        
+        vbox_container->add_child(hbox_container);
+        vbox_container->add_child(progress_bar);
+
         auto line_edit = std::make_shared<Flint::LineEdit>();
+        vbox_container->add_child(line_edit);
+
+        // Position.
+        auto position_container = std::make_shared<Flint::BoxContainer>();
+        {
+            auto label = std::make_shared<Flint::Label>();
+            label->set_horizontal_alignment(Flint::Alignment::Center);
+            label->set_vertical_alignment(Flint::Alignment::Begin);
+            label->set_text("Position");
+
+            auto spin_box_x = std::make_shared<SpinBox>();
+            spin_box_x->sizing_flag = ContainerSizingFlag::EXPAND;
+            auto spin_box_y = std::make_shared<SpinBox>();
+            spin_box_y->sizing_flag = ContainerSizingFlag::EXPAND;
+
+            auto xy_container = std::make_shared<Flint::BoxContainer>();
+            xy_container->sizing_flag = ContainerSizingFlag::EXPAND;
+            xy_container->make_vertical();
+            xy_container->add_child(spin_box_x);
+            xy_container->add_child(spin_box_y);
+
+            position_container->add_child(label);
+            position_container->add_child(xy_container);
+        }
+
+        vbox_container->add_child(position_container);
+        // ----------------------------------------------------
+
+        // Rotation.
+        // ----------------------------------------------------
+        auto rotation_container = std::make_shared<Flint::BoxContainer>();
+        {
+            auto label = std::make_shared<Flint::Label>();
+            label->set_horizontal_alignment(Flint::Alignment::Center);
+            label->set_vertical_alignment(Flint::Alignment::Begin);
+            label->set_text("Rotation");
+
+            auto spin_box = std::make_shared<SpinBox>();
+            spin_box->sizing_flag = ContainerSizingFlag::EXPAND;
+
+            rotation_container->add_child(label);
+            rotation_container->add_child(spin_box);
+        }
+        vbox_container->add_child(rotation_container);
+        // ----------------------------------------------------
 
         auto node_panel = std::make_shared<Flint::Panel>();
-        node_panel->set_position({0, 100});
-        node_panel->set_title("Create New Node");
+        node_panel->set_position({50, 100});
+        node_panel->set_title("Scene");
         node_panel->set_size({400, 400});
         auto vector_layer = std::make_shared<Flint::TextureRect>();
         vector_layer->name = "vector_layer";
@@ -124,22 +174,14 @@ void App::run() {
 
         auto skeleton = std::make_shared<Skeleton2d>();
         skeleton->position = {1000, 300};
-        auto spin_box = std::make_shared<SpinBox>();
 
         //node->add_child(model0);
         node->add_child(sub_viewport_c);
         node->add_child(skeleton);
 
         node->add_child(vector_layer);
-        h_stack_container->add_child(button);
-        h_stack_container->add_child(label);
-        h_stack_container->add_child(button2);
-        v_stack_container->add_child(h_stack_container);
-        v_stack_container->add_child(progress_bar);
-        v_stack_container->add_child(line_edit);
-        v_stack_container->add_child(spin_box);
-        margin_container->add_child(v_stack_container);
-        inspector_panel->add_child(margin_container);
+        hbox_container->add_child(button);
+        hbox_container->add_child(button2);
         node->add_child(inspector_panel);
         auto margin_container2 = std::make_shared<Flint::MarginContainer>();
         margin_container2->set_size({400, 400});

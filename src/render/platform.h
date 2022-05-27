@@ -9,8 +9,8 @@
 #include <vector>
 #include <optional>
 
-const uint32_t WIDTH = 1280;
-const uint32_t HEIGHT = 720;
+const uint32_t WIDTH = 1920;
+const uint32_t HEIGHT = 1080;
 
 /// How many frames should be processed concurrently.
 const int MAX_FRAMES_IN_FLIGHT = 2;

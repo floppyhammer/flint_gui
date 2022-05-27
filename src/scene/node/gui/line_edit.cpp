@@ -11,10 +11,11 @@ namespace Flint {
         label->set_parent(this);
 
         theme_normal = std::optional(StyleBox());
+        theme_normal->bg_color = ColorU(10, 10, 10);
 
-        theme_focused = std::optional(StyleBox());
-        theme_focused.value().border_color = ColorU(163, 163, 163, 255);
-        theme_focused.value().border_width = 2;
+        theme_focused = std::optional(theme_normal.value());
+        theme_focused->border_color = ColorU(163, 163, 163, 255);
+        theme_focused->border_width = 2;
 
         theme_caret.width = 2;
 

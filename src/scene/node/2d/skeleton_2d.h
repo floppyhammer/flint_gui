@@ -31,6 +31,8 @@ namespace Flint {
         Bone2d *parent;
         Skeleton2d *skeleton;
 
+        std::shared_ptr<ImageTexture> metadata;
+
         bool selected = false;
 
         void add_child(std::shared_ptr<Bone2d> child);
