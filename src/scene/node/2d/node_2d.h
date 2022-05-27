@@ -5,6 +5,7 @@
 #include "../../../common/math/vec2.h"
 #include "../../../render/mvp_buffer.h"
 #include "../../../resources/mesh.h"
+#include "../../../servers/vector_server.h"
 
 namespace Flint {
     class Node2d : public Node {
@@ -23,6 +24,10 @@ namespace Flint {
 
     protected:
         std::shared_ptr<Mesh2d> mesh;
+
+        void draw(VkCommandBuffer p_command_buffer) override;
+
+        VShape position_indicator;
     };
 }
 

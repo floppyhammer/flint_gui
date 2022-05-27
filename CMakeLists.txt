@@ -30,11 +30,13 @@ add_subdirectory(external/glfw)
 include_directories(external/pathfinder-cpp/include)
 add_subdirectory(external/pathfinder-cpp)
 
+add_subdirectory(third_party/poly2tri)
+
 add_executable(flint ${SOURCE_FILES})
 
 # Windows
 if (WIN32)
-    target_link_libraries(flint glfw Vulkan::Vulkan pathfinder)
+    target_link_libraries(flint glfw Vulkan::Vulkan pathfinder poly2tri)
 else () # Linux
     ## sudo apt install libglfw3-dev
     ## sudo apt install libvulkan-dev

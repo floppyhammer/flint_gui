@@ -2,6 +2,7 @@
 #define FLINT_SKELETON_2D_H
 
 #include "node_2d.h"
+#include "sprite_2d.h"
 #include "../../../resources/mesh.h"
 #include "../../../render/mvp_buffer.h"
 #include "../../../servers/vector_server.h"
@@ -44,17 +45,38 @@ namespace Flint {
         Transform2 get_global_transform();
     };
 
-    struct BoneVertex {
-        Vertex v; // Info on this vertex: position, color etc.
-        std::vector<float> weights;	// Weight for each bone connected.
-        std::vector<Bone2d *> bones; // Pointer to connected bones.
+    struct Skeleton2dMesh {
+        // Including internal vertexes, which are placed at the end of the vector.
+        std::vector<Vec2F> vertexes;
+        uint32_t internal_vertices;
+        std::vector<Vec2F> uvs;
+        std::vector<ColorU> vertex_colors;
+        std::vector<std::vector<uint32_t>> polygons;
+        std::vector<std::vector<float>> bone_weights; // Vector[Bone count][Vertex count]
     };
 
-    struct Skeleton2dMesh {
-        std::vector<BoneVertex> vertexes;
-        // Triangles made up of vertexes.
-        std::vector<uint32_t> triangles;
+    struct Skeleton2dMeshGpuData {
+        std::vector<uint32_t> indices;
+        std::vector<Vec2F> points;
+        std::vector<Vec2F> uvs;
+        std::vector<ColorU> colors;
+        std::vector<uint32_t> bones;
+        std::vector<float> weights;
+        std::shared_ptr<Texture> texture;
+        int count;
     };
+
+//    struct BoneVertex {
+//        Vertex v; // Info on this vertex: position, color etc.
+//        std::vector<float> weights;	// Weight for each bone connected.
+//        std::vector<Bone2d *> bones; // Pointer to connected bones.
+//    };
+//
+//    struct Skeleton2dMesh {
+//        std::vector<BoneVertex> vertexes;
+//        // Triangles made up of vertexes.
+//        std::vector<uint32_t> triangles;
+//    };
 
     class Skeleton2d : public Node2d {
     public:
@@ -63,9 +85,13 @@ namespace Flint {
     private:
         std::shared_ptr<Bone2d> base_bone;
 
+        std::shared_ptr<Sprite2d> sprite;
+
         void update(double delta) override;
 
         void draw(VkCommandBuffer p_command_buffer) override;
+
+        Skeleton2dMesh mesh;
     };
 }
 

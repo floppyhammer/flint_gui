@@ -50,8 +50,8 @@ namespace Flint {
             viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
         }
 
-        float sprite_width = mesh->surface->get_material()->get_texture()->get_width() * scale.x;
-        float sprite_height = mesh->surface->get_material()->get_texture()->get_height() * scale.y;
+        float scaled_sprite_width = mesh->surface->get_material()->get_texture()->get_width() * scale.x;
+        float scaled_sprite_height = mesh->surface->get_material()->get_texture()->get_height() * scale.y;
 
         auto global_position = get_global_position();
 
@@ -59,19 +59,17 @@ namespace Flint {
         ModelViewProjection mvp{};
 
         // The actual application order of these matrices is reverse.
-        // 4.
-        mvp.model = glm::translate(glm::mat4(1.0f),
-                                   glm::vec3(global_position.x / viewport_extent.x * 2.0f,
-                                             global_position.y / viewport_extent.y * 2.0f,
-                                             0.0f));
         // 3.
-        mvp.model = glm::translate(mvp.model, glm::vec3(-1.0, -1.0, 0.0f));
+        mvp.model = glm::translate(glm::mat4(1.0f),
+                                   glm::vec3((global_position.x - scaled_sprite_width * 0.5) / viewport_extent.x * 2.0f,
+                                             (global_position.y - scaled_sprite_height * 0.5) / viewport_extent.y * 2.0f,
+                                             0.0f));
         // 2.
-        mvp.model = glm::scale(mvp.model, glm::vec3(scale.x, scale.y, 1.0f));
+        mvp.model = glm::translate(mvp.model, glm::vec3(-1.0, -1.0, 0.0f));
         // 1.
         mvp.model = glm::scale(mvp.model,
-                               glm::vec3(sprite_width / viewport_extent.x * 2.0f,
-                                         sprite_height / viewport_extent.y * 2.0f,
+                               glm::vec3(scaled_sprite_width / viewport_extent.x * 2.0f,
+                                         scaled_sprite_height / viewport_extent.y * 2.0f,
                                          1.0f));
 
         push_constant.model = mvp.model;
@@ -108,5 +106,7 @@ namespace Flint {
                 vertexBuffers,
                 mesh->surface->get_index_buffer(),
                 mesh->surface->get_index_count());
+
+        Node2d::draw(p_command_buffer);
     }
 }

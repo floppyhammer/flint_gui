@@ -7,6 +7,13 @@ namespace Flint {
         type = NodeType::Node2D;
 
         mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
+
+        position_indicator.shape.move_to(-12, 0);
+        position_indicator.shape.line_to(12, 0);
+        position_indicator.shape.move_to(0, -12);
+        position_indicator.shape.line_to(0, 12);
+        position_indicator.stroke_width = 2;
+        position_indicator.stroke_color = ColorU::red();
     }
 
     Vec2<float> Node2d::get_global_position() const {
@@ -17,5 +24,9 @@ namespace Flint {
         }
 
         return position;
+    }
+
+    void Node2d::draw(VkCommandBuffer p_command_buffer) {
+        VectorServer::get_singleton()->draw_vshape(position_indicator, Transform2::from_translation(position));
     }
 }
