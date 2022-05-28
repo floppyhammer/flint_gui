@@ -35,14 +35,7 @@ namespace Flint {
     void ProgressBar::update(double dt) {
         Control::update(dt);
 
-        if (value == max_value) value = min_value;
-        value += dt * 10.0;
-        value = std::clamp(value, min_value, max_value);
-
-        ratio = (value - min_value) / (max_value - min_value);
-        label->set_text(std::to_string((int) round(ratio * 100)) + "%");
-
-        label->update(dt);
+        set_value(Engine::getSingleton()->get_fps());
     }
 
     void ProgressBar::draw(VkCommandBuffer p_command_buffer) {
@@ -63,6 +56,15 @@ namespace Flint {
     void ProgressBar::set_size(Vec2<float> p_size) {
         size = p_size;
         label->set_size(p_size);
+    }
+
+    void ProgressBar::set_value(float p_value) {
+        value = std::clamp(p_value, min_value, max_value);
+
+        ratio = (value - min_value) / (max_value - min_value);
+
+        label->set_text(std::to_string((int) round(ratio * 100)) + "%");
+        label->update(0);
     }
 
     void ProgressBar::value_changed() {
