@@ -1,6 +1,6 @@
 #include "progress_bar.h"
 
-#include "../../../common/math/rect.h"
+#include "../../../common/geometry.h"
 
 namespace Flint {
     ProgressBar::ProgressBar() {
@@ -71,7 +71,7 @@ namespace Flint {
         }
     }
 
-    void ProgressBar::connect_signal(std::string signal, std::function<void()> callback) {
+    void ProgressBar::connect_signal(const std::string &signal, std::function<void()> callback) {
         if (signal == "on_value_changed") {
             on_value_changed.push_back(callback);
         }

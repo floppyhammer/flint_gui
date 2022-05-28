@@ -1,10 +1,12 @@
 #ifndef FLINT_RENDER_TARGET_H
 #define FLINT_RENDER_TARGET_H
 
-#include "../common/math/vec2.h"
-#include "../common/color.h"
+#include "../common/geometry.h"
 #include "render_server.h"
 #include "../resources/image_texture.h"
+
+using Pathfinder::Vec2;
+using Pathfinder::Transform2;
 
 namespace Flint {
     /**

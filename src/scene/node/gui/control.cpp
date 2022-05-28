@@ -3,7 +3,9 @@
 #include "../sub_viewport.h"
 #include "../../../render/swap_chain.h"
 #include "../../../resources/default_resource.h"
-#include "../../../common/math/rect.h"
+#include "../../../common/geometry.h"
+
+using Pathfinder::Rect;
 
 namespace Flint {
     Control::Control() {

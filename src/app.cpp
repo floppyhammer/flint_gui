@@ -21,8 +21,11 @@
 
 using namespace Flint;
 
+using Pathfinder::Vec2;
+using Pathfinder::Vec3;
+
 void App::run() {
-    Flint::Logger::set_level(Flint::Logger::VERBOSE);
+    Logger::set_level(Logger::VERBOSE);
 
     // Initialization.
     // ---------------------------------------------------
@@ -36,11 +39,11 @@ void App::run() {
     auto swap_chain = SwapChain::getSingleton();
 
     // 4. Initialize input server.
-    auto input_server = Flint::InputServer::get_singleton();
+    auto input_server = InputServer::get_singleton();
     input_server->attach_callbacks(platform->window);
 
     // 5. Initialize vector server.
-    auto vector_server = Flint::VectorServer::get_singleton();
+    auto vector_server = VectorServer::get_singleton();
     std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(platform->device,
                                                                                         platform->physicalDevice,
                                                                                         platform->graphicsQueue,
@@ -61,37 +64,37 @@ void App::run() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto node = std::make_shared<Flint::Node>();
-        auto node_3d = std::make_shared<Flint::Node3D>();
-        auto model0 = std::make_shared<Flint::Model>();
+        auto node = std::make_shared<Node>();
+        auto node_3d = std::make_shared<Node3D>();
+        auto model0 = std::make_shared<Model>();
         model0->set_mesh(ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj"));
-        auto model1 = std::make_shared<Flint::Model>();
+        auto model1 = std::make_shared<Model>();
         model1->set_mesh(ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj"));
-        auto sub_viewport_c = std::make_shared<Flint::SubViewportContainer>();
-        auto sub_viewport = std::make_shared<Flint::SubViewport>();
+        auto sub_viewport_c = std::make_shared<SubViewportContainer>();
+        auto sub_viewport = std::make_shared<SubViewport>();
 
-        auto progress_bar = std::make_shared<Flint::ProgressBar>();
+        auto progress_bar = std::make_shared<ProgressBar>();
         progress_bar->set_size({256, 24});
-        auto button = std::make_shared<Flint::Button>();
+        auto button = std::make_shared<Button>();
         // Callback to clean up staging resources.
         auto callback = [] {
-            Flint::Logger::verbose("Button pressed");
+            Logger::verbose("Button pressed");
         };
         button->connect_signal("on_pressed", callback);
-        auto button2 = std::make_shared<Flint::Button>();
+        auto button2 = std::make_shared<Button>();
 
-        auto hbox_container = std::make_shared<Flint::BoxContainer>();
-        auto vbox_container = std::make_shared<Flint::BoxContainer>();
+        auto hbox_container = std::make_shared<BoxContainer>();
+        auto vbox_container = std::make_shared<BoxContainer>();
         vbox_container->make_vertical();
 
         // Inspector.
         // ------------------------------------------
-        auto inspector_panel = std::make_shared<Flint::Panel>();
+        auto inspector_panel = std::make_shared<Panel>();
         inspector_panel->set_position({50, 600});
         inspector_panel->set_title("Inspector");
         inspector_panel->set_size({400, 400});
 
-        auto margin_container = std::make_shared<Flint::MarginContainer>();
+        auto margin_container = std::make_shared<MarginContainer>();
         margin_container->set_size({400, 400});
         margin_container->add_child(vbox_container);
         inspector_panel->add_child(margin_container);
@@ -99,15 +102,15 @@ void App::run() {
         vbox_container->add_child(hbox_container);
         vbox_container->add_child(progress_bar);
 
-        auto line_edit = std::make_shared<Flint::LineEdit>();
+        auto line_edit = std::make_shared<LineEdit>();
         vbox_container->add_child(line_edit);
 
         // Position.
-        auto position_container = std::make_shared<Flint::BoxContainer>();
+        auto position_container = std::make_shared<BoxContainer>();
         {
-            auto label = std::make_shared<Flint::Label>();
-            label->set_horizontal_alignment(Flint::Alignment::Center);
-            label->set_vertical_alignment(Flint::Alignment::Begin);
+            auto label = std::make_shared<Label>();
+            label->set_horizontal_alignment(Alignment::Center);
+            label->set_vertical_alignment(Alignment::Begin);
             label->set_text("Position");
 
             auto spin_box_x = std::make_shared<SpinBox>();
@@ -115,7 +118,7 @@ void App::run() {
             auto spin_box_y = std::make_shared<SpinBox>();
             spin_box_y->sizing_flag = ContainerSizingFlag::EXPAND;
 
-            auto xy_container = std::make_shared<Flint::BoxContainer>();
+            auto xy_container = std::make_shared<BoxContainer>();
             xy_container->sizing_flag = ContainerSizingFlag::EXPAND;
             xy_container->make_vertical();
             xy_container->add_child(spin_box_x);
@@ -130,11 +133,11 @@ void App::run() {
 
         // Rotation.
         // ----------------------------------------------------
-        auto rotation_container = std::make_shared<Flint::BoxContainer>();
+        auto rotation_container = std::make_shared<BoxContainer>();
         {
-            auto label = std::make_shared<Flint::Label>();
-            label->set_horizontal_alignment(Flint::Alignment::Center);
-            label->set_vertical_alignment(Flint::Alignment::Begin);
+            auto label = std::make_shared<Label>();
+            label->set_horizontal_alignment(Alignment::Center);
+            label->set_vertical_alignment(Alignment::Begin);
             label->set_text("Rotation");
 
             auto spin_box = std::make_shared<SpinBox>();
@@ -146,11 +149,11 @@ void App::run() {
         vbox_container->add_child(rotation_container);
         // ----------------------------------------------------
 
-        auto node_panel = std::make_shared<Flint::Panel>();
+        auto node_panel = std::make_shared<Panel>();
         node_panel->set_position({50, 100});
         node_panel->set_title("Scene");
         node_panel->set_size({400, 400});
-        auto vector_layer = std::make_shared<Flint::TextureRect>();
+        auto vector_layer = std::make_shared<TextureRect>();
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WIDTH, HEIGHT});
         auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server->canvas->get_dest_texture().get());
@@ -159,14 +162,14 @@ void App::run() {
                                                   texture_vk->get_width(),
                                                   texture_vk->get_height());
         vector_layer->set_texture(texture);
-        auto item_tree = std::make_shared<Flint::Tree>();
+        auto item_tree = std::make_shared<Tree>();
         item_tree->set_size({400, 400});
 
         for (int i = 0; i < NODE_SPRITE_COUNT; i++) {
-            auto rigid_body_2d = std::make_shared<Flint::RigidBody2d>();
+            auto rigid_body_2d = std::make_shared<RigidBody2d>();
             rigid_body_2d->position = {400, 0};
             rigid_body_2d->velocity = {rand_velocity(generator), rand_velocity(generator)};
-            auto sprite_2d = std::make_shared<Flint::Sprite2d>();
+            auto sprite_2d = std::make_shared<Sprite2d>();
             sprite_2d->set_texture(ResourceManager::get_singleton()->load<ImageTexture>("../assets/duck.png"));
             rigid_body_2d->add_child(sprite_2d);
             node->add_child(rigid_body_2d);
@@ -183,7 +186,7 @@ void App::run() {
         hbox_container->add_child(button);
         hbox_container->add_child(button2);
         node->add_child(inspector_panel);
-        auto margin_container2 = std::make_shared<Flint::MarginContainer>();
+        auto margin_container2 = std::make_shared<MarginContainer>();
         margin_container2->set_size({400, 400});
         margin_container2->add_child(item_tree);
         node_panel->add_child(margin_container2);
@@ -198,7 +201,7 @@ void App::run() {
 
     // ECS test.
     {
-        world = std::make_unique<Flint::World>();
+        world = std::make_unique<World>();
 
         // Add some 2D sprites.
         for (int i = 0; i < ECS_SPRITE_COUNT; i++) {
@@ -207,17 +210,17 @@ void App::run() {
                     ResourceManager::get_singleton()->load<ImageTexture>("../assets/duck.png"));
 
             auto entity = world->spawn();
-            world->add_component(entity, Flint::Sprite2dComponent{mesh});
-            world->add_component(entity, Flint::ZSort2d{(float) i / (float) ECS_SPRITE_COUNT});
-            world->add_component(entity, Flint::Transform2dComponent{
-                    Flint::Vec2<float>(0.0f),
-                    Flint::Vec2<float>(1.0f),
-                    Flint::Vec2<float>(1.0f),
+            world->add_component(entity, Sprite2dComponent{mesh});
+            world->add_component(entity, ZSort2d{(float) i / (float) ECS_SPRITE_COUNT});
+            world->add_component(entity, Transform2dComponent{
+                    Vec2<float>(0.0f),
+                    Vec2<float>(1.0f),
+                    Vec2<float>(1.0f),
                     0.0f});
-            world->add_component(entity, Flint::GravityComponent{Flint::Vec3<float>(0.0f)});
-            world->add_component(entity, Flint::RigidBodyComponent{
-                    Flint::Vec3<float>(rand_velocity(generator), rand_velocity(generator), 0.0f),
-                    Flint::Vec3<float>(0.0f)});
+            world->add_component(entity, GravityComponent{Vec3<float>(0.0f)});
+            world->add_component(entity, RigidBodyComponent{
+                    Vec3<float>(rand_velocity(generator), rand_velocity(generator), 0.0f),
+                    Vec3<float>(0.0f)});
         }
 
         // 3D model.
@@ -229,9 +232,9 @@ void App::run() {
 //
 //            coordinator.add_component(
 //                    entity,
-//                    Flint::ModelComponent{mesh});
+//                    ModelComponent{mesh});
 //
-//            Flint::Transform3dComponent transform;
+//            Transform3dComponent transform;
 //            transform.position.x = 0.5;
 //            coordinator.add_component(
 //                    entity,
@@ -241,32 +244,32 @@ void App::run() {
         // Hierarchy test.
 //        {
 
-//            auto entity_0 = world->spawn(Flint::Sprite2dComponent{mesh};
-//            auto entity_0_0 = world->spawn(Flint::Sprite2dComponent{mesh};
-//            auto entity_0_1 = world->spawn(Flint::Sprite2dComponent{mesh};
-//            auto entity_0_0_1 = world->spawn(Flint::Sprite2dComponent{mesh};
+//            auto entity_0 = world->spawn(Sprite2dComponent{mesh};
+//            auto entity_0_0 = world->spawn(Sprite2dComponent{mesh};
+//            auto entity_0_1 = world->spawn(Sprite2dComponent{mesh};
+//            auto entity_0_0_1 = world->spawn(Sprite2dComponent{mesh};
 //
 //            coordinator.add_component(
 //                    entity_0,
-//                    Flint::HierarchicalRelations{{entity_0_0},
+//                    HierarchicalRelations{{entity_0_0},
 //                                                 {},
 //                                                 {},
 //                                                 {}});
 //            coordinator.add_component(
 //                    entity_0_0,
-//                    Flint::HierarchicalRelations{{entity_0_0_1},
+//                    HierarchicalRelations{{entity_0_0_1},
 //                                                 {},
 //                                                 {entity_0_1},
 //                                                 {entity_0}});
 //            coordinator.add_component(
 //                    entity_0_1,
-//                    Flint::HierarchicalRelations{{},
+//                    HierarchicalRelations{{},
 //                                                 {entity_0_1},
 //                                                 {},
 //                                                 {entity_0}});
 //            coordinator.add_component(
 //                    entity_0_0_1,
-//                    Flint::HierarchicalRelations{{},
+//                    HierarchicalRelations{{},
 //                                                 {},
 //                                                 {},
 //                                                 {entity_0_0_1}});
@@ -332,7 +335,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
                              VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    auto vector_server = Flint::VectorServer::get_singleton();
+    auto vector_server = VectorServer::get_singleton();
 
     vector_server->canvas->clear();
 
@@ -368,8 +371,8 @@ void App::main_loop() {
 
 void App::draw_frame() {
     // Engine processing.
-    Flint::Engine::getSingleton()->tick();
-    auto dt = Flint::Engine::getSingleton()->get_delta();
+    Engine::getSingleton()->tick();
+    auto dt = Engine::getSingleton()->get_delta();
 
     // Acquire next image.
     // We should do this before updating scene as we need to modify different buffers according to the current image index.
@@ -378,7 +381,7 @@ void App::draw_frame() {
 
     // Update the scene.
     {
-        tree.input(Flint::InputServer::get_singleton()->input_queue);
+        tree.input(InputServer::get_singleton()->input_queue);
 
         // Node scene manager.
         tree.update(dt);
@@ -390,7 +393,7 @@ void App::draw_frame() {
     // Record draw calls.
     record_commands(SwapChain::getSingleton()->commandBuffers, imageIndex);
 
-    Flint::InputServer::get_singleton()->clear_queue();
+    InputServer::get_singleton()->clear_queue();
 
     // Submit commands for drawing.
     SwapChain::getSingleton()->flush(imageIndex);

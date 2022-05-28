@@ -2,7 +2,7 @@
 #define FLINT_NODE_2D_H
 
 #include "../node.h"
-#include "../../../common/math/vec2.h"
+#include "../../../common/geometry.h"
 #include "../../../render/mvp_buffer.h"
 #include "../../../resources/mesh.h"
 #include "../../../servers/vector_server.h"

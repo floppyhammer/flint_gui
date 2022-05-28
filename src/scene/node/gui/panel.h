@@ -7,7 +7,7 @@
 #include "../../../resources/style_box.h"
 #include "../../../resources/vector_texture.h"
 #include "../../../resources/font.h"
-#include "../../../common/math/rect.h"
+#include "../../../common/geometry.h"
 
 #include <cstdint>
 #include <memory>

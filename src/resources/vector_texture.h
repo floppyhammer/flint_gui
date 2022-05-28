@@ -2,13 +2,15 @@
 #define FLINT_VECTOR_TEXTURE_H
 
 #include "texture.h"
-#include "../common/color.h"
-#include "../common/math/vec2.h"
+#include "../common/geometry.h"
 #include "../servers/vector_server.h"
 
 #include <pathfinder.h>
 
 #include <memory>
+
+using Pathfinder::Vec2;
+using Pathfinder::ColorU;
 
 namespace Flint {
     class VectorTexture : public Texture {

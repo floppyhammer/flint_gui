@@ -3,9 +3,11 @@
 
 #include <pathfinder.h>
 
-#include "../common/math/vec2.h"
-#include "../common/color.h"
-#include "../common/math/transform2.h"
+#include "../common/geometry.h"
+
+using Pathfinder::Vec2F;
+using Pathfinder::Transform2;
+using Pathfinder::ColorU;
 
 namespace Flint {
     /// A thin wrapper over Pathfinder shape.

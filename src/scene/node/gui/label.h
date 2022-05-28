@@ -5,10 +5,12 @@
 #include "../../../resources/style_box.h"
 #include "../../../resources/font.h"
 #include "../../../resources/resource_manager.h"
-#include "../../../common/math/rect.h"
+#include "../../../common/geometry.h"
 
 #include <cstdint>
 #include <memory>
+
+using Pathfinder::Rect;
 
 namespace Flint {
     enum class Alignment {

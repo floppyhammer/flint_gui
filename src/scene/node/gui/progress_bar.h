@@ -24,7 +24,7 @@ namespace Flint {
 
         void value_changed();
 
-        void connect_signal(std::string signal, std::function<void()> callback);
+        void connect_signal(const std::string &signal, std::function<void()> callback);
 
     protected:
         float value = 50, min_value = 0, max_value = 100, step = 1;

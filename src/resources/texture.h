@@ -2,7 +2,9 @@
 #define FLINT_TEXTURE_H
 
 #include "resource.h"
-#include "../common/math/vec2.h"
+#include "../common/geometry.h"
+
+using Pathfinder::Vec2;
 
 namespace Flint {
     enum class TextureType {

@@ -1,7 +1,7 @@
 #include "spin_box.h"
 
 #include "../../../resources/vector_texture.h"
-#include "../../../common/math/rect.h"
+#include "../../../common/geometry.h"
 
 #include <iostream>
 #include <iomanip>

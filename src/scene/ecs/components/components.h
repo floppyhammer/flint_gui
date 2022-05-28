@@ -1,9 +1,7 @@
 #ifndef FLINT_COMPONENTS_H
 #define FLINT_COMPONENTS_H
 
-#include "../../../common/math/vec2.h"
-#include "../../../common/math/vec3.h"
-#include "../../../common/math/quaternion.h"
+#include "../../../common/geometry.h"
 #include "../../../resources/surface.h"
 #include "../../../resources/material.h"
 #include "../../../resources/default_resource.h"
@@ -16,6 +14,9 @@
 #include "GLFW/glfw3.h"
 
 #include <queue>
+
+using Pathfinder::Vec2;
+using Pathfinder::Vec3;
 
 namespace Flint {
     /// NOTE: Must not allocate any on-heap data in components' default constructors as we will be
@@ -38,7 +39,7 @@ namespace Flint {
     struct Transform3dComponent {
         Vec3<float> position{0.0f};
         Vec3<float> scale{1.0f};
-        Quaternion rotation;
+        //Quaternion rotation;
     };
 
     struct Transform2dComponent {

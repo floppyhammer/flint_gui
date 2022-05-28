@@ -2,11 +2,12 @@
 #define FLINT_SUB_VIEWPORT_H
 
 #include "node.h"
-#include "../../common/math/vec2.h"
+#include "../../common/geometry.h"
 #include "../../render/render_server.h"
 #include "../../resources/image_texture.h"
 #include "../../render/render_target.h"
-#include "../../common/color.h"
+
+using Pathfinder::ColorF;
 
 namespace Flint {
     /**

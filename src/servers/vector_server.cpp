@@ -49,7 +49,7 @@ namespace Flint {
 
         canvas->set_transform(pf_transform);
 
-        if (!vshape.fill_color.is_transparent()) {
+        if (vshape.fill_color.is_opaque()) {
             canvas->set_fill_paint(Pathfinder::Paint::from_color(
                     {vshape.fill_color.r,
                      vshape.fill_color.g,

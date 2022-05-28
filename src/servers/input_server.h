@@ -1,13 +1,15 @@
 #ifndef FLINT_INPUT_SERVER_H
 #define FLINT_INPUT_SERVER_H
 
-#include "../common/math/vec2.h"
+#include "../common/geometry.h"
 
 #define GLFW_INCLUDE_VULKAN
 
 #include <GLFW/glfw3.h>
 #include <cstdint>
 #include <vector>
+
+using Pathfinder::Vec2;
 
 namespace Flint {
     enum class InputEventType {

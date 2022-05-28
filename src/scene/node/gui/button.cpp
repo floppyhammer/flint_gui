@@ -1,7 +1,7 @@
 #include "button.h"
 
 #include "../../../resources/vector_texture.h"
-#include "../../../common/math/rect.h"
+#include "../../../common/geometry.h"
 
 namespace Flint {
     Button::Button() {

@@ -4,13 +4,15 @@
 #include <vector>
 
 #include "../node.h"
-#include "../../../common/math/vec2.h"
+#include "../../../common/geometry.h"
 #include "../../../resources/mesh.h"
 #include "../../../render/mvp_buffer.h"
 #include "../../../render/render_server.h"
 #include "../../../servers/input_server.h"
 #include "../../../servers/vector_server.h"
 #include "../../../resources/style_box.h"
+
+using Pathfinder::ColorF;
 
 namespace Flint {
     /// How should this control node handle mouse input propagation.

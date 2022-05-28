@@ -3,8 +3,10 @@
 
 #include <pathfinder.h>
 
-#include "../common/color.h"
-#include "../common/math/vec2.h"
+#include "../common/geometry.h"
+
+using Pathfinder::Vec2;
+using Pathfinder::ColorU;
 
 namespace Flint {
     struct StyleBox {
