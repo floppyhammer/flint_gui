@@ -21,6 +21,7 @@ namespace Flint {
         bool pressed = false;
         bool hovered = false;
         bool pressed_inside = false;
+        bool drag_to_adjust_value = false;
 
         void input(std::vector<InputEvent> &input_queue) override;
 

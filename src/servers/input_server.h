@@ -104,7 +104,7 @@ namespace Flint {
 
         void clear_queue();
 
-        void capture_cursor();
+        void set_cursor_captured(bool captured);
 
         void hide_cursor();
 

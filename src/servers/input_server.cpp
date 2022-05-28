@@ -60,6 +60,7 @@ namespace Flint {
 
     void InputServer::attach_callbacks(GLFWwindow *window) {
         // GLFW input callbacks.
+        current_window = window;
 
         // A lambda function that doesn't capture anything can be implicitly converted to a regular function pointer.
         auto cursor_position_callback = [](GLFWwindow *window, double x_pos, double y_pos) {
@@ -148,8 +149,8 @@ namespace Flint {
         glfwSetCursor(current_window, current_cursor);
     }
 
-    void InputServer::capture_cursor() {
-        glfwSetInputMode(current_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    void InputServer::set_cursor_captured(bool captured) {
+        glfwSetInputMode(current_window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
     }
 
     void InputServer::hide_cursor() {

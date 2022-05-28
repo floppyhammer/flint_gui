@@ -55,7 +55,14 @@ namespace Flint {
                 auto args = event.args.mouse_motion;
 
                 if (pressed_inside) {
-                    set_value(value + args.relative.x * step);
+                    if (drag_to_adjust_value) {
+                        set_value(value + args.relative.x * step);
+                    }
+
+                    drag_to_adjust_value = true;
+
+                    // Capture cursor when dragging.
+                    InputServer::get_singleton()->set_cursor_captured(true);
                 }
 
                 if (active_rect.contains_point(args.position)) {
@@ -67,7 +74,13 @@ namespace Flint {
                 auto args = event.args.mouse_button;
 
                 if (!args.pressed) {
+                    if (pressed_inside) {
+                        // Release cursor when dragging ends.
+                        InputServer::get_singleton()->set_cursor_captured(false);
+                    }
+
                     pressed_inside = false;
+                    drag_to_adjust_value = false;
                 }
 
                 if (event.is_consumed()) {
