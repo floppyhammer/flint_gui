@@ -300,8 +300,7 @@ namespace Flint {
 
     template<class C>
     void FreeClear(C &cntr) {
-        for (typename C::iterator it = cntr.begin();
-             it != cntr.end(); ++it) {
+        for (auto it = cntr.begin(); it != cntr.end(); it++) {
             delete *it;
         }
         cntr.clear();
@@ -314,7 +313,24 @@ namespace Flint {
 
     void Skeleton2d::update(double delta) {
         sprite->propagate_update(delta);
+    }
 
+    void Skeleton2d::draw(VkCommandBuffer p_command_buffer) {
+        sprite->propagate_draw(p_command_buffer);
+
+        // Draw all triangles with a single draw call.
+//        if (total_indices.size()) {
+//            RenderServer::get_singleton()->canvas_item_add_triangle_array(total_indices, total_vertexes, colors, uvs, bones, weights, texture);
+//        }
+
+        if (base_bone) {
+            base_bone->draw();
+        }
+
+        Node2d::draw(p_command_buffer);
+    }
+
+    void Skeleton2d::update_bones() {
         uint32_t vertex_count = mesh.vertexes.size();
 
         std::vector<Vec2F> points = mesh.vertexes;
@@ -322,6 +338,7 @@ namespace Flint {
         std::vector<int> bones;
         std::vector<float> weights;
 
+        // Set UVs.
         if (sprite && sprite->get_texture()) {
             // We assume texture hasn't been rotated, scaled, or moved.
             Transform2 tex_transform;
@@ -397,8 +414,9 @@ namespace Flint {
                         }
 
                         if (!found_vertex) {
-                            Logger::error("Couldn't find the same vertex during triangulation. A new vertex has been generated, which is not allowed!",
-                                          "Skeleton2D");
+                            Logger::error(
+                                    "Couldn't find the same vertex during triangulation. A new vertex has been generated, which is not allowed!",
+                                    "Skeleton2D");
                         }
                     }
                 }
@@ -424,20 +442,9 @@ namespace Flint {
                 total_indices[index_count + i] = global_idx;
             }
         }
-
-        // Draw all triangles with a single draw call.
-        if (total_indices.size()) {
-//            RenderServer::get_singleton()->canvas_item_add_triangle_array(total_indices, total_vertexes, colors, uvs, bones, weights, texture);
-        }
     }
 
-    void Skeleton2d::draw(VkCommandBuffer p_command_buffer) {
-        sprite->propagate_draw(p_command_buffer);
-
-        if (base_bone) {
-            base_bone->draw();
-        }
-
-        Node2d::draw(p_command_buffer);
+    void Skeleton2d::update_bone_transforms() {
+        // Update transform data to skeleton texture.
     }
 }

@@ -17,12 +17,17 @@ namespace Flint {
         glm::mat4 model;
     };
 
-// TODO: We might need to push model, view and projection separately.
+    // TODO: We might need to push model, view and projection separately.
     struct Surface3dPushConstant {
         glm::mat4 mvp;
     };
 
-/// A surface may contain a material, which may be shared by other surfaces.
+    struct Skeleton2dSurfacePushConstant {
+        glm::mat4 transform;
+        glm::mat4 transform_inverse;
+    };
+
+    /// A surface may contain a material, which may be shared by other surfaces.
 
     struct SurfaceGpuResources {
         SurfaceGpuResources(const std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices);

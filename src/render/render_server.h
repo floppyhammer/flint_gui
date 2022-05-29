@@ -15,9 +15,17 @@
 #include <array>
 
 namespace Flint {
-/**
- * Shared by 2D and 3D meshes.
- */
+    struct SkeletonVertex {
+        glm::vec3 pos;
+        glm::vec3 color;
+        glm::vec2 uv;
+        glm::vec4 bone_indices;
+        glm::vec4 bone_weights;
+    };
+
+    /**
+     * Shared by 2D and 3D meshes.
+     */
     struct Vertex {
         glm::vec3 pos;
         glm::vec3 color;
@@ -176,6 +184,10 @@ namespace Flint {
         VkPipelineLayout blitPipelineLayout;
         VkPipeline blitGraphicsPipeline;
 
+        VkDescriptorSetLayout skeleton2dMeshDescriptorSetLayout;
+        VkPipelineLayout skeleton2dMeshPipelineLayout;
+        VkPipeline skeleton2dMeshGraphicsPipeline;
+
         /**
          * Set up shaders, viewport, blend state, etc.
          * @param renderPass Target render pass.
@@ -244,6 +256,10 @@ namespace Flint {
          * @dependency None.
          */
         void createBlitLayouts();
+
+        void createSkeleton2dMeshLayouts();
+
+        void createSkeleton2dMeshPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
     };
 }
 

@@ -92,6 +92,12 @@ namespace Flint {
         void draw(VkCommandBuffer p_command_buffer) override;
 
         Skeleton2dMesh mesh;
+
+        /// When bone vertexes, weights, or polygons changes, update the vertex buffer.
+        /// Bone transforms are updated through update_bone_transforms().
+        void update_bones();
+
+        void update_bone_transforms();
     };
 }
 
