@@ -92,10 +92,34 @@ namespace Flint {
             InputEvent input_event{};
             input_event.type = InputEventType::Key;
             input_event.args.key.pressed = action == GLFW_PRESS;
+            input_event.args.key.repeated = action == GLFW_REPEAT;
             input_event.args.key.key = KeyCode::UNKNOWN;
 
-            if (key == GLFW_KEY_BACKSPACE)
-                input_event.args.key.key = KeyCode::BACKSPACE;
+            switch (key) {
+                case GLFW_KEY_BACKSPACE: {
+                    input_event.args.key.key = KeyCode::BACKSPACE;
+                }
+                    break;
+                case GLFW_KEY_LEFT: {
+                    input_event.args.key.key = KeyCode::LEFT;
+                }
+                    break;
+                case GLFW_KEY_RIGHT: {
+                    input_event.args.key.key = KeyCode::RIGHT;
+                }
+                    break;
+                case GLFW_KEY_UP: {
+                    input_event.args.key.key = KeyCode::UP;
+                }
+                    break;
+                case GLFW_KEY_DOWN: {
+                    input_event.args.key.key = KeyCode::DOWN;
+                }
+                    break;
+                default: {
+                    input_event.args.key.key = KeyCode::UNKNOWN;
+                }
+            }
 
             input_server->input_queue.push_back(input_event);
         };

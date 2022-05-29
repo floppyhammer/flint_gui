@@ -105,6 +105,8 @@ namespace Flint {
 
         bool focused = false;
 
+        bool is_pressed_inside = false;
+
         Vec2<float> minimum_size{0};
 
         Vec2F local_mouse_position;
@@ -114,6 +116,12 @@ namespace Flint {
         void update(double dt) override;
 
         void input(std::vector<InputEvent> &input_queue) override;
+
+        bool is_cursor_inside = false;
+
+        virtual void cursor_entered();
+
+        virtual void cursor_exited();
 
         bool visible = true;
 

@@ -23,7 +23,11 @@ namespace Flint {
 
     enum class KeyCode {
         UNKNOWN,
-        BACKSPACE
+        BACKSPACE,
+        LEFT,
+        RIGHT,
+        UP,
+        DOWN,
     };
 
     class InputEvent {
@@ -34,6 +38,7 @@ namespace Flint {
             struct {
                 KeyCode key;
                 bool pressed;
+                bool repeated;
             } key{};
             struct {
                 uint8_t button;
@@ -50,7 +55,7 @@ namespace Flint {
             struct {
                 uint32_t codepoint;
             } text;
-        } args;
+        } args{};
 
         void consume();
 

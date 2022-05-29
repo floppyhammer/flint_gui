@@ -36,21 +36,33 @@ namespace Flint {
 
         auto global_position = get_global_position();
 
+        auto active_rect = Rect<float>(global_position, global_position + size);
+
         // Handle mouse input propagation.
         for (auto &event : input_queue) {
             bool consume_flag = false;
 
             switch (event.type) {
                 case InputEventType::MouseMotion: {
-                    if (Rect<float>(global_position, global_position + size).contains_point(event.args.mouse_motion.position)) {
+                    if (active_rect.contains_point(event.args.mouse_motion.position)) {
                         local_mouse_position = event.args.mouse_motion.position - global_position;
 
+                        if (!event.is_consumed()) {
+                            is_cursor_inside = true;
+                            cursor_entered();
+                        }
+
                         consume_flag = true;
+                    } else {
+                        if (is_cursor_inside) {
+                            is_cursor_inside = false;
+                            cursor_exited();
+                        }
                     }
                 }
                     break;
                 case InputEventType::MouseButton: {
-                    if (Rect<float>(global_position, global_position + size).contains_point(event.args.mouse_button.position)) {
+                    if (active_rect.contains_point(event.args.mouse_button.position)) {
                         grab_focus();
 
                         consume_flag = true;
@@ -136,5 +148,13 @@ namespace Flint {
         } else {
             return {1, 1, 1, 1};
         }
+    }
+
+    void Control::cursor_entered() {
+
+    }
+
+    void Control::cursor_exited() {
+
     }
 }

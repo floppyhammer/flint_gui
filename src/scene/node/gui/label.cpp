@@ -32,10 +32,10 @@ namespace Flint {
         measure();
     }
 
-    void Label::remove_text(uint32_t position) {
+    void Label::remove_text(uint32_t position, uint32_t count) {
         if (position == -1) return;
 
-        text.erase(position);
+        text.erase(position, count);
 
         measure();
     }

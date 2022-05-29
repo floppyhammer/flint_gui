@@ -56,7 +56,7 @@ namespace Flint {
 
         void insert_text(uint32_t position, const std::string &p_text);
 
-        void remove_text(uint32_t position);
+        void remove_text(uint32_t position, uint32_t count);
 
         void set_size(Vec2<float> p_size) override;
 

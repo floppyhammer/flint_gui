@@ -19,6 +19,10 @@ namespace Flint {
 
         theme_caret.width = 2;
 
+        theme_selection_box.bg_color = ColorU(33, 66, 131, 255);
+        theme_selection_box.border_width = 0;
+        theme_selection_box.corner_radius = 0;
+
         set_text("Enter text here");
     }
 
@@ -35,16 +39,52 @@ namespace Flint {
         for (auto &event : input_queue) {
             bool consume_flag = false;
 
+            auto &glyphs = label->get_glyphs();
+            int32_t glyph_count = glyphs.size();
+
+            auto global_position = get_global_position();
+            auto active_rect = Rect<float>(global_position, global_position + size);
+
             switch (event.type) {
+                case InputEventType::MouseButton: {
+                    auto args = event.args.mouse_button;
+
+                    if (active_rect.contains_point(args.position)) {
+                        if (args.pressed) {
+                            // Decide caret position.
+                            auto local_mouse_pos = get_local_mouse_position();
+                            caret_index = calculate_caret_index(local_mouse_pos);
+                            selected_caret_index = caret_index;
+
+                            is_pressed_inside = true;
+                        } else {
+                            is_pressed_inside = false;
+                        }
+                        consume_flag = true;
+                    }
+
+                    if (!args.pressed) {
+                        is_pressed_inside = false;
+                    }
+                }
+                    break;
+                case InputEventType::MouseMotion: {
+                    if (active_rect.contains_point(event.args.mouse_motion.position)) {
+                        consume_flag = true;
+                        if (is_pressed_inside) {
+                            caret_index = calculate_caret_index(get_local_mouse_position());
+                            caret_blink_timer = 0;
+                        }
+                    }
+                }
+                    break;
                 case InputEventType::Text: {
                     if (!focused) continue;
-
-                    auto &glyphs = label->get_glyphs();
-                    auto glyph_count = glyphs.size();
 
                     if (caret_index < (int32_t) glyph_count) {
                         label->insert_text(caret_index + 1, cpp11_codepoint_to_utf8(event.args.text.codepoint));
                         caret_index++;
+                        caret_blink_timer = 0;
                     }
 
                     consume_flag = true;
@@ -53,9 +93,32 @@ namespace Flint {
                 case InputEventType::Key: {
                     auto key_args = event.args.key;
 
-                    if (key_args.key == KeyCode::BACKSPACE && key_args.pressed && caret_index > -1) {
-                        label->remove_text(caret_index);
-                        caret_index--;
+                    if (key_args.key == KeyCode::BACKSPACE && caret_index > -1) {
+                        if (key_args.pressed || key_args.repeated) {
+                            if (selected_caret_index != caret_index) {
+                                auto start_index = std::min(selected_caret_index, caret_index) + 1;
+                                auto count = std::abs(selected_caret_index - caret_index);
+                                label->remove_text(start_index, count);
+                                caret_index = selected_caret_index;
+                            } else {
+                                label->remove_text(caret_index, 1);
+                                caret_index--;
+                                selected_caret_index--;
+                            }
+                            caret_blink_timer = 0;
+                        }
+                    }
+
+                    if (key_args.pressed || key_args.repeated) {
+                        if (key_args.key == KeyCode::LEFT && caret_index > -1) {
+                            caret_index--;
+                            selected_caret_index--;
+                            caret_blink_timer = 0;
+                        } else if (key_args.key == KeyCode::RIGHT && caret_index < glyph_count - 1) {
+                            caret_index++;
+                            selected_caret_index++;
+                            caret_blink_timer = 0;
+                        }
                     }
                 }
                     break;
@@ -74,6 +137,8 @@ namespace Flint {
     void LineEdit::update(double dt) {
         Control::update(dt);
 
+        caret_blink_timer += dt;
+
         label->update(dt);
     }
 
@@ -89,11 +154,22 @@ namespace Flint {
             active_style_box.value().add_to_canvas(global_position, size, canvas);
         }
 
+        // Selection box.
+        if (focused) {
+            if (selected_caret_index != caret_index) {
+                auto start = calculate_caret_position(std::min(caret_index, selected_caret_index));
+                auto end = calculate_caret_position(std::max(caret_index, selected_caret_index));
+                auto box_position = label->get_global_position() + start;
+                auto box_size = Vec2F(0, label->get_font_size()) + (end - start);
+                theme_selection_box.add_to_canvas(box_position, box_size, canvas);
+            }
+        }
+
         label->draw(p_command_buffer);
 
         // Blink caret.
         if (focused) {
-            theme_caret.color.a = 255 * std::ceil(std::sin(Engine::getSingleton()->get_elapsed() * 5.0));
+            theme_caret.color.a = 255 * std::ceil(std::sin(caret_blink_timer * 5.0));
 
             auto current_glyph_box = Rect<float>({0, 0}, {0, label->get_font_size()});
             if (caret_index > -1 && caret_index < label->get_glyphs().size()) {
@@ -102,8 +178,8 @@ namespace Flint {
 
             auto caret_offset = current_glyph_box.max_x();
 
-            auto start = label->get_global_position() + Vec2F(caret_offset, 0);
-            auto end = start + Vec2F(0, label->get_font_size());
+            auto start = label->get_global_position() + Vec2F(caret_offset, 3);
+            auto end = start + Vec2F(0, label->get_font_size() - 6);
             theme_caret.add_to_canvas(start, end, canvas);
         }
 
@@ -114,11 +190,7 @@ namespace Flint {
         return label->calculate_minimum_size();
     }
 
-    void LineEdit::grab_focus() {
-        focused = true;
-
-        // Decide caret position.
-        auto local_mouse_pos = get_local_mouse_position();
+    int32_t LineEdit::calculate_caret_index(Vec2F local_cursor_position) {
         auto closest_glyph_index = -1;
         auto closest_distance = std::numeric_limits<float>::max();
         auto &glyphs = label->get_glyphs();
@@ -127,7 +199,7 @@ namespace Flint {
             auto glyph_box = glyphs[i].layout_box;
 
             // Mouse position to the right boundary of the glyph.
-            auto distance = abs(local_mouse_pos.x - glyph_box.max_x());
+            auto distance = abs(local_cursor_position.x - glyph_box.max_x());
 
             if (distance < closest_distance) {
                 closest_distance = distance;
@@ -135,15 +207,39 @@ namespace Flint {
             }
         }
 
-        caret_index = closest_glyph_index;
-
         // Caret at the beginning of the text, i.e. before the first glyph.
-        if (abs(local_mouse_pos.x) < closest_distance) {
-            caret_index = -1;
+        if (abs(local_cursor_position.x) < closest_distance) {
+            closest_glyph_index = -1;
         }
+
+        return closest_glyph_index;
+    }
+
+    Vec2F LineEdit::calculate_caret_position(int32_t caret_index) {
+        auto closest_glyph_index = -1;
+        auto closest_distance = std::numeric_limits<float>::max();
+        auto &glyphs = label->get_glyphs();
+
+        if (caret_index > -1) {
+            return glyphs[caret_index].layout_box.upper_right();
+        } else {
+            return {0, 0};
+        }
+    }
+
+    void LineEdit::grab_focus() {
+        focused = true;
     }
 
     void LineEdit::release_focus() {
         focused = false;
+    }
+
+    void LineEdit::cursor_entered() {
+        InputServer::get_singleton()->set_cursor(CursorShape::IBEAM);
+    }
+
+    void LineEdit::cursor_exited() {
+        InputServer::get_singleton()->set_cursor(CursorShape::ARROW);
     }
 }

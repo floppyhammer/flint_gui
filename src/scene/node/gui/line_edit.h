@@ -34,12 +34,24 @@ namespace Flint {
     private:
         bool editable = true;
 
+        int32_t selected_caret_index = -1;
         int32_t caret_index = -1;
         Vec2F caret_position;
 
         StyleLine theme_caret;
+        StyleBox theme_selection_box;
 
         std::shared_ptr<Label> label;
+
+        float caret_blink_timer = 0;
+
+        void cursor_entered() override;
+
+        void cursor_exited() override;
+
+        int32_t calculate_caret_index(Vec2F local_cursor_position);
+
+        Vec2F calculate_caret_position(int32_t caret_index);
 
         std::optional<StyleBox> theme_normal;
         std::optional<StyleBox> theme_focused;
