@@ -415,6 +415,45 @@ namespace Flint {
                      default_resources->indices_count);
     }
 
+    void RenderServer::draw_skeleton_2d(VkCommandBuffer command_buffer,
+                                        VkPipeline pipeline,
+                                        const VkDescriptorSet &descriptor_set,
+                                        VkBuffer vertex_buffers[],
+                                        VkBuffer index_buffer,
+                                        uint32_t index_count) const {
+        // Bind pipeline.
+        vkCmdBindPipeline(command_buffer,
+                          VK_PIPELINE_BIND_POINT_GRAPHICS,
+                          pipeline);
+
+        // Bind vertex buffers.
+        VkDeviceSize offsets[] = {0};
+        vkCmdBindVertexBuffers(command_buffer,
+                               0,
+                               1,
+                               vertex_buffers,
+                               offsets);
+
+        // Bind index buffer.
+        vkCmdBindIndexBuffer(command_buffer,
+                             index_buffer,
+                             0,
+                             VK_INDEX_TYPE_UINT32);
+
+        // Bind uniform buffers and samplers.
+        vkCmdBindDescriptorSets(command_buffer,
+                                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                skeleton2dMeshPipelineLayout,
+                                0,
+                                1,
+                                &descriptor_set,
+                                0,
+                                nullptr);
+
+        // Draw call.
+        vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
+    }
+
     void RenderServer::draw_mesh_2d(VkCommandBuffer commandBuffer,
                                     VkPipeline graphicsPipeline,
                                     const VkDescriptorSet &descriptorSet,
@@ -724,8 +763,8 @@ namespace Flint {
         auto attributeDescriptions = Vertex::getAttributeDescriptions();
 
         vertexInputInfo.vertexBindingDescriptionCount = 1;
-        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
         vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
         vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
         // -----------------------------------------------------
 
@@ -863,8 +902,8 @@ namespace Flint {
         auto attributeDescriptions = Vertex::getAttributeDescriptions();
 
         vertexInputInfo.vertexBindingDescriptionCount = 1;
-        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
         vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
         vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
         // -----------------------------------------------------
 
@@ -1008,41 +1047,12 @@ namespace Flint {
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-        VkVertexInputBindingDescription bindingDescription{};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(SkeletonVertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-        std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions{};
-
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(SkeletonVertex, pos);
-
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(SkeletonVertex, color);
-
-        attributeDescriptions[2].binding = 0;
-        attributeDescriptions[2].location = 2;
-        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[2].offset = offsetof(SkeletonVertex, uv);
-
-        attributeDescriptions[3].binding = 0;
-        attributeDescriptions[3].location = 3;
-        attributeDescriptions[3].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        attributeDescriptions[3].offset = offsetof(SkeletonVertex, bone_indices);
-
-        attributeDescriptions[4].binding = 0;
-        attributeDescriptions[4].location = 4;
-        attributeDescriptions[4].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        attributeDescriptions[4].offset = offsetof(SkeletonVertex, bone_weights);
+        auto bindingDescription = SkeletonVertex::getBindingDescription();
+        auto attributeDescriptions = SkeletonVertex::getAttributeDescriptions();
 
         vertexInputInfo.vertexBindingDescriptionCount = 1;
-        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
         vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
         vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
         // -----------------------------------------------------
 

@@ -21,7 +21,7 @@ namespace Flint {
                     0, 2, 1, 2, 0, 3
             };
 
-            default_surface_2d_gpu_resources = std::make_shared<SurfaceGpuResources>(vertices, indices);
+            default_surface_2d_gpu_resources = std::make_shared<SurfaceGpuResources<Vertex>>(vertices, indices);
         }
 
         static DefaultResource *get_singleton() {
@@ -29,7 +29,7 @@ namespace Flint {
             return &singleton;
         }
 
-        inline std::shared_ptr<SurfaceGpuResources> get_default_surface_2d_gpu_resources() {
+        inline std::shared_ptr<SurfaceGpuResources<Vertex>> get_default_surface_2d_gpu_resources() {
             return default_surface_2d_gpu_resources;
         }
 
@@ -55,7 +55,7 @@ namespace Flint {
 
     private:
         // Default resources should never be modified.
-        std::shared_ptr<SurfaceGpuResources> default_surface_2d_gpu_resources;
+        std::shared_ptr<SurfaceGpuResources<Vertex>> default_surface_2d_gpu_resources;
     };
 }
 

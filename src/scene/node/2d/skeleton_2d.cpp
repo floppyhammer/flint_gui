@@ -319,9 +319,22 @@ namespace Flint {
         sprite->propagate_draw(p_command_buffer);
 
         // Draw all triangles with a single draw call.
-//        if (total_indices.size()) {
-//            RenderServer::get_singleton()->canvas_item_add_triangle_array(total_indices, total_vertexes, colors, uvs, bones, weights, texture);
-//        }
+        VkPipeline pipeline = RenderServer::getSingleton()->skeleton2dMeshGraphicsPipeline;
+        VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->skeleton2dMeshPipelineLayout;
+
+        // Upload the model matrix to the GPU via push constants.
+        vkCmdPushConstants(p_command_buffer, pipeline_layout,
+                           VK_SHADER_STAGE_VERTEX_BIT, 0,
+                           sizeof(Skeleton2dSurfacePushConstant), &pc_transform);
+
+//        VkBuffer vertexBuffers[] = {surface->get_vertex_buffer()};
+//        RenderServer::getSingleton()->draw_skeleton_2d(
+//                p_command_buffer,
+//                pipeline,
+//                surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage),
+//                vertexBuffers,
+//                triangles,
+//                total_indices);
 
         if (base_bone) {
             base_bone->draw();
@@ -460,7 +473,9 @@ namespace Flint {
         bone_transform_data.resize(tex_width * tex_height * 4);
         bone_transform_data_texture = ImageTexture::from_empty(tex_width, tex_height, VK_FORMAT_R32G32B32A32_SFLOAT);
 
-        // NEAREST sampler.
+        // Need a sampler of nearest.
+
+        //std::make_shared<SurfaceGpuResources<SkeletonVertex>>(vertices, indices);
     }
 
     void Skeleton2dMeshGpuData::upload_bone_transforms() {

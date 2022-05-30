@@ -21,6 +21,53 @@ namespace Flint {
         glm::vec2 uv;
         glm::vec4 bone_indices;
         glm::vec4 bone_weights;
+
+        bool operator==(const SkeletonVertex &other) const {
+            return pos == other.pos && color == other.color && uv == other.uv && bone_indices == other.bone_indices
+                && bone_weights == other.bone_weights;
+        }
+
+        /// Binding info.
+        static VkVertexInputBindingDescription getBindingDescription() {
+            VkVertexInputBindingDescription bindingDescription{};
+            bindingDescription.binding = 0;
+            bindingDescription.stride = sizeof(SkeletonVertex);
+            bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+            return bindingDescription;
+        }
+
+        /// Attributes info.
+        static std::array<VkVertexInputAttributeDescription, 5> getAttributeDescriptions() {
+            std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions{};
+
+            attributeDescriptions[0].binding = 0;
+            attributeDescriptions[0].location = 0;
+            attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+            attributeDescriptions[0].offset = offsetof(SkeletonVertex, pos);
+
+            attributeDescriptions[1].binding = 0;
+            attributeDescriptions[1].location = 1;
+            attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+            attributeDescriptions[1].offset = offsetof(SkeletonVertex, color);
+
+            attributeDescriptions[2].binding = 0;
+            attributeDescriptions[2].location = 2;
+            attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[2].offset = offsetof(SkeletonVertex, uv);
+
+            attributeDescriptions[3].binding = 0;
+            attributeDescriptions[3].location = 3;
+            attributeDescriptions[3].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+            attributeDescriptions[3].offset = offsetof(SkeletonVertex, bone_indices);
+
+            attributeDescriptions[4].binding = 0;
+            attributeDescriptions[4].location = 4;
+            attributeDescriptions[4].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+            attributeDescriptions[4].offset = offsetof(SkeletonVertex, bone_weights);
+
+            return attributeDescriptions;
+        }
     };
 
     /**
@@ -227,7 +274,14 @@ namespace Flint {
                   VkPipeline graphicsPipeline,
                   VkDescriptorSet const &descriptorSet) const;
 
+        void draw_skeleton_2d(VkCommandBuffer command_buffer,
+                              VkPipeline pipeline,
+                              const VkDescriptorSet &descriptor_set,
+                              VkBuffer vertex_buffers[],
+                              VkBuffer index_buffer,
+                              uint32_t index_count) const;
         // --------------------------------------------------
+
         void cleanupSwapChainRelatedResources() const;
 
         void createCommandPool();

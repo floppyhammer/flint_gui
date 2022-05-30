@@ -56,7 +56,9 @@ namespace Flint {
     };
 
     struct Skeleton2dMeshGpuData {
+        std::vector<SkeletonVertex> vertexes;
         std::vector<uint32_t> indices;
+
         std::vector<Vec2F> points;
         std::vector<Vec2F> uvs;
         std::vector<ColorU> colors;
@@ -102,6 +104,8 @@ namespace Flint {
         void draw(VkCommandBuffer p_command_buffer) override;
 
         Skeleton2dMesh mesh;
+
+        Skeleton2dSurfacePushConstant pc_transform;
 
         /// When bone vertexes, weights, or polygons changes, update the vertex buffer.
         /// Bone transforms are updated through update_bone_transforms().
