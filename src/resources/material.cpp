@@ -214,7 +214,7 @@ namespace Flint {
 
     std::shared_ptr<Material3d> Material3d::from_default() {
         auto material = std::make_shared<Material3d>();
-        material->diffuse_texture = ImageTexture::from_empty(4, 4);
+        material->diffuse_texture = ImageTexture::from_empty(4, 4, VK_FORMAT_R8G8B8A8_UNORM);
 
         return material;
     }

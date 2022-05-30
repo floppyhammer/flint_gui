@@ -444,7 +444,65 @@ namespace Flint {
         }
     }
 
-    void Skeleton2d::update_bone_transforms() {
-        // Update transform data to skeleton texture.
+    void Skeleton2dMeshGpuData::allocate_bone_transforms(uint32_t new_bone_count) {
+        if (bone_count == new_bone_count) {
+            return;
+        }
+
+        bone_count = new_bone_count;
+
+        int height = bone_count / 256;
+        if (bone_count % 256) height++;
+
+        uint32_t tex_width = 256;
+        uint32_t tex_height = height * (true ? 2 : 3); // 2D/3D.
+
+        bone_transform_data.resize(tex_width * tex_height * 4);
+        bone_transform_data_texture = ImageTexture::from_empty(tex_width, tex_height, VK_FORMAT_R32G32B32A32_SFLOAT);
+
+        // NEAREST sampler.
+    }
+
+    void Skeleton2dMeshGpuData::upload_bone_transforms() {
+        if (bone_count > 0) {
+            int height = bone_count / 256;
+            if (bone_count % 256) height++;
+
+            // Upload the bone transform data to the texture.
+            //glBindTexture(GL_TEXTURE_2D, skeleton->texture);
+            //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, height * 2, GL_RGBA, GL_FLOAT, skeleton->skel_texture.ptr());
+        }
+    }
+
+    void Skeleton2dMeshGpuData::set_bone_transform(uint32_t bone_index, const Transform2 &p_transform) {
+        if (bone_index >= bone_count) {
+            Logger::error("Invalid bone index!", "Skeleton 2D");
+            return;
+        }
+
+        // Data offset.
+        uint32_t row = (bone_index / 256) * 2;
+        uint32_t col = bone_index % 256;
+        uint32_t offset = (row * 256 + col) * 4;
+
+        // First row.
+        bone_transform_data[offset + 0] = p_transform.matrix.m11();
+        bone_transform_data[offset + 1] = p_transform.matrix.m12();
+        bone_transform_data[offset + 2] = 0;
+        bone_transform_data[offset + 3] = p_transform.vector.x;
+
+        // Second row.
+        offset += 256 * 4;
+        bone_transform_data[offset + 0] = p_transform.matrix.m21();
+        bone_transform_data[offset + 1] = p_transform.matrix.m22();
+        bone_transform_data[offset + 2] = 0;
+        bone_transform_data[offset + 3] = p_transform.vector.y;
+
+        // 3D.
+//        offset += 256 * 4;
+//        bone_transform_data[offset + 0] = 0;
+//        bone_transform_data[offset + 1] = 0;
+//        bone_transform_data[offset + 2] = 0;
+//        bone_transform_data[offset + 3] = 0;
     }
 }

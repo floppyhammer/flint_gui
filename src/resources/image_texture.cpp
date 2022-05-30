@@ -30,12 +30,12 @@ namespace Flint {
         vkFreeMemory(device, imageMemory, nullptr);
     }
 
-    void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height) {
+    void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height, VkFormat tex_format) {
         width = tex_width;
         height = tex_height;
 
         // In bytes. 4 bytes per pixel.
-        VkDeviceSize imageSize = tex_width * tex_height * 4;
+        VkDeviceSize imageSize = width * height * 4;
 
         // Temporary buffer and CPU memory.
         VkBuffer stagingBuffer;
@@ -52,7 +52,7 @@ namespace Flint {
         RenderServer::getSingleton()->copyDataToMemory(pixels, stagingBufferMemory, imageSize);
 
         RenderServer::getSingleton()->createImage(width, height,
-                                                 VK_FORMAT_R8G8B8A8_UNORM,
+                                                  tex_format,
                                                  VK_IMAGE_TILING_OPTIMAL,
                                                  VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT |
                                                  VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
@@ -62,7 +62,7 @@ namespace Flint {
 
         // Transition the texture image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL.
         RenderServer::getSingleton()->transitionImageLayout(image,
-                                                           VK_FORMAT_R8G8B8A8_UNORM,
+                                                            tex_format,
                                                            VK_IMAGE_LAYOUT_UNDEFINED,
                                                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
@@ -72,7 +72,7 @@ namespace Flint {
 
         // To be able to start sampling from the texture image in the shader, we need one last transition to prepare it for shader access.
         RenderServer::getSingleton()->transitionImageLayout(image,
-                                                           VK_FORMAT_R8G8B8A8_UNORM,
+                                                            tex_format,
                                                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                                                            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
@@ -81,7 +81,7 @@ namespace Flint {
         vkFreeMemory(Platform::getSingleton()->device, stagingBufferMemory, nullptr);
     }
 
-    std::shared_ptr<ImageTexture> ImageTexture::from_empty(uint32_t p_width, uint32_t p_height) {
+    std::shared_ptr<ImageTexture> ImageTexture::from_empty(uint32_t p_width, uint32_t p_height, VkFormat tex_format) {
         assert(p_width != 0 && p_height != 0 && "Creating texture with zero size.");
 
         auto texture = std::make_shared<ImageTexture>();
@@ -89,10 +89,21 @@ namespace Flint {
         texture->height = p_height;
 
         // Pixel data.
-        std::vector<unsigned char> pixels(p_width * p_height * 4, 0);
+        std::vector<unsigned char> i8_pixels(p_width * p_height * 4, 0);
+        std::vector<float> f32_pixels(p_width * p_height * 4, 0);
+
+        void *pixel_data = nullptr;
+        if (tex_format == VK_FORMAT_R8G8B8A8_UNORM) {
+            pixel_data = i8_pixels.data();
+        } else if (tex_format == VK_FORMAT_R32G32B32A32_SFLOAT) {
+            pixel_data = f32_pixels.data();
+        } else {
+            abort();
+            return nullptr;
+        }
 
         // Create image and image memory.
-        texture->create_image_from_bytes(pixels.data(), p_width, p_height);
+        texture->create_image_from_bytes(pixel_data, p_width, p_height, tex_format);
 
         // Create image view.
         texture->imageView = RenderServer::getSingleton()->createImageView(texture->image,
@@ -118,7 +129,7 @@ namespace Flint {
         }
 
         // Create image and image memory.
-        create_image_from_bytes(pixels, tex_width, tex_height);
+        create_image_from_bytes(pixels, tex_width, tex_height, VK_FORMAT_R8G8B8A8_UNORM);
 
         // Clean up the original pixel array.
         stbi_image_free(pixels);

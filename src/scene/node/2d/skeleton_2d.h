@@ -62,8 +62,18 @@ namespace Flint {
         std::vector<ColorU> colors;
         std::vector<uint32_t> bones;
         std::vector<float> weights;
-        std::shared_ptr<Texture> texture;
-        int count;
+
+        std::vector<float> bone_transform_data;
+        std::shared_ptr<ImageTexture> bone_transform_data_texture;
+
+        Transform2 base_transform;
+        int bone_count;
+
+        void allocate_bone_transforms(uint32_t new_bone_count);
+
+        void set_bone_transform(uint32_t bone_index, const Transform2 &transform);
+
+        void upload_bone_transforms();
     };
 
 //    struct BoneVertex {

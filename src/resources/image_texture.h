@@ -21,7 +21,7 @@ namespace Flint {
         ~ImageTexture() override;
 
         /// Create an empty texture with specific size.
-        static std::shared_ptr<ImageTexture> from_empty(uint32_t p_width, uint32_t p_height);
+        static std::shared_ptr<ImageTexture> from_empty(uint32_t p_width, uint32_t p_height, VkFormat tex_format);
 
         static std::shared_ptr<ImageTexture> from_wrapper(VkImageView p_image_view, VkSampler p_sampler, uint32_t p_width, uint32_t p_height);
 
@@ -45,7 +45,7 @@ namespace Flint {
         VkSampler sampler{};
 
     private:
-        void create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height);
+        void create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height, VkFormat tex_format);
     };
 }
 
