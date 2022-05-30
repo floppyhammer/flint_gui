@@ -29,6 +29,8 @@ void main() {
 
         highp mat2x4 m;
 
+        // Get bone transform data from the texture.
+
         ivec2 tex_offset = ivec2(boneIndicesi.x % 256, (boneIndicesi.x / 256) * 2);
         m = mat2x4(texelFetch(skeletonTexture, tex_offset, 0), texelFetch(skeletonTexture, tex_offset + ivec2(0, 1), 0)) * inBoneWeights.x;
 
@@ -41,6 +43,7 @@ void main() {
         tex_offset = ivec2(boneIndicesi.w % 256, (boneIndicesi.w / 256) * 2);
         m += mat2x4(texelFetch(skeletonTexture, tex_offset, 0), texelFetch(skeletonTexture, tex_offset + ivec2(0, 1), 0)) * inBoneWeights.w;
 
+        // Move to origin, do transform, move back to skeleton position.
         mat4 boneMatrix = skeletonTransform * transpose(mat4(m[0], m[1], vec4(0.0, 0.0, 1.0, 0.0), vec4(0.0, 0.0, 0.0, 1.0))) * skeletonTransformInverse;
 
         pos = boneMatrix * pos;

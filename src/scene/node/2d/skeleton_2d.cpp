@@ -370,6 +370,65 @@ namespace Flint {
             }
         }
 
+        // Set bones and weights.
+//        {
+//            // A vertex can be affected by 4 bones at most.
+//            bones = std::vector<int>(vertex_count * 4, 0);
+//            weights = std::vector<float>(vertex_count * 4, 0);
+//
+//            // bone_weights: Vector[Bone count][Vertex count]
+//            // Traverse each bone.
+//            for (int i = 0; i < bone_weights.size(); i++) {
+//                if (bone_weights[i].weights.size() != points.size()) {
+//                    continue; //different number of vertices, sorry not using.
+//                }
+//                Bone2D *bone = Object::cast_to<Bone2D>(skeleton_node->get_node(bone_weights[i].path));
+//                if (!bone) {
+//                    continue;
+//                }
+//
+//                int bone_index = bone->get_index_in_skeleton();
+//
+//                for (int j = 0; j < vertex_count; j++) {
+//                    if (bone_weights[i].weights[j] == 0.0) {
+//                        continue; //weight is unpainted, skip
+//                    }
+//                    //find an index with a weight
+//                    for (int k = 0; k < 4; k++) {
+//                        if (weights[j * 4 + k] < bone_weights[i].weights[j]) {
+//                            //this is less than this weight, insert weight!
+//                            for (int l = 3; l > k; l--) {
+//                                weights[j * 4 + l] = weights[j * 4 + l - 1];
+//                                bones[j * 4 + l] = bones[j * 4 + l - 1];
+//                            }
+//                            weights[j * 4 + k] = bone_weights[i].weights[j];
+//                            bones[j * 4 + k] = bone_index;
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//
+//            // Normalize the weights.
+//            for (int i = 0; i < vertex_count; i++) {
+//                // Sum up weights.
+//                float weight_sum = 0;
+//                for (int j = 0; j < 4; j++) {
+//                    weight_sum += weights[i * 4 + j];
+//                }
+//
+//                // Zero weight, do nothing.
+//                if (weight_sum == 0) {
+//                    continue;
+//                }
+//
+//                // Normalize.
+//                for (int j = 0; j < 4; j++) {
+//                    weights[i * 4 + j] /= weight_sum;
+//                }
+//            }
+//        }
+
         // Final indices.
         std::vector<uint32_t> total_indices;
 
