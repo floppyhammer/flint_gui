@@ -160,10 +160,14 @@ namespace Flint {
          * Copy data from VkBuffer to VkImage.
          * @param buffer Src buffer.
          * @param image Dst image.
-         * @param width Image width.
-         * @param height Image height.
+         * @param offset_x Image region offset x.
+         * @param offset_y Image region offset y.
+         * @param width Image region width.
+         * @param height Image region height.
          */
-        void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) const;
+        void copyBufferToImage(VkBuffer buffer, VkImage image,
+                               uint32_t offset_x, uint32_t offset_y,
+                               uint32_t width, uint32_t height) const;
 
         static bool hasStencilComponent(VkFormat format);
 

@@ -109,6 +109,14 @@ namespace Flint {
         }
     }
 
+    Skeleton2d *Bone2d::get_skeleton() {
+        if (skeleton) {
+            return skeleton;
+        } else {
+            return parent->get_skeleton();
+        }
+    }
+
     Skeleton2d::Skeleton2d() {
         type = NodeType::Skeleton2D;
 
@@ -116,71 +124,87 @@ namespace Flint {
         sprite->set_texture(ResourceManager::get_singleton()->load<ImageTexture>("../assets/skeleton_2d_texture.png"));
         sprite->set_parent(this);
 
-        base_bone = std::make_shared<Bone2d>();
-        base_bone->skeleton = this;
+        root_bone = std::make_shared<Bone2d>();
+        root_bone->skeleton = this;
+        bones.push_back(root_bone.get());
 
         auto neck_bone = std::make_shared<Bone2d>();
         neck_bone->position = {0, -4};
         neck_bone->length = 4;
-        base_bone->add_child(neck_bone);
+        root_bone->add_child(neck_bone);
+        bones.push_back(neck_bone.get());
 
         auto head_bone = std::make_shared<Bone2d>();
         head_bone->position = {0, -20};
         head_bone->length = 20;
         neck_bone->add_child(head_bone);
+        bones.push_back(head_bone.get());
 
         auto left_shoulder_bone = std::make_shared<Bone2d>();
         left_shoulder_bone->position = {-50, 10};
         left_shoulder_bone->length = 50;
-        base_bone->add_child(left_shoulder_bone);
+        root_bone->add_child(left_shoulder_bone);
+        bones.push_back(left_shoulder_bone.get());
 
         auto left_arm_bone = std::make_shared<Bone2d>();
         left_arm_bone->position = {-50, 10};
         left_arm_bone->length = 50;
         left_shoulder_bone->add_child(left_arm_bone);
+        bones.push_back(left_arm_bone.get());
 
         auto right_shoulder_bone = std::make_shared<Bone2d>();
         right_shoulder_bone->position = {50, 10};
         right_shoulder_bone->length = 50;
-        base_bone->add_child(right_shoulder_bone);
+        root_bone->add_child(right_shoulder_bone);
+        bones.push_back(right_shoulder_bone.get());
 
         auto right_arm_bone = std::make_shared<Bone2d>();
         right_arm_bone->position = {50, 10};
         right_arm_bone->length = 50;
         right_shoulder_bone->add_child(right_arm_bone);
+        bones.push_back(right_arm_bone.get());
 
         auto left_hip_bone = std::make_shared<Bone2d>();
         left_hip_bone->position = {-40, 100};
         left_hip_bone->length = 50;
-        base_bone->add_child(left_hip_bone);
+        root_bone->add_child(left_hip_bone);
+        bones.push_back(left_hip_bone.get());
 
         auto left_leg_bone = std::make_shared<Bone2d>();
         left_leg_bone->position = {0, 60};
         left_leg_bone->length = 50;
         left_hip_bone->add_child(left_leg_bone);
+        bones.push_back(left_leg_bone.get());
 
         auto left_foot_bone = std::make_shared<Bone2d>();
         left_foot_bone->position = {0, 60};
         left_foot_bone->length = 50;
         left_leg_bone->add_child(left_foot_bone);
+        bones.push_back(left_foot_bone.get());
 
         auto right_hip_bone = std::make_shared<Bone2d>();
         right_hip_bone->position = {40, 100};
         right_hip_bone->length = 50;
-        base_bone->add_child(right_hip_bone);
+        root_bone->add_child(right_hip_bone);
+        bones.push_back(right_hip_bone.get());
 
         auto right_leg_bone = std::make_shared<Bone2d>();
         right_leg_bone->position = {0, 60};
         right_leg_bone->length = 50;
         right_hip_bone->add_child(right_leg_bone);
+        bones.push_back(right_leg_bone.get());
 
         auto right_foot_bone = std::make_shared<Bone2d>();
         right_foot_bone->position = {0, 60};
         right_foot_bone->length = 50;
         right_leg_bone->add_child(right_foot_bone);
+        bones.push_back(right_foot_bone.get());
+
+        mesh = std::make_shared<Skeleton2dMesh>();
 
         // Mesh.
-        mesh.vertexes = {
+        // Root bone as the origin.
+        mesh->vertexes = {
                 Vec2F(19.5, -58.1),
                 Vec2F(19.7, -24.0),
                 Vec2F(14.1, -19.4),
@@ -254,48 +278,103 @@ namespace Flint {
                 Vec2F(31.8, 237.7),
         };
 
-        mesh.polygons.push_back({44, 43, 60, 46, 45});
-        mesh.polygons.push_back({47, 60, 46});
-        mesh.polygons.push_back({47, 60, 48});
-        mesh.polygons.push_back({60, 43, 42});
-        mesh.polygons.push_back({60, 41, 42});
-        mesh.polygons.push_back({48, 49, 59, 40, 41, 60});
-        mesh.polygons.push_back({49, 59, 50});
-        mesh.polygons.push_back({50, 59, 51});
-        mesh.polygons.push_back({52, 58, 53});
-        mesh.polygons.push_back({53, 54, 58});
-        mesh.polygons.push_back({59, 58, 52, 51});
-        mesh.polygons.push_back({59, 40, 39, 65, 68, 17, 16, 62, 58});
-        mesh.polygons.push_back({58, 2, 3});
-        mesh.polygons.push_back({58, 4, 3});
-        mesh.polygons.push_back({54, 2, 58});
-        mesh.polygons.push_back({55, 56, 0, 1, 2, 54});
-        mesh.polygons.push_back({58, 4, 5, 62});
-        mesh.polygons.push_back({5, 62, 6});
-        mesh.polygons.push_back({62, 7, 6});
-        mesh.polygons.push_back({62, 16, 15, 63, 8, 7});
-        mesh.polygons.push_back({8, 9, 63});
-        mesh.polygons.push_back({9, 10, 63});
-        mesh.polygons.push_back({15, 14, 63});
-        mesh.polygons.push_back({14, 13, 63});
-        mesh.polygons.push_back({63, 10, 11, 12, 13});
-        mesh.polygons.push_back({68, 17, 18});
-        mesh.polygons.push_back({68, 19, 18});
-        mesh.polygons.push_back({27, 69, 20, 19, 68, 28});
-        mesh.polygons.push_back({65, 28, 68});
-        mesh.polygons.push_back({65, 28, 29, 66, 36, 37});
-        mesh.polygons.push_back({65, 37, 38});
-        mesh.polygons.push_back({65, 39, 38});
-        mesh.polygons.push_back({36, 66, 35});
-        mesh.polygons.push_back({35, 34, 66});
-        mesh.polygons.push_back({66, 29, 30});
-        mesh.polygons.push_back({66, 31, 30});
-        mesh.polygons.push_back({66, 31, 32, 33, 34});
-        mesh.polygons.push_back({27, 69, 26});
-        mesh.polygons.push_back({26, 25, 69});
-        mesh.polygons.push_back({69, 20, 21});
-        mesh.polygons.push_back({22, 21, 69});
-        mesh.polygons.push_back({69, 22, 23, 24, 25});
+        // Move to top-left.
+        for (auto &v: mesh->vertexes) {
+            v += Vec2F(171, 77);
+        }
+
+        mesh->polygons.push_back({44, 43, 60, 46, 45});
+        mesh->polygons.push_back({47, 60, 46});
+        mesh->polygons.push_back({47, 60, 48});
+        mesh->polygons.push_back({60, 43, 42});
+        mesh->polygons.push_back({60, 41, 42});
+        mesh->polygons.push_back({48, 49, 59, 40, 41, 60});
+        mesh->polygons.push_back({49, 59, 50});
+        mesh->polygons.push_back({50, 59, 51});
+        mesh->polygons.push_back({52, 58, 53});
+        mesh->polygons.push_back({53, 54, 58});
+        mesh->polygons.push_back({59, 58, 52, 51});
+        mesh->polygons.push_back({59, 40, 39, 65, 68, 17, 16, 62, 58});
+        mesh->polygons.push_back({58, 2, 3});
+        mesh->polygons.push_back({58, 4, 3});
+        mesh->polygons.push_back({54, 2, 58});
+        mesh->polygons.push_back({55, 56, 0, 1, 2, 54});
+        mesh->polygons.push_back({58, 4, 5, 62});
+        mesh->polygons.push_back({5, 62, 6});
+        mesh->polygons.push_back({62, 7, 6});
+        mesh->polygons.push_back({62, 16, 15, 63, 8, 7});
+        mesh->polygons.push_back({8, 9, 63});
+        mesh->polygons.push_back({9, 10, 63});
+        mesh->polygons.push_back({15, 14, 63});
+        mesh->polygons.push_back({14, 13, 63});
+        mesh->polygons.push_back({63, 10, 11, 12, 13});
+        mesh->polygons.push_back({68, 17, 18});
+        mesh->polygons.push_back({68, 19, 18});
+        mesh->polygons.push_back({27, 69, 20, 19, 68, 28});
+        mesh->polygons.push_back({65, 28, 68});
+        mesh->polygons.push_back({65, 28, 29, 66, 36, 37});
+        mesh->polygons.push_back({65, 37, 38});
+        mesh->polygons.push_back({65, 39, 38});
+        mesh->polygons.push_back({36, 66, 35});
+        mesh->polygons.push_back({35, 34, 66});
+        mesh->polygons.push_back({66, 29, 30});
+        mesh->polygons.push_back({66, 31, 30});
+        mesh->polygons.push_back({66, 31, 32, 33, 34});
+        mesh->polygons.push_back({27, 69, 26});
+        mesh->polygons.push_back({26, 25, 69});
+        mesh->polygons.push_back({69, 20, 21});
+        mesh->polygons.push_back({22, 21, 69});
+        mesh->polygons.push_back({69, 22, 23, 24, 25});
+
+        root_bone->weights = std::vector<float>(mesh->vertexes.size());
+        neck_bone->weights = std::vector<float>(mesh->vertexes.size());
+        head_bone->weights = std::vector<float>(mesh->vertexes.size());
+        left_shoulder_bone->weights = std::vector<float>(mesh->vertexes.size());
+        left_arm_bone->weights = std::vector<float>(mesh->vertexes.size());
+        right_shoulder_bone->weights = std::vector<float>(mesh->vertexes.size());
+        right_arm_bone->weights = std::vector<float>(mesh->vertexes.size());
+        left_hip_bone->weights = std::vector<float>(mesh->vertexes.size());
+        left_leg_bone->weights = std::vector<float>(mesh->vertexes.size());
+        left_foot_bone->weights = std::vector<float>(mesh->vertexes.size());
+        right_hip_bone->weights = std::vector<float>(mesh->vertexes.size());
+        right_leg_bone->weights = std::vector<float>(mesh->vertexes.size());
+        right_foot_bone->weights = std::vector<float>(mesh->vertexes.size());
+
+        std::array<VkDescriptorPoolSize, 2> poolSizes{};
+        poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        poolSizes[0].descriptorCount = 1;
+        poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        poolSizes[1].descriptorCount = 1;
+
+        VkDescriptorPoolCreateInfo poolInfo{};
+        poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+        poolInfo.pPoolSizes = poolSizes.data();
+        poolInfo.maxSets = 1;
+
+        if (vkCreateDescriptorPool(Platform::getSingleton()->device, &poolInfo, nullptr, &descriptor_pool) !=
+            VK_SUCCESS) {
+            throw std::runtime_error("Failed to create descriptor pool!");
+        }
+
+        auto device = Platform::getSingleton()->device;
+        auto &descriptorSetLayout = RenderServer::getSingleton()->skeleton2dMeshDescriptorSetLayout;
+
+        std::vector<VkDescriptorSetLayout> layouts(1, descriptorSetLayout);
+        VkDescriptorSetAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        allocInfo.descriptorPool = descriptor_pool;
+        allocInfo.descriptorSetCount = 1;
+        allocInfo.pSetLayouts = layouts.data();
+
+        if (vkAllocateDescriptorSets(device, &allocInfo, &descriptor_set) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to allocate descriptor sets!");
+        }
+
+        allocate_bone_transforms(13);
+        update_bones();
+        //set_bone_transform();
+        upload_bone_transforms();
     }
 
     template<class C>
@@ -312,11 +391,39 @@ namespace Flint {
     }
 
     void Skeleton2d::update(double delta) {
+        Node *viewport_node = get_viewport();
+
+        Vec2<uint32_t> viewport_extent;
+        if (viewport_node) {
+            auto viewport = dynamic_cast<SubViewport *>(viewport_node);
+            viewport_extent = viewport->get_extent();
+        } else { // Default to swap chain image.
+            auto extent = SwapChain::getSingleton()->swapChainExtent;
+            viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
+        }
+
+        // Prepare MVP data. We use this matrix to convert a full-screen to the NodeGui's rect.
+        ModelViewProjection mvp{};
+
+        // The actual application order of these matrices is reverse.
+        // 4.
+        mvp.model = glm::translate(glm::mat4(1.0f),
+                                   glm::vec3(position.x / viewport_extent.x * 2.0f,
+                                             position.y / viewport_extent.y * 2.0f,
+                                             0.0f));
+        // 3.
+        mvp.model = glm::translate(mvp.model, glm::vec3(-1.0, -1.0, 0.0f));
+        // 2.
+        mvp.model = glm::scale(mvp.model, glm::vec3(scale.x, scale.y, 1.0f));
+
+        pc_transform.transform = mvp.calculate_mvp();
+        pc_transform.transform_inverse = glm::inverse(pc_transform.transform);
+
         sprite->propagate_update(delta);
     }
 
     void Skeleton2d::draw(VkCommandBuffer p_command_buffer) {
-        sprite->propagate_draw(p_command_buffer);
+        //sprite->propagate_draw(p_command_buffer);
 
         // Draw all triangles with a single draw call.
         VkPipeline pipeline = RenderServer::getSingleton()->skeleton2dMeshGraphicsPipeline;
@@ -327,29 +434,33 @@ namespace Flint {
                            VK_SHADER_STAGE_VERTEX_BIT, 0,
                            sizeof(Skeleton2dSurfacePushConstant), &pc_transform);
 
-//        VkBuffer vertexBuffers[] = {surface->get_vertex_buffer()};
-//        RenderServer::getSingleton()->draw_skeleton_2d(
-//                p_command_buffer,
-//                pipeline,
-//                surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage),
-//                vertexBuffers,
-//                triangles,
-//                total_indices);
+        VkBuffer vertexBuffers[] = {mesh->gpu_resources->vertexBuffer};
+        RenderServer::getSingleton()->draw_skeleton_2d(
+                p_command_buffer,
+                pipeline,
+                descriptor_set,
+                vertexBuffers,
+                mesh->gpu_resources->indexBuffer,
+                mesh->gpu_resources->indices_count);
 
-        if (base_bone) {
-            base_bone->draw();
+        if (root_bone) {
+            root_bone->draw();
         }
 
         Node2d::draw(p_command_buffer);
     }
 
     void Skeleton2d::update_bones() {
-        uint32_t vertex_count = mesh.vertexes.size();
+        uint32_t vertex_count = mesh->vertexes.size();
 
-        std::vector<Vec2F> points = mesh.vertexes;
-        std::vector<Vec2F> uvs;
-        std::vector<int> bones;
-        std::vector<float> weights;
+        // Vertex input.
+        // -------------------------------------
+        auto points = mesh->vertexes;
+        auto uvs = std::vector<Vec2F>(vertex_count);
+        // A vertex can be affected by 4 bones at most.
+        auto gpu_bones = std::vector<float>(vertex_count * 4, 0);
+        auto gpu_weights = std::vector<float>(vertex_count * 4, 0);
+        // -------------------------------------
 
         // Set UVs.
         if (sprite && sprite->get_texture()) {
@@ -357,8 +468,6 @@ namespace Flint {
             Transform2 tex_transform;
 
             auto tex_sizei = sprite->get_texture()->get_size();
-
-            uvs.resize(vertex_count);
 
             // Map UVs to points.
             if (points.size() == uvs.size()) {
@@ -371,69 +480,72 @@ namespace Flint {
         }
 
         // Set bones and weights.
-//        {
-//            // A vertex can be affected by 4 bones at most.
-//            bones = std::vector<int>(vertex_count * 4, 0);
-//            weights = std::vector<float>(vertex_count * 4, 0);
-//
-//            // bone_weights: Vector[Bone count][Vertex count]
-//            // Traverse each bone.
-//            for (int i = 0; i < bone_weights.size(); i++) {
-//                if (bone_weights[i].weights.size() != points.size()) {
-//                    continue; //different number of vertices, sorry not using.
-//                }
-//                Bone2D *bone = Object::cast_to<Bone2D>(skeleton_node->get_node(bone_weights[i].path));
-//                if (!bone) {
-//                    continue;
-//                }
-//
-//                int bone_index = bone->get_index_in_skeleton();
-//
-//                for (int j = 0; j < vertex_count; j++) {
-//                    if (bone_weights[i].weights[j] == 0.0) {
-//                        continue; //weight is unpainted, skip
-//                    }
-//                    //find an index with a weight
-//                    for (int k = 0; k < 4; k++) {
-//                        if (weights[j * 4 + k] < bone_weights[i].weights[j]) {
-//                            //this is less than this weight, insert weight!
-//                            for (int l = 3; l > k; l--) {
-//                                weights[j * 4 + l] = weights[j * 4 + l - 1];
-//                                bones[j * 4 + l] = bones[j * 4 + l - 1];
-//                            }
-//                            weights[j * 4 + k] = bone_weights[i].weights[j];
-//                            bones[j * 4 + k] = bone_index;
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//
-//            // Normalize the weights.
-//            for (int i = 0; i < vertex_count; i++) {
-//                // Sum up weights.
-//                float weight_sum = 0;
-//                for (int j = 0; j < 4; j++) {
-//                    weight_sum += weights[i * 4 + j];
-//                }
-//
-//                // Zero weight, do nothing.
-//                if (weight_sum == 0) {
-//                    continue;
-//                }
-//
-//                // Normalize.
-//                for (int j = 0; j < 4; j++) {
-//                    weights[i * 4 + j] /= weight_sum;
-//                }
-//            }
-//        }
+        {
+            // bone_weights: Vector[Bone count][Vertex count]
+            // Traverse each bone.
+            for (int i = 0; i < bones.size(); i++) {
+                auto &bone = bones[i];
+                if (bone == nullptr) {
+                    continue;
+                }
+
+                auto &weights = bone->weights;
+
+                if (weights.size() != points.size()) {
+                    Logger::error("Weights number is different from points number!", "Skeleton2d");
+                    continue;
+                }
+
+                float bone_index = i;
+
+                // Traverse vertexes to calculate weights.
+                // This loop picks 4 largest weights.
+                for (int j = 0; j < vertex_count; j++) {
+                    if (weights[j] == 0) {
+                        continue;
+                    }
+
+                    // A vertex can be affected by 4 bones at most.
+                    for (int k = 0; k < 4; k++) {
+                        // Bigger than an existing weight, insert new weight!
+                        if (weights[j] > gpu_weights[j * 4 + k]) {
+                            for (int l = 3; l > k; l--) {
+                                gpu_weights[j * 4 + l] = gpu_weights[j * 4 + l - 1];
+                                gpu_bones[j * 4 + l] = gpu_bones[j * 4 + l - 1];
+                            }
+                            gpu_weights[j * 4 + k] = weights[j];
+                            gpu_bones[j * 4 + k] = bone_index;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Normalize the weights.
+            for (int i = 0; i < vertex_count; i++) {
+                // Sum up weights.
+                float weight_sum = 0;
+                for (int j = 0; j < 4; j++) {
+                    weight_sum += gpu_weights[i * 4 + j];
+                }
+
+                // Zero weight, do nothing.
+                if (weight_sum == 0) {
+                    continue;
+                }
+
+                // Normalize.
+                for (int j = 0; j < 4; j++) {
+                    gpu_weights[i * 4 + j] /= weight_sum;
+                }
+            }
+        }
 
         // Final indices.
         std::vector<uint32_t> total_indices;
 
         // Go through polygons.
-        for (auto &polygon: mesh.polygons) {
+        for (auto &polygon: mesh->polygons) {
             uint32_t polygon_vertex_count = polygon.size();
 
             // Invalid polygon.
@@ -456,8 +568,8 @@ namespace Flint {
             for (int i = 0; i < polygon_vertex_count; i++) {
                 // Vertex indices.
                 uint32_t idx = polygon[i];
-                assert(idx < mesh.vertexes.size());
-                polygon_vertexes[i] = mesh.vertexes[idx];
+                assert(idx < mesh->vertexes.size());
+                polygon_vertexes[i] = mesh->vertexes[idx];
 
                 // Add points to P2T.
                 polyline.push_back(new p2t::Point(polygon_vertexes[i].x, polygon_vertexes[i].y));
@@ -514,41 +626,129 @@ namespace Flint {
                 total_indices[index_count + i] = global_idx;
             }
         }
+
+        // Upload to vertex buffer and index buffer.
+        auto vertex_data = std::vector<SkeletonVertex>(vertex_count);
+
+        for (int i = 0; i < vertex_count; i++) {
+            vertex_data[i].pos = {points[i].x, points[i].y, 0};
+            vertex_data[i].uv = {uvs[i].x, uvs[i].y};
+            vertex_data[i].bone_indices = {gpu_bones[i * 4], gpu_bones[i * 4 + 1], gpu_bones[i * 4 + 2], gpu_bones[i * 4 + 3]};
+            vertex_data[i].bone_weights = {gpu_weights[i * 4], gpu_weights[i * 4 + 1], gpu_weights[i * 4 + 2], gpu_weights[i * 4 + 3]};
+        }
+
+        mesh->gpu_resources = std::make_shared<SurfaceGpuResources<SkeletonVertex>>(vertex_data, total_indices);
     }
 
-    void Skeleton2dMeshGpuData::allocate_bone_transforms(uint32_t new_bone_count) {
+    void Skeleton2d::allocate_bone_transforms(uint32_t new_bone_count) {
         if (bone_count == new_bone_count) {
             return;
         }
 
         bone_count = new_bone_count;
 
-        int height = bone_count / 256;
-        if (bone_count % 256) height++;
+        int width = 256;
+        int height = (int) bone_count / width;
+        if (bone_count % width) height++;
 
-        uint32_t tex_width = 256;
+        uint32_t tex_width = width;
         uint32_t tex_height = height * (true ? 2 : 3); // 2D/3D.
 
-        bone_transform_data.resize(tex_width * tex_height * 4);
-        bone_transform_data_texture = ImageTexture::from_empty(tex_width, tex_height, VK_FORMAT_R32G32B32A32_SFLOAT);
+        bone_transforms.resize(tex_width * tex_height * 4);
+        bone_transforms_texture = ImageTexture::from_empty(tex_width, tex_height, VK_FORMAT_R32G32B32A32_SFLOAT);
 
         // Need a sampler of nearest.
 
-        //std::make_shared<SurfaceGpuResources<SkeletonVertex>>(vertices, indices);
+        std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+
+        VkDescriptorImageInfo imageInfo{};
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = bone_transforms_texture->imageView;
+        imageInfo.sampler = bone_transforms_texture->sampler;
+
+        descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrites[0].dstSet = descriptor_set;
+        descriptorWrites[0].dstBinding = 0;
+        descriptorWrites[0].dstArrayElement = 0;
+        descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        descriptorWrites[0].descriptorCount = 1;
+        descriptorWrites[0].pImageInfo = &imageInfo;
+
+        VkDescriptorImageInfo imageInfo2{};
+        imageInfo2.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo2.imageView = sprite->get_texture()->imageView;
+        imageInfo2.sampler = sprite->get_texture()->sampler;
+
+        descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        descriptorWrites[1].dstSet = descriptor_set;
+        descriptorWrites[1].dstBinding = 1;
+        descriptorWrites[1].dstArrayElement = 0;
+        descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        descriptorWrites[1].descriptorCount = 1;
+        descriptorWrites[1].pImageInfo = &imageInfo2;
+
+        // Update the contents of a descriptor set object.
+        vkUpdateDescriptorSets(Platform::getSingleton()->device,
+                               static_cast<uint32_t>(descriptorWrites.size()),
+                               descriptorWrites.data(),
+                               0,
+                               nullptr);
     }
 
-    void Skeleton2dMeshGpuData::upload_bone_transforms() {
+    void Skeleton2d::upload_bone_transforms() {
         if (bone_count > 0) {
-            int height = bone_count / 256;
-            if (bone_count % 256) height++;
+            int width = 256;
+            int height = (int) bone_count / width;
+            if (bone_count % width) height++;
+
+            uint32_t tex_width = width;
+            uint32_t tex_height = height * 2;
 
             // Upload the bone transform data to the texture.
-            //glBindTexture(GL_TEXTURE_2D, skeleton->texture);
-            //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 256, height * 2, GL_RGBA, GL_FLOAT, skeleton->skel_texture.ptr());
+            // In bytes. 16 bytes per R32G32B32A32F pixel.
+            VkDeviceSize imageSize = tex_width * tex_height * 16;
+
+            // Temporary buffer and CPU memory.
+            VkBuffer staging_buffer;
+            VkDeviceMemory staging_buffer_memory;
+
+            RenderServer::getSingleton()->createBuffer(imageSize,
+                                                       VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                       VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                                       staging_buffer,
+                                                       staging_buffer_memory);
+
+            // Copy the pixel values that we got from the image loading library to the buffer.
+            RenderServer::getSingleton()->copyDataToMemory(bone_transforms.data(), staging_buffer_memory, imageSize);
+
+            // Transition the texture image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL.
+            RenderServer::getSingleton()->transitionImageLayout(bone_transforms_texture->image,
+                                                                VK_FORMAT_R32G32B32A32_SFLOAT,
+                                                                VK_IMAGE_LAYOUT_UNDEFINED,
+                                                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+            // Execute the buffer to image copy operation.
+            RenderServer::getSingleton()->copyBufferToImage(staging_buffer,
+                                                            bone_transforms_texture->image,
+                                                            0,
+                                                            0,
+                                                            static_cast<uint32_t>(tex_width),
+                                                            static_cast<uint32_t>(tex_height));
+
+            // To be able to start sampling from the texture image in the shader, we need one last transition to prepare it for shader access.
+            RenderServer::getSingleton()->transitionImageLayout(bone_transforms_texture->image,
+                                                                VK_FORMAT_R32G32B32A32_SFLOAT,
+                                                                VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+            // Clean up staging objects.
+            vkDestroyBuffer(Platform::getSingleton()->device, staging_buffer, nullptr);
+            vkFreeMemory(Platform::getSingleton()->device, staging_buffer_memory, nullptr);
         }
     }
 
-    void Skeleton2dMeshGpuData::set_bone_transform(uint32_t bone_index, const Transform2 &p_transform) {
+    void Skeleton2d::set_bone_transform(uint32_t bone_index, const Transform2 &p_transform) {
         if (bone_index >= bone_count) {
             Logger::error("Invalid bone index!", "Skeleton 2D");
             return;
@@ -560,17 +760,17 @@ namespace Flint {
         uint32_t offset = (row * 256 + col) * 4;
 
         // First row.
-        bone_transform_data[offset + 0] = p_transform.matrix.m11();
-        bone_transform_data[offset + 1] = p_transform.matrix.m12();
-        bone_transform_data[offset + 2] = 0;
-        bone_transform_data[offset + 3] = p_transform.vector.x;
+        bone_transforms[offset + 0] = p_transform.matrix.m11();
+        bone_transforms[offset + 1] = p_transform.matrix.m12();
+        bone_transforms[offset + 2] = 0;
+        bone_transforms[offset + 3] = p_transform.vector.x;
 
         // Second row.
         offset += 256 * 4;
-        bone_transform_data[offset + 0] = p_transform.matrix.m21();
-        bone_transform_data[offset + 1] = p_transform.matrix.m22();
-        bone_transform_data[offset + 2] = 0;
-        bone_transform_data[offset + 3] = p_transform.vector.y;
+        bone_transforms[offset + 0] = p_transform.matrix.m21();
+        bone_transforms[offset + 1] = p_transform.matrix.m22();
+        bone_transforms[offset + 2] = 0;
+        bone_transforms[offset + 3] = p_transform.vector.y;
 
         // 3D.
 //        offset += 256 * 4;

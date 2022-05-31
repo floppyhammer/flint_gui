@@ -24,94 +24,79 @@ namespace Flint {
         Transform2 parent_transform;
         // Bone flags, 8 bits should be sufficient for now.
         uint8_t flags;
-        // Number of children.
-        uint8_t child_count;
         // Pointers to children.
         std::vector<std::shared_ptr<Bone2d>> children;
         // Pointer to parent.
         Bone2d *parent;
         Skeleton2d *skeleton;
 
-        std::shared_ptr<ImageTexture> metadata;
-
-        bool selected = false;
+        // Vector[Vertex count]
+        std::vector<float> weights;
 
         void add_child(std::shared_ptr<Bone2d> child);
+
+        Skeleton2d *get_skeleton();
 
         void draw();
 
         Transform2 get_transform();
 
         Transform2 get_global_transform();
+
+        int get_index_in_skeleton();
     };
 
     struct Skeleton2dMesh {
         // Including internal vertexes, which are placed at the end of the vector.
         std::vector<Vec2F> vertexes;
         uint32_t internal_vertices;
-        std::vector<Vec2F> uvs;
-        std::vector<ColorU> vertex_colors;
+
+        // Vector[polygon count][vertex count in a polygon]
         std::vector<std::vector<uint32_t>> polygons;
-        std::vector<std::vector<float>> bone_weights; // Vector[Bone count][Vertex count]
+
+        // Vector[bone count][vertex count]
+        std::vector<std::vector<float>> bone_weights;
+
+        std::shared_ptr<SurfaceGpuResources<SkeletonVertex>> gpu_resources;
     };
 
-    struct Skeleton2dMeshGpuData {
-        std::vector<SkeletonVertex> vertexes;
-        std::vector<uint32_t> indices;
+    class Skeleton2d : public Node2d {
+        friend Bone2d;
+    public:
+        Skeleton2d();
 
-        std::vector<Vec2F> points;
-        std::vector<Vec2F> uvs;
-        std::vector<ColorU> colors;
-        std::vector<uint32_t> bones;
-        std::vector<float> weights;
+    private:
+        void update(double delta) override;
 
-        std::vector<float> bone_transform_data;
-        std::shared_ptr<ImageTexture> bone_transform_data_texture;
+        void draw(VkCommandBuffer p_command_buffer) override;
 
-        Transform2 base_transform;
-        int bone_count;
+        std::shared_ptr<Bone2d> root_bone;
+
+        std::shared_ptr<Sprite2d> sprite;
+
+        std::vector<Bone2d *> bones;
+
+        std::shared_ptr<Skeleton2dMesh> mesh;
+
+        Skeleton2dSurfacePushConstant pc_transform;
+
+        std::vector<float> bone_transforms;
+        std::shared_ptr<ImageTexture> bone_transforms_texture;
+
+        uint32_t bone_count;
+
+        VkDescriptorPool descriptor_pool;
+        VkDescriptorSet descriptor_set;
+
+        /// When bone vertexes, weights, or polygons changes, update the vertex buffer.
+        /// Bone transforms are updated through update_bone_transforms().
+        void update_bones();
 
         void allocate_bone_transforms(uint32_t new_bone_count);
 
         void set_bone_transform(uint32_t bone_index, const Transform2 &transform);
 
         void upload_bone_transforms();
-    };
-
-//    struct BoneVertex {
-//        Vertex v; // Info on this vertex: position, color etc.
-//        std::vector<float> weights;	// Weight for each bone connected.
-//        std::vector<Bone2d *> bones; // Pointer to connected bones.
-//    };
-//
-//    struct Skeleton2dMesh {
-//        std::vector<BoneVertex> vertexes;
-//        // Triangles made up of vertexes.
-//        std::vector<uint32_t> triangles;
-//    };
-
-    class Skeleton2d : public Node2d {
-    public:
-        Skeleton2d();
-
-    private:
-        std::shared_ptr<Bone2d> base_bone;
-
-        std::shared_ptr<Sprite2d> sprite;
-
-        void update(double delta) override;
-
-        void draw(VkCommandBuffer p_command_buffer) override;
-
-        Skeleton2dMesh mesh;
-
-        Skeleton2dSurfacePushConstant pc_transform;
-
-        /// When bone vertexes, weights, or polygons changes, update the vertex buffer.
-        /// Bone transforms are updated through update_bone_transforms().
-        void update_bones();
-
-        void update_bone_transforms();
     };
 }
 

@@ -204,7 +204,9 @@ namespace Flint {
         endSingleTimeCommands(commandBuffer);
     }
 
-    void RenderServer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) const {
+    void RenderServer::copyBufferToImage(VkBuffer buffer, VkImage image,
+                                         uint32_t offset_x, uint32_t offset_y,
+                                         uint32_t width, uint32_t height) const {
         VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
         // Structure specifying a buffer image copy operation.
@@ -213,15 +215,16 @@ namespace Flint {
         region.bufferRowLength = 0; // Specify in texels a subregion of a larger two- or three-dimensional image in buffer memory, and control the addressing calculations.
         region.bufferImageHeight = 0;
 
-        // A VkImageSubresourceLayers used to specify the specific image subresources of the image used for the source or destination image data.
+        // A VkImageSubresourceLayers used to specify the specific image sub-resources of the image used for the source or destination image data.
         region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         region.imageSubresource.mipLevel = 0;
         region.imageSubresource.baseArrayLayer = 0;
         region.imageSubresource.layerCount = 1;
 
-        region.imageOffset = {0, 0,
-                              0}; // Selects the initial x, y, z offsets in texels of the sub-region of the source or destination image data.
-        region.imageExtent = {width, height, 1}; // Size in texels of the image to copy in width, height and depth.
+        // Selects the initial x, y, z offsets in texels of the subregion of the source or destination image data.
+        region.imageOffset = {0, 0, 0};
+        // Size in texels of the image to copy in width, height and depth.
+        region.imageExtent = {width, height, 1};
 
         // Copy data from a buffer into an image.
         vkCmdCopyBufferToImage(
@@ -1086,7 +1089,7 @@ namespace Flint {
         rasterizer.rasterizerDiscardEnable = VK_FALSE;
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth = 1.0f;
-        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+        rasterizer.cullMode = VK_CULL_MODE_NONE;
         rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.depthBiasEnable = VK_FALSE;
 
