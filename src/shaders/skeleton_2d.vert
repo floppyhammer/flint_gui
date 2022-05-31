@@ -49,7 +49,7 @@ void main() {
         pos = boneMatrix * pos;
     }
 
-    gl_Position = pos;
+    gl_Position = skeletonTransform * pos;
     fragColor = inColor;
     fragTexCoord = inTexCoord;
 }

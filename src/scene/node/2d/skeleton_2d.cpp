@@ -415,6 +415,11 @@ namespace Flint {
         mvp.model = glm::translate(mvp.model, glm::vec3(-1.0, -1.0, 0.0f));
         // 2.
         mvp.model = glm::scale(mvp.model, glm::vec3(scale.x, scale.y, 1.0f));
+        // 1.
+        mvp.model = glm::scale(mvp.model,
+                               glm::vec3(1.0f / viewport_extent.x * 2.0f,
+                                         1.0f / viewport_extent.y * 2.0f,
+                                         1.0f));
 
         pc_transform.transform = mvp.calculate_mvp();
         pc_transform.transform_inverse = glm::inverse(pc_transform.transform);
