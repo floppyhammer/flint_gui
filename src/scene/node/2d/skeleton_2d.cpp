@@ -398,10 +398,9 @@ namespace Flint {
         allocate_bone_transforms(bones.size());
         update_bones();
 
-        auto skeleton_transform = Transform2::from_translation(get_global_position());
         for (int i = 0; i < bone_count; i++) {
             auto relative_transform_to_rest_pose = bones[i]->get_global_transform() * bones[i]->get_global_rest_transform().inverse();
-            set_bone_transform(i, skeleton_transform.inverse() * relative_transform_to_rest_pose);
+            set_bone_transform(i, relative_transform_to_rest_pose);
         }
 
         upload_bone_transforms();
@@ -454,7 +453,12 @@ namespace Flint {
         pc_transform.transform = mvp.calculate_mvp();
         pc_transform.transform_inverse = glm::inverse(pc_transform.transform);
 
-        sprite->propagate_update(delta);
+        bones[4]->rotation = std::sin(Engine::getSingleton()->get_elapsed());
+        for (int i = 0; i < bone_count; i++) {
+            auto relative_transform_to_rest_pose = bones[i]->get_global_transform() * bones[i]->get_global_rest_transform().inverse();
+            set_bone_transform(i, relative_transform_to_rest_pose);
+        }
+        upload_bone_transforms();
     }
 
     void Skeleton2d::draw(VkCommandBuffer p_command_buffer) {
