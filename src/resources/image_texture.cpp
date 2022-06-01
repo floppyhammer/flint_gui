@@ -106,7 +106,7 @@ namespace Flint {
         std::vector<unsigned char> i8_pixels(p_width * p_height * 4, 0);
         std::vector<float> f32_pixels(p_width * p_height * 4, 0);
 
-        void *pixel_data = nullptr;
+        void *pixel_data{};
         if (tex_format == VK_FORMAT_R8G8B8A8_UNORM) {
             pixel_data = i8_pixels.data();
         } else if (tex_format == VK_FORMAT_R32G32B32A32_SFLOAT) {
@@ -124,9 +124,18 @@ namespace Flint {
                                                                            VK_IMAGE_ASPECT_COLOR_BIT);
 
         // Create sampler.
-        RenderServer::getSingleton()->createTextureSampler(texture->sampler);
+        RenderServer::getSingleton()->createTextureSampler(texture->sampler, VK_FILTER_LINEAR);
 
         return texture;
+    }
+
+    void ImageTexture::set_filter(VkFilter filter) {
+        // Destroy the old sampler.
+        auto device = Platform::getSingleton()->device;
+        vkDestroySampler(device, sampler, nullptr);
+
+        // Create a new sampler.
+        RenderServer::getSingleton()->createTextureSampler(sampler, filter);
     }
 
     ImageTexture::ImageTexture(const std::string &path) : Texture(path) {
@@ -153,7 +162,7 @@ namespace Flint {
                                                                   VK_IMAGE_ASPECT_COLOR_BIT);
 
         // Create sampler.
-        RenderServer::getSingleton()->createTextureSampler(sampler);
+        RenderServer::getSingleton()->createTextureSampler(sampler, VK_FILTER_LINEAR);
     }
 
     std::shared_ptr<ImageTexture> ImageTexture::from_wrapper(VkImageView p_image_view,

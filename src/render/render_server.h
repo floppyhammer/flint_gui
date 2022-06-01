@@ -216,7 +216,7 @@ namespace Flint {
          */
         void copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize) const;
 
-        void createTextureSampler(VkSampler &textureSampler) const;
+        void createTextureSampler(VkSampler &textureSampler, VkFilter filter) const;
 
     public:
         // Texture rect.

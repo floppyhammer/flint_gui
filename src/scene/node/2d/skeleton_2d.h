@@ -43,7 +43,9 @@ namespace Flint {
 
         Transform2 get_global_transform();
 
-        int get_index_in_skeleton();
+        Transform2 get_rest_transform();
+
+        Transform2 get_global_rest_transform();
     };
 
     struct Skeleton2dMesh {
@@ -94,6 +96,7 @@ namespace Flint {
 
         void allocate_bone_transforms(uint32_t new_bone_count);
 
+        /// Bone's global transform relative to the rest pose, i.e. how far it transforms from the rest pose.
         void set_bone_transform(uint32_t bone_index, const Transform2 &transform);
 
         void upload_bone_transforms();

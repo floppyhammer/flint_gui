@@ -44,7 +44,7 @@ void main() {
         m += mat2x4(texelFetch(skeletonTexture, tex_offset, 0), texelFetch(skeletonTexture, tex_offset + ivec2(0, 1), 0)) * inBoneWeights.w;
 
         // Move to origin, do transform, move back to skeleton position.
-        mat4 boneMatrix = skeletonTransform * transpose(mat4(m[0], m[1], vec4(0.0, 0.0, 1.0, 0.0), vec4(0.0, 0.0, 0.0, 1.0))) * skeletonTransformInverse;
+        mat4 boneMatrix = mat4(m[0], m[1], vec4(0.0, 0.0, 1.0, 0.0), vec4(0.0, 0.0, 0.0, 1.0));
 
         pos = boneMatrix * pos;
     }

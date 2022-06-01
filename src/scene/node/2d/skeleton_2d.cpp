@@ -19,16 +19,23 @@ namespace Flint {
 
     Transform2 Bone2d::get_transform() {
         Transform2 transform;
+
+        // Bone's start-point position.
         transform.vector = position;
 
-        // Local rotation in Cartesian coordinates.
+        // Local rotation around the start-point in Cartesian coordinates.
         float cartesian_rotation = rotation;
-//        if (parent) {
-//            auto normalized = position / position.length();
-//            cartesian_rotation += atan2(normalized.y, normalized.x);
-//        }
 
         transform = transform.rotate(cartesian_rotation);
+        return transform;
+    }
+
+    Transform2 Bone2d::get_rest_transform() {
+        Transform2 transform;
+
+        // Bone's start-point position.
+        transform.vector = position;
+
         return transform;
     }
 
@@ -38,6 +45,18 @@ namespace Flint {
         } else {
             if (skeleton) {
                 return Transform2::from_translation(skeleton->get_global_position()) * get_transform();
+            } else {
+                return get_transform();
+            }
+        }
+    }
+
+    Transform2 Bone2d::get_global_rest_transform() {
+        if (parent) {
+            return parent->get_global_transform() * get_rest_transform();
+        } else {
+            if (skeleton) {
+                return Transform2::from_translation(skeleton->get_global_position()) * get_rest_transform();
             } else {
                 return get_transform();
             }
@@ -129,8 +148,7 @@ namespace Flint {
         bones.push_back(root_bone.get());
 
         auto neck_bone = std::make_shared<Bone2d>();
-        neck_bone->position = {0, -4};
-        neck_bone->length = 4;
+        neck_bone->position = {0, 0};
         root_bone->add_child(neck_bone);
         bones.push_back(neck_bone.get());
 
@@ -142,37 +160,43 @@ namespace Flint {
 
         auto left_shoulder_bone = std::make_shared<Bone2d>();
         left_shoulder_bone->position = {-50, 10};
-        left_shoulder_bone->length = 50;
         root_bone->add_child(left_shoulder_bone);
         bones.push_back(left_shoulder_bone.get());
 
         auto left_arm_bone = std::make_shared<Bone2d>();
         left_arm_bone->position = {-50, 10};
-        left_arm_bone->length = 50;
         left_shoulder_bone->add_child(left_arm_bone);
         bones.push_back(left_arm_bone.get());
 
+        auto left_hand_bone = std::make_shared<Bone2d>();
+        left_hand_bone->position = {-50, 10};
+        left_hand_bone->length = 25;
+        left_arm_bone->add_child(left_hand_bone);
+        bones.push_back(left_hand_bone.get());
+
         auto right_shoulder_bone = std::make_shared<Bone2d>();
         right_shoulder_bone->position = {50, 10};
-        right_shoulder_bone->length = 50;
         root_bone->add_child(right_shoulder_bone);
         bones.push_back(right_shoulder_bone.get());
 
         auto right_arm_bone = std::make_shared<Bone2d>();
         right_arm_bone->position = {50, 10};
-        right_arm_bone->length = 50;
         right_shoulder_bone->add_child(right_arm_bone);
         bones.push_back(right_arm_bone.get());
 
+        auto right_hand_bone = std::make_shared<Bone2d>();
+        right_hand_bone->position = {50, 10};
+        right_hand_bone->length = 25;
+        right_arm_bone->add_child(right_hand_bone);
+        bones.push_back(right_hand_bone.get());
+
         auto left_hip_bone = std::make_shared<Bone2d>();
         left_hip_bone->position = {-40, 100};
-        left_hip_bone->length = 50;
         root_bone->add_child(left_hip_bone);
         bones.push_back(left_hip_bone.get());
 
         auto left_leg_bone = std::make_shared<Bone2d>();
         left_leg_bone->position = {0, 60};
-        left_leg_bone->length = 50;
         left_hip_bone->add_child(left_leg_bone);
         bones.push_back(left_leg_bone.get());
 
@@ -184,13 +208,11 @@ namespace Flint {
 
         auto right_hip_bone = std::make_shared<Bone2d>();
         right_hip_bone->position = {40, 100};
-        right_hip_bone->length = 50;
         root_bone->add_child(right_hip_bone);
         bones.push_back(right_hip_bone.get());
 
         auto right_leg_bone = std::make_shared<Bone2d>();
         right_leg_bone->position = {0, 60};
-        right_leg_bone->length = 50;
         right_hip_bone->add_child(right_leg_bone);
         bones.push_back(right_leg_bone.get());
 
@@ -278,10 +300,10 @@ namespace Flint {
                 Vec2F(31.8, 237.7),
         };
 
-        // Move to top-left.
-        for (auto &v: mesh->vertexes) {
-            v += Vec2F(171, 77);
-        }
+//        // Move to top-left.
+//        for (auto &v: mesh->vertexes) {
+//            v += Vec2F(171, 77);
+//        }
 
         mesh->polygons.push_back({44, 43, 60, 46, 45});
         mesh->polygons.push_back({47, 60, 46});
@@ -326,19 +348,21 @@ namespace Flint {
         mesh->polygons.push_back({22, 21, 69});
         mesh->polygons.push_back({69, 22, 23, 24, 25});
 
-        root_bone->weights = std::vector<float>(mesh->vertexes.size());
-        neck_bone->weights = std::vector<float>(mesh->vertexes.size());
-        head_bone->weights = std::vector<float>(mesh->vertexes.size());
-        left_shoulder_bone->weights = std::vector<float>(mesh->vertexes.size());
-        left_arm_bone->weights = std::vector<float>(mesh->vertexes.size());
-        right_shoulder_bone->weights = std::vector<float>(mesh->vertexes.size());
-        right_arm_bone->weights = std::vector<float>(mesh->vertexes.size());
-        left_hip_bone->weights = std::vector<float>(mesh->vertexes.size());
-        left_leg_bone->weights = std::vector<float>(mesh->vertexes.size());
-        left_foot_bone->weights = std::vector<float>(mesh->vertexes.size());
-        right_hip_bone->weights = std::vector<float>(mesh->vertexes.size());
-        right_leg_bone->weights = std::vector<float>(mesh->vertexes.size());
-        right_foot_bone->weights = std::vector<float>(mesh->vertexes.size());
+        root_bone->weights = {0, 0, 0, 0.5, 0.5, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 0.94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.47, 1, 0.5, 0.5, 0, 0, 0, 0, 1, 0.47, 0, 0, 0.5, 0, 0, 0.5, 0, 0, 0.5, 0, 0};
+        neck_bone->weights = {1, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        head_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        left_shoulder_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.47, 0.98, 0.49, 0, 0, 0, 0, 0.49, 0.98, 0.98, 0.49, 0, 0, 0, 0, 0, 0, 0, 0, 0.49, 0.49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        left_arm_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.98, 0.98, 0.98, 0.98, 0.49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.49, 0.98, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        left_hand_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        right_shoulder_bone->weights = {0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.5, 0.5, 0, 0, 0, 0, 0.5, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0};
+        right_arm_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0};
+        right_hand_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        left_hip_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 0.5, 0, 0, 0, 0, 0.5, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0, 0, 0, 0};
+        left_leg_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 0, 0, 0};
+        left_foot_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        right_hip_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 0.5, 0, 0, 0, 0, 0.5, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0};
+        right_leg_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5};
+        right_foot_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -371,9 +395,15 @@ namespace Flint {
             throw std::runtime_error("Failed to allocate descriptor sets!");
         }
 
-        allocate_bone_transforms(13);
+        allocate_bone_transforms(bones.size());
         update_bones();
-        //set_bone_transform();
+
+        auto skeleton_transform = Transform2::from_translation(get_global_position());
+        for (int i = 0; i < bone_count; i++) {
+            auto relative_transform_to_rest_pose = bones[i]->get_global_transform() * bones[i]->get_global_rest_transform().inverse();
+            set_bone_transform(i, skeleton_transform.inverse() * relative_transform_to_rest_pose);
+        }
+
         upload_bone_transforms();
     }
 
@@ -477,7 +507,7 @@ namespace Flint {
             // Map UVs to points.
             if (points.size() == uvs.size()) {
                 for (int i = 0; i < vertex_count; i++) {
-                    uvs[i] = tex_transform * points[i] / Vec2F(tex_sizei.x, tex_sizei.y);
+                    uvs[i] = tex_transform * (points[i] + Vec2F(171, 77)) / Vec2F(tex_sizei.x, tex_sizei.y);
                 }
             } else {
                 // Should not happen.
@@ -663,6 +693,7 @@ namespace Flint {
         bone_transforms_texture = ImageTexture::from_empty(tex_width, tex_height, VK_FORMAT_R32G32B32A32_SFLOAT);
 
         // Need a sampler of nearest.
+        bone_transforms_texture->set_filter(VK_FILTER_NEAREST);
 
         std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
 
@@ -776,12 +807,5 @@ namespace Flint {
         bone_transforms[offset + 1] = p_transform.matrix.m22();
         bone_transforms[offset + 2] = 0;
         bone_transforms[offset + 3] = p_transform.vector.y;
-
-        // 3D.
-//        offset += 256 * 4;
-//        bone_transform_data[offset + 0] = 0;
-//        bone_transform_data[offset + 1] = 0;
-//        bone_transform_data[offset + 2] = 0;
-//        bone_transform_data[offset + 3] = 0;
     }
 }

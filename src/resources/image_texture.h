@@ -29,6 +29,8 @@ namespace Flint {
 
         bool resource_ownership = true;
 
+        void set_filter(VkFilter filter);
+
     public:
         VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 
