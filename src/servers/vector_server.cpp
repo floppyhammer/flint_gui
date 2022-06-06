@@ -40,14 +40,7 @@ namespace Flint {
     void VectorServer::draw_vshape(const VShape &vshape, Transform2 transform) {
         canvas->save_state();
 
-        Pathfinder::Transform2 pf_transform;
-        pf_transform.vector.x = transform.vector.x;
-        pf_transform.vector.y = transform.vector.y;
-        for (int i = 0; i < 4; i++) {
-            pf_transform.matrix.v[i] = transform.matrix.v[i];
-        }
-
-        canvas->set_transform(pf_transform);
+        canvas->set_transform(transform);
 
         if (vshape.fill_color.is_opaque()) {
             canvas->set_fill_paint(Pathfinder::Paint::from_color(

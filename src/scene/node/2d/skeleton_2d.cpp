@@ -20,21 +20,22 @@ namespace Flint {
     Transform2 Bone2d::get_transform() {
         Transform2 transform;
 
-        // Bone's start-point position.
-        transform.vector = position;
+        // First do rotation, second do translation. Note that the code order is reversed.
 
-        // Local rotation around the start-point in Cartesian coordinates.
-        float cartesian_rotation = rotation;
+        // 2. Translation.
+        // Position of the bone's start-point .
+        transform = transform.translate(position);
 
-        transform = transform.rotate(cartesian_rotation);
+        // 1. Rotation.
+        // Local rotation around the bone's start-point.
+        transform = transform.rotate(rotation);
+
         return transform;
     }
 
     Transform2 Bone2d::get_rest_transform() {
-        Transform2 transform;
-
         // Bone's start-point position.
-        transform.vector = position;
+        auto transform = Transform2::from_translation(position);
 
         return transform;
     }
@@ -43,27 +44,21 @@ namespace Flint {
         if (parent) {
             return parent->get_global_transform() * get_transform();
         } else {
-            if (skeleton) {
-                return Transform2::from_translation(skeleton->get_global_position()) * get_transform();
-            } else {
-                return get_transform();
-            }
+            return get_transform();
         }
     }
 
     Transform2 Bone2d::get_global_rest_transform() {
         if (parent) {
-            return parent->get_global_transform() * get_rest_transform();
+            return parent->get_global_rest_transform() * get_rest_transform();
         } else {
-            if (skeleton) {
-                return Transform2::from_translation(skeleton->get_global_position()) * get_rest_transform();
-            } else {
-                return get_transform();
-            }
+            return get_rest_transform();
         }
     }
 
     void Bone2d::draw() {
+        auto skeleton_transform = Transform2::from_translation(get_skeleton()->get_global_position());
+
         VShape vshape_start;
 
         // Bone starting point.
@@ -71,8 +66,8 @@ namespace Flint {
         vshape_start.stroke_color = ColorU(200, 200, 200, 255);
         vshape_start.stroke_width = 3;
 
-        Transform2 start_transform = get_global_transform();
-        VectorServer::get_singleton()->draw_vshape(vshape_start, start_transform);
+        Transform2 global_transform = get_global_transform();
+        VectorServer::get_singleton()->draw_vshape(vshape_start, skeleton_transform * global_transform);
 
         float arrow_head_length = 6;
 
@@ -80,7 +75,7 @@ namespace Flint {
         if (parent) {
             // Draw in global coordinates.
             auto parent_global_transform = parent->get_global_transform();
-            auto distance_to_parent = (start_transform.vector - parent_global_transform.vector).length();
+            auto distance_to_parent = (global_transform.get_position() - parent_global_transform.get_position()).length();
 
             // If the bone is too short, don't draw the bone body.
             if (distance_to_parent > arrow_head_length) {
@@ -96,12 +91,11 @@ namespace Flint {
 
                 // Local rotation in Cartesian coordinates.
                 float cartesian_rotation = rotation;
-                if (parent) {
-                    auto normalized = position / position.length();
-                    cartesian_rotation += atan2(normalized.y, normalized.x);
-                }
+                auto normalized = position / position.length();
+                cartesian_rotation += atan2(normalized.y, normalized.x);
+
                 auto rot_transform = Transform2::from_rotation(cartesian_rotation);
-                VectorServer::get_singleton()->draw_vshape(vshape, parent_global_transform * rot_transform);
+                VectorServer::get_singleton()->draw_vshape(vshape, skeleton_transform * parent_global_transform * rot_transform);
             }
         }
 
@@ -119,7 +113,7 @@ namespace Flint {
                 vshape.stroke_color = ColorU(0, 0, 0, 150);
                 vshape.stroke_width = 1;
 
-                VectorServer::get_singleton()->draw_vshape(vshape, start_transform);
+                VectorServer::get_singleton()->draw_vshape(vshape, skeleton_transform * global_transform);
             }
         } else {
             for (auto &bone: children) {
@@ -396,10 +390,10 @@ namespace Flint {
         }
 
         allocate_bone_transforms(bones.size());
-        update_bones();
+        update_bones_rest();
 
         for (int i = 0; i < bone_count; i++) {
-            auto relative_transform_to_rest_pose = bones[i]->get_global_transform() * bones[i]->get_global_rest_transform().inverse();
+            auto relative_transform_to_rest_pose = bones[i]->get_global_transform() * bones[i]->global_rest_inverse;
             set_bone_transform(i, relative_transform_to_rest_pose);
         }
 
@@ -454,9 +448,13 @@ namespace Flint {
         pc_transform.transform_inverse = glm::inverse(pc_transform.transform);
 
         bones[4]->rotation = std::sin(Engine::getSingleton()->get_elapsed());
+
         for (int i = 0; i < bone_count; i++) {
-            auto relative_transform_to_rest_pose = bones[i]->get_global_transform() * bones[i]->get_global_rest_transform().inverse();
-            set_bone_transform(i, relative_transform_to_rest_pose);
+            if (i == 4) {
+                auto global_transform = bones[i]->get_global_transform();
+                auto relative_transform_to_rest_pose = global_transform * bones[i]->global_rest_inverse;
+                set_bone_transform(i, relative_transform_to_rest_pose);
+            }
         }
         upload_bone_transforms();
     }
@@ -489,7 +487,7 @@ namespace Flint {
         Node2d::draw(p_command_buffer);
     }
 
-    void Skeleton2d::update_bones() {
+    void Skeleton2d::update_bones_rest() {
         uint32_t vertex_count = mesh->vertexes.size();
 
         // Vertex input.
@@ -527,6 +525,10 @@ namespace Flint {
                 if (bone == nullptr) {
                     continue;
                 }
+
+                auto rest_transform = bone->get_global_rest_transform();
+
+                bone->global_rest_inverse = rest_transform.inverse();
 
                 auto &weights = bone->weights;
 
@@ -800,16 +802,16 @@ namespace Flint {
         uint32_t offset = (row * 256 + col) * 4;
 
         // First row.
-        bone_transforms[offset + 0] = p_transform.matrix.m11();
-        bone_transforms[offset + 1] = p_transform.matrix.m12();
+        bone_transforms[offset + 0] = p_transform.m11();
+        bone_transforms[offset + 1] = p_transform.m12();
         bone_transforms[offset + 2] = 0;
-        bone_transforms[offset + 3] = p_transform.vector.x;
+        bone_transforms[offset + 3] = p_transform.get_position().x;
 
         // Second row.
         offset += 256 * 4;
-        bone_transforms[offset + 0] = p_transform.matrix.m21();
-        bone_transforms[offset + 1] = p_transform.matrix.m22();
+        bone_transforms[offset + 0] = p_transform.m21();
+        bone_transforms[offset + 1] = p_transform.m22();
         bone_transforms[offset + 2] = 0;
-        bone_transforms[offset + 3] = p_transform.vector.y;
+        bone_transforms[offset + 3] = p_transform.get_position().y;
     }
 }

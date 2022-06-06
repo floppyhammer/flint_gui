@@ -20,6 +20,7 @@ layout(location = 0) out vec3 fragColor;
 layout(location = 1) out vec2 fragTexCoord;
 
 void main() {
+    // Relative to the root bone.
     highp vec4 pos = vec4(inPosition.xy, 0.0, 1.0);
 
     // Must be a valid bone.
@@ -49,7 +50,9 @@ void main() {
         pos = boneMatrix * pos;
     }
 
+    // To global coordinates.
     gl_Position = skeletonTransform * pos;
+
     fragColor = inColor;
     fragTexCoord = inTexCoord;
 }

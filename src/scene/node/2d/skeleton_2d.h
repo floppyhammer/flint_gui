@@ -16,7 +16,6 @@ namespace Flint {
         // Starting point, which is relative to parent. This doesn't change once the rest pose is set.
         Vec2F position;
         // Rotation in radians, which is relative to parent.
-        // Zero when the bone points to the same direction of the parent-to-self arrow.
         float rotation;
         // Length of the bone. Only for terminal bones.
         float length = 48;
@@ -26,9 +25,12 @@ namespace Flint {
         uint8_t flags;
         // Pointers to children.
         std::vector<std::shared_ptr<Bone2d>> children;
-        // Pointer to parent.
+        // Pointer to parent bone.
         Bone2d *parent;
+        // Pointer to parent skeleton, only for root bone.
         Skeleton2d *skeleton;
+
+        Transform2 global_rest_inverse;
 
         // Vector[Vertex count]
         std::vector<float> weights;
@@ -92,7 +94,7 @@ namespace Flint {
 
         /// When bone vertexes, weights, or polygons changes, update the vertex buffer.
         /// Bone transforms are updated through update_bone_transforms().
-        void update_bones();
+        void update_bones_rest();
 
         void allocate_bone_transforms(uint32_t new_bone_count);
 
