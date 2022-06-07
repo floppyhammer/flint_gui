@@ -145,71 +145,71 @@ namespace Flint {
         bones.push_back(neck_bone.get());
 
         auto head_bone = std::make_shared<Bone2d>();
-        head_bone->position = {0, -20};
+        head_bone->position = {0, -42.5};
         head_bone->length = 20;
         neck_bone->add_child(head_bone);
         bones.push_back(head_bone.get());
 
         auto left_shoulder_bone = std::make_shared<Bone2d>();
-        left_shoulder_bone->position = {-50, 10};
+        left_shoulder_bone->position = {-29, 3};
         root_bone->add_child(left_shoulder_bone);
         bones.push_back(left_shoulder_bone.get());
 
         auto left_arm_bone = std::make_shared<Bone2d>();
-        left_arm_bone->position = {-50, 10};
+        left_arm_bone->position = {-39.5, 2.6};
         left_shoulder_bone->add_child(left_arm_bone);
         bones.push_back(left_arm_bone.get());
 
         auto left_hand_bone = std::make_shared<Bone2d>();
-        left_hand_bone->position = {-50, 10};
+        left_hand_bone->position = {-47.3, 1.8};
         left_hand_bone->length = 25;
         left_arm_bone->add_child(left_hand_bone);
         bones.push_back(left_hand_bone.get());
 
         auto right_shoulder_bone = std::make_shared<Bone2d>();
-        right_shoulder_bone->position = {50, 10};
+        right_shoulder_bone->position = {29, 3};
         root_bone->add_child(right_shoulder_bone);
         bones.push_back(right_shoulder_bone.get());
 
         auto right_arm_bone = std::make_shared<Bone2d>();
-        right_arm_bone->position = {50, 10};
+        right_arm_bone->position = {39.5, 2.6};
         right_shoulder_bone->add_child(right_arm_bone);
         bones.push_back(right_arm_bone.get());
 
         auto right_hand_bone = std::make_shared<Bone2d>();
-        right_hand_bone->position = {50, 10};
+        right_hand_bone->position = {47.3, 1.8};
         right_hand_bone->length = 25;
         right_arm_bone->add_child(right_hand_bone);
         bones.push_back(right_hand_bone.get());
 
         auto left_hip_bone = std::make_shared<Bone2d>();
-        left_hip_bone->position = {-40, 100};
+        left_hip_bone->position = {-14.5, 100};
         root_bone->add_child(left_hip_bone);
         bones.push_back(left_hip_bone.get());
 
         auto left_leg_bone = std::make_shared<Bone2d>();
-        left_leg_bone->position = {0, 60};
+        left_leg_bone->position = {-10.3, 68};
         left_hip_bone->add_child(left_leg_bone);
         bones.push_back(left_leg_bone.get());
 
         auto left_foot_bone = std::make_shared<Bone2d>();
-        left_foot_bone->position = {0, 60};
+        left_foot_bone->position = {-7.6, 66.1};
         left_foot_bone->length = 50;
         left_leg_bone->add_child(left_foot_bone);
         bones.push_back(left_foot_bone.get());
 
         auto right_hip_bone = std::make_shared<Bone2d>();
-        right_hip_bone->position = {40, 100};
+        right_hip_bone->position = {16, 97.5};
         root_bone->add_child(right_hip_bone);
         bones.push_back(right_hip_bone.get());
 
         auto right_leg_bone = std::make_shared<Bone2d>();
-        right_leg_bone->position = {0, 60};
+        right_leg_bone->position = {9.3, 70.1};
         right_hip_bone->add_child(right_leg_bone);
         bones.push_back(right_leg_bone.get());
 
         auto right_foot_bone = std::make_shared<Bone2d>();
-        right_foot_bone->position = {0, 60};
+        right_foot_bone->position = {7.6, 68};
         right_foot_bone->length = 50;
         right_leg_bone->add_child(right_foot_bone);
         bones.push_back(right_foot_bone.get());
