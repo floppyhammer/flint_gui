@@ -22,11 +22,6 @@ namespace Flint {
         glm::mat4 mvp;
     };
 
-    struct Skeleton2dSurfacePushConstant {
-        glm::mat4 transform;
-        glm::mat4 transform_inverse;
-    };
-
     /// A surface may contain a material, which may be shared by other surfaces.
 
     template <typename T>

@@ -712,7 +712,7 @@ namespace Flint {
             VkPushConstantRange pushConstant;
             {
                 pushConstant.offset = 0;
-                pushConstant.size = sizeof(Skeleton2dSurfacePushConstant);
+                pushConstant.size = sizeof(Surface2dPushConstant);
                 pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
             }
 

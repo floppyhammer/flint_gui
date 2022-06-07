@@ -35,7 +35,7 @@ namespace Flint {
         // Vector[Vertex count]
         std::vector<float> weights;
 
-        void add_child(std::shared_ptr<Bone2d> child);
+        void add_child(const std::shared_ptr<Bone2d> &child);
 
         Skeleton2d *get_skeleton();
 
@@ -82,7 +82,7 @@ namespace Flint {
 
         std::shared_ptr<Skeleton2dMesh> mesh;
 
-        Skeleton2dSurfacePushConstant pc_transform;
+        Surface2dPushConstant pc_skeleton_transform;
 
         std::vector<float> bone_transforms;
         std::shared_ptr<ImageTexture> bone_transforms_texture;
@@ -94,7 +94,7 @@ namespace Flint {
 
         /// When bone vertexes, weights, or polygons changes, update the vertex buffer.
         /// Bone transforms are updated through update_bone_transforms().
-        void update_bones_rest();
+        void update_bone_rest();
 
         void allocate_bone_transforms(uint32_t new_bone_count);
 

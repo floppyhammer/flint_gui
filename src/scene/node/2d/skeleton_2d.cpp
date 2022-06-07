@@ -12,7 +12,7 @@
 #include "poly2tri/poly2tri.h"
 
 namespace Flint {
-    void Bone2d::add_child(std::shared_ptr<Bone2d> child) {
+    void Bone2d::add_child(const std::shared_ptr<Bone2d> &child) {
         children.push_back(child);
         child->parent = this;
     }
@@ -20,15 +20,15 @@ namespace Flint {
     Transform2 Bone2d::get_transform() {
         Transform2 transform;
 
-        // First do rotation, second do translation. Note that the code order is reversed.
-
-        // 2. Translation.
-        // Position of the bone's start-point .
-        transform = transform.translate(position);
+        // First do rotation, then do translation.
 
         // 1. Rotation.
         // Local rotation around the bone's start-point.
         transform = transform.rotate(rotation);
+
+        // 2. Translation.
+        // Position of the bone's start-point .
+        transform = transform.translate(position);
 
         return transform;
     }
@@ -67,37 +67,11 @@ namespace Flint {
         vshape_start.stroke_width = 3;
 
         Transform2 global_transform = get_global_transform();
+
+        // Draw bone head.
         VectorServer::get_singleton()->draw_vshape(vshape_start, skeleton_transform * global_transform);
 
         float arrow_head_length = 6;
-
-        // Draw bone to parent connection.
-        if (parent) {
-            // Draw in global coordinates.
-            auto parent_global_transform = parent->get_global_transform();
-            auto distance_to_parent = (global_transform.get_position() - parent_global_transform.get_position()).length();
-
-            // If the bone is too short, don't draw the bone body.
-            if (distance_to_parent > arrow_head_length) {
-                VShape vshape;
-                vshape.shape.move_to(arrow_head_length, 0);
-                vshape.shape.line_to(arrow_head_length * 2, -arrow_head_length);
-                vshape.shape.line_to(distance_to_parent, 0);
-                vshape.shape.line_to(arrow_head_length * 2, arrow_head_length);
-                vshape.shape.close();
-                vshape.fill_color = ColorU(200, 200, 200, 255);
-                vshape.stroke_color = ColorU(0, 0, 0, 150);
-                vshape.stroke_width = 1;
-
-                // Local rotation in Cartesian coordinates.
-                float cartesian_rotation = rotation;
-                auto normalized = position / position.length();
-                cartesian_rotation += atan2(normalized.y, normalized.x);
-
-                auto rot_transform = Transform2::from_rotation(cartesian_rotation);
-                VectorServer::get_singleton()->draw_vshape(vshape, skeleton_transform * parent_global_transform * rot_transform);
-            }
-        }
 
         // Draw terminal bone.
         if (children.empty()) {
@@ -116,8 +90,32 @@ namespace Flint {
                 VectorServer::get_singleton()->draw_vshape(vshape, skeleton_transform * global_transform);
             }
         } else {
-            for (auto &bone: children) {
-                bone->draw();
+            for (auto &child: children) {
+                // (global_transform.get_position() - bone->get_global_transform().get_position()).length();
+                auto child_length = child->position.length();
+
+                // If the bone is too short, don't draw the bone body.
+                if (child_length > arrow_head_length) {
+                    VShape vshape;
+                    vshape.shape.move_to(arrow_head_length, 0);
+                    vshape.shape.line_to(arrow_head_length * 2, -arrow_head_length);
+                    vshape.shape.line_to(child_length, 0);
+                    vshape.shape.line_to(arrow_head_length * 2, arrow_head_length);
+                    vshape.shape.close();
+                    vshape.fill_color = ColorU(200, 200, 200, 255);
+                    vshape.stroke_color = ColorU(0, 0, 0, 150);
+                    vshape.stroke_width = 1;
+
+                    auto unit_vector = child->position / child_length;
+                    float child_rotation = atan2(unit_vector.y, unit_vector.x);
+
+                    auto local_rotation_transform = Transform2::from_rotation(child_rotation);
+                    VectorServer::get_singleton()->draw_vshape(
+                            vshape,
+                            skeleton_transform * global_transform * local_rotation_transform);
+                }
+
+                child->draw();
             }
         }
     }
@@ -342,21 +340,51 @@ namespace Flint {
         mesh->polygons.push_back({22, 21, 69});
         mesh->polygons.push_back({69, 22, 23, 24, 25});
 
-        root_bone->weights = {0, 0, 0, 0.5, 0.5, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 0.94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.47, 1, 0.5, 0.5, 0, 0, 0, 0, 1, 0.47, 0, 0, 0.5, 0, 0, 0.5, 0, 0, 0.5, 0, 0};
-        neck_bone->weights = {1, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        head_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        left_shoulder_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.47, 0.98, 0.49, 0, 0, 0, 0, 0.49, 0.98, 0.98, 0.49, 0, 0, 0, 0, 0, 0, 0, 0, 0.49, 0.49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        left_arm_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.98, 0.98, 0.98, 0.98, 0.49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.49, 0.98, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        left_hand_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        right_shoulder_bone->weights = {0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.5, 0.5, 0, 0, 0, 0, 0.5, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0};
-        right_arm_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0};
-        right_hand_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        left_hip_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 0.5, 0, 0, 0, 0, 0.5, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0, 0, 0, 0};
-        left_leg_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 0, 0, 0};
-        left_foot_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        right_hip_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 0.5, 0, 0, 0, 0, 0.5, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0};
-        right_leg_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5};
-        right_foot_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        root_bone->weights = {0, 0, 0, 0.5, 0.5, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 0.94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.47, 1, 0.5,
+                              0.5, 0, 0, 0, 0, 1, 0.47, 0, 0, 0.5, 0, 0, 0.5, 0, 0, 0.5, 0, 0};
+        neck_bone->weights = {1, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        head_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        left_shoulder_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.47, 0.98, 0.49, 0, 0, 0, 0, 0.49, 0.98,
+                                       0.98, 0.49, 0, 0, 0, 0, 0, 0, 0, 0, 0.49, 0.49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        left_arm_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.98, 0.98, 0.98, 0.98, 0.49, 0, 0, 0, 0, 0,
+                                  0, 0, 0, 0, 0, 0, 0, 0.49, 0.98, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        left_hand_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        right_shoulder_bone->weights = {0, 0, 0, 0, 0, 0, 0.5, 0.5, 0.5, 0.5, 0, 0, 0, 0, 0.5, 0.5, 0.5, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0, 0, 0, 0, 0, 0, 0};
+        right_arm_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0};
+        right_hand_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        left_hip_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                  0.5, 1, 0.5, 0, 0, 0, 0, 0.5, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0, 0, 0, 0};
+        left_leg_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                  0, 0.5, 1, 1, 1, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 0, 0, 0};
+        left_foot_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        right_hip_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 0.5, 0, 0, 0, 0,
+                                   0.5, 1, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5, 0};
+        right_leg_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 1, 1, 1, 1, 0.5,
+                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0.5};
+        right_foot_bone->weights = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -390,7 +418,7 @@ namespace Flint {
         }
 
         allocate_bone_transforms(bones.size());
-        update_bones_rest();
+        update_bone_rest();
 
         for (int i = 0; i < bone_count; i++) {
             auto relative_transform_to_rest_pose = bones[i]->get_global_transform() * bones[i]->global_rest_inverse;
@@ -414,16 +442,7 @@ namespace Flint {
     }
 
     void Skeleton2d::update(double delta) {
-        Node *viewport_node = get_viewport();
-
-        Vec2<uint32_t> viewport_extent;
-        if (viewport_node) {
-            auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-            viewport_extent = viewport->get_extent();
-        } else { // Default to swap chain image.
-            auto extent = SwapChain::getSingleton()->swapChainExtent;
-            viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
-        }
+        Vec2<uint32_t> viewport_size = get_viewport_size();
 
         // Prepare MVP data. We use this matrix to convert a full-screen to the NodeGui's rect.
         ModelViewProjection mvp{};
@@ -431,8 +450,8 @@ namespace Flint {
         // The actual application order of these matrices is reverse.
         // 4.
         mvp.model = glm::translate(glm::mat4(1.0f),
-                                   glm::vec3(position.x / viewport_extent.x * 2.0f,
-                                             position.y / viewport_extent.y * 2.0f,
+                                   glm::vec3(position.x / viewport_size.x * 2.0f,
+                                             position.y / viewport_size.y * 2.0f,
                                              0.0f));
         // 3.
         mvp.model = glm::translate(mvp.model, glm::vec3(-1.0, -1.0, 0.0f));
@@ -440,28 +459,24 @@ namespace Flint {
         mvp.model = glm::scale(mvp.model, glm::vec3(scale.x, scale.y, 1.0f));
         // 1.
         mvp.model = glm::scale(mvp.model,
-                               glm::vec3(1.0f / viewport_extent.x * 2.0f,
-                                         1.0f / viewport_extent.y * 2.0f,
+                               glm::vec3(1.0f / viewport_size.x * 2.0f,
+                                         1.0f / viewport_size.y * 2.0f,
                                          1.0f));
 
-        pc_transform.transform = mvp.calculate_mvp();
-        pc_transform.transform_inverse = glm::inverse(pc_transform.transform);
+        pc_skeleton_transform.model = mvp.calculate_mvp();
 
-        bones[4]->rotation = std::sin(Engine::getSingleton()->get_elapsed());
+        bones[3]->rotation = std::sin((float) Engine::getSingleton()->get_elapsed());
+        bones[4]->rotation = std::sin((float) Engine::getSingleton()->get_elapsed());
 
         for (int i = 0; i < bone_count; i++) {
-            if (i == 4) {
-                auto global_transform = bones[i]->get_global_transform();
-                auto relative_transform_to_rest_pose = global_transform * bones[i]->global_rest_inverse;
-                set_bone_transform(i, relative_transform_to_rest_pose);
-            }
+            auto global_transform = bones[i]->get_global_transform();
+            auto relative_transform_to_rest_pose = global_transform * bones[i]->global_rest_inverse;
+            set_bone_transform(i, relative_transform_to_rest_pose);
         }
         upload_bone_transforms();
     }
 
     void Skeleton2d::draw(VkCommandBuffer p_command_buffer) {
-        //sprite->propagate_draw(p_command_buffer);
-
         // Draw all triangles with a single draw call.
         VkPipeline pipeline = RenderServer::getSingleton()->skeleton2dMeshGraphicsPipeline;
         VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->skeleton2dMeshPipelineLayout;
@@ -469,7 +484,7 @@ namespace Flint {
         // Upload the model matrix to the GPU via push constants.
         vkCmdPushConstants(p_command_buffer, pipeline_layout,
                            VK_SHADER_STAGE_VERTEX_BIT, 0,
-                           sizeof(Skeleton2dSurfacePushConstant), &pc_transform);
+                           sizeof(Surface2dPushConstant), &pc_skeleton_transform);
 
         VkBuffer vertexBuffers[] = {mesh->gpu_resources->vertexBuffer};
         RenderServer::getSingleton()->draw_skeleton_2d(
@@ -487,7 +502,7 @@ namespace Flint {
         Node2d::draw(p_command_buffer);
     }
 
-    void Skeleton2d::update_bones_rest() {
+    void Skeleton2d::update_bone_rest() {
         uint32_t vertex_count = mesh->vertexes.size();
 
         // Vertex input.
@@ -674,8 +689,10 @@ namespace Flint {
         for (int i = 0; i < vertex_count; i++) {
             vertex_data[i].pos = {points[i].x, points[i].y, 0};
             vertex_data[i].uv = {uvs[i].x, uvs[i].y};
-            vertex_data[i].bone_indices = {gpu_bones[i * 4], gpu_bones[i * 4 + 1], gpu_bones[i * 4 + 2], gpu_bones[i * 4 + 3]};
-            vertex_data[i].bone_weights = {gpu_weights[i * 4], gpu_weights[i * 4 + 1], gpu_weights[i * 4 + 2], gpu_weights[i * 4 + 3]};
+            vertex_data[i].bone_indices = {gpu_bones[i * 4], gpu_bones[i * 4 + 1], gpu_bones[i * 4 + 2],
+                                           gpu_bones[i * 4 + 3]};
+            vertex_data[i].bone_weights = {gpu_weights[i * 4], gpu_weights[i * 4 + 1], gpu_weights[i * 4 + 2],
+                                           gpu_weights[i * 4 + 3]};
         }
 
         mesh->gpu_resources = std::make_shared<SurfaceGpuResources<SkeletonVertex>>(vertex_data, total_indices);

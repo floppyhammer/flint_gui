@@ -3,7 +3,6 @@
 
 layout(push_constant) uniform uTransform {
     mat4 skeletonTransform;
-    mat4 skeletonTransformInverse;
 };
 
 layout(binding = 0) uniform mediump sampler2D skeletonTexture;

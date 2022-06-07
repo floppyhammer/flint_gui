@@ -116,6 +116,8 @@ namespace Flint {
          */
         virtual Node *get_viewport();
 
+        Vec2<uint32_t> get_viewport_size();
+
         Node *get_parent();
 
         void set_parent(Node *node);

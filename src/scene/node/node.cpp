@@ -1,5 +1,8 @@
-#include <string>
 #include "node.h"
+#include "sub_viewport.h"
+#include "../../render/swap_chain.h"
+
+#include <string>
 
 namespace Flint {
     void Node::propagate_update(double dt) {
@@ -62,6 +65,22 @@ namespace Flint {
         if (parent == nullptr) return nullptr;
 
         return parent->type == NodeType::SubViewport ? parent : parent->get_viewport();
+    }
+
+    Vec2<uint32_t> Node::get_viewport_size() {
+        Vec2<uint32_t> size;
+
+        Node *viewport_node = get_viewport();
+
+        if (viewport_node) {
+            auto viewport = dynamic_cast<SubViewport *>(viewport_node);
+            size = viewport->get_extent();
+        } else { // Default to swap chain image.
+            auto extent = SwapChain::getSingleton()->swapChainExtent;
+            size = Vec2<uint32_t>(extent.width, extent.height);
+        }
+
+        return size;
     }
 
     Node *Node::get_parent() {
