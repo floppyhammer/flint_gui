@@ -1102,7 +1102,16 @@ namespace Flint {
         colorBlendAttachment.colorWriteMask =
                 VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
                 VK_COLOR_COMPONENT_A_BIT;
-        colorBlendAttachment.blendEnable = VK_FALSE;
+        colorBlendAttachment.blendEnable = VK_TRUE;
+        // Need to set blend config if blend is enabled.
+        {
+            colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+            colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+            colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+            colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+            colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+            colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
+        }
 
         VkPipelineColorBlendStateCreateInfo colorBlending{};
         colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -1118,7 +1127,8 @@ namespace Flint {
         VkPipelineDepthStencilStateCreateInfo depthStencil{};
         depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
         depthStencil.depthTestEnable = VK_TRUE;
-        depthStencil.depthWriteEnable = VK_TRUE;
+        // In general, when using blending we should keep depth test enabled, but disable depth write.
+        depthStencil.depthWriteEnable = VK_FALSE;
         depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
         depthStencil.depthBoundsTestEnable = VK_FALSE;
         depthStencil.minDepthBounds = 0.0f; // Optional
