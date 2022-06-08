@@ -56,20 +56,33 @@ namespace Flint {
         }
     }
 
+    VectorPath get_bone_body_path(float head_length, float bone_length) {
+        VectorPath vp_body;
+        vp_body.outline.move_to(head_length, 0);
+        vp_body.outline.line_to(head_length * 2, -head_length);
+        vp_body.outline.line_to(bone_length, 0);
+        vp_body.outline.line_to(head_length * 2, head_length);
+        vp_body.outline.close();
+        vp_body.fill_color = ColorU(200, 200, 200, 255);
+        vp_body.stroke_color = ColorU(0, 0, 0, 150);
+        vp_body.stroke_width = 1;
+        return vp_body;
+    }
+
     void Bone2d::draw() {
         auto skeleton_transform = Transform2::from_translation(get_skeleton()->get_global_position());
 
-        VShape vshape_start;
+        VectorPath vp_head;
 
         // Bone starting point.
-        vshape_start.shape.add_circle({0, 0}, 5);
-        vshape_start.stroke_color = ColorU(200, 200, 200, 255);
-        vshape_start.stroke_width = 3;
+        vp_head.outline.add_circle({0, 0}, 5);
+        vp_head.stroke_color = ColorU(200, 200, 200, 255);
+        vp_head.stroke_width = 3;
 
         Transform2 global_transform = get_global_transform();
 
         // Draw bone head.
-        VectorServer::get_singleton()->draw_vshape(vshape_start, skeleton_transform * global_transform);
+        VectorServer::get_singleton()->draw_path(vp_head, skeleton_transform * global_transform);
 
         float arrow_head_length = 6;
 
@@ -77,17 +90,9 @@ namespace Flint {
         if (children.empty()) {
             // If the bone is too short, don't draw the bone body.
             if (length > arrow_head_length) {
-                VShape vshape;
-                vshape.shape.move_to(arrow_head_length, 0);
-                vshape.shape.line_to(arrow_head_length * 2, -arrow_head_length);
-                vshape.shape.line_to(length, 0);
-                vshape.shape.line_to(arrow_head_length * 2, arrow_head_length);
-                vshape.shape.close();
-                vshape.fill_color = ColorU(200, 200, 200, 255);
-                vshape.stroke_color = ColorU(0, 0, 0, 150);
-                vshape.stroke_width = 1;
+                auto vp_body = get_bone_body_path(arrow_head_length, length);
 
-                VectorServer::get_singleton()->draw_vshape(vshape, skeleton_transform * global_transform);
+                VectorServer::get_singleton()->draw_path(vp_body, skeleton_transform * global_transform);
             }
         } else {
             for (auto &child: children) {
@@ -96,22 +101,14 @@ namespace Flint {
 
                 // If the bone is too short, don't draw the bone body.
                 if (child_length > arrow_head_length) {
-                    VShape vshape;
-                    vshape.shape.move_to(arrow_head_length, 0);
-                    vshape.shape.line_to(arrow_head_length * 2, -arrow_head_length);
-                    vshape.shape.line_to(child_length, 0);
-                    vshape.shape.line_to(arrow_head_length * 2, arrow_head_length);
-                    vshape.shape.close();
-                    vshape.fill_color = ColorU(200, 200, 200, 255);
-                    vshape.stroke_color = ColorU(0, 0, 0, 150);
-                    vshape.stroke_width = 1;
+                    auto vp_body = get_bone_body_path(arrow_head_length, child_length);
 
                     auto unit_vector = child->position / child_length;
                     float child_rotation = atan2(unit_vector.y, unit_vector.x);
 
                     auto local_rotation_transform = Transform2::from_rotation(child_rotation);
-                    VectorServer::get_singleton()->draw_vshape(
-                            vshape,
+                    VectorServer::get_singleton()->draw_path(
+                            vp_body,
                             skeleton_transform * global_transform * local_rotation_transform);
                 }
 

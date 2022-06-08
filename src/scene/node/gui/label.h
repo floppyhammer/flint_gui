@@ -38,7 +38,7 @@ namespace Flint {
         Rect<float> layout_box;
         Rect<float> bbox;
 
-        Pathfinder::Shape shape; // Glyph shape.
+        Pathfinder::Outline outline; // Glyph outline.
     };
 
     class Label : public Control {

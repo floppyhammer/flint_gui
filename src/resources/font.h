@@ -32,7 +32,7 @@ namespace Flint {
 
         float get_metrics(float line_height, int &ascent, int &descent, int &line_gap) const;
 
-        Pathfinder::Shape get_glyph_shape(int glyph_index) const;
+        Pathfinder::Outline get_glyph_outline(int glyph_index) const;
 
     private:
         /// Stores font data, should not be freed until font is deleted.

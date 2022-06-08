@@ -26,12 +26,12 @@ namespace Flint {
         label->set_vertical_alignment(Alignment::Center);
 
         auto vector_texture = VectorTexture::from_empty(24, 24);
-        VShape vshape;
-        vshape.shape.add_circle({}, 8);
-        vshape.shape.translate({vector_texture->get_width() * 0.5f, vector_texture->get_height() * 0.5f});
-        vshape.stroke_color = ColorU(163, 163, 163, 255);
-        vshape.stroke_width = 2;
-        vector_texture->set_vshapes({vshape});
+        VectorPath vp;
+        vp.outline.add_circle({}, 8);
+        vp.outline.translate({vector_texture->get_width() * 0.5f, vector_texture->get_height() * 0.5f});
+        vp.stroke_color = ColorU(163, 163, 163, 255);
+        vp.stroke_width = 2;
+        vector_texture->set_vector_paths({vp});
         icon_rect = std::make_shared<TextureRect>();
         icon_rect->sizing_flag = ContainerSizingFlag::EXPAND;
         icon_rect->set_texture(vector_texture);

@@ -8,10 +8,10 @@ namespace Flint {
 
         mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
 
-        position_indicator.shape.move_to(-12, 0);
-        position_indicator.shape.line_to(12, 0);
-        position_indicator.shape.move_to(0, -12);
-        position_indicator.shape.line_to(0, 12);
+        position_indicator.outline.move_to(-12, 0);
+        position_indicator.outline.line_to(12, 0);
+        position_indicator.outline.move_to(0, -12);
+        position_indicator.outline.line_to(0, 12);
         position_indicator.stroke_width = 2;
         position_indicator.stroke_color = ColorU::red();
     }
@@ -27,6 +27,7 @@ namespace Flint {
     }
 
     void Node2d::draw(VkCommandBuffer p_command_buffer) {
-        VectorServer::get_singleton()->draw_vshape(position_indicator, Transform2::from_translation(position));
+        VectorServer::get_singleton()->draw_path(position_indicator,
+                                                 Transform2::from_translation(position));
     }
 }

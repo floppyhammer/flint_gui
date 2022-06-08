@@ -25,14 +25,14 @@ namespace Flint {
         /// Create an empty texture with a specific size.
         static std::shared_ptr<VectorTexture> from_empty(uint32_t p_width, uint32_t p_height);
 
-        /// Draw vector shapes.
+        /// Draw vector paths.
         void add_to_canvas(const Vec2<float> &position, const std::shared_ptr<Pathfinder::Canvas> &canvas);
 
-        /// Replace vector shapes.
-        void set_vshapes(std::vector<VShape> p_vshapes);
+        /// Replace vector paths.
+        void set_vector_paths(const std::vector<VectorPath> &p_vector_paths);
 
     protected:
-        std::vector<VShape> vshapes;
+        std::vector<VectorPath> vector_paths;
     };
 }
 

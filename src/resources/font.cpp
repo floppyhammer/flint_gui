@@ -4,6 +4,7 @@
 #include "../common/io.h"
 
 #define STB_TRUETYPE_IMPLEMENTATION
+
 #include "stb_truetype.h"
 
 #include "pathfinder.h"
@@ -52,8 +53,8 @@ namespace Flint {
         return scale;
     }
 
-    Pathfinder::Shape Font::get_glyph_shape(int glyph_index) const {
-        Pathfinder::Shape shape;
+    Pathfinder::Outline Font::get_glyph_outline(int glyph_index) const {
+        Pathfinder::Outline outline;
 
         stbtt_vertex *vertices = nullptr;
 
@@ -61,38 +62,42 @@ namespace Flint {
 
         // Glyph has no shape (e.g. Space).
         if (vertices == nullptr) {
-            return shape;
+            return outline;
         }
 
         for (int i = 0; i < num_vertices; i++) {
             auto &v = vertices[i];
 
             switch (v.type) {
-                case STBTT_vmove:
+                case STBTT_vmove: {
                     // Close last path (if there's any).
-                    shape.close();
+                    outline.close();
 
-                    shape.move_to(v.x, v.y);
+                    outline.move_to(v.x, v.y);
+                }
                     break;
-                case STBTT_vline:
-                    shape.line_to(v.x, v.y);
+                case STBTT_vline: {
+                    outline.line_to(v.x, v.y);
+                }
                     break;
-                case STBTT_vcurve:
-                    shape.curve_to(v.cx, v.cy, v.x, v.y);
+                case STBTT_vcurve: {
+                    outline.curve_to(v.cx, v.cy, v.x, v.y);
+
+                }
                     break;
-                case STBTT_vcubic:
-                    shape.cubic_to(v.cx, v.cy, v.cx1, v.cy1, v.x, v.y);
+                case STBTT_vcubic: {
+                    outline.cubic_to(v.cx, v.cy, v.cx1, v.cy1, v.x, v.y);
+
+                }
                     break;
             }
         }
 
-        // Close last path.
-        shape.close();
-
-        shape.fill_rule = Pathfinder::FillRule::EvenOdd;
+        // Close the last contour.
+        outline.close();
 
         stbtt_FreeShape(&info, vertices);
 
-        return shape;
+        return outline;
     }
 }

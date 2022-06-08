@@ -116,10 +116,10 @@ namespace Flint {
 
             // Set glyph shape.
             // --------------------------------
-            g.shape = font->get_glyph_shape(g.index);
+            g.outline = font->get_glyph_outline(g.index);
 
-            g.shape.scale(Pathfinder::Vec2<float>(scale, -scale));
-            g.shape.translate(Pathfinder::Vec2<float>(x, font_size + descent + y));
+            g.outline.scale(Pathfinder::Vec2<float>(scale, -scale));
+            g.outline.translate(Pathfinder::Vec2<float>(x, font_size + descent + y));
             // --------------------------------
 
             // Layout box.
@@ -212,32 +212,32 @@ namespace Flint {
         for (Glyph &g: glyphs) {
             // Add fill.
             canvas->set_fill_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(color.r, color.g, color.b, color.a)));
-            canvas->fill_shape(g.shape, Pathfinder::FillRule::Winding);
+            canvas->fill_path(g.outline, Pathfinder::FillRule::Winding);
 
             // Add stroke if needed.
             canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(stroke_color.r, stroke_color.g, stroke_color.b, stroke_color.a)));
             canvas->set_line_width(stroke_width);
-            canvas->stroke_shape(g.shape);
+            canvas->stroke_path(g.outline);
 
             if (debug) {
                 canvas->set_line_width(1);
 
                 // Add layout box.
                 // --------------------------------
-                Pathfinder::Shape layout_shape;
-                layout_shape.add_rect({g.layout_box.left, g.layout_box.top, g.layout_box.right, g.layout_box.bottom});
+                Pathfinder::Outline layout_outline;
+                layout_outline.add_rect(g.layout_box);
 
                 canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::green()));
-                canvas->stroke_shape(layout_shape);
+                canvas->stroke_path(layout_outline);
                 // --------------------------------
 
                 // Add bbox.
                 // --------------------------------
-                Pathfinder::Shape bbox_shape;
-                bbox_shape.add_rect({g.bbox.left, g.bbox.top, g.bbox.right, g.bbox.bottom});
+                Pathfinder::Outline bbox_outline;
+                bbox_outline.add_rect(g.bbox);
 
                 canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::red()));
-                canvas->stroke_shape(bbox_shape);
+                canvas->stroke_path(bbox_outline);
                 // --------------------------------
             }
         }

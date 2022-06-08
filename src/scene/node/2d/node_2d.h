@@ -23,11 +23,11 @@ namespace Flint {
         Vec2<float> get_global_position() const;
 
     protected:
-        std::shared_ptr<Mesh2d> mesh;
-
         void draw(VkCommandBuffer p_command_buffer) override;
 
-        VShape position_indicator;
+        std::shared_ptr<Mesh2d> mesh;
+
+        VectorPath position_indicator;
     };
 }
 

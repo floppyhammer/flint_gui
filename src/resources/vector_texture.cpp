@@ -52,39 +52,36 @@ namespace Flint {
 
         // Extract shapes, paths and points from the SVG image.
         for (NSVGshape *nsvg_shape = image->shapes; nsvg_shape != nullptr; nsvg_shape = nsvg_shape->next) {
-            Pathfinder::Shape shape;
+            Pathfinder::Outline outline;
 
             // Load the bounds from the SVG file, will be modified when pushing points anyway.
-            shape.bounds = Pathfinder::Rect<float>(nsvg_shape->bounds[0],
-                                       nsvg_shape->bounds[1],
-                                       nsvg_shape->bounds[2],
-                                       nsvg_shape->bounds[3]);
+            outline.bounds = Pathfinder::Rect<float>(nsvg_shape->bounds);
 
             for (NSVGpath *nsvg_path = nsvg_shape->paths; nsvg_path != nullptr; nsvg_path = nsvg_path->next) {
-                shape.move_to(nsvg_path->pts[0], nsvg_path->pts[1]);
+                outline.move_to(nsvg_path->pts[0], nsvg_path->pts[1]);
 
                 // -6 or -3, both will do, probably.
                 for (int point_index = 0; point_index < nsvg_path->npts - 3; point_index += 3) {
                     // * 2 because a point has x and y components.
                     float *p = &nsvg_path->pts[point_index * 2];
-                    shape.cubic_to(p[2], p[3], p[4], p[5], p[6], p[7]);
+                    outline.cubic_to(p[2], p[3], p[4], p[5], p[6], p[7]);
                 }
 
                 if (nsvg_path->closed)
-                    shape.close();
+                    outline.close();
             }
 
-            VShape vshape;
-            vshape.shape = shape;
+            VectorPath vp;
+            vp.outline = outline;
 
             // Add fill.
-            vshape.fill_color = ColorU(nsvg_shape->fill.color);
+            vp.fill_color = ColorU(nsvg_shape->fill.color);
 
             // Add stroke if needed.
-            vshape.stroke_color = ColorU(nsvg_shape->stroke.color);
-            vshape.stroke_width = nsvg_shape->strokeWidth;
+            vp.stroke_color = ColorU(nsvg_shape->stroke.color);
+            vp.stroke_width = nsvg_shape->strokeWidth;
 
-            vshapes.push_back(vshape);
+            vector_paths.push_back(vp);
         }
 
         // Clean up NanoSVG.
@@ -98,19 +95,20 @@ namespace Flint {
         auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
         canvas->set_transform(transform);
 
-        for (auto &s: vshapes) {
-            canvas->set_fill_paint(Pathfinder::Paint::from_color({s.fill_color.r, s.fill_color.g, s.fill_color.b, s.fill_color.a}));
-            canvas->fill_shape(s.shape, Pathfinder::FillRule::Winding);
+        for (auto &vp: vector_paths) {
+            canvas->set_fill_paint(
+                    Pathfinder::Paint::from_color({vp.fill_color}));
+            canvas->fill_path(vp.outline, Pathfinder::FillRule::Winding);
 
-            canvas->set_line_width(s.stroke_width);
-            canvas->set_stroke_paint(Pathfinder::Paint::from_color({s.stroke_color.r, s.stroke_color.g, s.stroke_color.b, s.stroke_color.a}));
-            canvas->stroke_shape(s.shape);
+            canvas->set_line_width(vp.stroke_width);
+            canvas->set_stroke_paint(Pathfinder::Paint::from_color({vp.stroke_color}));
+            canvas->stroke_path(vp.outline);
         }
 
         canvas->restore_state();
     }
 
-    void VectorTexture::set_vshapes(std::vector<VShape> p_vshapes) {
-        vshapes = std::move(p_vshapes);
+    void VectorTexture::set_vector_paths(const std::vector<VectorPath> &p_vector_paths) {
+        vector_paths = p_vector_paths;
     }
 }
