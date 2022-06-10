@@ -58,8 +58,6 @@ namespace Flint {
     public:
         Control();
 
-        ~Control() = default;
-
         virtual void set_position(Vec2<float> p_position);
 
         virtual Vec2<float> get_position() const;

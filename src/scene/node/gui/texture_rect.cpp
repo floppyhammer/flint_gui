@@ -19,30 +19,23 @@ namespace Flint {
     TextureRect::TextureRect() {
         type = NodeType::TextureRect;
 
-        mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
-
         debug_size_box.border_color = ColorU::blue();
     }
 
     void TextureRect::set_texture(const std::shared_ptr<Texture> &p_texture) {
+        if (!p_texture) return;
+
         texture = p_texture;
 
-        if (!texture) return;
-
         if (p_texture->get_type() == TextureType::IMAGE) {
-            auto image_texture = static_cast<ImageTexture *>(p_texture.get());
-            mesh->surface->get_material()->set_texture(std::shared_ptr<ImageTexture>(image_texture));
+            mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
+            auto image_texture = dynamic_cast<ImageTexture *>(p_texture.get());
+            mesh->surface->get_material()->set_texture(image_texture);
         }
     }
 
     std::shared_ptr<Texture> TextureRect::get_texture() const {
-        if (!texture) return nullptr;
-
-        if (texture->get_type() == TextureType::IMAGE) {
-            return mesh->surface->get_material()->get_texture();
-        } else {
-            return texture;
-        }
+        return texture;
     }
 
     void TextureRect::update(double dt) {

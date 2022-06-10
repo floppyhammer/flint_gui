@@ -23,7 +23,7 @@ namespace Flint {
 
         uint32_t get_height();
 
-        Vec2<uint32_t> get_size();
+        Vec2 <uint32_t> get_size();
 
         TextureType get_type();
 

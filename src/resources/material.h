@@ -51,7 +51,7 @@ namespace Flint {
 
         void createDescriptorSet() override;
 
-        void updateDescriptorSet(const std::shared_ptr<ImageTexture> &p_texture);
+        void updateDescriptorSet(ImageTexture *p_texture);
     };
 
     class Material3dDescSet : public MaterialDescSet {
@@ -74,16 +74,16 @@ namespace Flint {
     public:
         Material2d();
 
-        void set_texture(const std::shared_ptr<ImageTexture> &p_texture);
+        void set_texture(ImageTexture *p_texture);
 
-        std::shared_ptr<ImageTexture> get_texture();
+        ImageTexture *get_texture();
 
         std::shared_ptr<Material2dDescSet> get_desc_set() {
             return desc_set;
         }
 
     private:
-        std::shared_ptr<ImageTexture> texture;
+        ImageTexture *texture;
 
         std::shared_ptr<Material2dDescSet> desc_set;
     };

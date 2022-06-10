@@ -15,11 +15,15 @@ namespace Flint {
     }
 
     void Sprite2d::set_texture(std::shared_ptr<ImageTexture> p_texture) {
-        mesh->surface->get_material()->set_texture(p_texture);
+        if (!p_texture) return;
+
+        texture = p_texture;
+
+        mesh->surface->get_material()->set_texture(p_texture.get());
     }
 
     std::shared_ptr<ImageTexture> Sprite2d::get_texture() const {
-        return mesh->surface->get_material()->get_texture();
+        return texture;
     }
 
     void Sprite2d::set_mesh(const std::shared_ptr<Mesh2d> &p_mesh) {

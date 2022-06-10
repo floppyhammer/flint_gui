@@ -15,7 +15,8 @@ namespace Flint {
     public:
         TextureRect();
 
-        void set_texture(const std::shared_ptr<Texture>& p_texture);
+        void set_texture(const std::shared_ptr<Texture> &p_texture);
+
         [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
 
         virtual Vec2<float> calculate_minimum_size() const override;

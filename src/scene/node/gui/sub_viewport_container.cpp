@@ -22,7 +22,7 @@ namespace Flint {
     void SubViewportContainer::set_viewport(std::shared_ptr<SubViewport> p_viewport) {
         sub_viewport = std::move(p_viewport);
 
-        mesh->surface->get_material()->set_texture(sub_viewport->get_texture());
+        mesh->surface->get_material()->set_texture(sub_viewport->get_texture().get());
     }
 
     void SubViewportContainer::update(double dt) {

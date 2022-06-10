@@ -11,7 +11,7 @@ namespace Flint {
 
     class Engine {
     public:
-        static Engine *getSingleton() {
+        static Engine *get_singleton() {
             static Engine singleton;
 
             return &singleton;

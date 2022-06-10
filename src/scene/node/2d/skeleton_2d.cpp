@@ -462,19 +462,20 @@ namespace Flint {
 
         pc_skeleton_transform.model = mvp.calculate_mvp();
 
-        bones[3]->rotation = std::sin((float) Engine::getSingleton()->get_elapsed());
-        bones[4]->rotation = std::sin((float) Engine::getSingleton()->get_elapsed());
+        float time = Engine::get_singleton()->get_elapsed();
+        bones[3]->rotation = std::sin(time);
+        bones[4]->rotation = std::sin(time);
 
-        bones[6]->rotation = std::cos((float) Engine::getSingleton()->get_elapsed());
-        bones[7]->rotation = std::cos((float) Engine::getSingleton()->get_elapsed());
+        bones[6]->rotation = std::cos(time);
+        bones[7]->rotation = std::cos(time);
 
-        bones[9]->rotation = std::sin((float) Engine::getSingleton()->get_elapsed());
-        bones[10]->rotation = std::sin((float) Engine::getSingleton()->get_elapsed());
-        bones[11]->rotation = std::sin((float) Engine::getSingleton()->get_elapsed());
+        bones[9]->rotation = std::sin(time);
+        bones[10]->rotation = std::sin(time);
+        bones[11]->rotation = std::sin(time);
 
-        bones[12]->rotation = std::cos((float) Engine::getSingleton()->get_elapsed());
-        bones[13]->rotation = std::cos((float) Engine::getSingleton()->get_elapsed());
-        bones[14]->rotation = std::cos((float) Engine::getSingleton()->get_elapsed());
+        bones[12]->rotation = std::cos(time);
+        bones[13]->rotation = std::cos(time);
+        bones[14]->rotation = std::cos(time);
 
         for (int i = 0; i < bone_count; i++) {
             auto global_transform = bones[i]->get_global_transform();

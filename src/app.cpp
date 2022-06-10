@@ -25,32 +25,7 @@ using Pathfinder::Vec2;
 using Pathfinder::Vec3;
 
 void App::run() {
-    Logger::set_level(Logger::VERBOSE);
-
-    // Initialization.
-    // ---------------------------------------------------
-    // 1. Initialize hardware.
-    auto platform = Platform::getSingleton();
-
-    // 2. Initialize render server.
-    auto render_server = RenderServer::getSingleton();
-
-    // 3. Initialize swap chain.
-    auto swap_chain = SwapChain::getSingleton();
-
-    // 4. Initialize input server.
-    auto input_server = InputServer::get_singleton();
-    input_server->attach_callbacks(platform->window);
-
-    // 5. Initialize vector server.
-    auto vector_server = VectorServer::get_singleton();
-    std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(platform->device,
-                                                                                        platform->physicalDevice,
-                                                                                        platform->graphicsQueue,
-                                                                                        platform->graphicsQueue,
-                                                                                        render_server->commandPool);
-    vector_server->init(driver, WIDTH, HEIGHT, load_file_as_bytes("../assets/area-lut.png"));
-    // ---------------------------------------------------
+    init();
 
     uint32_t NODE_SPRITE_COUNT = 000;
     uint32_t ECS_SPRITE_COUNT = 000;
@@ -98,7 +73,7 @@ void App::run() {
         margin_container->set_size({400, 400});
         margin_container->add_child(vbox_container);
         inspector_panel->add_child(margin_container);
-        
+
         vbox_container->add_child(hbox_container);
         vbox_container->add_child(progress_bar);
 
@@ -156,7 +131,7 @@ void App::run() {
         auto vector_layer = std::make_shared<TextureRect>();
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WIDTH, HEIGHT});
-        auto texture_vk = static_cast<Pathfinder::TextureVk *>(vector_server->canvas->get_dest_texture().get());
+        auto texture_vk = static_cast<Pathfinder::TextureVk *>(VectorServer::get_singleton()->canvas->get_dest_texture().get());
         auto texture = ImageTexture::from_wrapper(texture_vk->get_image_view(),
                                                   texture_vk->get_sampler(),
                                                   texture_vk->get_width(),
@@ -196,32 +171,31 @@ void App::run() {
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport->add_child(node_3d);
         node_3d->add_child(model1);
-        tree.set_root(node);
+
+        tree->get_root()->add_child(node);
     }
 
     // ECS test.
     {
-        world = std::make_unique<World>();
-
         // Add some 2D sprites.
-        for (int i = 0; i < ECS_SPRITE_COUNT; i++) {
-            auto mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
-            mesh->surface->get_material()->set_texture(
-                    ResourceManager::get_singleton()->load<ImageTexture>("../assets/duck.png"));
-
-            auto entity = world->spawn();
-            world->add_component(entity, Sprite2dComponent{mesh});
-            world->add_component(entity, ZSort2d{(float) i / (float) ECS_SPRITE_COUNT});
-            world->add_component(entity, Transform2dComponent{
-                    Vec2<float>(0.0f),
-                    Vec2<float>(1.0f),
-                    Vec2<float>(1.0f),
-                    0.0f});
-            world->add_component(entity, GravityComponent{Vec3<float>(0.0f)});
-            world->add_component(entity, RigidBodyComponent{
-                    Vec3<float>(rand_velocity(generator), rand_velocity(generator), 0.0f),
-                    Vec3<float>(0.0f)});
-        }
+//        for (int i = 0; i < ECS_SPRITE_COUNT; i++) {
+//            auto mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
+//            mesh->surface->get_material()->set_texture(
+//                    ResourceManager::get_singleton()->load<ImageTexture>("../assets/duck.png"));
+//
+//            auto entity = world->spawn();
+//            world->add_component(entity, Sprite2dComponent{mesh});
+//            world->add_component(entity, ZSort2d{(float) i / (float) ECS_SPRITE_COUNT});
+//            world->add_component(entity, Transform2dComponent{
+//                    Vec2<float>(0.0f),
+//                    Vec2<float>(1.0f),
+//                    Vec2<float>(1.0f),
+//                    0.0f});
+//            world->add_component(entity, GravityComponent{Vec3<float>(0.0f)});
+//            world->add_component(entity, RigidBodyComponent{
+//                    Vec3<float>(rand_velocity(generator), rand_velocity(generator), 0.0f),
+//                    Vec3<float>(0.0f)});
+//        }
 
         // 3D model.
 //        {
@@ -280,25 +254,7 @@ void App::run() {
 
     main_loop();
 
-    // Cleanup.
-    {
-        // Clean up the scene.
-        {
-            // Node.
-            tree.set_root(nullptr);
-
-            // ECS.
-            world.reset();
-        }
-
-        DefaultResource::get_singleton()->cleanup();
-
-        swap_chain->cleanup();
-
-        render_server->cleanup();
-
-        platform->cleanup();
-    }
+    cleanup();
 }
 
 void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex) const {
@@ -341,7 +297,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
 
     // Record commands from the scene manager.
     {
-        tree.draw(commandBuffers[imageIndex]);
+        tree->draw(commandBuffers[imageIndex]);
 
         world->draw(commandBuffers[imageIndex]);
     }
@@ -359,42 +315,98 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
     }
 }
 
+void App::init() {
+    Logger::set_level(Logger::VERBOSE);
+
+    // 1. Initialize hardware.
+    auto platform = Platform::getSingleton();
+
+    // 2. Initialize render server.
+    auto render_server = RenderServer::getSingleton();
+
+    // 3. Initialize swap chain.
+    auto swap_chain = SwapChain::getSingleton();
+
+    // 4. Initialize input server.
+    auto input_server = InputServer::get_singleton();
+    input_server->attach_callbacks(platform->window);
+
+    // 5. Initialize vector server.
+    auto vector_server = VectorServer::get_singleton();
+    std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(
+            platform->device,
+            platform->physicalDevice,
+            platform->graphicsQueue,
+            platform->graphicsQueue,
+            render_server->commandPool);
+    vector_server->init(driver,
+                        WIDTH,
+                        HEIGHT,
+                        load_file_as_bytes("../assets/area-lut.png"));
+
+    tree = std::make_unique<Flint::SceneTree>();
+    world = std::make_unique<World>();
+}
+
 void App::main_loop() {
     while (!glfwWindowShouldClose(Platform::getSingleton()->window)) {
+        // Collect input and window events.
         glfwPollEvents();
-        draw_frame();
+
+        // Engine processing.
+        Engine::get_singleton()->tick();
+
+        // Get frame time.
+        auto dt = Engine::get_singleton()->get_delta();
+
+        // Acquire next image.
+        // We should do this before updating scene as we need to modify different buffers according to the current image index.
+        uint32_t imageIndex;
+        if (!SwapChain::getSingleton()->acquireSwapChainImage(imageIndex)) {
+            Logger::error("Invalid swap chain image index!", "Swap Chain");
+            return;
+        }
+
+        // Update the scene.
+        {
+            tree->input(InputServer::get_singleton()->input_queue);
+
+            // Node scene manager.
+            tree->update(dt);
+
+            // ECS scene manager.
+            world->update(dt);
+        }
+
+        // Record draw calls.
+        record_commands(SwapChain::getSingleton()->commandBuffers, imageIndex);
+
+        InputServer::get_singleton()->clear_queue();
+
+        // Submit commands for drawing.
+        SwapChain::getSingleton()->flush(imageIndex);
     }
 
     // Wait on the host for the completion of outstanding queue operations for all queues on a given logical device.
     vkDeviceWaitIdle(Platform::getSingleton()->device);
 }
 
-void App::draw_frame() {
-    // Engine processing.
-    Engine::getSingleton()->tick();
-    auto dt = Engine::getSingleton()->get_delta();
+void App::cleanup() {
+    // Clean up the scene.
+    tree.reset();
+    world.reset();
 
-    // Acquire next image.
-    // We should do this before updating scene as we need to modify different buffers according to the current image index.
-    uint32_t imageIndex;
-    if (!SwapChain::getSingleton()->acquireSwapChainImage(imageIndex)) return;
+    VectorServer::get_singleton()->canvas.reset();
 
-    // Update the scene.
-    {
-        tree.input(InputServer::get_singleton()->input_queue);
+    DefaultResource::get_singleton()->cleanup();
+    Logger::verbose("Cleaned up DefaultResource.", "App");
 
-        // Node scene manager.
-        tree.update(dt);
+    SwapChain::getSingleton()->cleanup();
+    Logger::verbose("Cleaned up SwapChain.", "App");
 
-        // ECS scene manager.
-        world->update(dt);
-    }
+    RenderServer::getSingleton()->cleanup();
+    Logger::verbose("Cleaned up RenderServer.", "App");
 
-    // Record draw calls.
-    record_commands(SwapChain::getSingleton()->commandBuffers, imageIndex);
-
-    InputServer::get_singleton()->clear_queue();
-
-    // Submit commands for drawing.
-    SwapChain::getSingleton()->flush(imageIndex);
+    Platform::getSingleton()->cleanup();
+    Logger::verbose("Cleaned up Platform.", "App");
 }

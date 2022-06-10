@@ -4,8 +4,9 @@
 #include <utility>
 
 namespace Flint {
-    void SceneTree::set_root(std::shared_ptr<Node> p_node) {
-        root = std::move(p_node);
+    SceneTree::SceneTree() {
+        root = std::make_shared<Node>();
+        root->name = "root";
     }
 
     std::shared_ptr<Node> SceneTree::get_root() const {

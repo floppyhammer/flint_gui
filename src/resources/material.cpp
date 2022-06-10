@@ -151,7 +151,7 @@ namespace Flint {
         }
     }
 
-    void Material2dDescSet::updateDescriptorSet(const std::shared_ptr<ImageTexture> &p_texture) {
+    void Material2dDescSet::updateDescriptorSet(ImageTexture *p_texture) {
         auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
         auto &descriptorSetLayout = RenderServer::getSingleton()->blitDescriptorSetLayout;
         auto device = Platform::getSingleton()->device;
@@ -198,13 +198,13 @@ namespace Flint {
         desc_set = std::make_shared<Material2dDescSet>();
     }
 
-    void Material2d::set_texture(const std::shared_ptr<ImageTexture> &p_texture) {
+    void Material2d::set_texture(ImageTexture *p_texture) {
         texture = p_texture;
 
         desc_set->updateDescriptorSet(p_texture);
     }
 
-    std::shared_ptr<ImageTexture> Material2d::get_texture() {
+    ImageTexture *Material2d::get_texture() {
         return texture;
     }
 

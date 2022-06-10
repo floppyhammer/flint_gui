@@ -28,16 +28,16 @@ public:
     void run();
 
 private:
-    Flint::SceneTree tree;
-
-    std::queue<Flint::InputEvent> input_queue;
+    std::unique_ptr<Flint::SceneTree> tree;
 
     std::unique_ptr<Flint::World> world;
 
 private:
+    void init();
+
     void main_loop();
 
-    void draw_frame();
+    void cleanup();
 
     /**
      * Record commands into the current command buffer.

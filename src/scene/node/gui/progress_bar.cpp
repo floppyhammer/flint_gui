@@ -35,7 +35,7 @@ namespace Flint {
     void ProgressBar::update(double dt) {
         Control::update(dt);
 
-        set_value(Engine::getSingleton()->get_fps());
+        set_value(Engine::get_singleton()->get_fps());
     }
 
     void ProgressBar::draw(VkCommandBuffer p_command_buffer) {
