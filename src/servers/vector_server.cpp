@@ -1,10 +1,26 @@
 #include "vector_server.h"
 
 namespace Flint {
-    void
-    VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver, float p_canvas_width, float p_canvas_height,
-                       const std::vector<char> &area_lut_input) {
-        canvas = std::make_shared<Pathfinder::Canvas>(driver, p_canvas_width, p_canvas_height, area_lut_input);
+    void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver,
+                            float p_canvas_width,
+                            float p_canvas_height,
+                            const std::vector<char> &area_lut_input) {
+        canvas = std::make_shared<Pathfinder::Canvas>(driver,
+                                                      p_canvas_width,
+                                                      p_canvas_height,
+                                                      area_lut_input);
+    }
+
+    void VectorServer::cleanup() {
+        canvas.reset();
+    }
+
+    void VectorServer::clear() {
+        canvas->clear();
+    }
+
+    void VectorServer::submit() {
+        canvas->build_and_render();
     }
 
     void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) {
@@ -62,5 +78,13 @@ namespace Flint {
         }
 
         canvas->restore_state();
+    }
+
+    std::shared_ptr<ImageTexture> VectorServer::get_texture() {
+        auto texture_vk = static_cast<Pathfinder::TextureVk *>(canvas->get_dest_texture().get());
+        return ImageTexture::from_wrapper(texture_vk->get_image_view(),
+                                          texture_vk->get_sampler(),
+                                          texture_vk->get_width(),
+                                          texture_vk->get_height());
     }
 }

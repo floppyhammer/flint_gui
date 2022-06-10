@@ -3,6 +3,7 @@
 #include "../sub_viewport.h"
 #include "../../../render/mvp_buffer.h"
 #include "../../../render/swap_chain.h"
+#include "../../../render/render_server.h"
 #include "../../../resources/resource_manager.h"
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -423,6 +424,10 @@ namespace Flint {
         }
 
         upload_bone_transforms();
+    }
+
+    Skeleton2d::~Skeleton2d() {
+        vkDestroyDescriptorPool(Platform::getSingleton()->device, descriptor_pool, nullptr);
     }
 
     template<class C>

@@ -131,12 +131,7 @@ void App::run() {
         auto vector_layer = std::make_shared<TextureRect>();
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WIDTH, HEIGHT});
-        auto texture_vk = static_cast<Pathfinder::TextureVk *>(VectorServer::get_singleton()->canvas->get_dest_texture().get());
-        auto texture = ImageTexture::from_wrapper(texture_vk->get_image_view(),
-                                                  texture_vk->get_sampler(),
-                                                  texture_vk->get_width(),
-                                                  texture_vk->get_height());
-        vector_layer->set_texture(texture);
+        vector_layer->set_texture(VectorServer::get_singleton()->get_texture());
         auto item_tree = std::make_shared<Tree>();
         item_tree->set_size({400, 400});
 
@@ -293,7 +288,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
 
     auto vector_server = VectorServer::get_singleton();
 
-    vector_server->canvas->clear();
+    vector_server->clear();
 
     // Record commands from the scene manager.
     {
@@ -307,7 +302,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t
 
     // FIXME: When nothing is drawn, the dest image layout will not be set to SHADER_READ_ONLY.
     // Do the vector render pass before the main render pass.
-    vector_server->canvas->build_and_render();
+    vector_server->submit();
 
     // End recording.
     if (vkEndCommandBuffer(commandBuffers[imageIndex]) != VK_SUCCESS) {
@@ -396,7 +391,8 @@ void App::cleanup() {
     tree.reset();
     world.reset();
 
-    VectorServer::get_singleton()->canvas.reset();
+    VectorServer::get_singleton()->cleanup();
+    Logger::verbose("Cleaned up VectorServer.", "App");
 
     DefaultResource::get_singleton()->cleanup();
     Logger::verbose("Cleaned up DefaultResource.", "App");

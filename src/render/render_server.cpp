@@ -28,6 +28,7 @@ namespace Flint {
         // Graphics pipeline resources.
         vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
         vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);
+        vkDestroyPipeline(device, skeleton2dMeshGraphicsPipeline, nullptr);
     }
 
     void RenderServer::cleanup() {
@@ -36,10 +37,12 @@ namespace Flint {
         // Pipeline layouts.
         vkDestroyPipelineLayout(device, meshPipelineLayout, nullptr);
         vkDestroyPipelineLayout(device, blitPipelineLayout, nullptr);
+        vkDestroyPipelineLayout(device, skeleton2dMeshPipelineLayout, nullptr);
 
         // Descriptor set layouts.
         vkDestroyDescriptorSetLayout(device, meshDescriptorSetLayout, nullptr);
         vkDestroyDescriptorSetLayout(device, blitDescriptorSetLayout, nullptr);
+        vkDestroyDescriptorSetLayout(device, skeleton2dMeshDescriptorSetLayout, nullptr);
 
         vkDestroyCommandPool(device, commandPool, nullptr);
     }

@@ -69,6 +69,8 @@ namespace Flint {
     public:
         Skeleton2d();
 
+        ~Skeleton2d();
+
     private:
         void update(double delta) override;
 

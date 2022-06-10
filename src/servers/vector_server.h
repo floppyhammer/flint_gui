@@ -4,6 +4,7 @@
 #include <pathfinder.h>
 
 #include "../common/geometry.h"
+#include "../resources/image_texture.h"
 
 using Pathfinder::Vec2F;
 using Pathfinder::Transform2;
@@ -35,6 +36,14 @@ namespace Flint {
                   float p_canvas_width,
                   float p_canvas_height,
                   const std::vector<char> &area_lut_input);
+
+        void cleanup();
+
+        void clear();
+
+        void submit();
+
+        std::shared_ptr<ImageTexture> get_texture();
 
         void draw_line(Vec2F start, Vec2F end, float width, ColorU color);
 
