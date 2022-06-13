@@ -51,7 +51,8 @@ public:
 
     GLFWwindow *window;
 
-    VkSurfaceKHR surface;
+    /// Native platform surface or window objects are abstracted by surface objects.
+    VkSurfaceKHR surface{};
 
     /// The graphics card that we'll end up selecting will be stored in a VkPhysicalDevice handle.
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -59,15 +60,16 @@ public:
     /// Logical device.
     VkDevice device{};
 
+    /// Flag indicating the window size has changed.
     bool framebufferResized = false;
 
     static void framebufferResizeCallback(GLFWwindow *window, int width, int height) {
+        // We have attached a Platform pointer to this window previously. Now we retrieve it.
         auto platform = reinterpret_cast<Platform *>(glfwGetWindowUserPointer(window));
         platform->framebufferResized = true;
     }
 
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) const;
-
 
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
 
@@ -137,6 +139,9 @@ public:
     void cleanup();
 
 private:
+    // There is no global state in Vulkan and all per-application state is stored in a VkInstance object.
+    // Creating a VkInstance object initializes the Vulkan library and allows the application to pass
+    // information about itself to the implementation.
     VkInstance instance;
 
     VkDebugUtilsMessengerEXT debugMessenger;
