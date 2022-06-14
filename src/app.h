@@ -25,20 +25,17 @@
 
 class App {
 public:
-    void run();
-
-private:
-    std::unique_ptr<Flint::SceneTree> tree;
-
-    std::unique_ptr<Flint::World> world;
-
-private:
     void init();
 
     void main_loop();
 
     void cleanup();
 
+    std::unique_ptr<Flint::SceneTree> tree;
+
+    std::unique_ptr<Flint::World> world;
+
+private:
     /**
      * Record commands into the current command buffer.
      * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline layout.

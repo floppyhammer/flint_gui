@@ -32,14 +32,6 @@ add_subdirectory(external/pathfinder-cpp)
 
 add_subdirectory(third_party/poly2tri)
 
-add_executable(flint ${SOURCE_FILES})
+add_library(flint ${SOURCE_FILES})
 
-# Windows
-if (WIN32)
-    target_link_libraries(flint glfw Vulkan::Vulkan pathfinder poly2tri)
-else () # Linux
-    ## sudo apt install libglfw3-dev
-    ## sudo apt install libvulkan-dev
-    ## sudo apt install libvulkan1 mesa-vulkan-drivers vulkan-utils
-    target_link_libraries(flint -lglfw -lvulkan -lpathfinder)
-endif ()
+add_subdirectory(examples/2d_skeleton_editor)
