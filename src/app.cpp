@@ -88,16 +88,16 @@ void App::init() {
 
     // 4. Initialize input server.
     auto input_server = InputServer::get_singleton();
-    input_server->attach_callbacks(platform->window);
+    input_server->init(platform->window);
 
     // 5. Initialize vector server.
-    auto vector_server = VectorServer::get_singleton();
     std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(
             platform->device,
             platform->physicalDevice,
             platform->graphicsQueue,
             platform->graphicsQueue,
             render_server->commandPool);
+    auto vector_server = VectorServer::get_singleton();
     vector_server->init(driver,
                         WIDTH,
                         HEIGHT,
@@ -110,7 +110,7 @@ void App::init() {
 void App::main_loop() {
     while (!glfwWindowShouldClose(Platform::getSingleton()->window)) {
         // Collect input and window events.
-        glfwPollEvents();
+        InputServer::get_singleton()->collect_events();
 
         // Engine processing.
         Engine::get_singleton()->tick();
@@ -119,9 +119,10 @@ void App::main_loop() {
         auto dt = Engine::get_singleton()->get_delta();
 
         // Acquire next image.
-        // We should do this before updating scene as we need to modify different buffers according to the current image index.
-        uint32_t imageIndex;
-        if (!SwapChain::getSingleton()->acquireSwapChainImage(imageIndex)) {
+        // We should do this before updating the scenes as we need to modify different
+        // buffers according to the current image index.
+        uint32_t image_index;
+        if (!SwapChain::getSingleton()->acquireSwapChainImage(image_index)) {
             Logger::error("Invalid swap chain image index!", "Swap Chain");
             return;
         }
@@ -138,12 +139,10 @@ void App::main_loop() {
         }
 
         // Record draw calls.
-        record_commands(SwapChain::getSingleton()->commandBuffers, imageIndex);
-
-        InputServer::get_singleton()->clear_queue();
+        record_commands(SwapChain::getSingleton()->commandBuffers, image_index);
 
         // Submit commands for drawing.
-        SwapChain::getSingleton()->flush(imageIndex);
+        SwapChain::getSingleton()->flush(image_index);
     }
 
     // Wait on the host for the completion of outstanding queue operations for all queues on a given logical device.

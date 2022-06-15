@@ -58,7 +58,7 @@ namespace Flint {
         resize_cursor_v = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
     }
 
-    void InputServer::attach_callbacks(GLFWwindow *window) {
+    void InputServer::init(GLFWwindow *window) {
         // GLFW input callbacks.
         current_window = window;
 
@@ -136,8 +136,10 @@ namespace Flint {
         glfwSetCharCallback(window, character_callback);
     }
 
-    void InputServer::clear_queue() {
+    void InputServer::collect_events() {
         input_queue.clear();
+
+        glfwPollEvents();
     }
 
     void InputServer::set_cursor(CursorShape shape) {

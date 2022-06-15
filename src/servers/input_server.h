@@ -98,7 +98,9 @@ namespace Flint {
 
         InputServer();
 
-        void attach_callbacks(GLFWwindow *window);
+        void init(GLFWwindow *window);
+
+        void collect_events();
 
         Vec2<float> cursor_position;
         Vec2<float> last_cursor_position;
@@ -106,8 +108,6 @@ namespace Flint {
         std::vector<InputEvent> input_queue;
 
         GLFWwindow *current_window{};
-
-        void clear_queue();
 
         void set_cursor_captured(bool captured);
 

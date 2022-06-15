@@ -23,13 +23,14 @@ namespace Flint {
     }
 
     void TextureRect::set_texture(const std::shared_ptr<Texture> &p_texture) {
-        if (!p_texture) return;
-
+        // Texture can be null.
         texture = p_texture;
 
-        if (p_texture->get_type() == TextureType::IMAGE) {
+        if (!texture) return;
+
+        if (texture->get_type() == TextureType::IMAGE) {
             mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
-            auto image_texture = dynamic_cast<ImageTexture *>(p_texture.get());
+            auto image_texture = dynamic_cast<ImageTexture *>(texture.get());
             mesh->surface->get_material()->set_texture(image_texture);
         }
     }
@@ -74,7 +75,8 @@ namespace Flint {
 
                 if (stretch_mode == StretchMode::KEEP_CENTER) {
                     auto texture_size = vector_texture->get_size();
-                    vector_texture->add_to_canvas(global_position + ((size - Vec2<float>(texture_size.x, texture_size.y)) * 0.5f), canvas);
+                    vector_texture->add_to_canvas(
+                            global_position + ((size - Vec2<float>(texture_size.x, texture_size.y)) * 0.5f), canvas);
                 } else {
                     vector_texture->add_to_canvas(global_position, canvas);
                 }
