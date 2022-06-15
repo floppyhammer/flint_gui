@@ -87,16 +87,7 @@ namespace Flint {
     }
 
     void TextureRect::update_mvp() {
-        Node *viewport_node = get_viewport();
-
-        Vec2<uint32_t> viewport_extent;
-        if (viewport_node) {
-            auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-            viewport_extent = viewport->get_extent();
-        } else { // Default to swap chain image.
-            auto extent = SwapChain::getSingleton()->swapChainExtent;
-            viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
-        }
+        Vec2<uint32_t> viewport_extent = get_viewport_size();
 
         // Prepare MVP data. We use this matrix to convert a full-screen to the NodeGui's rect.
         ModelViewProjection mvp{};

@@ -43,16 +43,7 @@ namespace Flint {
             return;
         }
 
-        Node *viewport_node = get_viewport();
-
-        Vec2<uint32_t> viewport_extent;
-        if (viewport_node) {
-            auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-            viewport_extent = viewport->get_extent();
-        } else { // Default to swap chain image.
-            auto extent = SwapChain::getSingleton()->swapChainExtent;
-            viewport_extent = Vec2<uint32_t>(extent.width, extent.height);
-        }
+        Vec2<uint32_t> viewport_extent = get_viewport_size();
 
         float scaled_sprite_width = mesh->surface->get_material()->get_texture()->get_width() * scale.x;
         float scaled_sprite_height = mesh->surface->get_material()->get_texture()->get_height() * scale.y;
