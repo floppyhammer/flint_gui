@@ -11,6 +11,10 @@
 #include <memory>
 
 namespace Flint {
+    class CubemapTexture : public Texture {
+
+    };
+
     class ImageTexture : public Texture {
     public:
         ImageTexture();
