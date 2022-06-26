@@ -14,12 +14,14 @@ namespace Flint {
         createMeshLayouts();
         createBlitLayouts();
         createSkeleton2dMeshLayouts();
+        create_skybox_layouts();
     }
 
     void RenderServer::createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
         createMeshPipeline(renderPass, swapChainExtent, meshGraphicsPipeline);
         createBlitPipeline(renderPass, swapChainExtent, blitGraphicsPipeline);
         createSkeleton2dMeshPipeline(renderPass, swapChainExtent, skeleton2dMeshGraphicsPipeline);
+        create_skybox_pipeline(renderPass, swapChainExtent, skybox_graphics_pipeline);
     }
 
     void RenderServer::cleanupSwapChainRelatedResources() const {
@@ -135,8 +137,12 @@ namespace Flint {
         vkFreeCommandBuffers(Platform::getSingleton()->device, commandPool, 1, &commandBuffer);
     }
 
-    void RenderServer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout,
-                                             VkImageLayout newLayout) const {
+    void RenderServer::transitionImageLayout(VkImage image,
+                                             VkFormat format,
+                                             VkImageLayout oldLayout,
+                                             VkImageLayout newLayout,
+                                             uint32_t levelCount,
+                                             uint32_t layerCount) const {
         VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
         VkImageMemoryBarrier barrier{};
@@ -150,9 +156,9 @@ namespace Flint {
         barrier.image = image;
         barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         barrier.subresourceRange.baseMipLevel = 0;
-        barrier.subresourceRange.levelCount = 1;
+        barrier.subresourceRange.levelCount = levelCount;
         barrier.subresourceRange.baseArrayLayer = 0;
-        barrier.subresourceRange.layerCount = 1;
+        barrier.subresourceRange.layerCount = layerCount;
 
         // Transition barrier masks.
         // -----------------------------
@@ -259,19 +265,23 @@ namespace Flint {
         endSingleTimeCommands(commandBuffer);
     }
 
-    void RenderServer::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling,
-                                   VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage &image,
-                                   VkDeviceMemory &imageMemory) const {
+    void RenderServer::createImage(uint32_t width,
+                                   uint32_t height,
+                                   VkFormat format,
+                                   VkImageTiling tiling,
+                                   VkImageUsageFlags usage,
+                                   VkMemoryPropertyFlags properties,
+                                   VkImage &image,
+                                   VkDeviceMemory &imageMemory,
+                                   uint32_t arrayLayers) const {
         auto device = Platform::getSingleton()->device;
 
         VkImageCreateInfo imageInfo{};
         imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         imageInfo.imageType = VK_IMAGE_TYPE_2D;
-        imageInfo.extent.width = width;
-        imageInfo.extent.height = height;
-        imageInfo.extent.depth = 1;
+        imageInfo.extent = {width, height, 1};
         imageInfo.mipLevels = 1;
-        imageInfo.arrayLayers = 1;
+        imageInfo.arrayLayers = arrayLayers;
         imageInfo.format = format;
         imageInfo.tiling = tiling;
         imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -536,6 +546,44 @@ namespace Flint {
         vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
     }
 
+    void RenderServer::draw_skybox(VkCommandBuffer commandBuffer,
+                                   VkPipeline graphicsPipeline,
+                                   const VkDescriptorSet &descriptorSet,
+                                   VkBuffer vertexBuffers[],
+                                   VkBuffer indexBuffer,
+                                   uint32_t indexCount) const {
+        // Bind pipeline.
+        vkCmdBindPipeline(commandBuffer,
+                          VK_PIPELINE_BIND_POINT_GRAPHICS,
+                          graphicsPipeline);
+
+        // Bind vertex and index buffers.
+        VkDeviceSize offsets[] = {0};
+        vkCmdBindVertexBuffers(commandBuffer,
+                               0,
+                               1,
+                               vertexBuffers,
+                               offsets);
+
+        vkCmdBindIndexBuffer(commandBuffer,
+                             indexBuffer,
+                             0,
+                             VK_INDEX_TYPE_UINT32);
+
+        // Bind uniform buffers and samplers.
+        vkCmdBindDescriptorSets(commandBuffer,
+                                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                                skybox_pipeline_layout,
+                                0,
+                                1,
+                                &descriptorSet,
+                                0,
+                                nullptr);
+
+        // Draw call.
+        vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
+    }
+
     void RenderServer::createMeshLayouts() {
         // Descriptor set layout.
         {
@@ -731,6 +779,58 @@ namespace Flint {
                                        &pipelineLayoutInfo,
                                        nullptr,
                                        &skeleton2dMeshPipelineLayout) != VK_SUCCESS) {
+                throw std::runtime_error("Failed to create pipeline layout!");
+            }
+        }
+    }
+
+    void RenderServer::create_skybox_layouts() {
+        // Descriptor set layout.
+        {
+            // Image sampler uniform binding.
+            // ------------------------------
+            VkDescriptorSetLayoutBinding samplerLayoutBinding{};
+            samplerLayoutBinding.binding = 0;
+            samplerLayoutBinding.descriptorCount = 1;
+            samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            samplerLayoutBinding.pImmutableSamplers = nullptr;
+            samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            // ------------------------------
+
+            std::array<VkDescriptorSetLayoutBinding, 1> bindings = {samplerLayoutBinding};
+            VkDescriptorSetLayoutCreateInfo layoutInfo{};
+            layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+            layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+            layoutInfo.pBindings = bindings.data();
+
+            if (vkCreateDescriptorSetLayout(Platform::getSingleton()->device, &layoutInfo, nullptr,
+                                            &skybox_descriptor_set_layout) != VK_SUCCESS) {
+                throw std::runtime_error("Failed to create descriptor set layout!");
+            }
+        }
+
+        // Pipeline layout, which depends on a descriptor set layout.
+        {
+            // Push constant.
+            VkPushConstantRange pushConstant;
+            {
+                pushConstant.offset = 0;
+                pushConstant.size = sizeof(Surface3dPushConstant);
+                pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+            }
+
+            VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
+            pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+            pipelineLayoutInfo.setLayoutCount = 1;
+            pipelineLayoutInfo.pSetLayouts = &skybox_descriptor_set_layout;
+            pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
+            pipelineLayoutInfo.pushConstantRangeCount = 1;
+
+            // Create pipeline layout.
+            if (vkCreatePipelineLayout(Platform::getSingleton()->device,
+                                       &pipelineLayoutInfo,
+                                       nullptr,
+                                       &skybox_pipeline_layout) != VK_SUCCESS) {
                 throw std::runtime_error("Failed to create pipeline layout!");
             }
         }
@@ -1151,6 +1251,145 @@ namespace Flint {
         pipelineInfo.pMultisampleState = &multisampling;
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.layout = skeleton2dMeshPipelineLayout;
+        pipelineInfo.renderPass = renderPass;
+        pipelineInfo.subpass = 0;
+        pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+        pipelineInfo.pDepthStencilState = &depthStencil;
+
+        auto device = Platform::getSingleton()->device;
+
+        // Create pipeline.
+        if (vkCreateGraphicsPipelines(device,
+                                      VK_NULL_HANDLE,
+                                      1,
+                                      &pipelineInfo,
+                                      nullptr,
+                                      &pipeline) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to create graphics pipeline!");
+        }
+
+        // Clean up shader modules.
+        vkDestroyShaderModule(device, fragShaderModule, nullptr);
+        vkDestroyShaderModule(device, vertShaderModule, nullptr);
+    }
+
+    void RenderServer::create_skybox_pipeline(VkRenderPass renderPass,
+                                              VkExtent2D viewportExtent,
+                                              VkPipeline &pipeline) {
+        auto vertShaderCode = load_file_as_bytes("../src/shaders/skybox_vert.spv");
+        auto fragShaderCode = load_file_as_bytes("../src/shaders/skybox_frag.spv");
+
+        VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
+        VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
+
+        // Specify shader stages.
+        VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
+        vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
+        vertShaderStageInfo.module = vertShaderModule;
+        vertShaderStageInfo.pName = "main"; // Specifying the entry point name of the shader for this stage.
+
+        VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
+        fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+        fragShaderStageInfo.module = fragShaderModule;
+        fragShaderStageInfo.pName = "main";
+
+        VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
+
+        // Set up how to accept vertex data.
+        // -----------------------------------------------------
+        VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+        vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+
+        auto bindingDescription = SkyboxVertex::getBindingDescription();
+        auto attributeDescriptions = SkyboxVertex::getAttributeDescriptions();
+
+        vertexInputInfo.vertexBindingDescriptionCount = 1;
+        vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+        vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+        vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+        // -----------------------------------------------------
+
+        VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+        inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+        inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        inputAssembly.primitiveRestartEnable = VK_FALSE;
+
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float) viewportExtent.width;
+        viewport.height = (float) viewportExtent.height;
+        viewport.minDepth = 0.0f; // The depth range for the viewport.
+        viewport.maxDepth = 1.0f;
+
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = viewportExtent;
+
+        VkPipelineViewportStateCreateInfo viewportState{};
+        viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        viewportState.viewportCount = 1;
+        viewportState.pViewports = &viewport;
+        viewportState.scissorCount = 1;
+        viewportState.pScissors = &scissor;
+
+        VkPipelineRasterizationStateCreateInfo rasterizer{};
+        rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+        rasterizer.depthClampEnable = VK_FALSE;
+        rasterizer.rasterizerDiscardEnable = VK_FALSE;
+        rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+        rasterizer.lineWidth = 1.0f;
+        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+        rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+        rasterizer.depthBiasEnable = VK_FALSE;
+
+        VkPipelineMultisampleStateCreateInfo multisampling{};
+        multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+        multisampling.sampleShadingEnable = VK_FALSE;
+        multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+
+        VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+        colorBlendAttachment.colorWriteMask =
+                VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
+                VK_COLOR_COMPONENT_A_BIT;
+        colorBlendAttachment.blendEnable = VK_FALSE;
+
+        VkPipelineColorBlendStateCreateInfo colorBlending{};
+        colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        colorBlending.logicOpEnable = VK_FALSE;
+        colorBlending.logicOp = VK_LOGIC_OP_COPY;
+        colorBlending.attachmentCount = 1;
+        colorBlending.pAttachments = &colorBlendAttachment;
+        colorBlending.blendConstants[0] = 0.0f;
+        colorBlending.blendConstants[1] = 0.0f;
+        colorBlending.blendConstants[2] = 0.0f;
+        colorBlending.blendConstants[3] = 0.0f;
+
+        VkPipelineDepthStencilStateCreateInfo depthStencil{};
+        depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+        depthStencil.depthTestEnable = VK_TRUE;
+        depthStencil.depthWriteEnable = VK_TRUE;
+        depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+        depthStencil.depthBoundsTestEnable = VK_FALSE;
+        depthStencil.minDepthBounds = 0.0f; // Optional
+        depthStencil.maxDepthBounds = 1.0f; // Optional
+        depthStencil.stencilTestEnable = VK_FALSE;
+        depthStencil.front = {}; // Optional
+        depthStencil.back = {}; // Optional
+
+        VkGraphicsPipelineCreateInfo pipelineInfo{};
+        pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipelineInfo.stageCount = 2;
+        pipelineInfo.pStages = shaderStages;
+        pipelineInfo.pVertexInputState = &vertexInputInfo;
+        pipelineInfo.pInputAssemblyState = &inputAssembly;
+        pipelineInfo.pViewportState = &viewportState;
+        pipelineInfo.pRasterizationState = &rasterizer;
+        pipelineInfo.pMultisampleState = &multisampling;
+        pipelineInfo.pColorBlendState = &colorBlending;
+        pipelineInfo.layout = skybox_pipeline_layout;
         pipelineInfo.renderPass = renderPass;
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;

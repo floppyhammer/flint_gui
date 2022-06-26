@@ -24,7 +24,7 @@ namespace Flint {
 
         bool operator==(const SkeletonVertex &other) const {
             return pos == other.pos && color == other.color && uv == other.uv && bone_indices == other.bone_indices
-                && bone_weights == other.bone_weights;
+                   && bone_weights == other.bone_weights;
         }
 
         /// Binding info.
@@ -115,6 +115,32 @@ namespace Flint {
         }
     };
 
+    struct SkyboxVertex {
+        glm::vec3 pos;
+
+        /// Binding info.
+        static VkVertexInputBindingDescription getBindingDescription() {
+            VkVertexInputBindingDescription bindingDescription{};
+            bindingDescription.binding = 0;
+            bindingDescription.stride = sizeof(SkyboxVertex);
+            bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; // Specify rate at which vertex attributes are pulled from buffers.
+
+            return bindingDescription;
+        }
+
+        /// Attributes info.
+        static std::array<VkVertexInputAttributeDescription, 1> getAttributeDescriptions() {
+            std::array<VkVertexInputAttributeDescription, 1> attributeDescriptions{};
+
+            attributeDescriptions[0].binding = 0;
+            attributeDescriptions[0].location = 0;
+            attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+            attributeDescriptions[0].offset = 0;
+
+            return attributeDescriptions;
+        }
+    };
+
     class RenderServer {
     public:
         static RenderServer *getSingleton() {
@@ -153,8 +179,12 @@ namespace Flint {
          */
         void endSingleTimeCommands(VkCommandBuffer commandBuffer) const;
 
-        void
-        transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) const;
+        void transitionImageLayout(VkImage image,
+                                   VkFormat format,
+                                   VkImageLayout oldLayout,
+                                   VkImageLayout newLayout,
+                                   uint32_t levelCount = 1,
+                                   uint32_t layerCount = 1) const;
 
         /**
          * Copy data from VkBuffer to VkImage.
@@ -179,9 +209,15 @@ namespace Flint {
          */
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) const;
 
-        void
-        createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
-                    VkMemoryPropertyFlags properties, VkImage &image, VkDeviceMemory &imageMemory) const;
+        void createImage(uint32_t width,
+                         uint32_t height,
+                         VkFormat format,
+                         VkImageTiling tiling,
+                         VkImageUsageFlags usage,
+                         VkMemoryPropertyFlags properties,
+                         VkImage &image,
+                         VkDeviceMemory &imageMemory,
+                         uint32_t arrayLayers = 1) const;
 
         /**
          * An image view is a reference to a VkImage.
@@ -239,6 +275,10 @@ namespace Flint {
         VkPipelineLayout skeleton2dMeshPipelineLayout;
         VkPipeline skeleton2dMeshGraphicsPipeline;
 
+        VkDescriptorSetLayout skybox_descriptor_set_layout;
+        VkPipelineLayout skybox_pipeline_layout;
+        VkPipeline skybox_graphics_pipeline;
+
         /**
          * Set up shaders, viewport, blend state, etc.
          * @param renderPass Target render pass.
@@ -250,6 +290,10 @@ namespace Flint {
         void createMeshPipeline(VkRenderPass renderPass,
                                 VkExtent2D viewportExtent,
                                 VkPipeline &pipeline);
+
+        void create_skybox_pipeline(VkRenderPass renderPass,
+                                    VkExtent2D viewportExtent,
+                                    VkPipeline &pipeline);
 
         /**
          * Draw a single mesh.
@@ -284,6 +328,13 @@ namespace Flint {
                               VkBuffer vertex_buffers[],
                               VkBuffer index_buffer,
                               uint32_t index_count) const;
+
+        void draw_skybox(VkCommandBuffer commandBuffer,
+                         VkPipeline meshGraphicsPipeline,
+                         VkDescriptorSet const &descriptorSet,
+                         VkBuffer *vertexBuffers,
+                         VkBuffer indexBuffer,
+                         uint32_t indexCount) const;
         // --------------------------------------------------
 
         void cleanupSwapChainRelatedResources() const;
@@ -318,6 +369,8 @@ namespace Flint {
         void createSkeleton2dMeshLayouts();
 
         void createSkeleton2dMeshPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
+
+        void create_skybox_layouts();
     };
 }
 

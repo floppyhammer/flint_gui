@@ -27,7 +27,6 @@ namespace Flint {
         // ------------------------------------------
 
     protected:
-
         void update(double delta) override;
 
         void update_mvp();

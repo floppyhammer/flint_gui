@@ -6,6 +6,8 @@ New-Variable -Name "GLSLC" -Visibility Public -Value "C:/VulkanSDK/1.3.204.0/Bin
 & $GLSLC mesh_instance.frag -o mesh_instance_frag.spv
 & $GLSLC skeleton_2d.vert -o skeleton_2d_vert.spv
 & $GLSLC skeleton_2d.frag -o skeleton_2d_frag.spv
+& $GLSLC skybox.vert -o skybox_vert.spv
+& $GLSLC skybox.frag -o skybox_frag.spv
 
 # Wait for input.
 Write-Host "All jobs finished."

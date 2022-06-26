@@ -12,7 +12,22 @@
 
 namespace Flint {
     class CubemapTexture : public Texture {
+    public:
+        void load();
 
+        VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
+
+        /// GPU memory.
+        VkImage image{};
+
+        /// CPU memory.
+        VkDeviceMemory imageMemory{};
+
+        /// Thin wrapper.
+        VkImageView imageView{};
+
+        /// How image should be filtered.
+        VkSampler sampler{};
     };
 
     class ImageTexture : public Texture {

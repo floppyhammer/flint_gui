@@ -22,6 +22,15 @@ namespace Flint {
             };
 
             default_surface_2d_gpu_resources = std::make_shared<SurfaceGpuResources<Vertex>>(vertices, indices);
+
+            const std::vector<SkyboxVertex> skybox_vertices = {
+                    {{0.0f, 0.0f, 0.0f}},
+                    {{1.0f, 0.0f, 0.0f}},
+                    {{1.0f, 1.0f, 0.0f}},
+                    {{0.0f, 1.0f, 0.0f}}
+            };
+
+            default_skybox_gpu_resources = std::make_shared<SurfaceGpuResources<SkyboxVertex>>(skybox_vertices, indices);
         }
 
         static DefaultResource *get_singleton() {
@@ -33,8 +42,13 @@ namespace Flint {
             return default_surface_2d_gpu_resources;
         }
 
+        inline std::shared_ptr<SurfaceGpuResources<SkyboxVertex>> get_default_skybox_gpu_resources() {
+            return default_skybox_gpu_resources;
+        }
+
         inline void cleanup() {
             default_surface_2d_gpu_resources.reset();
+            default_skybox_gpu_resources.reset();
         }
 
         /**
@@ -56,6 +70,8 @@ namespace Flint {
     private:
         // Default resources should never be modified.
         std::shared_ptr<SurfaceGpuResources<Vertex>> default_surface_2d_gpu_resources;
+
+        std::shared_ptr<SurfaceGpuResources<SkyboxVertex>> default_skybox_gpu_resources;
     };
 }
 
