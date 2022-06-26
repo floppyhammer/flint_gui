@@ -151,6 +151,7 @@ int main() {
 
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);
+        sub_viewport->add_child(std::make_shared<Skybox>());
         sub_viewport->add_child(node_3d);
         node_3d->add_child(model1);
 

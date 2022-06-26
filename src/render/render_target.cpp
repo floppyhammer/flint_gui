@@ -167,6 +167,11 @@ namespace Flint {
                 renderPass,
                 VkExtent2D{extent.x, extent.y},
                 blitGraphicsPipeline);
+
+        RenderServer::getSingleton()->create_skybox_pipeline(
+                renderPass,
+                VkExtent2D{extent.x, extent.y},
+                skybox_graphics_pipeline);
     }
 
     void RenderTarget::set_extent(Vec2<uint32_t> p_extent) {

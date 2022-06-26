@@ -4,6 +4,7 @@
 #include "node.h"
 #include "gui/sub_viewport_container.h"
 #include "3d/model.h"
+#include "3d/skybox.h"
 #include "gui/texture_rect.h"
 #include "gui/label.h"
 #include "gui/button.h"

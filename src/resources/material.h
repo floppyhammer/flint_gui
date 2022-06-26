@@ -2,6 +2,7 @@
 #define FLINT_MATERIAL_H
 
 #include "image_texture.h"
+#include "cubemap_texture.h"
 
 #include <memory>
 #include <iostream>
@@ -65,7 +66,18 @@ namespace Flint {
         void updateDescriptorSet(const std::shared_ptr<ImageTexture> &p_texture);
     };
 
-/// Material Resources
+    class MaterialSkyboxDescSet : public MaterialDescSet {
+    public:
+        MaterialSkyboxDescSet();
+
+        void createDescriptorPool() override;
+
+        void createDescriptorSet() override;
+
+        void updateDescriptorSet(CubemapTexture *p_texture);
+    };
+
+    /// Material Resources
 
     class Material : public Resource {
     };
@@ -105,6 +117,24 @@ namespace Flint {
         std::shared_ptr<ImageTexture> normal_texture;
 
         std::shared_ptr<Material3dDescSet> desc_set;
+    };
+
+    class MaterialSkybox : public Material {
+    public:
+        MaterialSkybox();
+
+        static std::shared_ptr<MaterialSkybox> from_default();
+
+        void set_texture(std::shared_ptr<CubemapTexture> p_texture);
+
+        std::shared_ptr<MaterialSkyboxDescSet> get_desc_set() {
+            return desc_set;
+        }
+
+    private:
+        std::shared_ptr<CubemapTexture> texture;
+
+        std::shared_ptr<MaterialSkyboxDescSet> desc_set;
     };
 }
 

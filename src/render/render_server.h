@@ -217,7 +217,8 @@ namespace Flint {
                          VkMemoryPropertyFlags properties,
                          VkImage &image,
                          VkDeviceMemory &imageMemory,
-                         uint32_t arrayLayers = 1) const;
+                         uint32_t arrayLayers = 1,
+                         VkImageCreateFlags flags = VK_IMAGE_CREATE_FLAG_BITS_MAX_ENUM) const;
 
         /**
          * An image view is a reference to a VkImage.
@@ -250,7 +251,7 @@ namespace Flint {
          * @param bufferMemory Device memory.
          * @param dataSize Data size in bytes.
          */
-        void copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize) const;
+        void copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize, size_t memoryOffset = 0) const;
 
         void createTextureSampler(VkSampler &textureSampler, VkFilter filter) const;
 

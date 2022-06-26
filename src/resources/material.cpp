@@ -224,4 +224,92 @@ namespace Flint {
 
         desc_set->updateDescriptorSet(p_texture);
     }
+
+    MaterialSkyboxDescSet::MaterialSkyboxDescSet() {
+        createDescriptorPool();
+
+        createDescriptorSet();
+    }
+
+    void MaterialSkyboxDescSet::createDescriptorPool() {
+        auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
+
+        std::array<VkDescriptorPoolSize, 1> poolSizes{};
+        poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+
+        VkDescriptorPoolCreateInfo poolInfo{};
+        poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+        poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+        poolInfo.pPoolSizes = poolSizes.data();
+        poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
+
+        if (vkCreateDescriptorPool(Platform::getSingleton()->device,
+                                   &poolInfo,
+                                   nullptr,
+                                   &descriptorPool) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to create descriptor pool!");
+        }
+    }
+
+    void MaterialSkyboxDescSet::createDescriptorSet() {
+        auto device = Platform::getSingleton()->device;
+        auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
+        auto &descriptorSetLayout = RenderServer::getSingleton()->skybox_descriptor_set_layout;
+
+        std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
+        VkDescriptorSetAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        allocInfo.descriptorPool = descriptorPool;
+        allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
+        allocInfo.pSetLayouts = layouts.data();
+
+        descriptorSets.resize(swapChainImages.size());
+        if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
+            throw std::runtime_error("Failed to allocate descriptor sets!");
+        }
+    }
+
+    void MaterialSkyboxDescSet::updateDescriptorSet(CubemapTexture *p_texture) {
+        auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
+        auto &descriptorSetLayout = RenderServer::getSingleton()->skybox_descriptor_set_layout;
+        auto device = Platform::getSingleton()->device;
+
+        for (size_t i = 0; i < swapChainImages.size(); i++) {
+            VkDescriptorImageInfo imageInfo{};
+            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            imageInfo.imageView = p_texture->imageView;
+            imageInfo.sampler = p_texture->sampler;
+
+            std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+
+            descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[0].dstSet = descriptorSets[i];
+            descriptorWrites[0].dstBinding = 0;
+            descriptorWrites[0].dstArrayElement = 0;
+            descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptorWrites[0].descriptorCount = 1;
+            descriptorWrites[0].pImageInfo = &imageInfo;
+
+            // Update the contents of a descriptor set object.
+            vkUpdateDescriptorSets(device,
+                                   static_cast<uint32_t>(descriptorWrites.size()),
+                                   descriptorWrites.data(),
+                                   0,
+                                   nullptr);
+        }
+    }
+
+    MaterialSkybox::MaterialSkybox() {
+        desc_set = std::make_shared<MaterialSkyboxDescSet>();
+    }
+
+    std::shared_ptr<MaterialSkybox> MaterialSkybox::from_default() {
+        return std::shared_ptr<MaterialSkybox>();
+    }
+
+    void MaterialSkybox::set_texture(std::shared_ptr<CubemapTexture> p_texture) {
+        texture = p_texture;
+        desc_set->updateDescriptorSet(texture.get());
+    }
 }

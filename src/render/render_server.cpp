@@ -273,7 +273,8 @@ namespace Flint {
                                    VkMemoryPropertyFlags properties,
                                    VkImage &image,
                                    VkDeviceMemory &imageMemory,
-                                   uint32_t arrayLayers) const {
+                                   uint32_t arrayLayers,
+                                   VkImageCreateFlags flags) const {
         auto device = Platform::getSingleton()->device;
 
         VkImageCreateInfo imageInfo{};
@@ -288,6 +289,9 @@ namespace Flint {
         imageInfo.usage = usage;
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
         imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        if (flags != VK_IMAGE_CREATE_FLAG_BITS_MAX_ENUM) {
+            imageInfo.flags = flags;
+        }
 
         if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create image!");
@@ -372,11 +376,11 @@ namespace Flint {
         vkBindBufferMemory(device, buffer, bufferMemory, 0);
     }
 
-    void RenderServer::copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize) const {
+    void RenderServer::copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize, size_t memoryOffset) const {
         auto device = Platform::getSingleton()->device;
 
         void *data;
-        vkMapMemory(device, bufferMemory, 0, dataSize, 0, &data);
+        vkMapMemory(device, bufferMemory, memoryOffset, dataSize, 0, &data);
         memcpy(data, src, dataSize);
         vkUnmapMemory(device, bufferMemory);
     }
@@ -803,7 +807,9 @@ namespace Flint {
             layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
             layoutInfo.pBindings = bindings.data();
 
-            if (vkCreateDescriptorSetLayout(Platform::getSingleton()->device, &layoutInfo, nullptr,
+            if (vkCreateDescriptorSetLayout(Platform::getSingleton()->device,
+                                            &layoutInfo,
+                                            nullptr,
                                             &skybox_descriptor_set_layout) != VK_SUCCESS) {
                 throw std::runtime_error("Failed to create descriptor set layout!");
             }
@@ -1341,7 +1347,7 @@ namespace Flint {
         rasterizer.rasterizerDiscardEnable = VK_FALSE;
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
         rasterizer.lineWidth = 1.0f;
-        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+        rasterizer.cullMode = VK_CULL_MODE_FRONT_BIT;
         rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.depthBiasEnable = VK_FALSE;
 

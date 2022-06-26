@@ -26,6 +26,7 @@ namespace Flint {
         // ------------------------------------
         VkPipeline meshGraphicsPipeline;
         VkPipeline blitGraphicsPipeline;
+        VkPipeline skybox_graphics_pipeline;
         // ------------------------------------
 
         VkImage depthImage;

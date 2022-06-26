@@ -45,11 +45,12 @@ namespace Flint {
         Node3D,
         Sprite3D,
         Model,
+        Skybox,
 
         Max,
     };
 
-    const std::array<std::string, 27> NodeTypeName {
+    const std::array<std::string, 28> NodeTypeName {
         // General.
         "Node",
         "SubViewport",
@@ -82,6 +83,7 @@ namespace Flint {
         "Node3D",
         "Sprite3D",
         "Model",
+        "Skybox",
     };
 
     class Node {
