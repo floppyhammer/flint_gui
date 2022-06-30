@@ -18,6 +18,8 @@ namespace Flint {
         std::shared_ptr<MaterialSkybox> material;
 
         std::shared_ptr<SurfaceGpuResources<SkyboxVertex>> surface_gpu_resources;
+
+        std::shared_ptr<Mesh3d> mesh;
     };
 }
 

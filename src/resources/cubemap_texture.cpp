@@ -21,12 +21,12 @@ namespace Flint {
         uint32_t mipLevels = 1;
 
         std::vector<std::string> paths = {
-                "../assets/skybox_0.jpg",
-                "../assets/skybox_1.jpg",
-                "../assets/skybox_2.jpg",
-                "../assets/skybox_3.jpg",
-                "../assets/skybox_4.jpg",
-                "../assets/skybox_5.jpg",
+                "../assets/skybox/000.png",
+                "../assets/skybox/001.png",
+                "../assets/skybox/002.png",
+                "../assets/skybox/003.png",
+                "../assets/skybox/004.png",
+                "../assets/skybox/005.png",
         };
 
         VkDeviceSize image_size = 0;

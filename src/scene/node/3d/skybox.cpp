@@ -11,6 +11,8 @@ namespace Flint {
     Skybox::Skybox() {
         type = NodeType::Skybox;
 
+        //mesh = ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj");
+
         material = std::make_shared<MaterialSkybox>();
         material->set_texture(std::make_shared<CubemapTexture>());
     }

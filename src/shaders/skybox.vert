@@ -7,11 +7,11 @@ layout(push_constant) uniform uWvp {
 
 layout(location = 0) in vec3 inPosition;
 
-layout(location = 0) out vec3 fragTexCoord;
+layout(location = 0) out vec3 outTexCoord;
 
 void main() {
-    vec4 wvpPos = pcs.wvp * vec4(inPosition, 1.0);
+    vec4 wvpPos = pcs.wvp * vec4(inPosition, 0.0);
     gl_Position = wvpPos.xyww;
 
-    fragTexCoord = inPosition;
+    outTexCoord = inPosition;
 }

@@ -18,19 +18,39 @@ namespace Flint {
 
             // For index buffer. (Front is counter-clockwise.)
             const std::vector<uint32_t> indices = {
-                    0, 2, 1, 2, 0, 3
+                    0, 2, 1,
+                    2, 0, 3,
             };
 
             default_surface_2d_gpu_resources = std::make_shared<SurfaceGpuResources<Vertex>>(vertices, indices);
 
             const std::vector<SkyboxVertex> skybox_vertices = {
-                    {{0.0f, 0.0f, 0.0f}},
-                    {{1.0f, 0.0f, 0.0f}},
-                    {{1.0f, 1.0f, 0.0f}},
-                    {{0.0f, 1.0f, 0.0f}}
+                    {{-1.0f, -1.0f, -1.0f}},
+                    {{1.0f, -1.0f, -1.0f}},
+                    {{1.0f, 1.0f, -1.0f}},
+                    {{-1.0f, 1.0f, -1.0f}},
+                    {{-1.0f, -1.0f, 1.0f}},
+                    {{1.0f, -1.0f, 1.0f}},
+                    {{1.0f, 1.0f, 1.0f}},
+                    {{-1.0f, 1.0f, 1.0f}},
             };
 
-            default_skybox_gpu_resources = std::make_shared<SurfaceGpuResources<SkyboxVertex>>(skybox_vertices, indices);
+            const std::vector<uint32_t> skybox_indices = {
+                    0, 1, 2,
+                    2, 3, 0,
+                    4, 6, 5,
+                    6, 4, 7,
+                    2, 6, 7,
+                    2, 7, 3,
+                    1, 5, 6,
+                    1, 6, 2,
+                    3, 7, 0,
+                    4, 0, 7,
+                    5, 1, 4,
+                    4, 1, 0,
+            };
+
+            default_skybox_gpu_resources = std::make_shared<SurfaceGpuResources<SkyboxVertex>>(skybox_vertices, skybox_indices);
         }
 
         static DefaultResource *get_singleton() {

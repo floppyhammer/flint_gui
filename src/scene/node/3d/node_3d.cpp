@@ -33,7 +33,7 @@ namespace Flint {
         // Determined by model transform.
         mvp.model = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, position.z));
         mvp.model = glm::scale(mvp.model, glm::vec3(scale.x, scale.y, scale.z));
-        mvp.model = glm::rotate(mvp.model, (float) Engine::get_singleton()->get_elapsed() * glm::radians(90.0f),
+        mvp.model = glm::rotate(mvp.model, (float) Engine::get_singleton()->get_elapsed() * 0.2f * glm::radians(90.0f),
                                 glm::vec3(0.0f, 0.0f, 1.0f));
 
         // FIXME: Should get camera from the viewport.
