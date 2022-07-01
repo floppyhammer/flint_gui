@@ -59,7 +59,7 @@ namespace Flint {
             // Upload the model matrix to the GPU via push constants.
             vkCmdPushConstants(command_buffer, pipeline_layout,
                                VK_SHADER_STAGE_VERTEX_BIT, 0,
-                               sizeof(Surface2dPushConstant), &model.push_constant.mvp);
+                               sizeof(MvpPushConstant), &model.push_constant.mvp);
 
             for (auto &surface: model.mesh->surfaces) {
                 VkBuffer vertexBuffers[] = {surface->get_vertex_buffer()};

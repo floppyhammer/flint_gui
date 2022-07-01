@@ -59,7 +59,7 @@ namespace Flint {
                 // Upload the model matrix to the GPU via push constants.
                 vkCmdPushConstants(p_command_buffer, pipeline_layout,
                                    VK_SHADER_STAGE_VERTEX_BIT, 0,
-                                   sizeof(Surface2dPushConstant), &push_constant);
+                                   sizeof(MvpPushConstant), &push_constant);
 
                 // Unlike Sprite 2D, Texture Rect should not support custom mesh.
                 RenderServer::getSingleton()->blit(
@@ -108,7 +108,7 @@ namespace Flint {
                                          size.y / viewport_extent.y * 2.0f,
                                          1.0f));
 
-        push_constant.model = mvp.model;
+        push_constant.mvp = mvp.model;
     }
 
     Vec2<float> TextureRect::calculate_minimum_size() const {

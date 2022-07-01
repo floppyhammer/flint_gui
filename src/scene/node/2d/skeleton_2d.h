@@ -84,7 +84,7 @@ namespace Flint {
 
         std::shared_ptr<Skeleton2dMesh> mesh;
 
-        Surface2dPushConstant pc_skeleton_transform;
+        MvpPushConstant pc_skeleton_transform;
 
         std::vector<float> bone_transforms;
         std::shared_ptr<ImageTexture> bone_transforms_texture;

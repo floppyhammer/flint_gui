@@ -2,6 +2,7 @@
 #define FLINT_SURFACE_H
 
 #include "material.h"
+#include "../render/vertex.h"
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -13,15 +14,6 @@
 #include <array>
 
 namespace Flint {
-    struct Surface2dPushConstant {
-        glm::mat4 model;
-    };
-
-    // TODO: We might need to push model, view and projection separately.
-    struct Surface3dPushConstant {
-        glm::mat4 mvp;
-    };
-
     class Surface {
     public:
         Surface() = default;
@@ -54,7 +46,6 @@ namespace Flint {
         std::shared_ptr<Material2d> get_material() const;
 
     private:
-
         std::shared_ptr<Material2d> material;
     };
 

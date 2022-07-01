@@ -27,7 +27,7 @@ namespace Flint {
         // Upload the model matrix to the GPU via push constants.
         vkCmdPushConstants(p_command_buffer, pipeline_layout,
                            VK_SHADER_STAGE_VERTEX_BIT, 0,
-                           sizeof(Surface3dPushConstant), &push_constant);
+                           sizeof(MvpPushConstant), &push_constant);
 
         for (auto &surface: mesh->surfaces) {
             const auto &desc_set = surface->get_material()->get_desc_set();

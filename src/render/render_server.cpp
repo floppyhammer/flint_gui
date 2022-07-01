@@ -640,7 +640,7 @@ namespace Flint {
             VkPushConstantRange pushConstant;
             {
                 pushConstant.offset = 0;
-                pushConstant.size = sizeof(Surface3dPushConstant);
+                pushConstant.size = sizeof(MvpPushConstant);
                 pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
             }
 
@@ -710,7 +710,7 @@ namespace Flint {
             VkPushConstantRange pushConstant;
             {
                 pushConstant.offset = 0;
-                pushConstant.size = sizeof(Surface2dPushConstant);
+                pushConstant.size = sizeof(MvpPushConstant);
                 pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
             }
 
@@ -770,7 +770,7 @@ namespace Flint {
             VkPushConstantRange pushConstant;
             {
                 pushConstant.offset = 0;
-                pushConstant.size = sizeof(Surface2dPushConstant);
+                pushConstant.size = sizeof(MvpPushConstant);
                 pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
             }
 
@@ -824,7 +824,7 @@ namespace Flint {
             VkPushConstantRange pushConstant;
             {
                 pushConstant.offset = 0;
-                pushConstant.size = sizeof(Surface3dPushConstant);
+                pushConstant.size = sizeof(MvpPushConstant);
                 pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
             }
 

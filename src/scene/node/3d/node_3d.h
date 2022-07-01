@@ -31,7 +31,7 @@ namespace Flint {
 
         void update_mvp();
 
-        Surface3dPushConstant push_constant;
+        MvpPushConstant push_constant;
     };
 }
 

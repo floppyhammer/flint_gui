@@ -39,7 +39,7 @@ namespace Flint {
                                              transform.size.y / viewport_extent.y * 2.0f,
                                              1.0f));
 
-            sprite.push_constant.model = mvp.model;
+            sprite.push_constant.mvp = mvp.model;
         }
     }
 
@@ -55,7 +55,7 @@ namespace Flint {
             // Upload the model matrix to the GPU via push constants.
             vkCmdPushConstants(command_buffer, pipeline_layout,
                                VK_SHADER_STAGE_VERTEX_BIT, 0,
-                               sizeof(Surface2dPushConstant), &sprite.push_constant.model);
+                               sizeof(MvpPushConstant), &sprite.push_constant.mvp);
 
             VkBuffer vertexBuffers[] = {sprite.mesh->surface->get_vertex_buffer()};
             RenderServer::getSingleton()->draw_mesh_2d(
@@ -105,7 +105,7 @@ namespace Flint {
                                              sprite_height / viewport_extent.y * 2.0f,
                                              1.0f));
 
-            sprite.push_constant.model = mvp.model;
+            sprite.push_constant.mvp = mvp.model;
         }
     }
 
@@ -124,7 +124,7 @@ namespace Flint {
             // Upload the model matrix to the GPU via push constants.
             vkCmdPushConstants(command_buffer, pipeline_layout,
                                VK_SHADER_STAGE_VERTEX_BIT, 0,
-                               sizeof(Surface2dPushConstant), &sprite.push_constant.model);
+                               sizeof(MvpPushConstant), &sprite.push_constant.mvp);
 
             VkBuffer vertexBuffers[] = {sprite.mesh->surface->get_vertex_buffer()};
             RenderServer::getSingleton()->draw_mesh_2d(

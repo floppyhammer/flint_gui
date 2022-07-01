@@ -1,7 +1,3 @@
-//
-// Created by tannh on 4/3/2022.
-//
-
 #ifndef FLINT_MVP_BUFFER_H
 #define FLINT_MVP_BUFFER_H
 
@@ -16,7 +12,7 @@
 #include <vector>
 
 namespace Flint {
-    /// MVP, which will be sent to vertex shaders.
+    /// MVP, which will be sent to the vertex stage.
     /// Shared by 2D and 3D.
     struct ModelViewProjection {
         glm::mat4 model = glm::mat4(1.0f);
@@ -26,6 +22,12 @@ namespace Flint {
         glm::mat4 calculate_mvp() const;
     };
 
+    // TODO: We might need to push model, view and projection separately.
+    struct MvpPushConstant {
+        glm::mat4 mvp;
+    };
+
+    /// Uniform buffer for MVP. (Push constants are preferred over this.)
     class MvpBuffer {
     public:
         MvpBuffer();
@@ -37,7 +39,7 @@ namespace Flint {
         std::vector<VkDeviceMemory> uniform_buffers_memory;
 
         /**
-         * Update MVP. Update UBOs simply by memory mapping.
+         * Update buffer. Update buffer data simply by memory mapping.
          * @param currentImage Current image, which has different meaning from `current frame`.
          */
         void update_uniform_buffer(ModelViewProjection mvp);

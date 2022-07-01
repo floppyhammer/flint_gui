@@ -58,7 +58,7 @@ namespace Flint {
     // -----------------------------
     struct Sprite2dComponent {
         std::shared_ptr<Mesh2d> mesh;
-        Surface2dPushConstant push_constant;
+        MvpPushConstant push_constant;
     };
 
     struct ZSort2d {
@@ -79,7 +79,7 @@ namespace Flint {
 
     struct ModelComponent {
         std::shared_ptr<Mesh3d> mesh;
-        Surface3dPushConstant push_constant;
+        MvpPushConstant push_constant;
     };
 
     /**

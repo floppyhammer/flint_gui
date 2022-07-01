@@ -38,7 +38,7 @@ namespace Flint {
 
         std::shared_ptr<Mesh2d> mesh;
 
-        Surface2dPushConstant push_constant;
+        MvpPushConstant push_constant;
 
         std::shared_ptr<Texture> texture;
     };

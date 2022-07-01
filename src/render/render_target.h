@@ -10,7 +10,7 @@ using Pathfinder::Transform2;
 
 namespace Flint {
     /**
-     * RenderTarget is basically a texture to which you can draw stuff.
+     * RenderTarget is basically a texture to which you can draw things.
      */
     class RenderTarget {
     public:
@@ -37,6 +37,7 @@ namespace Flint {
 
         VkFramebuffer framebuffer;
 
+        /// For later use of the image as a sampler target.
         VkDescriptorImageInfo descriptor;
 
         /**

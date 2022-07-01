@@ -465,7 +465,7 @@ namespace Flint {
                                          1.0f / viewport_size.y * 2.0f,
                                          1.0f));
 
-        pc_skeleton_transform.model = mvp.calculate_mvp();
+        pc_skeleton_transform.mvp = mvp.calculate_mvp();
 
         float time = Engine::get_singleton()->get_elapsed();
         bones[3]->rotation = std::sin(time);
@@ -498,7 +498,7 @@ namespace Flint {
         // Upload the model matrix to the GPU via push constants.
         vkCmdPushConstants(p_command_buffer, pipeline_layout,
                            VK_SHADER_STAGE_VERTEX_BIT, 0,
-                           sizeof(Surface2dPushConstant), &pc_skeleton_transform);
+                           sizeof(MvpPushConstant), &pc_skeleton_transform);
 
         VkBuffer vertexBuffers[] = {mesh->gpu_resources->get_vertex_buffer()};
         RenderServer::getSingleton()->draw_skeleton_2d(

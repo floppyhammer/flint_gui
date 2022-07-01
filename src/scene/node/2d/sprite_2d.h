@@ -25,7 +25,7 @@ namespace Flint {
 
         void update_mvp();
 
-        Surface2dPushConstant push_constant;
+        MvpPushConstant push_constant;
 
         std::shared_ptr<ImageTexture> texture;
     };
