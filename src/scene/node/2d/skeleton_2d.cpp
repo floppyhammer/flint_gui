@@ -1,7 +1,7 @@
 #include "skeleton_2d.h"
 
 #include "../sub_viewport.h"
-#include "../../../render/mvp_buffer.h"
+#include "../../../render/mvp.h"
 #include "../../../render/swap_chain.h"
 #include "../../../render/render_server.h"
 #include "../../../resources/resource_manager.h"

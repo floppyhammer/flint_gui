@@ -20,69 +20,46 @@ namespace Flint {
         // TODO: Add mip levels.
         uint32_t mipLevels = 1;
 
-        std::vector<std::string> paths = {
-                "../assets/skybox/000.png",
-                "../assets/skybox/001.png",
-                "../assets/skybox/002.png",
-                "../assets/skybox/003.png",
-                "../assets/skybox/004.png",
-                "../assets/skybox/005.png",
-        };
+        std::string filename = "../assets/skybox.png";
+        int tex_width, tex_height, tex_channels;
+        stbi_uc *pixels = stbi_load(filename.c_str(),
+                                    &tex_width,
+                                    &tex_height,
+                                    &tex_channels,
+                                    STBI_rgb_alpha);
 
-        VkDeviceSize image_size = 0;
+        if (!pixels) {
+            Flint::Logger::warn("Failed to load image file: " + filename, "Texture");
+            throw std::runtime_error("Failed to load texture image!");
+        }
+
+        width = tex_width;
+        height = tex_height / 6;
+
+        format = VK_FORMAT_R8G8B8A8_UNORM;
+
+        // Image layer data size per layer in bytes.
+        VkDeviceSize layer_data_size = width * height * 4;
 
         // Temporary buffer and CPU memory.
         VkBuffer staging_buffer;
         VkDeviceMemory staging_buffer_memory;
 
-        for (uint32_t face = 0; face < 6; face++) {
-            auto path = paths[face];
+        RenderServer::getSingleton()->createBuffer(layer_data_size * 6,
+                                                   VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                                   staging_buffer,
+                                                   staging_buffer_memory);
 
-            int tex_width, tex_height, tex_channels;
-            stbi_uc *pixels = stbi_load(path.c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
+        // Copy the pixel values that we got from the image loading library to the buffer.
+        RenderServer::getSingleton()->copyDataToMemory(pixels,
+                                                       staging_buffer_memory,
+                                                       layer_data_size * 6,
+                                                       0);
 
-            if (!pixels) {
-                Flint::Logger::warn("Failed to load image file " + path, "Texture");
-                //return Texture::from_empty(4, 4);
-                throw std::runtime_error("Failed to load texture image!");
-            }
-
-            width = tex_width;
-            height = tex_height;
-
-            VkFormat tex_format = VK_FORMAT_R8G8B8A8_UNORM;
-
-            // Data size per pixel.
-            int pixel_bytes;
-            if (tex_format == VK_FORMAT_R8G8B8A8_UNORM) {
-                pixel_bytes = 4;
-            } else if (tex_format == VK_FORMAT_R32G32B32A32_SFLOAT) {
-                pixel_bytes = 16;
-            } else {
-                abort();
-            }
-
-            // Image data size in bytes.
-            image_size = width * height * pixel_bytes;
-
-            if (face == 0) {
-                RenderServer::getSingleton()->createBuffer(image_size * 6,
-                                                           VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                                           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                                           VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                                           staging_buffer,
-                                                           staging_buffer_memory);
-            }
-
-            // Copy the pixel values that we got from the image loading library to the buffer.
-            RenderServer::getSingleton()->copyDataToMemory(pixels,
-                                                           staging_buffer_memory,
-                                                           image_size,
-                                                           face * image_size);
-
-            // Clean up the original pixel array.
-            stbi_image_free(pixels);
-        }
+        // Clean up the original pixel array.
+        stbi_image_free(pixels);
 
         // Create optimal tiled target image.
         RenderServer::getSingleton()->createImage(width,
@@ -99,10 +76,12 @@ namespace Flint {
         // Setup buffer copy regions for each face including all of its mip levels.
         std::vector<VkBufferImageCopy> buffer_copy_regions;
 
+        // Order has to be (+X, -X, +Y, -Y, +Z, -Z).
         for (uint32_t face = 0; face < 6; face++) {
+            // Mip level has to be 1 for now.
             for (uint32_t level = 0; level < mipLevels; level++) {
                 // Calculate offset into staging buffer for the current mip level and face
-                size_t offset = face * image_size;
+                size_t offset = face * layer_data_size;
 
                 VkBufferImageCopy buffer_copy_region = {};
                 buffer_copy_region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;

@@ -5,7 +5,7 @@
 #include "../../../resources/surface.h"
 #include "../../../resources/material.h"
 #include "../../../resources/default_resource.h"
-#include "../../../render/mvp_buffer.h"
+#include "../../../render/mvp.h"
 #include "../../../render/render_target.h"
 #include "../../../servers/input_server.h"
 

@@ -1,5 +1,5 @@
-#ifndef FLINT_MVP_BUFFER_H
-#define FLINT_MVP_BUFFER_H
+#ifndef FLINT_MVP_H
+#define FLINT_MVP_H
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -55,4 +55,4 @@ namespace Flint {
     };
 }
 
-#endif //FLINT_MVP_BUFFER_H
+#endif //FLINT_MVP_H

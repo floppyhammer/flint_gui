@@ -2,7 +2,7 @@
 #define FLINT_RENDER_SERVER_H
 
 #include "platform.h"
-#include "mvp_buffer.h"
+#include "mvp.h"
 
 #define GLFW_INCLUDE_VULKAN
 

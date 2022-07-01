@@ -4,7 +4,7 @@
 #include "node_2d.h"
 #include "sprite_2d.h"
 #include "../../../resources/mesh.h"
-#include "../../../render/mvp_buffer.h"
+#include "../../../render/mvp.h"
 #include "../../../servers/vector_server.h"
 
 namespace Flint {

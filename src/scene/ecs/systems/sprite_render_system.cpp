@@ -3,7 +3,7 @@
 #include "../components/components.h"
 #include "../../../render/swap_chain.h"
 #include "../../../resources/surface.h"
-#include "../../../render/mvp_buffer.h"
+#include "../../../render/mvp.h"
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"

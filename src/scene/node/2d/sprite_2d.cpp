@@ -1,7 +1,7 @@
 #include "sprite_2d.h"
 
 #include "../sub_viewport.h"
-#include "../../../render/mvp_buffer.h"
+#include "../../../render/mvp.h"
 #include "../../../render/swap_chain.h"
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
