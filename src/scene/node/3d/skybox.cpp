@@ -11,8 +11,6 @@ namespace Flint {
     Skybox::Skybox() {
         type = NodeType::Skybox;
 
-        //mesh = ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj");
-
         material = std::make_shared<MaterialSkybox>();
         material->set_texture(std::make_shared<CubemapTexture>());
     }
@@ -37,13 +35,13 @@ namespace Flint {
 
         auto skybox_gpu_resource = DefaultResource::get_singleton()->get_default_skybox_gpu_resources();
 
-        VkBuffer vertexBuffers[] = {skybox_gpu_resource->vertexBuffer};
+        VkBuffer vertexBuffers[] = {skybox_gpu_resource->get_vertex_buffer()};
         RenderServer::getSingleton()->draw_skybox(
                 p_command_buffer,
                 pipeline,
                 desc_set->getDescriptorSet(SwapChain::getSingleton()->currentImage),
                 vertexBuffers,
-                skybox_gpu_resource->indexBuffer,
-                skybox_gpu_resource->indices_count);
+                skybox_gpu_resource->get_index_buffer(),
+                skybox_gpu_resource->get_index_count());
     }
 }

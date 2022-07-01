@@ -500,14 +500,14 @@ namespace Flint {
                            VK_SHADER_STAGE_VERTEX_BIT, 0,
                            sizeof(Surface2dPushConstant), &pc_skeleton_transform);
 
-        VkBuffer vertexBuffers[] = {mesh->gpu_resources->vertexBuffer};
+        VkBuffer vertexBuffers[] = {mesh->gpu_resources->get_vertex_buffer()};
         RenderServer::getSingleton()->draw_skeleton_2d(
                 p_command_buffer,
                 pipeline,
                 descriptor_set,
                 vertexBuffers,
-                mesh->gpu_resources->indexBuffer,
-                mesh->gpu_resources->indices_count);
+                mesh->gpu_resources->get_index_buffer(),
+                mesh->gpu_resources->get_index_count());
 
         if (root_bone) {
             root_bone->draw();
@@ -709,7 +709,7 @@ namespace Flint {
                                            gpu_weights[i * 4 + 3]};
         }
 
-        mesh->gpu_resources = std::make_shared<SurfaceGpuResources<SkeletonVertex>>(vertex_data, total_indices);
+        mesh->gpu_resources = std::make_shared<VertexGpuResources<SkeletonVertex>>(vertex_data, total_indices);
     }
 
     void Skeleton2d::allocate_bone_transforms(uint32_t new_bone_count) {

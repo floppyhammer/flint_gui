@@ -61,7 +61,7 @@ namespace Flint {
         // Vector[bone count][vertex count]
         std::vector<std::vector<float>> bone_weights;
 
-        std::shared_ptr<SurfaceGpuResources<SkeletonVertex>> gpu_resources;
+        std::shared_ptr<VertexGpuResources<SkeletonVertex>> gpu_resources;
     };
 
     class Skeleton2d : public Node2d {

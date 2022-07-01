@@ -15,19 +15,15 @@
 #include <array>
 
 namespace Flint {
+    /// Vertex for Skeleton2D.
     struct SkeletonVertex {
         glm::vec3 pos;
         glm::vec3 color;
-        glm::vec2 uv;
-        glm::vec4 bone_indices;
-        glm::vec4 bone_weights;
+        glm::vec2 uv; // Texture coordinates.
+        glm::vec4 bone_indices; // Can be affected by at most 4 bones.
+        glm::vec4 bone_weights; // These 4 bones' weights.
 
-        bool operator==(const SkeletonVertex &other) const {
-            return pos == other.pos && color == other.color && uv == other.uv && bone_indices == other.bone_indices
-                   && bone_weights == other.bone_weights;
-        }
-
-        /// Binding info.
+        /// Vertex binding description.
         static VkVertexInputBindingDescription getBindingDescription() {
             VkVertexInputBindingDescription bindingDescription{};
             bindingDescription.binding = 0;
@@ -37,7 +33,7 @@ namespace Flint {
             return bindingDescription;
         }
 
-        /// Attributes info.
+        /// Vertex attribute descriptions.
         static std::array<VkVertexInputAttributeDescription, 5> getAttributeDescriptions() {
             std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions{};
 
@@ -70,19 +66,18 @@ namespace Flint {
         }
     };
 
-    /**
-     * Shared by 2D and 3D meshes.
-     */
+    /// Vertex for 2D and 3D meshes.
     struct Vertex {
         glm::vec3 pos;
         glm::vec3 color;
         glm::vec2 uv; // Texture coordinates.
 
+        /// For hashmap.
         bool operator==(const Vertex &other) const {
             return pos == other.pos && color == other.color && uv == other.uv;
         }
 
-        /// Binding info.
+        /// Vertex binding description.
         static VkVertexInputBindingDescription getBindingDescription() {
             VkVertexInputBindingDescription bindingDescription{};
             bindingDescription.binding = 0;
@@ -92,7 +87,7 @@ namespace Flint {
             return bindingDescription;
         }
 
-        /// Attributes info.
+        /// Vertex attribute descriptions.
         static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
             std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
 
@@ -115,10 +110,11 @@ namespace Flint {
         }
     };
 
+    /// Vertex for Skybox.
     struct SkyboxVertex {
         glm::vec3 pos;
 
-        /// Binding info.
+        /// Vertex binding description.
         static VkVertexInputBindingDescription getBindingDescription() {
             VkVertexInputBindingDescription bindingDescription{};
             bindingDescription.binding = 0;
@@ -128,7 +124,7 @@ namespace Flint {
             return bindingDescription;
         }
 
-        /// Attributes info.
+        /// Vertex attribute descriptions.
         static std::array<VkVertexInputAttributeDescription, 1> getAttributeDescriptions() {
             std::array<VkVertexInputAttributeDescription, 1> attributeDescriptions{};
 
@@ -138,6 +134,122 @@ namespace Flint {
             attributeDescriptions[0].offset = 0;
 
             return attributeDescriptions;
+        }
+    };
+
+    /// GPU data containing a vertex and index buffer.
+    template<typename T>
+    struct VertexGpuResources {
+        VertexGpuResources(const std::vector<T> &vertices, const std::vector<uint32_t> &indices) {
+            create_vertex_buffer(vertices);
+            create_index_buffer(indices);
+        }
+
+        ~VertexGpuResources() {
+            auto device = Platform::getSingleton()->device;
+
+            // Clean up index buffer.
+            vkDestroyBuffer(device, index_buffer, nullptr);
+            vkFreeMemory(device, index_buffer_memory, nullptr);
+
+            // Clean up vertex buffer.
+            vkDestroyBuffer(device, vertex_buffer, nullptr); // GPU memory
+            vkFreeMemory(device, vertex_buffer_memory, nullptr); // CPU memory
+        }
+
+        VkBuffer get_vertex_buffer() {
+            return vertex_buffer;
+        }
+
+        VkBuffer get_index_buffer() {
+            return index_buffer;
+        }
+
+        uint32_t get_index_count() {
+            return index_count;
+        }
+
+    private:
+        /// Vertex buffer.
+        VkBuffer vertex_buffer{};
+        VkDeviceMemory vertex_buffer_memory{};
+
+        /// Index buffer.
+        VkBuffer index_buffer{};
+        VkDeviceMemory index_buffer_memory{};
+        uint32_t index_count = 0;
+
+    private:
+        void create_vertex_buffer(const std::vector<T> &vertices) {
+            VkDeviceSize buffer_size = sizeof(vertices[0]) * vertices.size();
+
+            VkBuffer staging_buffer; // In GPU
+            VkDeviceMemory staging_buffer_memory; // In CPU
+
+            auto rs = RenderServer::getSingleton();
+
+            // Create the GPU buffer and link it with the CPU memory.
+            rs->createBuffer(buffer_size,
+                             VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                             VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                             staging_buffer,
+                             staging_buffer_memory);
+
+            // Copy data to the CPU memory.
+            rs->copyDataToMemory((void *) vertices.data(), staging_buffer_memory,
+                                 buffer_size);
+
+            // Create the vertex buffer (GPU) and bind it to the vertex memory (CPU).
+            rs->createBuffer(buffer_size,
+                             VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+                             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                             vertex_buffer,
+                             vertex_buffer_memory);
+
+            // Copy buffer (GPU).
+            rs->copyBuffer(staging_buffer, vertex_buffer, buffer_size);
+
+            // Clean up staging buffer and memory.
+            vkDestroyBuffer(Platform::getSingleton()->device, staging_buffer, nullptr);
+            vkFreeMemory(Platform::getSingleton()->device, staging_buffer_memory, nullptr);
+        }
+
+        void create_index_buffer(const std::vector<uint32_t> &indices) {
+            VkDeviceSize buffer_size = sizeof(indices[0]) * indices.size();
+
+            // Set indices count for surface.
+            index_count = indices.size();
+
+            VkBuffer staging_buffer;
+            VkDeviceMemory staging_buffer_memory;
+
+            auto rs = RenderServer::getSingleton();
+
+            rs->createBuffer(buffer_size,
+                             VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                             VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                             staging_buffer,
+                             staging_buffer_memory);
+
+            rs->copyDataToMemory((void *) indices.data(),
+                                 staging_buffer_memory,
+                                 buffer_size);
+
+            rs->createBuffer(buffer_size,
+                             VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+                             VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+                             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                             index_buffer,
+                             index_buffer_memory);
+
+            // Copy data from staging buffer to index buffer.
+            rs->copyBuffer(staging_buffer, index_buffer, buffer_size);
+
+            vkDestroyBuffer(Platform::getSingleton()->device, staging_buffer, nullptr);
+            vkFreeMemory(Platform::getSingleton()->device, staging_buffer_memory, nullptr);
         }
     };
 
@@ -251,19 +363,14 @@ namespace Flint {
          * @param bufferMemory Device memory.
          * @param dataSize Data size in bytes.
          */
-        void copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize, size_t memoryOffset = 0) const;
+        void
+        copyDataToMemory(const void *src, VkDeviceMemory bufferMemory, size_t dataSize, size_t memoryOffset = 0) const;
 
         void createTextureSampler(VkSampler &textureSampler, VkFilter filter) const;
 
     public:
-        // Texture rect.
+        // Various pipelines.
         // --------------------------------------------------
-
-        // --------------------------------------------------
-
-        // Mesh instance 3D.
-        // --------------------------------------------------
-        // These should be shared by all mesh instances.
         VkDescriptorSetLayout meshDescriptorSetLayout;
         VkPipelineLayout meshPipelineLayout;
         VkPipeline meshGraphicsPipeline;
@@ -346,13 +453,7 @@ namespace Flint {
 
         void createBlitPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
 
-        void createIndexBuffer(std::vector<uint32_t> &indices,
-                               VkBuffer &p_index_buffer,
-                               VkDeviceMemory &p_index_buffer_memory);
-
-        void createVertexBuffer(std::vector<Vertex> &vertices,
-                                VkBuffer &p_vertex_buffer,
-                                VkDeviceMemory &p_vertex_buffer_memory);
+        void createSkeleton2dMeshPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
 
     private:
         /**
@@ -368,8 +469,6 @@ namespace Flint {
         void createBlitLayouts();
 
         void createSkeleton2dMeshLayouts();
-
-        void createSkeleton2dMeshPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
 
         void create_skybox_layouts();
     };

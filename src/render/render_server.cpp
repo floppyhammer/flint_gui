@@ -376,7 +376,10 @@ namespace Flint {
         vkBindBufferMemory(device, buffer, bufferMemory, 0);
     }
 
-    void RenderServer::copyDataToMemory(void *src, VkDeviceMemory bufferMemory, size_t dataSize, size_t memoryOffset) const {
+    void RenderServer::copyDataToMemory(const void *src,
+                                        VkDeviceMemory bufferMemory,
+                                        size_t dataSize,
+                                        size_t memoryOffset) const {
         auto device = Platform::getSingleton()->device;
 
         void *data;
@@ -425,14 +428,14 @@ namespace Flint {
                             const VkDescriptorSet &descriptorSet) const {
         auto default_resources = DefaultResource::get_singleton()->get_default_surface_2d_gpu_resources();
 
-        VkBuffer vertexBuffers[] = {default_resources->vertexBuffer};
+        VkBuffer vertexBuffers[] = {default_resources->get_vertex_buffer()};
 
         draw_mesh_2d(commandBuffer,
                      graphicsPipeline,
                      descriptorSet,
                      vertexBuffers,
-                     default_resources->indexBuffer,
-                     default_resources->indices_count);
+                     default_resources->get_index_buffer(),
+                     default_resources->get_index_count());
     }
 
     void RenderServer::draw_skeleton_2d(VkCommandBuffer command_buffer,
@@ -1416,68 +1419,5 @@ namespace Flint {
         // Clean up shader modules.
         vkDestroyShaderModule(device, fragShaderModule, nullptr);
         vkDestroyShaderModule(device, vertShaderModule, nullptr);
-    }
-
-    void RenderServer::createVertexBuffer(std::vector<Vertex> &vertices,
-                                          VkBuffer &p_vertex_buffer,
-                                          VkDeviceMemory &p_vertex_buffer_memory) {
-        VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
-
-        VkBuffer stagingBuffer; // In GPU
-        VkDeviceMemory stagingBufferMemory; // In CPU
-
-        // Create the GPU buffer and link it with the CPU memory.
-        createBuffer(bufferSize,
-                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                     stagingBuffer,
-                     stagingBufferMemory);
-
-        // Copy data to the CPU memory.
-        copyDataToMemory(vertices.data(), stagingBufferMemory, bufferSize);
-
-        // Create the vertex buffer (GPU) and bind it to the vertex memory (CPU).
-        createBuffer(bufferSize,
-                     VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                     p_vertex_buffer,
-                     p_vertex_buffer_memory);
-
-        // Copy buffer (GPU).
-        copyBuffer(stagingBuffer, p_vertex_buffer, bufferSize);
-
-        // Clean up staging buffer and memory.
-        vkDestroyBuffer(Platform::getSingleton()->device, stagingBuffer, nullptr);
-        vkFreeMemory(Platform::getSingleton()->device, stagingBufferMemory, nullptr);
-    }
-
-    void RenderServer::createIndexBuffer(std::vector<uint32_t> &indices,
-                                         VkBuffer &p_index_buffer,
-                                         VkDeviceMemory &p_index_buffer_memory) {
-        VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
-
-        VkBuffer stagingBuffer;
-        VkDeviceMemory stagingBufferMemory;
-        createBuffer(bufferSize,
-                     VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                     VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                     stagingBuffer,
-                     stagingBufferMemory);
-
-        copyDataToMemory(indices.data(),
-                         stagingBufferMemory,
-                         bufferSize);
-
-        createBuffer(bufferSize,
-                     VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-                     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                     p_index_buffer,
-                     p_index_buffer_memory);
-
-        // Copy data from staging buffer to index buffer.
-        copyBuffer(stagingBuffer, p_index_buffer, bufferSize);
-
-        vkDestroyBuffer(Platform::getSingleton()->device, stagingBuffer, nullptr);
-        vkFreeMemory(Platform::getSingleton()->device, stagingBufferMemory, nullptr);
     }
 }

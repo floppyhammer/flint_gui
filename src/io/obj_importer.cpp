@@ -101,7 +101,7 @@ namespace Flint {
                 indices.push_back(uniqueVertices[vertex]);
             }
 
-            surface->set_gpu_resources(std::make_shared<SurfaceGpuResources<Vertex>>(vertices, indices));
+            surface->set_gpu_resources(std::make_shared<VertexGpuResources<Vertex>>(vertices, indices));
 
             if (material_id >= 0 && material_id < materials.size()) {
                 surface->set_material(materials[material_id]);

@@ -29,24 +29,24 @@ namespace Flint {
         if (gpu_resources == nullptr)
             return nullptr;
 
-        return gpu_resources->vertexBuffer;
+        return gpu_resources->get_vertex_buffer();
     }
 
     VkBuffer Surface::get_index_buffer() {
         if (gpu_resources == nullptr)
             return nullptr;
 
-        return gpu_resources->indexBuffer;
+        return gpu_resources->get_index_buffer();
     }
 
     uint32_t Surface::get_index_count() {
         if (gpu_resources == nullptr)
             return 0;
 
-        return gpu_resources->indices_count;
+        return gpu_resources->get_index_count();
     }
 
-    void Surface::set_gpu_resources(std::shared_ptr<SurfaceGpuResources<Vertex>> p_gpu_resources) {
+    void Surface::set_gpu_resources(std::shared_ptr<VertexGpuResources<Vertex>> p_gpu_resources) {
         gpu_resources = p_gpu_resources;
     }
 }
