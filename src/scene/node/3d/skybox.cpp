@@ -12,7 +12,7 @@ namespace Flint {
         type = NodeType::Skybox;
 
         material = std::make_shared<MaterialSkybox>();
-        material->set_texture(std::make_shared<CubemapTexture>());
+        material->set_texture(std::make_shared<CubemapTexture>("../assets/skybox.png"));
     }
 
     void Skybox::draw(VkCommandBuffer p_command_buffer) {

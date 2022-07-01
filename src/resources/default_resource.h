@@ -8,49 +8,54 @@ namespace Flint {
     class DefaultResource {
     public:
         DefaultResource() {
-            // Default vertices and indices data for 2D quad surface.
-            const std::vector<Vertex> vertices = {
-                    {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
-                    {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
-                    {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-                    {{0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
-            };
+            // Default vertex and index data for 2D quad surface.
+            {
+                const std::vector<Vertex> vertices = {
+                        {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f}},
+                        {{1.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 0.0f}},
+                        {{1.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+                        {{0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
+                };
 
-            // For index buffer. (Front is counter-clockwise.)
-            const std::vector<uint32_t> indices = {
-                    0, 2, 1,
-                    2, 0, 3,
-            };
+                // Front is counter-clockwise.
+                const std::vector<uint32_t> indices = {
+                        0, 2, 1,
+                        2, 0, 3,
+                };
 
-            default_surface_2d_gpu_resources = std::make_shared<VertexGpuResources<Vertex>>(vertices, indices);
+                default_surface_2d_gpu_resources = std::make_shared<VertexGpuResources<Vertex>>(vertices, indices);
+            }
 
-            const std::vector<SkyboxVertex> skybox_vertices = {
-                    {{-1.0f, -1.0f, -1.0f}},
-                    {{1.0f, -1.0f, -1.0f}},
-                    {{1.0f, 1.0f, -1.0f}},
-                    {{-1.0f, 1.0f, -1.0f}},
-                    {{-1.0f, -1.0f, 1.0f}},
-                    {{1.0f, -1.0f, 1.0f}},
-                    {{1.0f, 1.0f, 1.0f}},
-                    {{-1.0f, 1.0f, 1.0f}},
-            };
+            // Default vertex and index data for Skybox.
+            {
+                const std::vector<SkyboxVertex> skybox_vertices = {
+                        {{-1.0f, -1.0f, -1.0f}},
+                        {{1.0f, -1.0f, -1.0f}},
+                        {{1.0f, 1.0f, -1.0f}},
+                        {{-1.0f, 1.0f, -1.0f}},
+                        {{-1.0f, -1.0f, 1.0f}},
+                        {{1.0f, -1.0f, 1.0f}},
+                        {{1.0f, 1.0f, 1.0f}},
+                        {{-1.0f, 1.0f, 1.0f}},
+                };
 
-            const std::vector<uint32_t> skybox_indices = {
-                    0, 1, 2,
-                    2, 3, 0,
-                    4, 6, 5,
-                    6, 4, 7,
-                    2, 6, 7,
-                    2, 7, 3,
-                    1, 5, 6,
-                    1, 6, 2,
-                    3, 7, 0,
-                    4, 0, 7,
-                    5, 1, 4,
-                    4, 1, 0,
-            };
+                const std::vector<uint32_t> skybox_indices = {
+                        0, 1, 2,
+                        2, 3, 0,
+                        4, 6, 5,
+                        6, 4, 7,
+                        2, 6, 7,
+                        2, 7, 3,
+                        1, 5, 6,
+                        1, 6, 2,
+                        3, 7, 0,
+                        4, 0, 7,
+                        5, 1, 4,
+                        4, 1, 0,
+                };
 
-            default_skybox_gpu_resources = std::make_shared<VertexGpuResources<SkyboxVertex>>(skybox_vertices, skybox_indices);
+                default_skybox_gpu_resources = std::make_shared<VertexGpuResources<SkyboxVertex>>(skybox_vertices, skybox_indices);
+            }
         }
 
         static DefaultResource *get_singleton() {
@@ -72,8 +77,8 @@ namespace Flint {
         }
 
         /**
-         * Same GPU vertex and index buffers will be shared by all 2D meshes instanced this way.
-         * @return
+         * Same vertex and index buffers will be shared by all default 2D meshes.
+         * @return Mesh2d
          */
         inline std::shared_ptr<Mesh2d> new_default_mesh_2d() const {
             auto surface = std::make_shared<Surface2d>();

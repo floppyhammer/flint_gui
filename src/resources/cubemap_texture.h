@@ -13,9 +13,9 @@
 namespace Flint {
     class CubemapTexture : public Texture {
     public:
-        CubemapTexture();
+        CubemapTexture(const std::string &path);
 
-        void load();
+        void load_from_file(const std::string &path);
 
         VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 

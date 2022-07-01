@@ -10,26 +10,25 @@
 #include <stdexcept>
 
 namespace Flint {
-    CubemapTexture::CubemapTexture() {
-        load();
+    CubemapTexture::CubemapTexture(const std::string &path) {
+        load_from_file(path);
     }
 
-    void CubemapTexture::load() {
+    void CubemapTexture::load_from_file(const std::string &path) {
         auto device = Platform::getSingleton()->device;
 
         // TODO: Add mip levels.
         uint32_t mipLevels = 1;
 
-        std::string filename = "../assets/skybox.png";
         int tex_width, tex_height, tex_channels;
-        stbi_uc *pixels = stbi_load(filename.c_str(),
+        stbi_uc *pixels = stbi_load(path.c_str(),
                                     &tex_width,
                                     &tex_height,
                                     &tex_channels,
                                     STBI_rgb_alpha);
 
         if (!pixels) {
-            Flint::Logger::warn("Failed to load image file: " + filename, "Texture");
+            Flint::Logger::warn("Failed to load image file: " + path, "Texture");
             throw std::runtime_error("Failed to load texture image!");
         }
 
@@ -45,33 +44,35 @@ namespace Flint {
         VkBuffer staging_buffer;
         VkDeviceMemory staging_buffer_memory;
 
-        RenderServer::getSingleton()->createBuffer(layer_data_size * 6,
-                                                   VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                                                   VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-                                                   staging_buffer,
-                                                   staging_buffer_memory);
+        auto rs = RenderServer::getSingleton();
+
+        rs->createBuffer(layer_data_size * 6,
+                         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                         VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                         staging_buffer,
+                         staging_buffer_memory);
 
         // Copy the pixel values that we got from the image loading library to the buffer.
-        RenderServer::getSingleton()->copyDataToMemory(pixels,
-                                                       staging_buffer_memory,
-                                                       layer_data_size * 6,
-                                                       0);
+        rs->copyDataToMemory(pixels,
+                             staging_buffer_memory,
+                             layer_data_size * 6,
+                             0);
 
         // Clean up the original pixel array.
         stbi_image_free(pixels);
 
         // Create optimal tiled target image.
-        RenderServer::getSingleton()->createImage(width,
-                                                  height,
-                                                  format,
-                                                  VK_IMAGE_TILING_OPTIMAL,
-                                                  VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-                                                  VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                                  image,
-                                                  imageMemory,
-                                                  6,
-                                                  VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT);
+        rs->createImage(width,
+                        height,
+                        format,
+                        VK_IMAGE_TILING_OPTIMAL,
+                        VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                        image,
+                        imageMemory,
+                        6,
+                        VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT);
 
         // Setup buffer copy regions for each face including all of its mip levels.
         std::vector<VkBufferImageCopy> buffer_copy_regions;
@@ -98,15 +99,15 @@ namespace Flint {
 
         // Image barrier for optimal image (target).
         // Set initial layout for all array layers (faces) of the optimal (target) tiled texture.
-        RenderServer::getSingleton()->transitionImageLayout(image,
-                                                            format,
-                                                            VK_IMAGE_LAYOUT_UNDEFINED,
-                                                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                                            1,
-                                                            6);
+        rs->transitionImageLayout(image,
+                                  format,
+                                  VK_IMAGE_LAYOUT_UNDEFINED,
+                                  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                  1,
+                                  6);
 
         // Copy the cube map faces from the staging buffer to the optimal tiled image.
-        VkCommandBuffer command_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
+        VkCommandBuffer command_buffer = rs->beginSingleTimeCommands();
 
         vkCmdCopyBufferToImage(
                 command_buffer,
@@ -117,15 +118,15 @@ namespace Flint {
                 buffer_copy_regions.data()
         );
 
-        RenderServer::getSingleton()->endSingleTimeCommands(command_buffer);
+        rs->endSingleTimeCommands(command_buffer);
 
         // Change texture image layout to shader read after all faces have been copied.
-        RenderServer::getSingleton()->transitionImageLayout(image,
-                                                            format,
-                                                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                                            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                                                            1,
-                                                            6);
+        rs->transitionImageLayout(image,
+                                  format,
+                                  VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                  1,
+                                  6);
 
         // Create sampler.
         VkSamplerCreateInfo sampler_info{};

@@ -12,21 +12,10 @@
 #include <vector>
 
 namespace Flint {
-    Font::Font(const std::string &path) {
+    Font::Font(const std::string &path) : Resource(path) {
         auto bytes = load_file_as_bytes(path.c_str());
-
         auto byte_size = bytes.size() * sizeof(unsigned char);
-        buffer = static_cast<unsigned char *>(malloc(byte_size));
-        memcpy(buffer, bytes.data(), byte_size);
 
-        // Prepare font info.
-        if (!stbtt_InitFont(&info, buffer, 0)) {
-            Logger::error("Failed to prepare font info!", "Font");
-        }
-    }
-
-    Font::Font(std::vector<char> &bytes) {
-        auto byte_size = bytes.size() * sizeof(unsigned char);
         buffer = static_cast<unsigned char *>(malloc(byte_size));
         memcpy(buffer, bytes.data(), byte_size);
 
@@ -70,9 +59,8 @@ namespace Flint {
 
             switch (v.type) {
                 case STBTT_vmove: {
-                    // Close last path (if there's any).
+                    // Close the last contour in the outline (if there's any).
                     outline.close();
-
                     outline.move_to(v.x, v.y);
                 }
                     break;
@@ -82,18 +70,16 @@ namespace Flint {
                     break;
                 case STBTT_vcurve: {
                     outline.curve_to(v.cx, v.cy, v.x, v.y);
-
                 }
                     break;
                 case STBTT_vcubic: {
                     outline.cubic_to(v.cx, v.cy, v.cx1, v.cy1, v.x, v.y);
-
                 }
                     break;
             }
         }
 
-        // Close the last contour.
+        // Close the last contour in the outline.
         outline.close();
 
         stbtt_FreeShape(&info, vertices);

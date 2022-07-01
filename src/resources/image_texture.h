@@ -25,8 +25,7 @@ namespace Flint {
 
         static std::shared_ptr<ImageTexture> from_wrapper(VkImageView p_image_view, VkSampler p_sampler, uint32_t p_width, uint32_t p_height);
 
-        //static std::shared_ptr<Texture> from_bytes(const std::string &filename);
-
+        /// If this texture should take the responsibility of managing GPU resources.
         bool resource_ownership = true;
 
         void set_filter(VkFilter filter);
