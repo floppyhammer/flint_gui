@@ -132,12 +132,21 @@ namespace Flint {
 
         std::string get_node_path() const;
 
+        /**
+         * Called when the sub-tree structure of this node changed.
+         */
+        void when_subtree_changed();
+
+        void connect_signal(const std::string &signal, const std::function<void()> &callback);
+
     protected:
         std::vector<std::shared_ptr<Node>> children;
 
         // Don't use a shared pointer as it causes circular references.
         // Also, we must initialize it.
         Node *parent{};
+
+        std::vector<std::function<void()>> subtree_changed_callbacks;
     };
 }
 

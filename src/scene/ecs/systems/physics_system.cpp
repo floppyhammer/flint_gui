@@ -29,12 +29,12 @@ namespace Flint {
 
                     if (transform.position.x < 0) {
                         rigidBody.velocity.x = std::abs(rigidBody.velocity.x);
-                    } else if (transform.position.x > WIDTH) {
+                    } else if (transform.position.x > 400) {
                         rigidBody.velocity.x = -std::abs(rigidBody.velocity.x);
                     }
                     if (transform.position.y < 0) {
                         rigidBody.velocity.y = std::abs(rigidBody.velocity.y);
-                    } else if (transform.position.y > HEIGHT) {
+                    } else if (transform.position.y > 400) {
                         rigidBody.velocity.y = -std::abs(rigidBody.velocity.y);
                     }
                 }
@@ -60,12 +60,12 @@ namespace Flint {
 
                 if (transform.position.x < 0) {
                     rigidBody.velocity.x = std::abs(rigidBody.velocity.x);
-                } else if (transform.position.x > WIDTH) {
+                } else if (transform.position.x > 400) {
                     rigidBody.velocity.x = -std::abs(rigidBody.velocity.x);
                 }
                 if (transform.position.y < 0) {
                     rigidBody.velocity.y = std::abs(rigidBody.velocity.y);
-                } else if (transform.position.y > HEIGHT) {
+                } else if (transform.position.y > 400) {
                     rigidBody.velocity.y = -std::abs(rigidBody.velocity.y);
                 }
             }

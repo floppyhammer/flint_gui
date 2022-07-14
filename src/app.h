@@ -25,7 +25,7 @@
 
 class App {
 public:
-    void init();
+    void init(uint32_t window_width, uint32_t window_height);
 
     void main_loop();
 
@@ -40,7 +40,7 @@ private:
      * Record commands into the current command buffer.
      * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline layout.
      */
-    void record_commands(std::vector<VkCommandBuffer> &commandBuffers, uint32_t imageIndex) const;
+    void record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_t image_index) const;
 };
 
 #endif //FLINT_APP_H

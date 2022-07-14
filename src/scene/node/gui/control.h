@@ -15,7 +15,7 @@
 using Pathfinder::ColorF;
 
 namespace Flint {
-    /// How should this control node handle mouse input propagation.
+    /// This indicates how a control node handles mouse input propagation.
     enum class MouseFilter {
         STOP, // Consume input.
         PASS, // Use then pass input.
@@ -23,8 +23,8 @@ namespace Flint {
     };
 
     /// Control anchor only takes effect when the control node is not a child of a container
-    /// (but a child of a normal control node).
-    enum class ControlAnchor {
+    /// but that of a normal control node.
+    enum class AnchorFlag {
         TOP_LEFT,
         TOP_RIGHT,
         BOTTOM_RIGHT,
@@ -87,12 +87,27 @@ namespace Flint {
         Vec2F get_local_mouse_position() const;
 
         virtual void grab_focus();
+
         virtual void release_focus();
 
         ColorF get_global_modulate();
 
+        /**
+         * Check if the node is a child of a container.
+         * @return
+         */
+        bool is_inside_container() const;
+
         ColorF modulate;
         ColorF self_modulate;
+
+        /**
+         * Adjust the node's position and size according to the anchor flag.
+         */
+        void apply_anchor();
+
+        void set_anchor_flag(AnchorFlag flag);
+        void get_anchor_flag();
 
     protected:
         Vec2<float> position{0};
@@ -109,7 +124,7 @@ namespace Flint {
 
         Vec2F local_mouse_position;
 
-        ControlAnchor anchor_mode = ControlAnchor::MAX;
+        AnchorFlag anchor_mode = AnchorFlag::MAX;
 
         void update(double dt) override;
 

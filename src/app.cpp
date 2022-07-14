@@ -74,11 +74,13 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
     }
 }
 
-void App::init() {
+void App::init(uint32_t window_width, uint32_t window_height) {
+    // Set logger level.
     Logger::set_level(Logger::VERBOSE);
 
     // 1. Initialize hardware.
     auto platform = Platform::getSingleton();
+    platform->init(window_width, window_height);
 
     // 2. Initialize render server.
     auto render_server = RenderServer::getSingleton();
@@ -99,8 +101,8 @@ void App::init() {
             render_server->commandPool);
     auto vector_server = VectorServer::get_singleton();
     vector_server->init(driver,
-                        WIDTH,
-                        HEIGHT,
+                        window_width,
+                        window_height,
                         load_file_as_bytes("../assets/area-lut.png"));
 
     tree = std::make_unique<Flint::SceneTree>();

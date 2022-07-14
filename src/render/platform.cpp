@@ -24,9 +24,9 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
     }
 }
 
-Platform::Platform() {
+void Platform::init(uint32_t window_width, uint32_t window_height) {
     // Get a GLFW window.
-    initWindow();
+    initWindow(window_width, window_height);
 
     // Initialize the Vulkan library by creating an instance.
     createInstance();
@@ -43,7 +43,7 @@ Platform::Platform() {
     createLogicalDevice();
 }
 
-void Platform::initWindow() {
+void Platform::initWindow(uint32_t window_width, uint32_t window_height) {
     // Initializes the GLFW library.
     glfwInit();
 
@@ -66,12 +66,12 @@ void Platform::initWindow() {
     float dpi_scale_x, dpi_scale_y;
     glfwGetMonitorContentScale(monitors[0], &dpi_scale_x, &dpi_scale_y);
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+    window = glfwCreateWindow(window_width, window_height, "Vulkan", nullptr, nullptr);
 
     // Center window.
     glfwSetWindowPos(window,
-                     monitor_x + (videoMode->width - WIDTH) / 2,
-                     monitor_y + (videoMode->height - HEIGHT) / 2);
+                     monitor_x + (videoMode->width - window_width) / 2,
+                     monitor_y + (videoMode->height - window_height) / 2);
 
     // Show window.
     glfwShowWindow(window);

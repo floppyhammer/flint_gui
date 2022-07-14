@@ -12,6 +12,8 @@ namespace Flint {
         theme_panel.value().border_width = 2;
         theme_panel.value().corner_radius = 8;
 
+        // Set up title bar.
+        // ---------------------------------------------------------
         theme_title_bar_line = std::make_optional(StyleLine());
         theme_title_bar_line.value().color = {50, 50, 50, 255};
 
@@ -72,14 +74,14 @@ namespace Flint {
         collapse_button->set_icon(collapse_icon);
         collapse_button->set_minimum_size(Vec2<float>(title_bar_height));
 
-        container = std::make_shared<BoxContainer>();
-        container->set_parent(this);
-        container->add_child(collapse_button);
-        container->add_child(title_label);
-        container->add_child(close_button);
-        container->set_position({0, -title_bar_height});
-        container->set_size({size.x, title_bar_height});
-        container->set_mouse_filter(MouseFilter::IGNORE);
+        title_container = std::make_shared<BoxContainer>();
+        title_container->set_parent(this);
+        title_container->add_child(collapse_button);
+        title_container->add_child(title_label);
+        title_container->add_child(close_button);
+        title_container->set_position({0, 0});
+        title_container->set_size({size.x, title_bar_height});
+        title_container->set_mouse_filter(MouseFilter::IGNORE);
 
         // Connect signals.
         auto callback = [this] {
@@ -90,7 +92,7 @@ namespace Flint {
                 // Store width.
                 expanded_width = size.x;
 
-                float new_width = container->calculate_minimum_size().x;
+                float new_width = title_container->calculate_minimum_size().x;
 
                 set_size({new_width, size.y});
 
@@ -106,10 +108,11 @@ namespace Flint {
         collapse_button->connect_signal("on_pressed", callback);
 
         title_bar = true;
+        // ---------------------------------------------------------
     }
 
     void Panel::propagate_input(std::vector<InputEvent> &input_queue) {
-        container->propagate_input(input_queue);
+        title_container->propagate_input(input_queue);
 
         if (collapsed) {
             input(input_queue);
@@ -134,7 +137,7 @@ namespace Flint {
 
                 Rect<float> active_rect;
                 active_rect.left = global_position.x;
-                active_rect.top = -title_bar_height;
+                active_rect.top = 0;
                 active_rect.right = size.x;
                 active_rect.bottom = collapsed ? title_bar_height : size.y + title_bar_height;
 
@@ -147,8 +150,9 @@ namespace Flint {
                 auto args = event.args.mouse_button;
 
                 if (!event.is_consumed()) {
-                    if (Rect<float>(global_position - Vec2<float>(0, title_bar_height),
-                                    global_position + Vec2<float>(size.x, 0)).contains_point(args.position)) {
+                    if (Rect<float>(global_position,
+                                    global_position + Vec2<float>(size.x, title_bar_height))
+                            .contains_point(args.position)) {
                         title_bar_pressed = args.pressed;
 
                         if (title_bar_pressed) {
@@ -174,7 +178,7 @@ namespace Flint {
     }
 
     void Panel::update(double dt) {
-        container->propagate_update(dt);
+        title_container->propagate_update(dt);
 
         Control::update(dt);
     }
@@ -194,17 +198,21 @@ namespace Flint {
 
         if (theme_panel.has_value()) {
             if (title_bar) {
-                if (!collapsed) {
-                    theme_panel.value().add_to_canvas(get_global_position() - Vec2<float>(0, title_bar_height),
+                if (collapsed) {
+                    // Only draw title bar.
+                    theme_panel.value().add_to_canvas(get_global_position(),
+                                                      Vec2<float>(size.x, title_bar_height), canvas);
+                } else {
+                    // Draw title bar + panel.
+                    theme_panel.value().add_to_canvas(get_global_position(),
                                                       size + Vec2<float>(0, title_bar_height), canvas);
 
-                    theme_title_bar_line->add_to_canvas({global_position.x, global_position.y}, {global_position.x + size.x, global_position.y}, canvas);
-                } else {
-                    theme_panel.value().add_to_canvas(get_global_position() - Vec2<float>(0, title_bar_height),
-                                                      Vec2<float>(size.x, title_bar_height), canvas);
+                    theme_title_bar_line->add_to_canvas({global_position.x, global_position.y + title_bar_height},
+                                                        {global_position.x + size.x,
+                                                         global_position.y + title_bar_height}, canvas);
                 }
 
-                container->propagate_draw(p_command_buffer);
+                title_container->propagate_draw(p_command_buffer);
             } else {
                 if (!collapsed) {
                     theme_panel.value().add_to_canvas(get_global_position(), size, canvas);
@@ -213,7 +221,7 @@ namespace Flint {
         }
 
         if (title_bar) {
-            container->propagate_draw(p_command_buffer);
+            title_container->propagate_draw(p_command_buffer);
         }
     }
 
@@ -224,7 +232,7 @@ namespace Flint {
     void Panel::set_size(Vec2<float> p_size) {
         if (size == p_size) return;
         size = p_size;
-        container->set_size({size.x, title_bar_height});
+        title_container->set_size({size.x, title_bar_height});
     }
 
     void Panel::set_title(std::string title) {

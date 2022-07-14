@@ -9,10 +9,13 @@ using namespace Flint;
 using Pathfinder::Vec2;
 using Pathfinder::Vec3;
 
+const uint32_t WINDOW_WIDTH = 1920;
+const uint32_t WINDOW_HEIGHT = 1080;
+
 int main() {
     App app;
 
-    app.init();
+    app.init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     uint32_t NODE_SPRITE_COUNT = 000;
     uint32_t ECS_SPRITE_COUNT = 000;
@@ -28,15 +31,39 @@ int main() {
     {
         auto node = std::make_shared<Node>();
         auto node_3d = std::make_shared<Node3D>();
+
+        auto node_gui = std::make_shared<Control>();
+        node_gui->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
+        node->add_child(node_gui);
+
         auto model0 = std::make_shared<Model>();
         model0->set_mesh(ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj"));
         auto model1 = std::make_shared<Model>();
         model1->set_mesh(ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj"));
+
         auto sub_viewport_c = std::make_shared<SubViewportContainer>();
+        node_gui->add_child(sub_viewport_c);
+
         auto sub_viewport = std::make_shared<SubViewport>();
 
-        auto progress_bar = std::make_shared<ProgressBar>();
-        progress_bar->set_size({256, 24});
+        // Inspector.
+        // ------------------------------------------
+        auto inspector_panel = std::make_shared<Panel>();
+        inspector_panel->set_title("Inspector");
+        inspector_panel->set_size({400, 400});
+
+        auto margin_container = std::make_shared<MarginContainer>();
+        margin_container->set_position({0, 48});
+        margin_container->set_size({400, 400 - 48});
+        inspector_panel->add_child(margin_container);
+
+        auto vbox_container = std::make_shared<BoxContainer>();
+        vbox_container->make_vertical();
+        margin_container->add_child(vbox_container);
+
+        auto hbox_container = std::make_shared<BoxContainer>();
+        vbox_container->add_child(hbox_container);
+
         auto button = std::make_shared<Button>();
         // Callback to clean up staging resources.
         auto callback = [] {
@@ -44,30 +71,18 @@ int main() {
         };
         button->connect_signal("on_pressed", callback);
         auto button2 = std::make_shared<Button>();
+        hbox_container->add_child(button);
+        hbox_container->add_child(button2);
 
-        auto hbox_container = std::make_shared<BoxContainer>();
-        auto vbox_container = std::make_shared<BoxContainer>();
-        vbox_container->make_vertical();
-
-        // Inspector.
-        // ------------------------------------------
-        auto inspector_panel = std::make_shared<Panel>();
-        inspector_panel->set_position({50, 600});
-        inspector_panel->set_title("Inspector");
-        inspector_panel->set_size({400, 400});
-
-        auto margin_container = std::make_shared<MarginContainer>();
-        margin_container->set_size({400, 400});
-        margin_container->add_child(vbox_container);
-        inspector_panel->add_child(margin_container);
-
-        vbox_container->add_child(hbox_container);
+        auto progress_bar = std::make_shared<ProgressBar>();
+        progress_bar->set_size({256, 24});
         vbox_container->add_child(progress_bar);
 
         auto line_edit = std::make_shared<LineEdit>();
         vbox_container->add_child(line_edit);
 
-        // Position.
+        // Position values.
+        // ----------------------------------------------------
         auto position_container = std::make_shared<BoxContainer>();
         {
             auto label = std::make_shared<Label>();
@@ -93,7 +108,7 @@ int main() {
         vbox_container->add_child(position_container);
         // ----------------------------------------------------
 
-        // Rotation.
+        // Rotation values.
         // ----------------------------------------------------
         auto rotation_container = std::make_shared<BoxContainer>();
         {
@@ -111,16 +126,21 @@ int main() {
         vbox_container->add_child(rotation_container);
         // ----------------------------------------------------
 
-        auto node_panel = std::make_shared<Panel>();
-        node_panel->set_position({50, 100});
-        node_panel->set_title("Scene");
-        node_panel->set_size({400, 400});
+        // Scene panel.
+        // ----------------------------------------------------
+        auto scene_panel = std::make_shared<Panel>();
+        scene_panel->set_position({50, 100});
+        scene_panel->set_title("Scene");
+        scene_panel->set_size({400, 400});
         auto vector_layer = std::make_shared<TextureRect>();
         vector_layer->name = "vector_layer";
-        vector_layer->set_size({WIDTH, HEIGHT});
+        vector_layer->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         vector_layer->set_texture(VectorServer::get_singleton()->get_texture());
+        vector_layer->set_mouse_filter(MouseFilter::IGNORE);
+
         auto item_tree = std::make_shared<Tree>();
         item_tree->set_size({400, 400});
+        // ----------------------------------------------------
 
         for (int i = 0; i < NODE_SPRITE_COUNT; i++) {
             auto rigid_body_2d = std::make_shared<RigidBody2d>();
@@ -136,22 +156,27 @@ int main() {
         skeleton->position = {1000, 300};
 
         //node->add_child(model0);
-        node->add_child(sub_viewport_c);
+
         node->add_child(skeleton);
 
         node->add_child(vector_layer);
-        hbox_container->add_child(button);
-        hbox_container->add_child(button2);
-        node->add_child(inspector_panel);
+
         auto margin_container2 = std::make_shared<MarginContainer>();
+        margin_container2->set_position({0, 48});
         margin_container2->set_size({400, 400});
         margin_container2->add_child(item_tree);
-        node_panel->add_child(margin_container2);
-        node->add_child(node_panel);
+        scene_panel->add_child(margin_container2);
+
+        node_gui->add_child(scene_panel);
+        scene_panel->set_anchor_flag(AnchorFlag::TOP_LEFT);
+
+        node_gui->add_child(inspector_panel);
+        inspector_panel->set_anchor_flag(AnchorFlag::TOP_RIGHT);
 
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport_c->set_size({512, 512});
+        sub_viewport_c->set_anchor_flag(AnchorFlag::CENTER);
         sub_viewport->add_child(std::make_shared<Skybox>());
         sub_viewport->add_child(node_3d);
         node_3d->add_child(model1);

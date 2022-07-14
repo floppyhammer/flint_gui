@@ -39,7 +39,7 @@ namespace Flint {
         auto active_rect = Rect<float>(global_position, global_position + size);
 
         // Handle mouse input propagation.
-        for (auto &event : input_queue) {
+        for (auto &event: input_queue) {
             bool consume_flag = false;
 
             switch (event.type) {
@@ -150,11 +150,131 @@ namespace Flint {
         }
     }
 
+    bool Control::is_inside_container() const {
+        if (parent) {
+            switch (parent->type) {
+                case NodeType::Container:
+                case NodeType::CenterContainer:
+                case NodeType::MarginContainer: {
+                    return true;
+                }
+                    break;
+                default:
+                    return false;
+            }
+        }
+        return false;
+    }
+
+    void Control::apply_anchor() {
+        if (is_inside_container()) return;
+
+        if (parent && parent->extended_from_which_base_node() == NodeType::Control) {
+            auto cast_parent = dynamic_cast<Control *>(parent);
+
+            auto actual_size = get_minimum_size().max(size);
+
+            float center_x = (cast_parent->size.x - actual_size.x) * 0.5f;
+            float center_y = (cast_parent->size.y - actual_size.y) * 0.5f;
+            float right = cast_parent->size.x - actual_size.x;
+            float bottom = cast_parent->size.y - actual_size.y;
+
+            switch (anchor_mode) {
+                case AnchorFlag::TOP_LEFT: {
+                    position = {0, 0};
+                }
+                    break;
+                case AnchorFlag::TOP_RIGHT: {
+                    position = {right, 0};
+                }
+                    break;
+                case AnchorFlag::BOTTOM_RIGHT: {
+                    position = {right, bottom};
+                }
+                    break;
+                case AnchorFlag::BOTTOM_LEFT: {
+                    position = {0, bottom};
+                }
+                    break;
+                case AnchorFlag::CENTER_LEFT: {
+                    position = {0, center_y};
+                }
+                    break;
+                case AnchorFlag::CENTER_RIGHT: {
+                    position = {right, center_y};
+                }
+                    break;
+                case AnchorFlag::CENTER_TOP: {
+                    position = {center_x, 0};
+                }
+                    break;
+                case AnchorFlag::CENTER_BOTTOM: {
+                    position = {center_x, bottom};
+                }
+                    break;
+                case AnchorFlag::CENTER: {
+                    position = {center_x, center_y};
+                }
+                    break;
+                case AnchorFlag::LEFT_WIDE: {
+                    position = {0, 0};
+                    size = {actual_size.x, cast_parent->size.y};
+                }
+                    break;
+                case AnchorFlag::RIGHT_WIDE: {
+                    position = {right, 0};
+                    size = {actual_size.x, cast_parent->size.y};
+                }
+                    break;
+                case AnchorFlag::TOP_WIDE: {
+                    position = {0, 0};
+                    size = {cast_parent->size.x, actual_size.y};
+                }
+                    break;
+                case AnchorFlag::BOTTOM_WIDE: {
+                    position = {0, bottom};
+                    size = {cast_parent->size.x, actual_size.y};
+                }
+                    break;
+                case AnchorFlag::VCENTER_WIDE: {
+                    position = {center_x, center_y};
+                    size = {cast_parent->size.x, actual_size.y};
+                }
+                    break;
+                case AnchorFlag::HCENTER_WIDE: {
+                    position = {center_x, center_y};
+                    size = {actual_size.x, cast_parent->size.y};
+                }
+                    break;
+                case AnchorFlag::FULL_RECT: {
+                    position = {0, 0};
+                    size = {cast_parent->size.x, cast_parent->size.y};
+                }
+                    break;
+                case AnchorFlag::MAX: {
+                    return;
+                }
+            }
+        }
+    }
+
     void Control::cursor_entered() {
 
     }
 
     void Control::cursor_exited() {
 
+    }
+
+    void Control::set_anchor_flag(AnchorFlag anchor_flag) {
+        if (anchor_flag == anchor_mode) return;
+
+        anchor_mode = anchor_flag;
+        apply_anchor();
+    }
+
+    void Control::get_anchor_flag() {
+        return;
+        anchor_mode;
     }
 }

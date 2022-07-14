@@ -113,6 +113,8 @@ namespace Flint {
         }
 
         children.push_back(p_child);
+
+//        get_tree()->
     }
 
     void Node::remove_child(size_t index) {
@@ -138,6 +140,23 @@ namespace Flint {
             return parent->get_node_path() + "/" + name;
         } else {
             return "/" + name;
+        }
+    }
+
+    void Node::when_subtree_changed() {
+        for (auto &callback: subtree_changed_callbacks) {
+            callback();
+        }
+
+        // Branch->root signal propagation.
+        if (parent) {
+            parent->when_subtree_changed();
+        }
+    }
+
+    void Node::connect_signal(const std::string &signal, const std::function<void()> &callback) {
+        if (signal == "subtree_changed") {
+            subtree_changed_callbacks.push_back(callback);
         }
     }
 }

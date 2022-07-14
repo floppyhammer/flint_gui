@@ -13,12 +13,12 @@ namespace Flint {
 
         if (position.x < 0) {
             velocity.x = std::abs(velocity.x);
-        } else if (position.x > WIDTH) {
+        } else if (position.x > 400) {
             velocity.x = -std::abs(velocity.x);
         }
         if (position.y < 0) {
             velocity.y = std::abs(velocity.y);
-        } else if (position.y > HEIGHT) {
+        } else if (position.y > 400) {
             velocity.y = -std::abs(velocity.y);
         }
     }

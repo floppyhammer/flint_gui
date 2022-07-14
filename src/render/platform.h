@@ -9,9 +9,6 @@
 #include <vector>
 #include <optional>
 
-const uint32_t WIDTH = 1920;
-const uint32_t HEIGHT = 1080;
-
 /// How many frames should be processed concurrently.
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -42,12 +39,14 @@ struct SwapChainSupportDetails {
 
 class Platform {
 public:
-    Platform();
+    Platform() = default;
 
     static Platform *getSingleton() {
         static Platform singleton;
         return &singleton;
     }
+
+    void init(uint32_t window_width, uint32_t window_height);
 
     GLFWwindow *window;
 
@@ -149,7 +148,7 @@ private:
     static const bool enableValidationLayers = true;
 
 private:
-    void initWindow();
+    void initWindow(uint32_t window_width, uint32_t window_height);
 
     void setupDebugMessenger();
 
