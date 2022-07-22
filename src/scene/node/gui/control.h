@@ -98,6 +98,8 @@ namespace Flint {
          */
         bool is_inside_container() const;
 
+        Vec2F get_max_child_min_size() const;
+
         ColorF modulate;
         ColorF self_modulate;
 

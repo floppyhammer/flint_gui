@@ -18,10 +18,20 @@ namespace Flint {
 
         Vec2<float> calculate_minimum_size() const override;
 
-    protected:
-        bool horizontal_scroll = true;
+        void set_hscroll(int32_t value);
 
-        bool vertical_scroll = true;
+        int32_t get_hscroll();
+
+        void set_vscroll(int32_t value);
+
+        int32_t get_vscroll();
+
+    protected:
+        bool horizontal_mode = true;
+        bool vertical_mode = true;
+
+        int32_t hscroll = 0;
+        int32_t vscroll = 0;
     };
 }
 

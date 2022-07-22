@@ -166,6 +166,19 @@ namespace Flint {
         return false;
     }
 
+    Vec2F Control::get_max_child_min_size() const {
+        Vec2F max_child_min_size;
+
+        for (auto &child: children) {
+            if (child->extended_from_which_base_node() == NodeType::Control) {
+                auto cast_child = dynamic_cast<Control *>(child.get());
+                max_child_min_size.max(cast_child->calculate_minimum_size());
+            }
+        }
+
+        return max_child_min_size;
+    }
+
     void Control::apply_anchor() {
         if (is_inside_container()) return;
 
