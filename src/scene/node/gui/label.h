@@ -29,16 +29,17 @@ namespace Flint {
 
         float x_off = 0.f; // Offset from the origin of the glyph on baseline.
         float y_off = 0.f;
-        float advance = 0.f; // Advance to the next glyph along baseline(x for horizontal layout, y for vertical).
+        float advance = 0.f; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
 
         int font_size = 0; // Font size;
         char32_t text{};
         int32_t index = 0; // Glyph index (font specific) or UTF-32 codepoint (for the invalid glyphs).
 
+        Pathfinder::Outline outline; // Glyph outline.
+
+        // For visual debugging.
         Rect<float> layout_box;
         Rect<float> bbox;
-
-        Pathfinder::Outline outline; // Glyph outline.
     };
 
     class Label : public Control {

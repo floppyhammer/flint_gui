@@ -91,7 +91,7 @@ namespace Flint {
                         if (pressed) {
                             pressed_inside = true;
                         } else {
-                            if (pressed_inside) on_pressed();
+                            if (pressed_inside) when_pressed();
                         }
                         consume_flag = true;
                     }
@@ -162,15 +162,15 @@ namespace Flint {
         size = final_size;
     }
 
-    void Button::on_pressed() {
-        for (auto &callback: on_pressed_callbacks) {
+    void Button::when_pressed() {
+        for (auto &callback: pressed_callbacks) {
             callback();
         }
     }
 
     void Button::connect_signal(std::string signal, std::function<void()> callback) {
         if (signal == "on_pressed") {
-            on_pressed_callbacks.push_back(callback);
+            pressed_callbacks.push_back(callback);
         }
     }
 

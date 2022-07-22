@@ -15,10 +15,10 @@
 using Pathfinder::ColorF;
 
 namespace Flint {
-    /// This indicates how a control node handles mouse input propagation.
+    /// How a control node handles mouse input propagation.
     enum class MouseFilter {
-        STOP, // Consume input.
-        PASS, // Use then pass input.
+        STOP, // Use input and mark it as consumed.
+        PASS, // Use input.
         IGNORE, // Ignore input.
     };
 
@@ -48,7 +48,7 @@ namespace Flint {
         MAX,
     };
 
-    /// Affect how containers organize this control node.
+    /// How a parent container organizes this control node.
     enum class ContainerSizingFlag {
         EXPAND,
         SHRINK,

@@ -8,7 +8,7 @@ namespace Flint {
 
         debug_size_box.border_color = ColorU::red();
 
-        set_font(ResourceManager::get_singleton()->load<Flint::Font>("../assets/unifont-14.0.03.ttf"));
+        set_font(ResourceManager::get_singleton()->load<Font>("../assets/unifont-14.0.03.ttf"));
 
         set_text("Label");
     }

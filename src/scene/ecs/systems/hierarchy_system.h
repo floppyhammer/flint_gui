@@ -8,7 +8,7 @@
 namespace Flint {
     class HierarchySystem : public System {
     public:
-        void traverse(const std::weak_ptr<Coordinator>& p_coordinator, Entity root);
+        void propagate(const std::weak_ptr<Coordinator>& p_coordinator, Entity root);
     };
 }
 

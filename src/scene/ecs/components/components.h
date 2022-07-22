@@ -24,7 +24,11 @@ namespace Flint {
 
     // INPUT
     // -----------------------------
-    struct InputComponent {
+    struct MouseInputComponent {
+        std::queue<InputEvent> input_queue;
+    };
+
+    struct KeyboardInputComponent {
         std::queue<InputEvent> input_queue;
     };
     // -----------------------------
@@ -116,6 +120,10 @@ namespace Flint {
         std::optional<Entity> prev_sibling;
         std::optional<Entity> next_sibling;
         std::optional<Entity> parent;
+    };
+
+    struct VisibilityComponent {
+        bool visible = true;
     };
     // -----------------------------
 

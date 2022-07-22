@@ -46,15 +46,15 @@ namespace Flint {
         std::shared_ptr<TextureRect> icon_rect;
         std::shared_ptr<Label> label;
 
-        std::vector<std::function<void()>> on_pressed_callbacks;
-        std::vector<std::function<void()>> on_down_callbacks;
-        std::vector<std::function<void()>> on_up_callbacks;
-        std::vector<std::function<void()>> on_hovered_callbacks;
+        std::vector<std::function<void()>> pressed_callbacks;
+        std::vector<std::function<void()>> hovered_callbacks;
+        std::vector<std::function<void()>> down_callbacks;
+        std::vector<std::function<void()>> up_callbacks;
 
         std::optional<StyleBox> theme_normal, theme_hovered, theme_pressed;
 
     protected:
-        void on_pressed();
+        void when_pressed();
     };
 }
 

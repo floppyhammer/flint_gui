@@ -22,6 +22,7 @@ namespace Flint {
         CenterContainer,
         MarginContainer,
         BoxContainer,
+        ScrollContainer,
         SubViewportContainer,
         Button,
         ItemList,
