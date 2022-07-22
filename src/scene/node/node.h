@@ -51,7 +51,8 @@ namespace Flint {
         Max,
     };
 
-    const std::array<std::string, 28> NodeTypeName {
+    /// Should be consistent with NodeType.
+    const std::array<std::string, 29> NodeTypeName {
         // General.
         "Node",
         "SubViewport",
@@ -63,6 +64,7 @@ namespace Flint {
         "CenterContainer",
         "MarginContainer",
         "BoxContainer",
+        "ScrollContainer",
         "SubViewportContainer",
         "Button",
         "ItemList",
@@ -85,6 +87,8 @@ namespace Flint {
         "Sprite3D",
         "Model",
         "Skybox",
+
+        "Invalid",
     };
 
     class Node {
