@@ -64,11 +64,16 @@ int main() {
         auto hbox_container = std::make_shared<BoxContainer>();
         vbox_container->add_child(hbox_container);
 
+        auto file_dialog = std::make_shared<FileDialog>();
+        vbox_container->add_child(file_dialog);
+
         auto button = std::make_shared<Button>();
         // Callback to clean up staging resources.
-        auto callback = [] {
+        auto callback = [file_dialog] {
             Logger::verbose("Button pressed");
+            file_dialog->show();
         };
+
         button->connect_signal("on_pressed", callback);
         auto button2 = std::make_shared<Button>();
         hbox_container->add_child(button);

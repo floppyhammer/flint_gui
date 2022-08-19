@@ -15,7 +15,9 @@ find_package(Vulkan REQUIRED FATAL_ERROR)
 # We need to include Vulkan headers manually because of the above reason.
 include_directories("C:/VulkanSDK/1.3.204.0/Include")
 
-file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.cpp src/*.h)
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
+        src/*.cpp
+        third_party/tinyfiledialogs/*.c)
 
 add_compile_definitions(PATHFINDER_USE_VULKAN)
 

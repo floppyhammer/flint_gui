@@ -20,6 +20,7 @@
 #include "gui/label.h"
 #include "2d/skeleton_2d.h"
 #include "gui/spin_box.h"
+#include "file_dialog.h"
 
 namespace Flint {
     class SceneTree {
