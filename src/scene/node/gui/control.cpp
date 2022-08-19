@@ -44,9 +44,10 @@ namespace Flint {
 
             switch (event.type) {
                 case InputEventType::MouseMotion: {
-                    if (active_rect.contains_point(event.args.mouse_motion.position)) {
-                        local_mouse_position = event.args.mouse_motion.position - global_position;
+                    // Mouse position relative to the node's origin.
+                    local_mouse_position = event.args.mouse_motion.position - global_position;
 
+                    if (active_rect.contains_point(event.args.mouse_motion.position)) {
                         if (!event.is_consumed()) {
                             is_cursor_inside = true;
                             cursor_entered();
@@ -62,12 +63,16 @@ namespace Flint {
                 }
                     break;
                 case InputEventType::MouseButton: {
-                    if (active_rect.contains_point(event.args.mouse_button.position)) {
-                        grab_focus();
+                    auto args = event.args.mouse_button;
 
-                        consume_flag = true;
-                    } else {
-                        release_focus();
+                    if (args.pressed) {
+                        if (active_rect.contains_point(args.position)) {
+                            grab_focus();
+
+                            consume_flag = true;
+                        } else {
+                            release_focus();
+                        }
                     }
                 }
                     break;
@@ -138,7 +143,7 @@ namespace Flint {
     }
 
     void Control::release_focus() {
-
+        focused = false;
     }
 
     ColorF Control::get_global_modulate() {

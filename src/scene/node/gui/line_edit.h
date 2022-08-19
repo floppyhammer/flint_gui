@@ -35,7 +35,7 @@ namespace Flint {
         bool editable = true;
 
         int32_t selected_caret_index = -1;
-        int32_t caret_index = -1;
+        int32_t current_caret_index = -1;
         Vec2F caret_position;
 
         StyleLine theme_caret;

@@ -15,7 +15,6 @@
 #define FLINT_LOGW(...) __android_log_print(ANDROID_LOG_WARN   , FLINT_LOG_TAG, __VA_ARGS__)
 #define FLINT_LOGE(...) __android_log_print(ANDROID_LOG_ERROR  , FLINT_LOG_TAG, __VA_ARGS__)
 #else
-
 #define FLINT_LOGV(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
 #define FLINT_LOGD(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
 #define FLINT_LOGI(...) printf("<%s>", FLINT_LOG_TAG); printf(__VA_ARGS__); printf("\n")
