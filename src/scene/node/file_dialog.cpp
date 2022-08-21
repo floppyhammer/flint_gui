@@ -1,7 +1,7 @@
 #include "file_dialog.h"
 
 namespace Flint {
-    void FileDialog::show() {
+    std::string FileDialog::show() {
         Logger::info("File dialog", "FileDialog");
 
         // In case of multiple files, the separator is `|`.
@@ -17,6 +17,9 @@ namespace Flint {
 
         if (path) {
             Logger::info("File dialog selected: " + std::string(path), "FileDialog");
+            return path;
         }
+
+        return "";
     }
 }

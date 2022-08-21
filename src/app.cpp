@@ -74,7 +74,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
     }
 }
 
-void App::init(uint32_t window_width, uint32_t window_height) {
+App::App(uint32_t window_width, uint32_t window_height) {
     // Set logger level.
     Logger::set_level(Logger::VERBOSE);
 

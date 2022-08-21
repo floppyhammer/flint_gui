@@ -11,5 +11,5 @@ else () # Linux
     ## sudo apt install libglfw3-dev
     ## sudo apt install libvulkan-dev
     ## sudo apt install libvulkan1 mesa-vulkan-drivers vulkan-utils
-    target_link_libraries(2d-skeleton-editor -lglfw -lvulkan -lpathfinder)
+    target_link_libraries(2d-skeleton-editor -lglfw -lvulkan -lpathfinder -lpoly2tri)
 endif ()

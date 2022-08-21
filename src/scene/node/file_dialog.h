@@ -8,7 +8,7 @@
 namespace Flint {
     class FileDialog : public Node {
     public:
-        void show();
+        std::string show();
     };
 }
 

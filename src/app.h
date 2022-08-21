@@ -25,7 +25,7 @@
 
 class App {
 public:
-    void init(uint32_t window_width, uint32_t window_height);
+    App(uint32_t window_width, uint32_t window_height);
 
     void main_loop();
 
