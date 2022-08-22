@@ -36,5 +36,7 @@ add_subdirectory(third_party/poly2tri)
 
 add_library(flint ${SOURCE_FILES})
 
-add_subdirectory(examples/2d_skeleton_editor)
 add_subdirectory(examples/file_selection)
+add_subdirectory(examples/2d_skeleton_editor)
+add_subdirectory(examples/3d_model_viewer)
+add_subdirectory(examples/ecs_test)

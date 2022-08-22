@@ -2,14 +2,14 @@
 include_directories(../../src)
 
 # Build executable.
-add_executable(2d_skeleton_viewer ${SOURCE_FILES} main.cpp)
+add_executable(3d_model_viewer ${SOURCE_FILES} main.cpp)
 
 # Windows
 if (WIN32)
-    target_link_libraries(2d_skeleton_viewer glfw Vulkan::Vulkan pathfinder poly2tri)
+    target_link_libraries(3d_model_viewer glfw Vulkan::Vulkan pathfinder poly2tri)
 else () # Linux
     ## sudo apt install libglfw3-dev
     ## sudo apt install libvulkan-dev
     ## sudo apt install libvulkan1 mesa-vulkan-drivers vulkan-utils
-    target_link_libraries(2d_skeleton_viewer -lglfw -lvulkan -lpathfinder -lpoly2tri)
+    target_link_libraries(3d_model_viewer -lglfw -lvulkan -lpathfinder -lpoly2tri)
 endif ()
