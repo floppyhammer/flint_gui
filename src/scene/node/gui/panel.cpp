@@ -49,7 +49,7 @@ namespace Flint {
             title_label->set_horizontal_alignment(Alignment::Center);
             title_label->set_vertical_alignment(Alignment::Center);
             title_label->set_mouse_filter(MouseFilter::IGNORE);
-            title_label->sizing_flag = ContainerSizingFlag::EXPAND;
+            title_label->sizing_flag = ContainerSizingFlag::Expand;
         }
 
         {

@@ -12,7 +12,6 @@ namespace Flint {
         type = NodeType::Control;
 
         debug_size_box.bg_color = ColorU();
-        debug_size_box.corner_radius = 0;
         debug_size_box.border_width = 0;
         debug_size_box.border_color = ColorU(202, 130, 94, 255);
     }
@@ -87,7 +86,7 @@ namespace Flint {
     }
 
     Vec2<float> Control::get_global_position() const {
-        if (parent != nullptr && parent->extended_from_which_base_node() == NodeType::Control) {
+        if (parent != nullptr && parent->is_gui_node()) {
             auto cast_parent = dynamic_cast<Control *>(parent);
 
             return cast_parent->get_global_position() + position;
@@ -147,7 +146,7 @@ namespace Flint {
     }
 
     ColorF Control::get_global_modulate() {
-        if (parent && parent->extended_from_which_base_node() == NodeType::Control) {
+        if (parent && parent->is_gui_node()) {
             auto cast_parent = dynamic_cast<Control *>(parent);
             return modulate * cast_parent->get_global_modulate();
         } else {
@@ -175,7 +174,7 @@ namespace Flint {
         Vec2F max_child_min_size;
 
         for (auto &child: children) {
-            if (child->extended_from_which_base_node() == NodeType::Control) {
+            if (child->is_gui_node()) {
                 auto cast_child = dynamic_cast<Control *>(child.get());
                 max_child_min_size.max(cast_child->calculate_minimum_size());
             }
@@ -187,7 +186,7 @@ namespace Flint {
     void Control::apply_anchor() {
         if (is_inside_container()) return;
 
-        if (parent && parent->extended_from_which_base_node() == NodeType::Control) {
+        if (parent && parent->is_gui_node()) {
             auto cast_parent = dynamic_cast<Control *>(parent);
 
             auto actual_size = get_minimum_size().max(size);

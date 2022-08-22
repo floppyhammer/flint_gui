@@ -10,7 +10,7 @@ namespace Flint {
         std::vector<float> child_min_width;
         std::vector<Control *> expanding_children;
         for (auto &child: children) {
-            if (child->extended_from_which_base_node() == NodeType::Control) {
+            if (child->is_gui_node()) {
                 auto cast_child = dynamic_cast<Control *>(child.get());
                 if (!cast_child->get_visibility()) continue;
                 auto child_min_size = cast_child->calculate_minimum_size();
@@ -29,7 +29,7 @@ namespace Flint {
                     min_size.x = std::max(size.x, child_min_size.x);
                 }
 
-                if (cast_child->sizing_flag == ContainerSizingFlag::EXPAND) {
+                if (cast_child->sizing_flag == ContainerSizingFlag::Expand) {
                     expanding_children.push_back(cast_child);
                 }
             }
@@ -56,7 +56,7 @@ namespace Flint {
 
             float shift = 0;
             for (auto &child: children) {
-                if (child->extended_from_which_base_node() == NodeType::Control) {
+                if (child->is_gui_node()) {
                     auto cast_child = dynamic_cast<Control *>(child.get());
                     if (!cast_child->get_visibility()) continue;
                     cast_child->set_position({shift, 0});
@@ -94,7 +94,7 @@ namespace Flint {
 
         // Add every child's minimum size.
         for (auto &child: children) {
-            if (child->extended_from_which_base_node() == NodeType::Control) {
+            if (child->is_gui_node()) {
                 auto cast_child = dynamic_cast<Control *>(child.get());
                 auto child_min_size = cast_child->calculate_minimum_size();
                 if (horizontal) {
@@ -111,7 +111,7 @@ namespace Flint {
             }
         }
 
-        // Take separations into account.
+        // Take separation into account.
         if (visible_child_count > 0) {
             float total_separation_size = separation * (float) (visible_child_count - 1);
             if (horizontal) {

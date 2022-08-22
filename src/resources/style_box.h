@@ -11,11 +11,9 @@ using Pathfinder::ColorU;
 namespace Flint {
     struct StyleBox {
         ColorU bg_color = ColorU(27, 27, 27, 255);
-        bool draw_center = true;
 
         ColorU border_color = ColorU(67, 67, 67, 255);
         float border_width = 0;
-
         float corner_radius = 4;
 
         float margin = 0;

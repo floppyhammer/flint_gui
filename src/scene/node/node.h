@@ -135,6 +135,8 @@ namespace Flint {
 
         NodeType extended_from_which_base_node() const;
 
+        bool is_gui_node() const;
+
         std::string get_node_path() const;
 
         /**

@@ -122,6 +122,10 @@ namespace Flint {
         children.erase(children.begin() + index);
     }
 
+    bool Node::is_gui_node() const {
+        return type >= NodeType::Control && type < NodeType::Node2D;
+    }
+
     NodeType Node::extended_from_which_base_node() const {
         if (type < NodeType::Control)
             return NodeType::Node;

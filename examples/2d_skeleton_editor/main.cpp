@@ -13,9 +13,7 @@ const uint32_t WINDOW_WIDTH = 1920;
 const uint32_t WINDOW_HEIGHT = 1080;
 
 int main() {
-    App app;
-
-    app.init(WINDOW_WIDTH, WINDOW_HEIGHT);
+    App app(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     uint32_t NODE_SPRITE_COUNT = 000;
     uint32_t ECS_SPRITE_COUNT = 000;
@@ -96,12 +94,12 @@ int main() {
             label->set_text("Position");
 
             auto spin_box_x = std::make_shared<SpinBox>();
-            spin_box_x->sizing_flag = ContainerSizingFlag::EXPAND;
+            spin_box_x->sizing_flag = ContainerSizingFlag::Expand;
             auto spin_box_y = std::make_shared<SpinBox>();
-            spin_box_y->sizing_flag = ContainerSizingFlag::EXPAND;
+            spin_box_y->sizing_flag = ContainerSizingFlag::Expand;
 
             auto xy_container = std::make_shared<BoxContainer>();
-            xy_container->sizing_flag = ContainerSizingFlag::EXPAND;
+            xy_container->sizing_flag = ContainerSizingFlag::Expand;
             xy_container->make_vertical();
             xy_container->add_child(spin_box_x);
             xy_container->add_child(spin_box_y);
@@ -123,7 +121,7 @@ int main() {
             label->set_text("Rotation");
 
             auto spin_box = std::make_shared<SpinBox>();
-            spin_box->sizing_flag = ContainerSizingFlag::EXPAND;
+            spin_box->sizing_flag = ContainerSizingFlag::Expand;
 
             rotation_container->add_child(label);
             rotation_container->add_child(spin_box);

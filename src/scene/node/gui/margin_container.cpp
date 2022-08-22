@@ -12,7 +12,7 @@ namespace Flint {
         child_size.y -= margin_top + margin_bottom;
 
         for (auto &child: children) {
-            if (child->extended_from_which_base_node() == NodeType::Control) {
+            if (child->is_gui_node()) {
                 auto cast_child = dynamic_cast<Control *>(child.get());
                 cast_child->set_position(child_position);
                 cast_child->set_size(child_size);

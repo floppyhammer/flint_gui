@@ -13,6 +13,9 @@ namespace Flint {
 
         void set_size(Vec2<float> p_size) override;
 
+        void update(double dt) override;
+
+    protected:
         virtual void adjust_layout();
     };
 }

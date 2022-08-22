@@ -9,8 +9,8 @@ using namespace Flint;
 using Pathfinder::Vec2;
 using Pathfinder::Vec3;
 
-const uint32_t WINDOW_WIDTH = 400;
-const uint32_t WINDOW_HEIGHT = 300;
+const uint32_t WINDOW_WIDTH = 640;
+const uint32_t WINDOW_HEIGHT = 480;
 
 int main() {
     App app(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -29,18 +29,15 @@ int main() {
         vector_layer->set_texture(VectorServer::get_singleton()->get_texture());
         vector_layer->set_mouse_filter(MouseFilter::IGNORE);
 
-        // Inspector.
-        // ------------------------------------------
-        auto inspector_panel = std::make_shared<Panel>();
-        inspector_panel->set_title("Inspector");
-        inspector_panel->enable_title_bar(false);
-        inspector_panel->set_size({400, 300});
-        node_gui->add_child(inspector_panel);
+        auto panel = std::make_shared<Panel>();
+        panel->enable_title_bar(false);
+        panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
+        node_gui->add_child(panel);
 
         auto margin_container = std::make_shared<MarginContainer>();
         margin_container->set_position({0, 0});
-        margin_container->set_size({400, 300});
-        inspector_panel->add_child(margin_container);
+        margin_container->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
+        panel->add_child(margin_container);
 
         auto vbox_container = std::make_shared<BoxContainer>();
         vbox_container->make_vertical();
@@ -50,6 +47,7 @@ int main() {
         vbox_container->add_child(hbox_container);
 
         auto line_edit = std::make_shared<LineEdit>();
+        line_edit->sizing_flag = ContainerSizingFlag::Expand;
         hbox_container->add_child(line_edit);
 
         auto file_dialog = std::make_shared<FileDialog>();

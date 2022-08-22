@@ -10,16 +10,12 @@
 #include <functional>
 
 namespace Flint {
-    /**
-     * Button[HBoxContainer[TextureRect, Label]]
-     */
     class Button : public Control {
     public:
         Button();
 
         bool pressed = false;
         bool hovered = false;
-        bool pressed_inside = false;
 
         void input(std::vector<InputEvent> &input_queue) override;
 
@@ -42,16 +38,23 @@ namespace Flint {
         bool expand_icon = false;
 
     protected:
+        bool pressed_inside = false;
+
+        /// Button[HBoxContainer[TextureRect, Label]]
         std::shared_ptr<BoxContainer> container;
         std::shared_ptr<TextureRect> icon_rect;
         std::shared_ptr<Label> label;
 
+        // Callbacks.
         std::vector<std::function<void()>> pressed_callbacks;
         std::vector<std::function<void()>> hovered_callbacks;
         std::vector<std::function<void()>> down_callbacks;
         std::vector<std::function<void()>> up_callbacks;
 
-        std::optional<StyleBox> theme_normal, theme_hovered, theme_pressed;
+        // Styles.
+        std::optional<StyleBox> theme_normal;
+        std::optional<StyleBox> theme_hovered;
+        std::optional<StyleBox> theme_pressed;
 
     protected:
         void when_pressed();

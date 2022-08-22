@@ -33,10 +33,10 @@ namespace Flint {
         vp.stroke_width = 2;
         vector_texture->set_vector_paths({vp});
         icon_rect = std::make_shared<TextureRect>();
-        icon_rect->sizing_flag = ContainerSizingFlag::EXPAND;
         icon_rect->set_texture(vector_texture);
 
         container = std::make_shared<BoxContainer>();
+        container->make_horizontal();
         container->set_parent(this);
         container->add_child(icon_rect);
         container->add_child(label);
@@ -109,17 +109,7 @@ namespace Flint {
     void Button::update(double dt) {
         Control::update(dt);
 
-//        if (icon.has_value()) {
-//            auto icon_size = icon.value().size;
-//            label->set_size({size.x - icon_size.x, size.y});
-//            label->set_position({icon_size.x, 0});
-//        } else {
-//            label->set_size({size.x, size.y});
-//            label->set_position({0, 0});
-//        }
         container->propagate_update(dt);
-
-        label->update(dt);
     }
 
     void Button::draw(VkCommandBuffer p_command_buffer) {
@@ -176,7 +166,6 @@ namespace Flint {
 
     void Button::set_text(const std::string &text) {
         label->set_text(text);
-        label->set_visibility(text.empty());
     }
 
     void Button::set_icon(const std::shared_ptr<Texture> &p_icon) {
