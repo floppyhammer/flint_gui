@@ -112,7 +112,9 @@ namespace Flint {
     }
 
     void Panel::propagate_input(std::vector<InputEvent> &input_queue) {
-        title_container->propagate_input(input_queue);
+        if (title_bar) {
+            title_container->propagate_input(input_queue);
+        }
 
         if (collapsed) {
             input(input_queue);
@@ -178,7 +180,9 @@ namespace Flint {
     }
 
     void Panel::update(double dt) {
-        title_container->propagate_update(dt);
+        if (title_bar) {
+            title_container->propagate_update(dt);
+        }
 
         Control::update(dt);
     }
