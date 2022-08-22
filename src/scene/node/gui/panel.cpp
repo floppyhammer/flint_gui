@@ -48,7 +48,7 @@ namespace Flint {
             title_label->set_text("Panel");
             title_label->set_horizontal_alignment(Alignment::Center);
             title_label->set_vertical_alignment(Alignment::Center);
-            title_label->set_mouse_filter(MouseFilter::IGNORE);
+            title_label->set_mouse_filter(MouseFilter::Ignore);
             title_label->sizing_flag = ContainerSizingFlag::Expand;
         }
 
@@ -81,7 +81,7 @@ namespace Flint {
         title_container->add_child(close_button);
         title_container->set_position({0, 0});
         title_container->set_size({size.x, title_bar_height});
-        title_container->set_mouse_filter(MouseFilter::IGNORE);
+        title_container->set_mouse_filter(MouseFilter::Ignore);
 
         // Connect signals.
         auto callback = [this] {

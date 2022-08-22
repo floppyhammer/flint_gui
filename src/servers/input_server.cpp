@@ -146,27 +146,27 @@ namespace Flint {
         GLFWcursor *current_cursor{};
 
         switch (shape) {
-            case CursorShape::ARROW: {
+            case CursorShape::Arrow: {
                 current_cursor = arrow_cursor;
             }
                 break;
-            case CursorShape::IBEAM: {
+            case CursorShape::IBeam: {
                 current_cursor = ibeam_cursor;
             }
                 break;
-            case CursorShape::CROSSHAIR: {
+            case CursorShape::Crosshair: {
                 current_cursor = crosshair_cursor;
             }
                 break;
-            case CursorShape::HAND: {
+            case CursorShape::Hand: {
                 current_cursor = hand_cursor;
             }
                 break;
-            case CursorShape::HRESIZE: {
+            case CursorShape::HResize: {
                 current_cursor = resize_cursor_h;
             }
                 break;
-            case CursorShape::VRESIZE: {
+            case CursorShape::VResize: {
                 current_cursor = resize_cursor_v;
             }
                 break;

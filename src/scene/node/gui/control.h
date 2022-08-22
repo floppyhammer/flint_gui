@@ -15,37 +15,37 @@
 using Pathfinder::ColorF;
 
 namespace Flint {
-    /// How a control node handles mouse input propagation.
+    /// How a GUI node handles mouse input propagation.
     enum class MouseFilter {
-        STOP, // Use input and mark it as consumed.
-        PASS, // Use input.
-        IGNORE, // Ignore input.
+        Stop, // Use input and mark it as consumed.
+        Pass, // Use input.
+        Ignore, // Ignore input.
     };
 
-    /// Control anchor only takes effect when the control node is not a child of a container
-    /// but that of a normal control node.
+    /// Anchor takes effect only when the GUI node is
+    /// inside a non-container control node.
     enum class AnchorFlag {
-        TOP_LEFT,
-        TOP_RIGHT,
-        BOTTOM_RIGHT,
-        BOTTOM_LEFT,
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight,
 
-        CENTER_LEFT,
-        CENTER_TOP,
-        CENTER_RIGHT,
-        CENTER_BOTTOM,
-        CENTER,
+        CenterLeft,
+        CenterRight,
+        CenterTop,
+        CenterBottom,
+        Center,
 
-        LEFT_WIDE,
-        TOP_WIDE,
-        RIGHT_WIDE,
-        BOTTOM_WIDE,
-        VCENTER_WIDE,
-        HCENTER_WIDE,
+        LeftWide,
+        RightWide,
+        TopWide,
+        BottomWide,
+        VCenterWide,
+        HCenterWide,
 
-        FULL_RECT,
+        FullRect,
 
-        MAX,
+        Max,
     };
 
     /// How a parent container organizes this control node.
@@ -126,7 +126,7 @@ namespace Flint {
 
         Vec2F local_mouse_position;
 
-        AnchorFlag anchor_mode = AnchorFlag::MAX;
+        AnchorFlag anchor_mode = AnchorFlag::Max;
 
         void update(double dt) override;
 
@@ -143,7 +143,7 @@ namespace Flint {
         /// Visualize the node's size.
         StyleBox debug_size_box;
 
-        MouseFilter mouse_filter = MouseFilter::STOP;
+        MouseFilter mouse_filter = MouseFilter::Stop;
     };
 }
 

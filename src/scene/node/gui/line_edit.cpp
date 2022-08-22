@@ -243,10 +243,10 @@ namespace Flint {
     }
 
     void LineEdit::cursor_entered() {
-        InputServer::get_singleton()->set_cursor(CursorShape::IBEAM);
+        InputServer::get_singleton()->set_cursor(CursorShape::IBeam);
     }
 
     void LineEdit::cursor_exited() {
-        InputServer::get_singleton()->set_cursor(CursorShape::ARROW);
+        InputServer::get_singleton()->set_cursor(CursorShape::Arrow);
     }
 }

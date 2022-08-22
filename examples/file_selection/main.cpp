@@ -27,7 +27,7 @@ int main() {
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         vector_layer->set_texture(VectorServer::get_singleton()->get_texture());
-        vector_layer->set_mouse_filter(MouseFilter::IGNORE);
+        vector_layer->set_mouse_filter(MouseFilter::Ignore);
 
         auto panel = std::make_shared<Panel>();
         panel->enable_title_bar(false);

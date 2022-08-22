@@ -21,7 +21,7 @@ namespace Flint {
 
         // Don't add the label as a child since it's not a normal node but part of the SpinBox.
         label = std::make_shared<Label>();
-        label->set_mouse_filter(MouseFilter::IGNORE);
+        label->set_mouse_filter(MouseFilter::Ignore);
         label->set_horizontal_alignment(Alignment::Center);
         label->set_vertical_alignment(Alignment::Center);
         set_value(0);

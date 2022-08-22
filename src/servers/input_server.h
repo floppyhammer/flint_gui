@@ -76,17 +76,17 @@ namespace Flint {
 
     enum class CursorShape {
         // The regular arrow cursor.
-        ARROW,
+        Arrow,
         // The text input I-beam cursor shape.
-        IBEAM,
+        IBeam,
         // The crosshair shape.
-        CROSSHAIR,
+        Crosshair,
         // The hand shape.
-        HAND,
+        Hand,
         // The horizontal resize arrow shape.
-        HRESIZE,
+        HResize,
         // The vertical resize arrow shape.
-        VRESIZE,
+        VResize,
     };
 
     class InputServer {

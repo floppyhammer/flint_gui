@@ -139,7 +139,7 @@ int main() {
         vector_layer->name = "vector_layer";
         vector_layer->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         vector_layer->set_texture(VectorServer::get_singleton()->get_texture());
-        vector_layer->set_mouse_filter(MouseFilter::IGNORE);
+        vector_layer->set_mouse_filter(MouseFilter::Ignore);
 
         auto item_tree = std::make_shared<Tree>();
         item_tree->set_size({400, 400});
@@ -171,15 +171,15 @@ int main() {
         scene_panel->add_child(margin_container2);
 
         node_gui->add_child(scene_panel);
-        scene_panel->set_anchor_flag(AnchorFlag::TOP_LEFT);
+        scene_panel->set_anchor_flag(AnchorFlag::TopLeft);
 
         node_gui->add_child(inspector_panel);
-        inspector_panel->set_anchor_flag(AnchorFlag::TOP_RIGHT);
+        inspector_panel->set_anchor_flag(AnchorFlag::TopRight);
 
         sub_viewport_c->add_child(sub_viewport);
         sub_viewport_c->set_viewport(sub_viewport);
         sub_viewport_c->set_size({512, 512});
-        sub_viewport_c->set_anchor_flag(AnchorFlag::CENTER);
+        sub_viewport_c->set_anchor_flag(AnchorFlag::Center);
         sub_viewport->add_child(std::make_shared<Skybox>());
         sub_viewport->add_child(node_3d);
         node_3d->add_child(model1);

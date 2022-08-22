@@ -31,7 +31,7 @@ namespace Flint {
     }
 
     void Control::input(std::vector<InputEvent> &input_queue) {
-        if (mouse_filter != MouseFilter::STOP) return;
+        if (mouse_filter != MouseFilter::Stop) return;
 
         auto global_position = get_global_position();
 
@@ -197,78 +197,78 @@ namespace Flint {
             float bottom = cast_parent->size.y - actual_size.y;
 
             switch (anchor_mode) {
-                case AnchorFlag::TOP_LEFT: {
+                case AnchorFlag::TopLeft: {
                     position = {0, 0};
                 }
                     break;
-                case AnchorFlag::TOP_RIGHT: {
+                case AnchorFlag::TopRight: {
                     position = {right, 0};
                 }
                     break;
-                case AnchorFlag::BOTTOM_RIGHT: {
+                case AnchorFlag::BottomRight: {
                     position = {right, bottom};
                 }
                     break;
-                case AnchorFlag::BOTTOM_LEFT: {
+                case AnchorFlag::BottomLeft: {
                     position = {0, bottom};
                 }
                     break;
-                case AnchorFlag::CENTER_LEFT: {
+                case AnchorFlag::CenterLeft: {
                     position = {0, center_y};
                 }
                     break;
-                case AnchorFlag::CENTER_RIGHT: {
+                case AnchorFlag::CenterRight: {
                     position = {right, center_y};
                 }
                     break;
-                case AnchorFlag::CENTER_TOP: {
+                case AnchorFlag::CenterTop: {
                     position = {center_x, 0};
                 }
                     break;
-                case AnchorFlag::CENTER_BOTTOM: {
+                case AnchorFlag::CenterBottom: {
                     position = {center_x, bottom};
                 }
                     break;
-                case AnchorFlag::CENTER: {
+                case AnchorFlag::Center: {
                     position = {center_x, center_y};
                 }
                     break;
-                case AnchorFlag::LEFT_WIDE: {
+                case AnchorFlag::LeftWide: {
                     position = {0, 0};
                     size = {actual_size.x, cast_parent->size.y};
                 }
                     break;
-                case AnchorFlag::RIGHT_WIDE: {
+                case AnchorFlag::RightWide: {
                     position = {right, 0};
                     size = {actual_size.x, cast_parent->size.y};
                 }
                     break;
-                case AnchorFlag::TOP_WIDE: {
+                case AnchorFlag::TopWide: {
                     position = {0, 0};
                     size = {cast_parent->size.x, actual_size.y};
                 }
                     break;
-                case AnchorFlag::BOTTOM_WIDE: {
+                case AnchorFlag::BottomWide: {
                     position = {0, bottom};
                     size = {cast_parent->size.x, actual_size.y};
                 }
                     break;
-                case AnchorFlag::VCENTER_WIDE: {
+                case AnchorFlag::VCenterWide: {
                     position = {center_x, center_y};
                     size = {cast_parent->size.x, actual_size.y};
                 }
                     break;
-                case AnchorFlag::HCENTER_WIDE: {
+                case AnchorFlag::HCenterWide: {
                     position = {center_x, center_y};
                     size = {actual_size.x, cast_parent->size.y};
                 }
                     break;
-                case AnchorFlag::FULL_RECT: {
+                case AnchorFlag::FullRect: {
                     position = {0, 0};
                     size = {cast_parent->size.x, cast_parent->size.y};
                 }
                     break;
-                case AnchorFlag::MAX: {
+                case AnchorFlag::Max: {
                     return;
                 }
             }
