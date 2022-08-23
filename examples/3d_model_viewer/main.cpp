@@ -76,10 +76,9 @@ int main() {
         // ----------------------------------------------------
         auto translation_container = std::make_shared<BoxContainer>();
         {
-            auto label = std::make_shared<Label>();
+            auto label = std::make_shared<Label>("Translation");
             label->set_horizontal_alignment(Alignment::Center);
             label->set_vertical_alignment(Alignment::Begin);
-            label->set_text("Translation");
 
             auto spin_box_x = std::make_shared<SpinBox>();
             spin_box_x->sizing_flag = ContainerSizingFlag::Expand;
@@ -106,10 +105,9 @@ int main() {
         // ----------------------------------------------------
         auto rotation_container = std::make_shared<BoxContainer>();
         {
-            auto label = std::make_shared<Label>();
+            auto label = std::make_shared<Label>("Rotation");
             label->set_horizontal_alignment(Alignment::Center);
             label->set_vertical_alignment(Alignment::Begin);
-            label->set_text("Rotation");
 
             auto spin_box_x = std::make_shared<SpinBox>();
             spin_box_x->sizing_flag = ContainerSizingFlag::Expand;

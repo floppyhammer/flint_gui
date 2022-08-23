@@ -4,12 +4,12 @@ namespace Flint {
     void MarginContainer::adjust_layout() {
         // Child's local position.
         Vec2<float> child_position;
-        child_position.x += margin_left;
-        child_position.y += margin_top;
+        child_position.x += margin.left;
+        child_position.y += margin.top;
 
         auto child_size = size;
-        child_size.x -= margin_left + margin_right;
-        child_size.y -= margin_top + margin_bottom;
+        child_size.x -= margin.left + margin.right;
+        child_size.y -= margin.top + margin.bottom;
 
         for (auto &child: children) {
             if (child->is_gui_node()) {
@@ -24,5 +24,13 @@ namespace Flint {
         adjust_layout();
 
         Control::update(dt);
+    }
+
+    void MarginContainer::set_margin_all(float value) {
+        set_margin({value, value, value, value});
+    }
+
+    void MarginContainer::set_margin(const Rect<float> &p_margin) {
+        margin = p_margin;
     }
 }

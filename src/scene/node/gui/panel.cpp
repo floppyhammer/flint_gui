@@ -44,8 +44,7 @@ namespace Flint {
         }
 
         {
-            title_label = std::make_shared<Label>();
-            title_label->set_text("Panel");
+            title_label = std::make_shared<Label>("Panel");
             title_label->set_horizontal_alignment(Alignment::Center);
             title_label->set_vertical_alignment(Alignment::Center);
             title_label->set_mouse_filter(MouseFilter::Ignore);

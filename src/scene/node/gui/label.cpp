@@ -3,14 +3,14 @@
 #include <string>
 
 namespace Flint {
-    Label::Label() {
+    Label::Label(const std::string &p_text) {
         type = NodeType::Label;
 
         debug_size_box.border_color = ColorU::red();
 
         set_font(ResourceManager::get_singleton()->load<Font>("../assets/unifont-14.0.03.ttf"));
 
-        set_text("Label");
+        set_text(p_text);
     }
 
     void Label::set_text(const std::string &p_text) {

@@ -44,7 +44,7 @@ namespace Flint {
 
     class Label : public Control {
     public:
-        Label();
+        Label(const std::string &p_text);
 
         /**
          * Set text context.

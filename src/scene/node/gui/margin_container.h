@@ -3,6 +3,8 @@
 
 #include "container.h"
 
+using Pathfinder::Rect;
+
 namespace Flint {
     class MarginContainer : public Container {
     public:
@@ -14,8 +16,12 @@ namespace Flint {
 
         void adjust_layout() override;
 
+        void set_margin(const Rect<float> &p_margin);
+
+        void set_margin_all(float value);
+
     private:
-        float margin_left = 8, margin_right = 8, margin_top = 8, margin_bottom = 8;
+        Rect<float> margin = {8, 8, 8, 8};
     };
 }
 

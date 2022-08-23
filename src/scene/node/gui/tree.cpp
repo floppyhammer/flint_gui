@@ -69,7 +69,7 @@ namespace Flint {
     }
 
     TreeItem::TreeItem() {
-        label = std::make_shared<Label>();
+        label = std::make_shared<Label>("");
 
         icon = std::make_shared<TextureRect>();
 

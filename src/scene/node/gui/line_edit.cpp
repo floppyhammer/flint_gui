@@ -7,7 +7,7 @@ namespace Flint {
     Flint::LineEdit::LineEdit() {
         type = NodeType::LineEdit;
 
-        label = std::make_shared<Label>();
+        label = std::make_shared<Label>("");
         label->set_parent(this);
 
         theme_normal = std::optional(StyleBox());
