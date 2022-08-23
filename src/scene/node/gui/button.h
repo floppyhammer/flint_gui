@@ -29,7 +29,7 @@ namespace Flint {
 
         Vec2<float> calculate_minimum_size() const override;
 
-        void connect_signal(std::string signal, std::function<void()> callback);
+        void connect_signal(std::string signal, const std::function<void()> &callback);
 
         void set_text(const std::string &text);
 

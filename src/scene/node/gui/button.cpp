@@ -158,8 +158,8 @@ namespace Flint {
         }
     }
 
-    void Button::connect_signal(std::string signal, std::function<void()> callback) {
-        if (signal == "on_pressed") {
+    void Button::connect_signal(std::string signal, const std::function<void()> &callback) {
+        if (signal == "pressed") {
             pressed_callbacks.push_back(callback);
         }
     }

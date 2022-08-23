@@ -110,7 +110,7 @@ namespace Flint {
                 collapse_button->set_icon(collapse_icon);
             }
         };
-        collapse_button->connect_signal("on_pressed", callback);
+        collapse_button->connect_signal("pressed", callback);
 
         container = std::make_shared<BoxContainer>();
         container->make_horizontal();

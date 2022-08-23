@@ -65,37 +65,41 @@ int main() {
             Logger::verbose("Button pressed");
             file_dialog->show();
         };
+        button->connect_signal("pressed", callback);
         hbox_container->add_child(button);
 
         auto progress_bar = std::make_shared<ProgressBar>();
         progress_bar->set_size({256, 24});
         vbox_container->add_child(progress_bar);
 
-        // Position values.
+        // Translation values.
         // ----------------------------------------------------
-        auto position_container = std::make_shared<BoxContainer>();
+        auto translation_container = std::make_shared<BoxContainer>();
         {
             auto label = std::make_shared<Label>();
             label->set_horizontal_alignment(Alignment::Center);
             label->set_vertical_alignment(Alignment::Begin);
-            label->set_text("Position");
+            label->set_text("Translation");
 
             auto spin_box_x = std::make_shared<SpinBox>();
             spin_box_x->sizing_flag = ContainerSizingFlag::Expand;
             auto spin_box_y = std::make_shared<SpinBox>();
             spin_box_y->sizing_flag = ContainerSizingFlag::Expand;
+            auto spin_box_z = std::make_shared<SpinBox>();
+            spin_box_z->sizing_flag = ContainerSizingFlag::Expand;
 
-            auto xy_container = std::make_shared<BoxContainer>();
-            xy_container->sizing_flag = ContainerSizingFlag::Expand;
-            xy_container->make_vertical();
-            xy_container->add_child(spin_box_x);
-            xy_container->add_child(spin_box_y);
+            auto value_container = std::make_shared<BoxContainer>();
+            value_container->sizing_flag = ContainerSizingFlag::Expand;
+            value_container->make_vertical();
+            value_container->add_child(spin_box_x);
+            value_container->add_child(spin_box_y);
+            value_container->add_child(spin_box_z);
 
-            position_container->add_child(label);
-            position_container->add_child(xy_container);
+            translation_container->add_child(label);
+            translation_container->add_child(value_container);
         }
 
-        vbox_container->add_child(position_container);
+        vbox_container->add_child(translation_container);
         // ----------------------------------------------------
 
         // Rotation values.
@@ -107,11 +111,22 @@ int main() {
             label->set_vertical_alignment(Alignment::Begin);
             label->set_text("Rotation");
 
-            auto spin_box = std::make_shared<SpinBox>();
-            spin_box->sizing_flag = ContainerSizingFlag::Expand;
+            auto spin_box_x = std::make_shared<SpinBox>();
+            spin_box_x->sizing_flag = ContainerSizingFlag::Expand;
+            auto spin_box_y = std::make_shared<SpinBox>();
+            spin_box_y->sizing_flag = ContainerSizingFlag::Expand;
+            auto spin_box_z = std::make_shared<SpinBox>();
+            spin_box_z->sizing_flag = ContainerSizingFlag::Expand;
+
+            auto value_container = std::make_shared<BoxContainer>();
+            value_container->sizing_flag = ContainerSizingFlag::Expand;
+            value_container->make_vertical();
+            value_container->add_child(spin_box_x);
+            value_container->add_child(spin_box_y);
+            value_container->add_child(spin_box_z);
 
             rotation_container->add_child(label);
-            rotation_container->add_child(spin_box);
+            rotation_container->add_child(value_container);
         }
         vbox_container->add_child(rotation_container);
         // ----------------------------------------------------

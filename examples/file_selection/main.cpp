@@ -60,7 +60,7 @@ int main() {
             Logger::verbose("Button pressed");
             line_edit->set_text(file_dialog->show());
         };
-        select_button->connect_signal("on_pressed", callback);
+        select_button->connect_signal("pressed", callback);
         hbox_container->add_child(select_button);
 
         auto confirm_button = std::make_shared<Button>();

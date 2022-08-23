@@ -105,7 +105,7 @@ namespace Flint {
                 Logger::verbose("Expanded", "Panel");
             }
         };
-        collapse_button->connect_signal("on_pressed", callback);
+        collapse_button->connect_signal("pressed", callback);
 
         title_bar = true;
         // ---------------------------------------------------------
