@@ -9,6 +9,7 @@
 using Pathfinder::Vec2F;
 using Pathfinder::Transform2;
 using Pathfinder::ColorU;
+using Pathfinder::Rect;
 
 namespace Flint {
     /// A thin wrapper over Pathfinder outline.
@@ -37,11 +38,20 @@ namespace Flint {
                   float p_canvas_height,
                   const std::vector<char> &area_lut_input);
 
+        void set_render_target(std::shared_ptr<ImageTexture> dest_texture);
+
         void cleanup();
 
-        void clear();
+        void clear_scene();
 
         void submit();
+
+        void push_scene(const Rect<float> &view_box);
+
+        void pop_scene();
+
+        /// Following paths will be added to the scene attached to the top scene builder.
+        std::vector<std::shared_ptr<Pathfinder::SceneBuilder>> scene_stack;
 
         std::shared_ptr<ImageTexture> get_texture();
 
@@ -52,6 +62,8 @@ namespace Flint {
         void draw_path(const VectorPath &vector_path, Transform2 transform);
 
         std::shared_ptr<Pathfinder::Canvas> canvas;
+
+        Vec2F default_canvas_size;
     };
 }
 

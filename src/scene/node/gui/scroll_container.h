@@ -4,8 +4,7 @@
 #include "container.h"
 
 namespace Flint {
-    /// Scroll container should use a separate Pathfinder::Scene and use the ViewBox property
-    /// to achieve the clipping effect.
+
     class ScrollContainer : public Container {
     public:
         ScrollContainer() {
@@ -13,6 +12,8 @@ namespace Flint {
         }
 
         void update(double dt) override;
+
+        void draw(VkCommandBuffer p_command_buffer) override;
 
         void adjust_layout() override;
 
@@ -30,8 +31,13 @@ namespace Flint {
         bool horizontal_mode = true;
         bool vertical_mode = true;
 
+        /// Scroll value can be negative to achieve blank scrolling space.
         int32_t hscroll = 0;
         int32_t vscroll = 0;
+
+        /// Scroll container should use a separate Pathfinder::SceneBuilder
+        /// and use the ViewBox property to achieve element clipping.
+        std::shared_ptr<Pathfinder::SceneBuilder> scene_builder;
     };
 }
 

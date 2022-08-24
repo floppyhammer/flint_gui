@@ -193,12 +193,18 @@ namespace Flint {
     }
 
     void Label::draw(VkCommandBuffer p_command_buffer) {
+        auto global_position = get_global_position();
+
+//        VectorServer::get_singleton()->submit();
+//        VectorServer::get_singleton()->push_scene({global_position.x,
+//                                                   global_position.y,
+//                                                   global_position.x + size.x,
+//                                                   global_position.y + size.y});
+
         auto canvas = VectorServer::get_singleton()->canvas;
         canvas->save_state();
 
-        auto global_position = get_global_position();
-
-        if (theme_background.has_value()){
+        if (theme_background.has_value()) {
             theme_background.value().add_to_canvas(global_position, size, canvas);
         }
 
@@ -211,11 +217,13 @@ namespace Flint {
         // Draw glyphs.
         for (Glyph &g: glyphs) {
             // Add fill.
-            canvas->set_fill_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(color.r, color.g, color.b, color.a)));
+            canvas->set_fill_paint(
+                    Pathfinder::Paint::from_color(Pathfinder::ColorU(color.r, color.g, color.b, color.a)));
             canvas->fill_path(g.outline, Pathfinder::FillRule::Winding);
 
             // Add stroke if needed.
-            canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(stroke_color.r, stroke_color.g, stroke_color.b, stroke_color.a)));
+            canvas->set_stroke_paint(Pathfinder::Paint::from_color(
+                    Pathfinder::ColorU(stroke_color.r, stroke_color.g, stroke_color.b, stroke_color.a)));
             canvas->set_line_width(stroke_width);
             canvas->stroke_path(g.outline);
 
@@ -243,6 +251,9 @@ namespace Flint {
         }
 
         canvas->restore_state();
+
+//        VectorServer::get_singleton()->submit();
+//        VectorServer::get_singleton()->pop_scene();
 
         Control::draw(p_command_buffer);
     }

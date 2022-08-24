@@ -171,6 +171,8 @@ namespace Flint {
             }
         }
 
+        label->set_size(size);
+
         // Draw text.
         label->draw(p_command_buffer);
 

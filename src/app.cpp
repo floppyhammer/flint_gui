@@ -53,7 +53,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
                              VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    VectorServer::get_singleton()->clear();
+    VectorServer::get_singleton()->clear_scene();
 
     // Record commands from the scene manager.
     {

@@ -15,6 +15,9 @@ namespace Flint {
         return min_size.max(minimum_size);
     }
 
+    void ScrollContainer::draw(VkCommandBuffer p_command_buffer) {
+    }
+
     void ScrollContainer::set_hscroll(int32_t value) {
         if (children.empty()) return;
 

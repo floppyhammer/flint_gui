@@ -5,18 +5,45 @@ namespace Flint {
                             float p_canvas_width,
                             float p_canvas_height,
                             const std::vector<char> &area_lut_input) {
-        canvas = std::make_shared<Pathfinder::Canvas>(driver,
-                                                      p_canvas_width,
-                                                      p_canvas_height,
-                                                      area_lut_input);
+        canvas = std::make_shared<Pathfinder::Canvas>(driver, area_lut_input);
+
+        // TODO
+        canvas->set_empty_dest_texture(p_canvas_width, p_canvas_height);
+
+        default_canvas_size = {p_canvas_width, p_canvas_height};
+
+        push_scene({0, 0, p_canvas_width, p_canvas_height});
     }
 
     void VectorServer::cleanup() {
         canvas.reset();
     }
 
-    void VectorServer::clear() {
+    // TODO: It might not be a good idea to use view box for clipping.
+    // Viewport may be a better choice?
+    void VectorServer::push_scene(const Rect<float> &view_box) {
+        canvas->set_empty_scene(view_box);
+        scene_stack.push_back(canvas->get_scene_builder());
+    }
+
+    void VectorServer::pop_scene() {
+        if (scene_stack.empty()) {
+            return;
+        }
+
+        scene_stack.erase(scene_stack.end() - 1);
+
+        if (scene_stack.empty()) {
+            canvas->set_scene_builder(nullptr);
+        } else {
+            canvas->set_scene_builder(scene_stack.back());
+        }
+    }
+
+    void VectorServer::clear_scene() {
+        scene_stack.clear();
         canvas->clear();
+        push_scene({0, 0, default_canvas_size.x, default_canvas_size.y});
     }
 
     void VectorServer::submit() {
@@ -24,6 +51,12 @@ namespace Flint {
     }
 
     void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) {
+        if (scene_stack.empty()) {
+            return;
+        }
+
+        canvas->set_scene_builder(scene_stack.back());
+
         Pathfinder::Outline outline;
         outline.add_line({start.x, start.y}, {end.x, end.y});
 
@@ -36,6 +69,12 @@ namespace Flint {
     }
 
     void VectorServer::draw_circle(Vec2F center, float radius, float line_width, bool fill, ColorU color) {
+        if (scene_stack.empty()) {
+            return;
+        }
+
+        canvas->set_scene_builder(scene_stack.back());
+
         Pathfinder::Outline outline;
         outline.add_circle({center.x, center.y}, radius);
 
@@ -54,6 +93,12 @@ namespace Flint {
     }
 
     void VectorServer::draw_path(const VectorPath &vector_path, Transform2 transform) {
+        if (scene_stack.empty()) {
+            return;
+        }
+
+        canvas->set_scene_builder(scene_stack.back());
+
         canvas->save_state();
 
         canvas->set_transform(transform);
@@ -86,5 +131,9 @@ namespace Flint {
                                           texture_vk->get_sampler(),
                                           texture_vk->get_width(),
                                           texture_vk->get_height());
+    }
+
+    void VectorServer::set_render_target(std::shared_ptr<ImageTexture> dest_texture) {
+
     }
 }
