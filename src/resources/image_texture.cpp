@@ -24,10 +24,10 @@ namespace Flint {
         // Should be right before destroying the image itself.
         vkDestroyImageView(device, imageView, nullptr);
 
-        // Release GPU memory.
+        // Destroy handle.
         vkDestroyImage(device, image, nullptr);
 
-        // Release CPU memory.
+        // Release device memory.
         vkFreeMemory(device, imageMemory, nullptr);
     }
 
@@ -51,7 +51,7 @@ namespace Flint {
         // In bytes.
         VkDeviceSize imageSize = width * height * pixel_bytes;
 
-        // Temporary buffer and CPU memory.
+        // Temporary buffer and device memory.
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingBufferMemory;
 

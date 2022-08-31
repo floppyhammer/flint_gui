@@ -781,7 +781,7 @@ namespace Flint {
             // In bytes. 16 bytes per R32G32B32A32F pixel.
             VkDeviceSize imageSize = tex_width * tex_height * 16;
 
-            // Temporary buffer and CPU memory.
+            // Temporary buffer and device memory.
             VkBuffer staging_buffer;
             VkDeviceMemory staging_buffer_memory;
 

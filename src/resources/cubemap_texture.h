@@ -19,10 +19,10 @@ namespace Flint {
 
         VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 
-        /// GPU memory.
+        /// Handle.
         VkImage image{};
 
-        /// CPU memory.
+        /// Device memory.
         VkDeviceMemory imageMemory{};
 
         /// Thin wrapper.

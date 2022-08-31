@@ -142,8 +142,8 @@ namespace Flint {
             vkFreeMemory(device, index_buffer_memory, nullptr);
 
             // Clean up vertex buffer.
-            vkDestroyBuffer(device, vertex_buffer, nullptr); // GPU memory
-            vkFreeMemory(device, vertex_buffer_memory, nullptr); // CPU memory
+            vkDestroyBuffer(device, vertex_buffer, nullptr);
+            vkFreeMemory(device, vertex_buffer_memory, nullptr);
         }
 
         VkBuffer get_vertex_buffer() {
@@ -177,7 +177,7 @@ namespace Flint {
 
             auto rs = RenderServer::getSingleton();
 
-            // Create the GPU buffer and link it with the CPU memory.
+            // Create the GPU buffer and link it with the GPU memory.
             rs->createBuffer(buffer_size,
                              VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                              VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
@@ -185,7 +185,7 @@ namespace Flint {
                              staging_buffer,
                              staging_buffer_memory);
 
-            // Copy data to the CPU memory.
+            // Copy data to the device memory.
             rs->copyDataToMemory((void *) vertices.data(), staging_buffer_memory,
                                  buffer_size);
 

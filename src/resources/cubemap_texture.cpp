@@ -40,7 +40,7 @@ namespace Flint {
         // Image layer data size per layer in bytes.
         VkDeviceSize layer_data_size = width * height * 4;
 
-        // Temporary buffer and CPU memory.
+        // Temporary buffer and device memory.
         VkBuffer staging_buffer;
         VkDeviceMemory staging_buffer_memory;
 
