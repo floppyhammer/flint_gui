@@ -28,7 +28,7 @@ namespace Flint {
         std::queue<InputEvent> input_queue;
     };
 
-    struct KeyboardInputComponent {
+    struct KeyInputComponent {
         std::queue<InputEvent> input_queue;
     };
     // -----------------------------
@@ -37,7 +37,7 @@ namespace Flint {
     // -----------------------------
     struct RigidBodyComponent {
         Vec3<float> velocity{0.0f};
-        Vec3<float> acceleration{0.0f};
+        Vec3<float> force{0.0f};
     };
 
     struct Transform3dComponent {
@@ -116,10 +116,10 @@ namespace Flint {
     // HIERARCHY
     // -----------------------------
     struct HierarchicalRelations {
-        std::optional<Entity> first_child;
-        std::optional<Entity> prev_sibling;
-        std::optional<Entity> next_sibling;
-        std::optional<Entity> parent;
+        std::optional<Entity> first_child{};
+        std::optional<Entity> prev_sibling{};
+        std::optional<Entity> next_sibling{};
+        std::optional<Entity> parent{};
     };
 
     struct VisibilityComponent {

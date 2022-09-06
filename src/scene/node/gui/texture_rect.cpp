@@ -26,7 +26,9 @@ namespace Flint {
         // Texture can be null.
         texture = p_texture;
 
-        if (!texture) return;
+        if (!texture) {
+            return;
+        }
 
         if (texture->get_type() == TextureType::IMAGE) {
             mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
@@ -45,6 +47,7 @@ namespace Flint {
 
     void TextureRect::draw(VkCommandBuffer p_command_buffer) {
         if (texture) {
+            // Image texture.
             if (texture->get_type() == TextureType::IMAGE) {
                 Node *viewport_node = get_viewport();
 
@@ -67,7 +70,7 @@ namespace Flint {
                         pipeline,
                         mesh->surface->get_material()->get_desc_set()->getDescriptorSet(
                                 SwapChain::getSingleton()->currentImage));
-            } else {
+            } else { // Vector texture.
                 auto canvas = VectorServer::get_singleton()->canvas;
                 auto global_position = get_global_position();
 
@@ -75,8 +78,8 @@ namespace Flint {
 
                 if (stretch_mode == StretchMode::KEEP_CENTER) {
                     auto texture_size = vector_texture->get_size();
-                    vector_texture->add_to_canvas(
-                            global_position + ((size - Vec2<float>(texture_size.x, texture_size.y)) * 0.5f), canvas);
+                    auto offset = (size - Vec2<float>(texture_size.x, texture_size.y)) * 0.5f;
+                    vector_texture->add_to_canvas(global_position + offset, canvas);
                 } else {
                     vector_texture->add_to_canvas(global_position, canvas);
                 }

@@ -50,8 +50,17 @@ namespace Flint {
 
     /// How a parent container organizes this control node.
     enum class ContainerSizingFlag {
-        Expand,
-        Shrink,
+        Fill,
+        ShrinkStart,
+        ShrinkCenter,
+        ShrinkEnd,
+    };
+
+    struct ContainerSizing {
+        ContainerSizingFlag flag_h = ContainerSizingFlag::Fill;
+        bool expand_h = false;
+        ContainerSizingFlag flag_v = ContainerSizingFlag::Fill;
+        bool expand_v = false;
     };
 
     class Control : public Node {
@@ -78,7 +87,7 @@ namespace Flint {
 
         void set_mouse_filter(MouseFilter filter);
 
-        ContainerSizingFlag sizing_flag = ContainerSizingFlag::Shrink;
+        ContainerSizing container_sizing{};
 
         void set_visibility(bool p_visible);
 

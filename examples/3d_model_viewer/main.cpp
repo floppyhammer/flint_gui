@@ -81,14 +81,18 @@ int main() {
             label->set_vertical_alignment(Alignment::Begin);
 
             auto spin_box_x = std::make_shared<SpinBox>();
-            spin_box_x->sizing_flag = ContainerSizingFlag::Expand;
+            spin_box_x->container_sizing.expand_h = true;
+            spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
             auto spin_box_y = std::make_shared<SpinBox>();
-            spin_box_y->sizing_flag = ContainerSizingFlag::Expand;
+            spin_box_x->container_sizing.expand_h = true;
+            spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
             auto spin_box_z = std::make_shared<SpinBox>();
-            spin_box_z->sizing_flag = ContainerSizingFlag::Expand;
+            spin_box_x->container_sizing.expand_h = true;
+            spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
 
             auto value_container = std::make_shared<BoxContainer>();
-            value_container->sizing_flag = ContainerSizingFlag::Expand;
+            spin_box_x->container_sizing.expand_h = true;
+            spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
             value_container->make_vertical();
             value_container->add_child(spin_box_x);
             value_container->add_child(spin_box_y);
@@ -110,14 +114,18 @@ int main() {
             label->set_vertical_alignment(Alignment::Begin);
 
             auto spin_box_x = std::make_shared<SpinBox>();
-            spin_box_x->sizing_flag = ContainerSizingFlag::Expand;
+            spin_box_x->container_sizing.expand_h = true;
+            spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
             auto spin_box_y = std::make_shared<SpinBox>();
-            spin_box_y->sizing_flag = ContainerSizingFlag::Expand;
+            spin_box_x->container_sizing.expand_h = true;
+            spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
             auto spin_box_z = std::make_shared<SpinBox>();
-            spin_box_z->sizing_flag = ContainerSizingFlag::Expand;
+            spin_box_x->container_sizing.expand_h = true;
+            spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
 
             auto value_container = std::make_shared<BoxContainer>();
-            value_container->sizing_flag = ContainerSizingFlag::Expand;
+            spin_box_x->container_sizing.expand_h = true;
+            spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
             value_container->make_vertical();
             value_container->add_child(spin_box_x);
             value_container->add_child(spin_box_y);

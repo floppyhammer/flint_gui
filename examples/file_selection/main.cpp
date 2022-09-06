@@ -52,7 +52,8 @@ int main() {
         vbox_container->add_child(hbox_container);
 
         auto line_edit = std::make_shared<LineEdit>();
-        line_edit->sizing_flag = ContainerSizingFlag::Expand;
+        line_edit->container_sizing.expand_h = true;
+        line_edit->container_sizing.flag_h = ContainerSizingFlag::Fill;
         hbox_container->add_child(line_edit);
 
         auto file_dialog = std::make_shared<FileDialog>();
@@ -69,7 +70,7 @@ int main() {
 
         auto confirm_button = std::make_shared<Button>();
         confirm_button->set_text("Confirm");
-        confirm_button->sizing_flag = ContainerSizingFlag::Shrink;
+        confirm_button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
         vbox_container->add_child(confirm_button);
 
         node->add_child(vector_layer);

@@ -131,6 +131,8 @@ namespace Flint {
 
         std::vector<std::shared_ptr<Node>> get_children();
 
+        virtual std::shared_ptr<Node> get_child(size_t index);
+
         void remove_child(size_t index);
 
         NodeType extended_from_which_base_node() const;

@@ -21,16 +21,20 @@ namespace Flint {
                     child_min_width.push_back(child_min_size.x);
                     min_size.x += child_min_size.x;
                     min_size.y = std::max(size.y, child_min_size.y);
+
+                    if (cast_child->container_sizing.expand_h) {
+                        expanding_children.push_back(cast_child);
+                    }
                 } else {
                     cast_child->set_position({0, min_size.y});
                     cast_child->set_size({size.x, child_min_size.y});
                     child_min_width.push_back(child_min_size.y);
                     min_size.y += child_min_size.y;
                     min_size.x = std::max(size.x, child_min_size.x);
-                }
 
-                if (cast_child->sizing_flag == ContainerSizingFlag::Expand) {
-                    expanding_children.push_back(cast_child);
+                    if (cast_child->container_sizing.expand_v) {
+                        expanding_children.push_back(cast_child);
+                    }
                 }
             }
 
@@ -41,7 +45,8 @@ namespace Flint {
             }
         }
 
-        float available_space_for_expanding = horizontal ? size.x - (min_size.x - separation) : size.y - (min_size.y - separation);
+        float available_space_for_expanding = horizontal ? size.x - (min_size.x - separation) : size.y - (min_size.y -
+                                                                                                          separation);
         uint32_t expanding_child_count = expanding_children.size();
         uint32_t valid_expanding_child_count = 0;
 
@@ -59,7 +64,9 @@ namespace Flint {
                 if (child->is_gui_node()) {
                     auto cast_child = dynamic_cast<Control *>(child.get());
                     if (!cast_child->get_visibility()) continue;
-                    cast_child->set_position({shift, 0});
+
+                    cast_child->set_position(horizontal ? Vec2F{shift, 0} : Vec2F{0, shift});
+
                     auto child_min_size = cast_child->calculate_minimum_size();
 
                     float min_width_or_height = horizontal ? child_min_size.x : child_min_size.y;

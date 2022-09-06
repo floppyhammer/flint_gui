@@ -94,7 +94,7 @@ namespace Flint {
         std::unordered_map<size_t, Entity> index_to_entity_map;
 
         // Total size of valid entries in the array.
-        size_t size;
+        size_t size{};
     };
 }
 

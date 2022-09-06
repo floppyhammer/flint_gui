@@ -117,6 +117,14 @@ namespace Flint {
 //        get_tree()->
     }
 
+    std::shared_ptr<Node> Node::get_child(size_t index) {
+        if (index > children.size()) {
+            return nullptr;
+        }
+
+        return children[index];
+    }
+
     void Node::remove_child(size_t index) {
         if (index < 0 || index >= children.size()) return;
         children.erase(children.begin() + index);
