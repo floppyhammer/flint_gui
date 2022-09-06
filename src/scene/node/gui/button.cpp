@@ -7,6 +7,9 @@ namespace Flint {
     Button::Button() {
         type = NodeType::Button;
 
+        theme_normal = std::optional(StyleBox());
+        theme_normal.value().bg_color = ColorU(27, 27, 27, 255);
+
         theme_hovered = std::optional(StyleBox());
         theme_hovered.value().border_color = ColorU(163, 163, 163, 255);
         theme_hovered.value().border_width = 2;
