@@ -41,7 +41,7 @@ namespace Flint {
         bool pressed_inside = false;
 
         /// Button[HBoxContainer[TextureRect, Label]]
-        std::shared_ptr<BoxContainer> container;
+        std::shared_ptr<HBoxContainer> container;
         std::shared_ptr<TextureRect> icon_rect;
         std::shared_ptr<Label> label;
 

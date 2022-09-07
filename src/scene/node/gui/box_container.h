@@ -4,28 +4,40 @@
 #include "container.h"
 
 namespace Flint {
+    /// BoxContainer is not meant for direct use as a node.
+    /// Instead, use HBoxContainer/VBoxContainer.
     class BoxContainer : public Container {
     public:
-        BoxContainer() {
-            type = NodeType::BoxContainer;
-        }
-
         void update(double dt) override;
 
         void adjust_layout() override;
 
         Vec2<float> calculate_minimum_size() const override;
 
-        void set_separation(float value);
-
-        void make_vertical();
-
-        void make_horizontal();
+        void set_separation(float new_separation);
 
     protected:
+        /// Separation between managed children.
         float separation = 8;
 
+        /// Child organizing direction.
         bool horizontal = true;
+    };
+
+    class HBoxContainer : public BoxContainer {
+    public:
+        HBoxContainer() {
+            type = NodeType::HBoxContainer;
+            horizontal = true;
+        }
+    };
+
+    class VBoxContainer : public BoxContainer {
+    public:
+        VBoxContainer() {
+            type = NodeType::VBoxContainer;
+            horizontal = false;
+        }
     };
 }
 

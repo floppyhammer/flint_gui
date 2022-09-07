@@ -37,8 +37,7 @@ namespace Flint {
         icon_rect = std::make_shared<TextureRect>();
         icon_rect->set_texture(vector_texture);
 
-        container = std::make_shared<BoxContainer>();
-        container->make_horizontal();
+        container = std::make_shared<HBoxContainer>();
         container->set_parent(this);
         container->add_child(icon_rect);
         container->add_child(label);

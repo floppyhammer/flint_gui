@@ -131,16 +131,12 @@ namespace Flint {
         return min_size.max(minimum_size);
     }
 
-    void BoxContainer::set_separation(float value) {
-        separation = value;
+    void BoxContainer::set_separation(float new_separation) {
+        if (separation == new_separation) {
+            return;
+        }
+
+        separation = new_separation;
         adjust_layout();
-    }
-
-    void BoxContainer::make_vertical() {
-        horizontal = false;
-    }
-
-    void BoxContainer::make_horizontal() {
-        horizontal = true;
     }
 }

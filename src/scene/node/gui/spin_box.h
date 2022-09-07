@@ -56,7 +56,8 @@ namespace Flint {
 
         bool focused = false;
 
-        std::shared_ptr<BoxContainer> container_h, container_v;
+        std::shared_ptr<HBoxContainer> container_h;
+        std::shared_ptr<VBoxContainer> container_v;
         std::shared_ptr<Button> increase_button, decrease_button;
         std::shared_ptr<Label> label;
 

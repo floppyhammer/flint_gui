@@ -99,18 +99,18 @@ namespace Flint {
         // Set self as the parent of the new node.
         p_child->parent = this;
 
-        if (p_child->name.empty()) {
-            auto node_type_name = NodeTypeName[(uint32_t) p_child->type];
-
-            uint32_t same_type_child_count = 0;
-            for (auto &c: children) {
-                if (c->type == p_child->type) {
-                    same_type_child_count++;
-                }
-            }
-
-            p_child->name = node_type_name + std::to_string(children.size());
-        }
+//        if (p_child->name.empty()) {
+//            auto node_type_name = NodeTypeName[(uint32_t) p_child->type];
+//
+//            uint32_t same_type_child_count = 0;
+//            for (auto &c: children) {
+//                if (c->type == p_child->type) {
+//                    same_type_child_count++;
+//                }
+//            }
+//
+//            p_child->name = node_type_name + std::to_string(children.size());
+//        }
 
         children.push_back(p_child);
 
