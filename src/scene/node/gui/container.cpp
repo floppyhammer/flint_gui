@@ -29,7 +29,10 @@ namespace Flint {
     }
 
     void Container::set_size(Vec2<float> p_size) {
-        if (size == p_size) return;
+        if (size == p_size) {
+            return;
+        }
+
         size = p_size;
 
         adjust_layout();

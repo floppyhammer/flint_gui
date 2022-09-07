@@ -10,6 +10,8 @@ namespace Flint {
         std::vector<float> max_child_width;
         std::vector<Control *> expanding_children;
 
+        std::vector<std::pair<Control *, Vec2<float>>> child_cache;
+
         // In the first loop, we only do some statistics.
         for (auto &child: children) {
             // We only care about visible GUI nodes in a container.
@@ -20,6 +22,8 @@ namespace Flint {
             auto cast_child = dynamic_cast<Control *>(child.get());
 
             auto child_min_size = cast_child->calculate_minimum_size();
+
+            child_cache.push_back(std::pair(cast_child, child_min_size));
 
             if (horizontal) {
                 total_size.x = std::max(total_size.x, child_min_size.x);
@@ -40,15 +44,18 @@ namespace Flint {
 
         float available_space_for_expanding;
         if (horizontal) {
+            // Subtract redundant separation.
             total_size.x -= separation;
 
             available_space_for_expanding = size.x - total_size.x;
         } else {
+            // Subtract redundant separation.
             total_size.y -= separation;
 
             available_space_for_expanding = size.y - total_size.y;
         }
 
+        // If the container is not large enough, readjust it to contain all its children.
         size = size.max(total_size);
 
         uint32_t expanding_child_count = expanding_children.size();
@@ -58,14 +65,10 @@ namespace Flint {
         float pos_primary_axis = 0;
 
         // In the second loop, we set child sizes and positions.
-        for (auto &child: children) {
-            if (!child->get_visibility() || !child->is_gui_node()) {
-                continue;
-            }
+        for (auto &pair: child_cache) {
+            auto cast_child = pair.first;
 
-            auto cast_child = dynamic_cast<Control *>(child.get());
-
-            auto child_min_size = cast_child->calculate_minimum_size();
+            auto child_min_size = pair.second;
 
             float min_width_or_height = horizontal ? child_min_size.x : child_min_size.y;
 

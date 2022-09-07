@@ -6,6 +6,7 @@
 namespace Flint {
     /**
      * Containers adjust their container children's layouts automatically.
+     * This base class is not meant for direct use as a node.
      */
     class Container : public Control {
     public:
