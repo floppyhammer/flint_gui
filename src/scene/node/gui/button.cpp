@@ -37,16 +37,20 @@ namespace Flint {
         icon_rect = std::make_shared<TextureRect>();
         icon_rect->set_texture(vector_texture);
 
-        container = std::make_shared<HBoxContainer>();
-        container->set_parent(this);
-        container->add_child(icon_rect);
-        container->add_child(label);
-        container->set_separation(0);
-        container->set_size(size);
+        hbox_container = std::make_shared<HBoxContainer>();
+        hbox_container->add_child(icon_rect);
+        hbox_container->add_child(label);
+        hbox_container->set_separation(0);
+
+        margin_container = std::make_shared<MarginContainer>();
+        margin_container->set_margin_all(4);
+        margin_container->add_child(hbox_container);
+        margin_container->set_parent(this);
+        margin_container->set_size(size);
     }
 
     Vec2<float> Button::calculate_minimum_size() const {
-        auto container_size = container->calculate_minimum_size();
+        auto container_size = margin_container->calculate_minimum_size();
 
         return container_size.max(minimum_size);
     }
@@ -110,7 +114,7 @@ namespace Flint {
     void Button::update(double dt) {
         Control::update(dt);
 
-        container->propagate_update(dt);
+        margin_container->propagate_update(dt);
     }
 
     void Button::draw(VkCommandBuffer p_command_buffer) {
@@ -132,7 +136,7 @@ namespace Flint {
             active_style_box.value().add_to_canvas(global_position, size, canvas);
         }
 
-        container->propagate_draw(p_command_buffer);
+        margin_container->propagate_draw(p_command_buffer);
 
         Control::draw(p_command_buffer);
     }
@@ -146,10 +150,10 @@ namespace Flint {
 
         auto path = get_node_path();
 
-        auto final_size = p_size.max(container->calculate_minimum_size());
+        auto final_size = p_size.max(margin_container->calculate_minimum_size());
         final_size = final_size.max(minimum_size);
 
-        container->set_size(final_size);
+        margin_container->set_size(final_size);
         size = final_size;
     }
 

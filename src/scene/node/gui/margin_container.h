@@ -16,6 +16,8 @@ namespace Flint {
 
         void adjust_layout() override;
 
+        Vec2<float> calculate_minimum_size() const override;
+
         void set_margin(const Rect<float> &p_margin);
 
         void set_margin_all(float value);

@@ -15,9 +15,26 @@ namespace Flint {
             if (child->is_gui_node()) {
                 auto cast_child = dynamic_cast<Control *>(child.get());
                 cast_child->set_position(child_position);
+
                 cast_child->set_size(child_size);
             }
         }
+    }
+
+    Vec2<float> MarginContainer::calculate_minimum_size() const {
+        Vec2<float> margin_size = {margin.left + margin.right, margin.top + margin.bottom};
+
+        Vec2<float> max_child_min_size;
+        for (auto &child : children) {
+            if (child->is_gui_node()) {
+                auto cast_child = dynamic_cast<Control *>(child.get());
+                auto child_min_size = cast_child->calculate_minimum_size() + margin_size;
+
+                max_child_min_size = max_child_min_size.max(child_min_size);
+            }
+        }
+
+        return minimum_size.max(max_child_min_size);
     }
 
     void MarginContainer::update(double dt) {

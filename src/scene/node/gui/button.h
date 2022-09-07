@@ -5,6 +5,7 @@
 #include "label.h"
 #include "texture_rect.h"
 #include "box_container.h"
+#include "margin_container.h"
 #include "../../../resources/style_box.h"
 
 #include <functional>
@@ -41,7 +42,8 @@ namespace Flint {
         bool pressed_inside = false;
 
         /// Button[HBoxContainer[TextureRect, Label]]
-        std::shared_ptr<HBoxContainer> container;
+        std::shared_ptr<MarginContainer> margin_container;
+        std::shared_ptr<HBoxContainer> hbox_container;
         std::shared_ptr<TextureRect> icon_rect;
         std::shared_ptr<Label> label;
 

@@ -16,6 +16,8 @@ namespace Flint {
 
         void update(double dt) override;
 
+        Vec2<float> calculate_minimum_size() const override;
+
     protected:
         virtual void adjust_layout();
     };
