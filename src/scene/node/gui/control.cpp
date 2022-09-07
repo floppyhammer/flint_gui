@@ -125,14 +125,6 @@ namespace Flint {
         return minimum_size;
     }
 
-    void Control::set_visibility(bool p_visible) {
-        visible = p_visible;
-    }
-
-    bool Control::get_visibility() const {
-        return visible;
-    }
-
     Vec2F Control::get_local_mouse_position() const {
         return local_mouse_position;
     }

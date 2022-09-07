@@ -89,10 +89,6 @@ namespace Flint {
 
         ContainerSizing container_sizing{};
 
-        void set_visibility(bool p_visible);
-
-        bool get_visibility() const;
-
         Vec2F get_local_mouse_position() const;
 
         virtual void grab_focus();
@@ -146,8 +142,6 @@ namespace Flint {
         virtual void cursor_entered();
 
         virtual void cursor_exited();
-
-        bool visible = true;
 
         /// Visualize the node's size.
         StyleBox debug_size_box;

@@ -6,87 +6,138 @@ namespace Flint {
 
         auto path = get_node_path();
 
-        Vec2<float> min_size;
-        std::vector<float> child_min_width;
+        Vec2<float> total_size;
+        std::vector<float> max_child_width;
         std::vector<Control *> expanding_children;
+
+        // In the first loop, we only do some statistics.
         for (auto &child: children) {
-            if (child->is_gui_node()) {
-                auto cast_child = dynamic_cast<Control *>(child.get());
-                if (!cast_child->get_visibility()) continue;
-                auto child_min_size = cast_child->calculate_minimum_size();
-
-                if (horizontal) {
-                    cast_child->set_position({min_size.x, 0});
-                    cast_child->set_size({child_min_size.x, size.y});
-                    child_min_width.push_back(child_min_size.x);
-                    min_size.x += child_min_size.x;
-                    min_size.y = std::max(size.y, child_min_size.y);
-
-                    if (cast_child->container_sizing.expand_h) {
-                        expanding_children.push_back(cast_child);
-                    }
-                } else {
-                    cast_child->set_position({0, min_size.y});
-                    cast_child->set_size({size.x, child_min_size.y});
-                    child_min_width.push_back(child_min_size.y);
-                    min_size.y += child_min_size.y;
-                    min_size.x = std::max(size.x, child_min_size.x);
-
-                    if (cast_child->container_sizing.expand_v) {
-                        expanding_children.push_back(cast_child);
-                    }
-                }
+            // We only care about visible GUI nodes in a container.
+            if (!child->get_visibility() || !child->is_gui_node()) {
+                continue;
             }
 
+            auto cast_child = dynamic_cast<Control *>(child.get());
+
+            auto child_min_size = cast_child->calculate_minimum_size();
+
             if (horizontal) {
-                min_size.x += separation;
+                total_size.x = std::max(total_size.x, child_min_size.x);
+                total_size.x += separation;
+
+                if (cast_child->container_sizing.expand_h) {
+                    expanding_children.push_back(cast_child);
+                }
             } else {
-                min_size.y += separation;
+                total_size.y = std::max(total_size.y, child_min_size.y);
+                total_size.y += separation;
+
+                if (cast_child->container_sizing.expand_v) {
+                    expanding_children.push_back(cast_child);
+                }
             }
         }
 
-        float available_space_for_expanding = horizontal ? size.x - (min_size.x - separation) : size.y - (min_size.y -
-                                                                                                          separation);
+        float available_space_for_expanding;
+        if (horizontal) {
+            total_size.x -= separation;
+
+            available_space_for_expanding = size.x - total_size.x;
+        } else {
+            total_size.y -= separation;
+
+            available_space_for_expanding = size.y - total_size.y;
+        }
+
+        size = size.max(total_size);
+
         uint32_t expanding_child_count = expanding_children.size();
-        uint32_t valid_expanding_child_count = 0;
 
-        if (available_space_for_expanding <= 0) {
-            if (horizontal) {
-                size = {min_size.x, size.y};
-            } else {
-                size = {size.x, min_size.y};
+        float extra_space_for_each_expanding_child = available_space_for_expanding / (float) expanding_child_count;
+
+        float pos_primary_axis = 0;
+
+        // In the second loop, we set child sizes and positions.
+        for (auto &child: children) {
+            if (!child->get_visibility() || !child->is_gui_node()) {
+                continue;
             }
-        } else if (expanding_child_count != 0) {
-            float extra_space_for_each_expanding_child = available_space_for_expanding / (float) expanding_child_count;
 
-            float shift = 0;
-            for (auto &child: children) {
-                if (child->is_gui_node()) {
-                    auto cast_child = dynamic_cast<Control *>(child.get());
-                    if (!cast_child->get_visibility()) continue;
+            auto cast_child = dynamic_cast<Control *>(child.get());
 
-                    cast_child->set_position(horizontal ? Vec2F{shift, 0} : Vec2F{0, shift});
+            auto child_min_size = cast_child->calculate_minimum_size();
 
-                    auto child_min_size = cast_child->calculate_minimum_size();
+            float min_width_or_height = horizontal ? child_min_size.x : child_min_size.y;
 
-                    float min_width_or_height = horizontal ? child_min_size.x : child_min_size.y;
+            if (extra_space_for_each_expanding_child > 0) {
+                if (std::find(expanding_children.begin(),
+                              expanding_children.end(),
+                              cast_child) != expanding_children.end()) {
+                    min_width_or_height += extra_space_for_each_expanding_child;
+                }
+            }
 
-                    if (std::find(expanding_children.begin(), expanding_children.end(), cast_child) !=
-                        expanding_children.end()) {
-                        min_width_or_height += extra_space_for_each_expanding_child;
+            if (horizontal) {
+                float pos_y = 0;
+                float height = 0;
+
+                switch (cast_child->container_sizing.flag_v) {
+                    case ContainerSizingFlag::Fill: {
+                        height = size.y;
+                        pos_y = 0;
                     }
-
-                    if (horizontal) {
-                        cast_child->set_size({min_width_or_height, size.y});
-                    } else {
-                        cast_child->set_size({size.x, min_width_or_height});
+                        break;
+                    case ContainerSizingFlag::ShrinkStart: {
+                        height = child_min_size.y;
+                        pos_y = 0;
                     }
-
-                    shift += min_width_or_height;
+                        break;
+                    case ContainerSizingFlag::ShrinkCenter: {
+                        height = child_min_size.y;
+                        pos_y = (size.y - height) * 0.5f;
+                    }
+                        break;
+                    case ContainerSizingFlag::ShrinkEnd: {
+                        height = child_min_size.y;
+                        pos_y = size.y - height;
+                    }
+                        break;
                 }
 
-                shift += separation;
+                cast_child->set_position({pos_primary_axis, pos_y});
+                cast_child->set_size({min_width_or_height, height});
+            } else {
+                float pos_x = 0;
+                float width = 0;
+
+                switch (cast_child->container_sizing.flag_h) {
+                    case ContainerSizingFlag::Fill: {
+                        width = size.x;
+                        pos_x = 0;
+                    }
+                        break;
+                    case ContainerSizingFlag::ShrinkStart: {
+                        width = child_min_size.x;
+                        pos_x = 0;
+                    }
+                        break;
+                    case ContainerSizingFlag::ShrinkCenter: {
+                        width = child_min_size.x;
+                        pos_x = (size.x - width) * 0.5f;
+                    }
+                        break;
+                    case ContainerSizingFlag::ShrinkEnd: {
+                        width = child_min_size.x;
+                        pos_x = size.x - width;
+                    }
+                        break;
+                }
+
+                cast_child->set_position({pos_x, pos_primary_axis});
+                cast_child->set_size({width, min_width_or_height});
             }
+
+            pos_primary_axis += min_width_or_height + separation;
         }
     }
 

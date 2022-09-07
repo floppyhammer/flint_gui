@@ -45,11 +45,10 @@ int main() {
         margin_container->set_size({400, 400 - 48});
         inspector_panel->add_child(margin_container);
 
-        auto vbox_container = std::make_shared<BoxContainer>();
-        vbox_container->make_vertical();
+        auto vbox_container = std::make_shared<VBoxContainer>();
         margin_container->add_child(vbox_container);
 
-        auto hbox_container = std::make_shared<BoxContainer>();
+        auto hbox_container = std::make_shared<HBoxContainer>();
         vbox_container->add_child(hbox_container);
 
         auto file_dialog = std::make_shared<FileDialog>();
@@ -90,10 +89,9 @@ int main() {
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
 
-            auto value_container = std::make_shared<BoxContainer>();
+            auto value_container = std::make_shared<VBoxContainer>();
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
-            value_container->make_vertical();
             value_container->add_child(spin_box_x);
             value_container->add_child(spin_box_y);
             value_container->add_child(spin_box_z);
@@ -123,10 +121,9 @@ int main() {
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
 
-            auto value_container = std::make_shared<BoxContainer>();
+            auto value_container = std::make_shared<VBoxContainer>();
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
-            value_container->make_vertical();
             value_container->add_child(spin_box_x);
             value_container->add_child(spin_box_y);
             value_container->add_child(spin_box_z);

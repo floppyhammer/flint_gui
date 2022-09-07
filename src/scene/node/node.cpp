@@ -134,6 +134,14 @@ namespace Flint {
         return type >= NodeType::Control && type < NodeType::Node2D;
     }
 
+    void Node::set_visibility(bool p_visible) {
+        visible = p_visible;
+    }
+
+    bool Node::get_visibility() const {
+        return visible;
+    }
+
     NodeType Node::extended_from_which_base_node() const {
         if (type < NodeType::Control)
             return NodeType::Node;

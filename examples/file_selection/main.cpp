@@ -40,8 +40,7 @@ int main() {
         margin_container->set_margin_all(32);
         panel->add_child(margin_container);
 
-        auto vbox_container = std::make_shared<BoxContainer>();
-        vbox_container->make_vertical();
+        auto vbox_container = std::make_shared<VBoxContainer>();
         vbox_container->set_separation(16);
         margin_container->add_child(vbox_container);
 

@@ -143,6 +143,10 @@ namespace Flint {
 
         std::string get_node_path() const;
 
+        void set_visibility(bool p_visible);
+
+        bool get_visibility() const;
+
         /**
          * Called when the sub-tree structure of this node changed.
          */
@@ -151,6 +155,8 @@ namespace Flint {
         void connect_signal(const std::string &signal, const std::function<void()> &callback);
 
     protected:
+        bool visible = true;
+
         std::vector<std::shared_ptr<Node>> children;
 
         // Don't use a shared pointer as it causes circular references.
