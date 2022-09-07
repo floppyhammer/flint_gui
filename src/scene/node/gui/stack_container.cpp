@@ -1,7 +1,7 @@
-#include "box_container.h"
+#include "stack_container.h"
 
 namespace Flint {
-    void BoxContainer::adjust_layout() {
+    void StackContainer::adjust_layout() {
         if (children.empty()) return;
 
         auto path = get_node_path();
@@ -191,11 +191,11 @@ namespace Flint {
         }
     }
 
-    void BoxContainer::update(double dt) {
+    void StackContainer::update(double dt) {
         Control::update(dt);
     }
 
-    Vec2<float> BoxContainer::calculate_minimum_size() const {
+    Vec2<float> StackContainer::calculate_minimum_size() const {
         Vec2<float> min_size;
 
         uint32_t visible_child_count = 0;
@@ -232,7 +232,7 @@ namespace Flint {
         return min_size.max(minimum_size);
     }
 
-    void BoxContainer::set_separation(float new_separation) {
+    void StackContainer::set_separation(float new_separation) {
         if (separation == new_separation) {
             return;
         }

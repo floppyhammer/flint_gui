@@ -74,7 +74,7 @@ namespace Flint {
         collapse_button->set_icon(collapse_icon);
         collapse_button->set_minimum_size(Vec2<float>(title_bar_height));
 
-        title_container = std::make_shared<BoxContainer>();
+        title_container = std::make_shared<HStackContainer>();
         title_container->set_parent(this);
         title_container->add_child(collapse_button);
         title_container->add_child(title_label);

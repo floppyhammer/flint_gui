@@ -4,7 +4,7 @@
 #include "control.h"
 #include "label.h"
 #include "texture_rect.h"
-#include "box_container.h"
+#include "stack_container.h"
 #include "button.h"
 #include "../../../resources/style_box.h"
 
@@ -56,8 +56,8 @@ namespace Flint {
 
         bool focused = false;
 
-        std::shared_ptr<HBoxContainer> container_h;
-        std::shared_ptr<VBoxContainer> container_v;
+        std::shared_ptr<HStackContainer> container_h;
+        std::shared_ptr<VStackContainer> container_v;
         std::shared_ptr<Button> increase_button, decrease_button;
         std::shared_ptr<Label> label;
 

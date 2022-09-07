@@ -29,7 +29,7 @@ int main() {
         vector_layer->set_texture(VectorServer::get_singleton()->get_texture());
         vector_layer->set_mouse_filter(MouseFilter::Ignore);
 
-        auto hbox_container = std::make_shared<HBoxContainer>();
+        auto hbox_container = std::make_shared<HStackContainer>();
         hbox_container->set_separation(8);
         node_gui->add_child(hbox_container);
         for (int _ = 0; _ < 4; _++) {
@@ -55,7 +55,7 @@ int main() {
         }
         hbox_container->set_size({800, 100});
 
-        auto vbox_container = std::make_shared<VBoxContainer>();
+        auto vbox_container = std::make_shared<VStackContainer>();
         vbox_container->set_separation(8);
         vbox_container->set_position({0, 200});
         node_gui->add_child(vbox_container);

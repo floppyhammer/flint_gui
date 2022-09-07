@@ -1,12 +1,12 @@
-#ifndef FLINT_BOX_CONTAINER_H
-#define FLINT_BOX_CONTAINER_H
+#ifndef FLINT_STACK_CONTAINER_H
+#define FLINT_STACK_CONTAINER_H
 
 #include "container.h"
 
 namespace Flint {
-    /// BoxContainer is not meant for direct use as a node.
-    /// Instead, use HBoxContainer/VBoxContainer.
-    class BoxContainer : public Container {
+    /// StackContainer is not meant for direct use as a node.
+    /// Instead, use HStackContainer/VStackContainer.
+    class StackContainer : public Container {
     public:
         void update(double dt) override;
 
@@ -24,21 +24,21 @@ namespace Flint {
         bool horizontal = true;
     };
 
-    class HBoxContainer : public BoxContainer {
+    class HStackContainer : public StackContainer {
     public:
-        HBoxContainer() {
-            type = NodeType::HBoxContainer;
+        HStackContainer() {
+            type = NodeType::HStackContainer;
             horizontal = true;
         }
     };
 
-    class VBoxContainer : public BoxContainer {
+    class VStackContainer : public StackContainer {
     public:
-        VBoxContainer() {
-            type = NodeType::VBoxContainer;
+        VStackContainer() {
+            type = NodeType::VStackContainer;
             horizontal = false;
         }
     };
 }
 
-#endif //FLINT_BOX_CONTAINER_H
+#endif //FLINT_STACK_CONTAINER_H

@@ -26,9 +26,9 @@ namespace Flint {
         label->set_vertical_alignment(Alignment::Center);
         set_value(0);
 
-        container_v = std::make_shared<VBoxContainer>();
+        container_v = std::make_shared<VStackContainer>();
 
-        container_h = std::make_shared<HBoxContainer>();
+        container_h = std::make_shared<HStackContainer>();
         container_h->set_parent(this);
         container_h->add_child(label);
         container_h->add_child(container_v);

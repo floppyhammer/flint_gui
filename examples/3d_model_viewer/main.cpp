@@ -45,10 +45,10 @@ int main() {
         margin_container->set_size({400, 400 - 48});
         inspector_panel->add_child(margin_container);
 
-        auto vbox_container = std::make_shared<VBoxContainer>();
+        auto vbox_container = std::make_shared<VStackContainer>();
         margin_container->add_child(vbox_container);
 
-        auto hbox_container = std::make_shared<HBoxContainer>();
+        auto hbox_container = std::make_shared<HStackContainer>();
         vbox_container->add_child(hbox_container);
 
         auto file_dialog = std::make_shared<FileDialog>();
@@ -73,7 +73,7 @@ int main() {
 
         // Translation values.
         // ----------------------------------------------------
-        auto translation_container = std::make_shared<HBoxContainer>();
+        auto translation_container = std::make_shared<HStackContainer>();
         {
             auto label = std::make_shared<Label>("Translation");
             label->set_horizontal_alignment(Alignment::Center);
@@ -89,7 +89,7 @@ int main() {
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
 
-            auto value_container = std::make_shared<VBoxContainer>();
+            auto value_container = std::make_shared<VStackContainer>();
             value_container->container_sizing.expand_h = true;
 
             spin_box_x->container_sizing.expand_h = true;
@@ -107,7 +107,7 @@ int main() {
 
         // Rotation values.
         // ----------------------------------------------------
-        auto rotation_container = std::make_shared<HBoxContainer>();
+        auto rotation_container = std::make_shared<HStackContainer>();
         {
             auto label = std::make_shared<Label>("Rotation");
             label->set_horizontal_alignment(Alignment::Center);
@@ -123,7 +123,7 @@ int main() {
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
 
-            auto value_container = std::make_shared<VBoxContainer>();
+            auto value_container = std::make_shared<VStackContainer>();
             value_container->container_sizing.expand_h = true;
 
             spin_box_x->container_sizing.expand_h = true;

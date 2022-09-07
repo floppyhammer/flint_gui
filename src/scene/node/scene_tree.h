@@ -8,7 +8,7 @@
 #include "gui/texture_rect.h"
 #include "gui/label.h"
 #include "gui/button.h"
-#include "gui/box_container.h"
+#include "gui/stack_container.h"
 #include "gui/margin_container.h"
 #include "gui/panel.h"
 #include "gui/tree.h"

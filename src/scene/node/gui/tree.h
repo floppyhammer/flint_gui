@@ -3,7 +3,7 @@
 
 #include "control.h"
 #include "button.h"
-#include "box_container.h"
+#include "stack_container.h"
 #include "../../../resources/style_box.h"
 #include "../../../resources/font.h"
 #include "../../../resources/vector_texture.h"
@@ -56,7 +56,7 @@ namespace Flint {
 
         std::shared_ptr<Label> label;
 
-        std::shared_ptr<HBoxContainer> container;
+        std::shared_ptr<HStackContainer> container;
 
         std::vector<std::shared_ptr<TreeItem>> children;
         TreeItem *parent;

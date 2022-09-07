@@ -40,14 +40,14 @@ int main() {
         margin_container->set_margin_all(32);
         panel->add_child(margin_container);
 
-        auto vbox_container = std::make_shared<VBoxContainer>();
+        auto vbox_container = std::make_shared<VStackContainer>();
         vbox_container->set_separation(16);
         margin_container->add_child(vbox_container);
 
         auto label = std::make_shared<Label>("File path:");
         vbox_container->add_child(label);
 
-        auto hbox_container = std::make_shared<BoxContainer>();
+        auto hbox_container = std::make_shared<HStackContainer>();
         vbox_container->add_child(hbox_container);
 
         auto line_edit = std::make_shared<LineEdit>();

@@ -112,7 +112,7 @@ namespace Flint {
         };
         collapse_button->connect_signal("pressed", callback);
 
-        container = std::make_shared<HBoxContainer>();
+        container = std::make_shared<HStackContainer>();
         container->set_separation(0);
         container->add_child(collapse_button);
         container->add_child(icon);
