@@ -2,9 +2,8 @@
 
 namespace Flint {
     Container::Container() {
-        type = NodeType::Container;
-
-        //outline.border_color = ColorU();
+        // This class is not meant for direct use as a node.
+        type = NodeType::Max;
     }
 
     void Container::adjust_layout() {

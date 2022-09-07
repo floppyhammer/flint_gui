@@ -79,6 +79,7 @@ namespace Flint {
 
         virtual Vec2<float> get_minimum_size() const;
 
+        /// Return `minimum_size` directly for non-container nodes.
         virtual Vec2<float> calculate_minimum_size() const;
 
         Vec2<float> get_global_position() const;

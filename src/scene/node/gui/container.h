@@ -16,9 +16,17 @@ namespace Flint {
 
         void update(double dt) override;
 
+        /**
+         * One of the most important methods to containers.
+         * Calculate the minimum size of this node, considering all its children' sizing effect.
+         */
         Vec2<float> calculate_minimum_size() const override;
 
     protected:
+        /**
+         * One of the most important methods to containers.
+         * Adjust its own size (but not position), adjust its children' sizes and positions.
+         */
         virtual void adjust_layout();
     };
 }
