@@ -39,7 +39,7 @@ int main() {
 
             if (_ == 0) {
                 button->container_sizing.expand_h = true;
-                button->container_sizing.flag_h = ContainerSizingFlag::Fill;
+                button->container_sizing.flag_h = ContainerSizingFlag::ShrinkCenter;
 
                 button->container_sizing.flag_v = ContainerSizingFlag::Fill;
             }
@@ -66,7 +66,7 @@ int main() {
 
             if (_ == 0) {
                 button->container_sizing.expand_v = true;
-                button->container_sizing.flag_v = ContainerSizingFlag::Fill;
+                button->container_sizing.flag_v = ContainerSizingFlag::ShrinkCenter;
 
                 button->container_sizing.flag_h = ContainerSizingFlag::Fill;
             }

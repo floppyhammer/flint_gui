@@ -62,7 +62,7 @@ namespace Flint {
 
         float extra_space_for_each_expanding_child = available_space_for_expanding / (float) expanding_child_count;
 
-        float pos_primary_axis = 0;
+        float pos_shift = 0;
 
         // In the second loop, we set child sizes and positions.
         for (auto &pair: child_cache) {
@@ -70,20 +70,44 @@ namespace Flint {
 
             auto child_min_size = pair.second;
 
-            float min_width_or_height = horizontal ? child_min_size.x : child_min_size.y;
+            float real_space = horizontal ? child_min_size.x : child_min_size.y;
+            float occupied_space = real_space;
 
             if (extra_space_for_each_expanding_child > 0) {
                 if (std::find(expanding_children.begin(),
                               expanding_children.end(),
                               cast_child) != expanding_children.end()) {
-                    min_width_or_height += extra_space_for_each_expanding_child;
+                    occupied_space += extra_space_for_each_expanding_child;
                 }
             }
 
             if (horizontal) {
+                float pos_x = 0;
                 float pos_y = 0;
                 float height = 0;
 
+                // Handle horizontal sizing.
+                switch (cast_child->container_sizing.flag_h) {
+                    case ContainerSizingFlag::Fill: {
+                        real_space = occupied_space;
+                        pos_x = pos_shift;
+                    }
+                        break;
+                    case ContainerSizingFlag::ShrinkStart: {
+                        pos_x = pos_shift;
+                    }
+                        break;
+                    case ContainerSizingFlag::ShrinkCenter: {
+                        pos_x = pos_shift + (occupied_space - real_space) * 0.5f;
+                    }
+                        break;
+                    case ContainerSizingFlag::ShrinkEnd: {
+                        pos_x = pos_shift + (occupied_space - real_space);
+                    }
+                        break;
+                }
+
+                // Handle vertical sizing.
                 switch (cast_child->container_sizing.flag_v) {
                     case ContainerSizingFlag::Fill: {
                         height = size.y;
@@ -107,12 +131,35 @@ namespace Flint {
                         break;
                 }
 
-                cast_child->set_position({pos_primary_axis, pos_y});
-                cast_child->set_size({min_width_or_height, height});
+                cast_child->set_position({pos_x, pos_y});
+                cast_child->set_size({real_space, height});
             } else {
                 float pos_x = 0;
+                float pos_y = 0;
                 float width = 0;
 
+                // Handle vertical sizing.
+                switch (cast_child->container_sizing.flag_v) {
+                    case ContainerSizingFlag::Fill: {
+                        real_space = occupied_space;
+                        pos_y = pos_shift;
+                    }
+                        break;
+                    case ContainerSizingFlag::ShrinkStart: {
+                        pos_y = pos_shift;
+                    }
+                        break;
+                    case ContainerSizingFlag::ShrinkCenter: {
+                        pos_y = pos_shift + (occupied_space - real_space) * 0.5f;
+                    }
+                        break;
+                    case ContainerSizingFlag::ShrinkEnd: {
+                        pos_y = pos_shift + (occupied_space - real_space);
+                    }
+                        break;
+                }
+
+                // Handle horizontal sizing.
                 switch (cast_child->container_sizing.flag_h) {
                     case ContainerSizingFlag::Fill: {
                         width = size.x;
@@ -136,11 +183,11 @@ namespace Flint {
                         break;
                 }
 
-                cast_child->set_position({pos_x, pos_primary_axis});
-                cast_child->set_size({width, min_width_or_height});
+                cast_child->set_position({pos_x, pos_y});
+                cast_child->set_size({width, real_space});
             }
 
-            pos_primary_axis += min_width_or_height + separation;
+            pos_shift += occupied_space + separation;
         }
     }
 

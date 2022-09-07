@@ -73,7 +73,7 @@ int main() {
 
         // Translation values.
         // ----------------------------------------------------
-        auto translation_container = std::make_shared<BoxContainer>();
+        auto translation_container = std::make_shared<HBoxContainer>();
         {
             auto label = std::make_shared<Label>("Translation");
             label->set_horizontal_alignment(Alignment::Center);
@@ -90,6 +90,8 @@ int main() {
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
 
             auto value_container = std::make_shared<VBoxContainer>();
+            value_container->container_sizing.expand_h = true;
+
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
             value_container->add_child(spin_box_x);
@@ -105,7 +107,7 @@ int main() {
 
         // Rotation values.
         // ----------------------------------------------------
-        auto rotation_container = std::make_shared<BoxContainer>();
+        auto rotation_container = std::make_shared<HBoxContainer>();
         {
             auto label = std::make_shared<Label>("Rotation");
             label->set_horizontal_alignment(Alignment::Center);
@@ -122,6 +124,8 @@ int main() {
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
 
             auto value_container = std::make_shared<VBoxContainer>();
+            value_container->container_sizing.expand_h = true;
+
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
             value_container->add_child(spin_box_x);
