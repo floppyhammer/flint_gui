@@ -35,8 +35,10 @@ namespace Flint {
     }
 
     void LineEdit::input(std::vector<InputEvent> &input_queue) {
+        Control::input(input_queue);
+
         // Handle mouse input propagation.
-        for (auto &event : input_queue) {
+        for (auto &event: input_queue) {
             bool consume_flag = false;
 
             auto &glyphs = label->get_glyphs();
@@ -133,8 +135,6 @@ namespace Flint {
                 event.consume();
             }
         }
-
-        Control::input(input_queue);
     }
 
     void LineEdit::update(double dt) {
