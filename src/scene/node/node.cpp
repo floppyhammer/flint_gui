@@ -156,10 +156,12 @@ namespace Flint {
     }
 
     std::string Node::get_node_path() const {
+        auto type_name = NodeTypeName[static_cast<unsigned __int64>(type)];
+
         if (parent) {
-            return parent->get_node_path() + "/" + name;
+            return parent->get_node_path() + "/" + type_name;
         } else {
-            return "/" + name;
+            return "/" + type_name;
         }
     }
 
