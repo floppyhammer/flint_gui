@@ -12,7 +12,9 @@ namespace Flint {
         type = NodeType::Control;
 
         debug_size_box.bg_color = ColorU();
-        debug_size_box.border_width = 0;
+#ifdef FLINT_DEBUG
+        debug_size_box.border_width = 1;
+#endif
         debug_size_box.border_color = ColorU(202, 130, 94, 255);
     }
 
