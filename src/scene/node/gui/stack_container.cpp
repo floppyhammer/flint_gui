@@ -26,15 +26,13 @@ namespace Flint {
             child_cache.push_back(std::pair(cast_child, child_min_size));
 
             if (horizontal) {
-                total_size.x = std::max(total_size.x, child_min_size.x);
-                total_size.x += separation;
+                total_size.x += child_min_size.x + separation;
 
                 if (cast_child->container_sizing.expand_h) {
                     expanding_children.push_back(cast_child);
                 }
             } else {
-                total_size.y = std::max(total_size.y, child_min_size.y);
-                total_size.y += separation;
+                total_size.y += child_min_size.y + separation;
 
                 if (cast_child->container_sizing.expand_v) {
                     expanding_children.push_back(cast_child);
