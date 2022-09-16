@@ -3,9 +3,8 @@
 namespace Flint {
     void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver,
                             float p_canvas_width,
-                            float p_canvas_height,
-                            const std::vector<char> &area_lut_input) {
-        canvas = std::make_shared<Pathfinder::Canvas>(driver, area_lut_input);
+                            float p_canvas_height) {
+        canvas = std::make_shared<Pathfinder::Canvas>(driver);
 
         // TODO
         canvas->set_empty_dest_texture(p_canvas_width, p_canvas_height);

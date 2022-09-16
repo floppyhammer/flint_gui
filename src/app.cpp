@@ -102,8 +102,7 @@ App::App(uint32_t window_width, uint32_t window_height) {
     auto vector_server = VectorServer::get_singleton();
     vector_server->init(driver,
                         window_width,
-                        window_height,
-                        load_file_as_bytes("../assets/area-lut.png"));
+                        window_height);
 
     tree = std::make_unique<Flint::SceneTree>();
     world = std::make_unique<World>();
