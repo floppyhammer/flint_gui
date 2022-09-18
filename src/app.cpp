@@ -97,7 +97,6 @@ App::App(uint32_t window_width, uint32_t window_height) {
             platform->device,
             platform->physicalDevice,
             platform->graphicsQueue,
-            platform->presentQueue,
             render_server->commandPool);
     auto vector_server = VectorServer::get_singleton();
     vector_server->init(driver,

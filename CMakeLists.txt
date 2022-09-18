@@ -32,7 +32,7 @@ include_directories(external/glfw/include)
 add_subdirectory(external/glfw)
 
 # Pathfinder library.
-include_directories(external/pathfinder-cpp/include)
+include_directories(external/pathfinder-cpp/src)
 add_subdirectory(external/pathfinder-cpp)
 
 add_subdirectory(third_party/poly2tri)
