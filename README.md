@@ -7,3 +7,5 @@
 </p>
 
 Flint is a vector-based GUI framework in development.
+
+![Example 1](screenshot_1.png)
