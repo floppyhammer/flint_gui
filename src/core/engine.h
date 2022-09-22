@@ -4,35 +4,35 @@
 #include <chrono>
 
 namespace Flint {
-    enum class Signal {
-        SwapChainChanged,
-        RebuildCommandBuffer,
-    };
+enum class Signal {
+    SwapChainChanged,
+    RebuildCommandBuffer,
+};
 
-    class Engine {
-    public:
-        static Engine *get_singleton() {
-            static Engine singleton;
+class Engine {
+public:
+    static Engine *get_singleton() {
+        static Engine singleton;
 
-            return &singleton;
-        }
+        return &singleton;
+    }
 
-        Engine();
+    Engine();
 
-        void tick();
+    void tick();
 
-        double get_delta() const;
+    double get_delta() const;
 
-        double get_elapsed() const;
+    double get_elapsed() const;
 
-        float get_fps() const;
+    float get_fps() const;
 
-    private:
-        std::chrono::time_point<std::chrono::steady_clock> last_time_updated_fps;
-        float fps = 0;
-        double elapsed = 0;
-        double delta = 0;
-    };
-}
+private:
+    std::chrono::time_point<std::chrono::steady_clock> last_time_updated_fps;
+    float fps = 0;
+    double elapsed = 0;
+    double delta = 0;
+};
+} // namespace Flint
 
-#endif //FLINT_ENGINE_H
+#endif // FLINT_ENGINE_H

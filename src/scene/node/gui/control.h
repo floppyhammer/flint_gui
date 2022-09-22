@@ -3,152 +3,153 @@
 
 #include <vector>
 
-#include "../node.h"
 #include "../../../common/geometry.h"
-#include "../../../resources/mesh.h"
 #include "../../../render/mvp.h"
 #include "../../../render/render_server.h"
+#include "../../../resources/mesh.h"
+#include "../../../resources/style_box.h"
 #include "../../../servers/input_server.h"
 #include "../../../servers/vector_server.h"
-#include "../../../resources/style_box.h"
+#include "../node.h"
 
 using Pathfinder::ColorF;
 
 namespace Flint {
-    /// How a GUI node handles mouse input propagation.
-    enum class MouseFilter {
-        Stop, // Use input and mark it as consumed.
-        Pass, // Use input.
-        Ignore, // Ignore input.
-    };
+/// How a GUI node handles mouse input propagation.
+enum class MouseFilter {
+    Stop,   // Use input and mark it as consumed.
+    Pass,   // Use input.
+    Ignore, // Ignore input.
+};
 
-    /// Anchor takes effect only when the GUI node is
-    /// inside a non-container control node.
-    enum class AnchorFlag {
-        TopLeft,
-        TopRight,
-        BottomLeft,
-        BottomRight,
+/// Anchor takes effect only when the GUI node is
+/// inside a non-container control node.
+enum class AnchorFlag {
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight,
 
-        CenterLeft,
-        CenterRight,
-        CenterTop,
-        CenterBottom,
-        Center,
+    CenterLeft,
+    CenterRight,
+    CenterTop,
+    CenterBottom,
+    Center,
 
-        LeftWide,
-        RightWide,
-        TopWide,
-        BottomWide,
-        VCenterWide,
-        HCenterWide,
+    LeftWide,
+    RightWide,
+    TopWide,
+    BottomWide,
+    VCenterWide,
+    HCenterWide,
 
-        FullRect,
+    FullRect,
 
-        Max,
-    };
+    Max,
+};
 
-    /// How a parent container organizes this control node.
-    enum class ContainerSizingFlag {
-        Fill,
-        ShrinkStart,
-        ShrinkCenter,
-        ShrinkEnd,
-    };
+/// How a parent container organizes this control node.
+enum class ContainerSizingFlag {
+    Fill,
+    ShrinkStart,
+    ShrinkCenter,
+    ShrinkEnd,
+};
 
-    struct ContainerSizing {
-        ContainerSizingFlag flag_h = ContainerSizingFlag::Fill;
-        bool expand_h = false;
-        ContainerSizingFlag flag_v = ContainerSizingFlag::Fill;
-        bool expand_v = false;
-    };
+struct ContainerSizing {
+    ContainerSizingFlag flag_h = ContainerSizingFlag::Fill;
+    bool expand_h = false;
+    ContainerSizingFlag flag_v = ContainerSizingFlag::Fill;
+    bool expand_v = false;
+};
 
-    class Control : public Node {
-    public:
-        Control();
+class Control : public Node {
+public:
+    Control();
 
-        virtual void set_position(Vec2<float> p_position);
+    virtual void set_position(Vec2<float> p_position);
 
-        virtual Vec2<float> get_position() const;
+    virtual Vec2<float> get_position() const;
 
-        virtual void set_size(Vec2<float> p_size);
+    virtual void set_size(Vec2<float> p_size);
 
-        virtual Vec2<float> get_size() const;
+    virtual Vec2<float> get_size() const;
 
-        virtual void set_minimum_size(Vec2<float> p_minimum_size);
+    virtual void set_minimum_size(Vec2<float> p_minimum_size);
 
-        virtual Vec2<float> get_minimum_size() const;
+    virtual Vec2<float> get_minimum_size() const;
 
-        /// Return `minimum_size` directly for non-container nodes.
-        virtual Vec2<float> calculate_minimum_size() const;
+    /// Return `minimum_size` directly for non-container nodes.
+    virtual Vec2<float> calculate_minimum_size() const;
 
-        Vec2<float> get_global_position() const;
+    Vec2<float> get_global_position() const;
 
-        void draw(VkCommandBuffer p_command_buffer) override;
+    void draw(VkCommandBuffer p_command_buffer) override;
 
-        void set_mouse_filter(MouseFilter filter);
+    void set_mouse_filter(MouseFilter filter);
 
-        ContainerSizing container_sizing{};
+    ContainerSizing container_sizing{};
 
-        Vec2F get_local_mouse_position() const;
+    Vec2F get_local_mouse_position() const;
 
-        virtual void grab_focus();
+    virtual void grab_focus();
 
-        virtual void release_focus();
+    virtual void release_focus();
 
-        ColorF get_global_modulate();
+    ColorF get_global_modulate();
 
-        /**
-         * Check if the node is a child of a container.
-         * @return
-         */
-        bool is_inside_container() const;
+    /**
+     * Check if the node is a child of a container.
+     * @return
+     */
+    bool is_inside_container() const;
 
-        Vec2F get_max_child_min_size() const;
+    Vec2F get_max_child_min_size() const;
 
-        ColorF modulate;
-        ColorF self_modulate;
+    ColorF modulate;
+    ColorF self_modulate;
 
-        /**
-         * Adjust the node's position and size according to the anchor flag.
-         */
-        void apply_anchor();
+    /**
+     * Adjust the node's position and size according to the anchor flag.
+     */
+    void apply_anchor();
 
-        void set_anchor_flag(AnchorFlag flag);
-        void get_anchor_flag();
+    void set_anchor_flag(AnchorFlag flag);
 
-    protected:
-        Vec2<float> position{0};
-        Vec2<float> size{128};
-        Vec2<float> scale{1};
-        Vec2<float> pivot_offset{0}; // Top-left as the default pivot.
-        float rotation = 0;
+    void get_anchor_flag();
 
-        bool focused = false;
+protected:
+    Vec2<float> position{0};
+    Vec2<float> size{128};
+    Vec2<float> scale{1};
+    Vec2<float> pivot_offset{0}; // Top-left as the default pivot.
+    float rotation = 0;
 
-        bool is_pressed_inside = false;
+    bool focused = false;
 
-        Vec2<float> minimum_size{0};
+    bool is_pressed_inside = false;
 
-        Vec2F local_mouse_position;
+    Vec2<float> minimum_size{0};
 
-        AnchorFlag anchor_mode = AnchorFlag::Max;
+    Vec2F local_mouse_position;
 
-        void update(double dt) override;
+    AnchorFlag anchor_mode = AnchorFlag::Max;
 
-        void input(std::vector<InputEvent> &input_queue) override;
+    void update(double dt) override;
 
-        bool is_cursor_inside = false;
+    void input(std::vector<InputEvent> &input_queue) override;
 
-        virtual void cursor_entered();
+    bool is_cursor_inside = false;
 
-        virtual void cursor_exited();
+    virtual void cursor_entered();
 
-        /// Visualize the node's size.
-        StyleBox debug_size_box;
+    virtual void cursor_exited();
 
-        MouseFilter mouse_filter = MouseFilter::Stop;
-    };
-}
+    /// Visualize the node's size.
+    StyleBox debug_size_box;
 
-#endif //FLINT_CONTROL_H
+    MouseFilter mouse_filter = MouseFilter::Stop;
+};
+} // namespace Flint
+
+#endif // FLINT_CONTROL_H

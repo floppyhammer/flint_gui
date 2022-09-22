@@ -1,47 +1,47 @@
 #ifndef FLINT_TEXTURE_RECT_H
 #define FLINT_TEXTURE_RECT_H
 
-#include "control.h"
-#include "../../../resources/texture.h"
-#include "../../../resources/surface.h"
-
 #include <memory>
 
+#include "../../../resources/surface.h"
+#include "../../../resources/texture.h"
+#include "control.h"
+
 namespace Flint {
-    /**
-     * Used to display an ImageTexture or a VectorTexture.
-     */
-    class TextureRect : public Control {
-    public:
-        TextureRect();
+/**
+ * Used to display an ImageTexture or a VectorTexture.
+ */
+class TextureRect : public Control {
+public:
+    TextureRect();
 
-        void set_texture(const std::shared_ptr<Texture> &p_texture);
+    void set_texture(const std::shared_ptr<Texture> &p_texture);
 
-        [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
+    [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
 
-        virtual Vec2<float> calculate_minimum_size() const override;
+    virtual Vec2<float> calculate_minimum_size() const override;
 
-        enum class StretchMode {
-            SCALE,
-            TILE,
-            KEEP,
-            KEEP_CENTER,
-            KEEP_ASPECT,
-        } stretch_mode = StretchMode::KEEP_CENTER;
+    enum class StretchMode {
+        SCALE,
+        TILE,
+        KEEP,
+        KEEP_CENTER,
+        KEEP_ASPECT,
+    } stretch_mode = StretchMode::KEEP_CENTER;
 
-    private:
-        void update(double delta) override;
+private:
+    void update(double delta) override;
 
-        void draw(VkCommandBuffer p_command_buffer) override;
+    void draw(VkCommandBuffer p_command_buffer) override;
 
-        void update_mvp();
+    void update_mvp();
 
-        std::shared_ptr<Mesh2d> mesh;
+    std::shared_ptr<Mesh2d> mesh;
 
-        MvpPushConstant push_constant;
+    MvpPushConstant push_constant;
 
-        std::shared_ptr<Texture> texture;
-    };
-}
+    std::shared_ptr<Texture> texture;
+};
+} // namespace Flint
 
-#endif //FLINT_TEXTURE_RECT_H
+#endif // FLINT_TEXTURE_RECT_H

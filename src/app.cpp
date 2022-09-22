@@ -1,21 +1,20 @@
 #include "app.h"
 
+#include <cstdint>
+#include <memory>
+
+#include "common/io.h"
+#include "core/engine.h"
+#include "io/obj_importer.h"
 #include "render/platform.h"
-#include "render/swap_chain.h"
 #include "render/render_server.h"
+#include "render/swap_chain.h"
 #include "resources/image_texture.h"
 #include "resources/mesh.h"
 #include "resources/resource_manager.h"
-#include "core/engine.h"
+#include "scene/ecs/components/components.h"
 #include "servers/input_server.h"
 #include "servers/vector_server.h"
-#include "io/obj_importer.h"
-#include "common/io.h"
-
-#include "scene/ecs/components/components.h"
-
-#include <cstdint>
-#include <memory>
 
 using namespace Flint;
 
@@ -36,9 +35,11 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
         VkRenderPassBeginInfo render_pass_info{};
         render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         render_pass_info.renderPass = SwapChain::getSingleton()->renderPass;
-        render_pass_info.framebuffer = SwapChain::getSingleton()->swapChainFramebuffers[image_index]; // Set target framebuffer.
+        render_pass_info.framebuffer =
+            SwapChain::getSingleton()->swapChainFramebuffers[image_index]; // Set target framebuffer.
         render_pass_info.renderArea.offset = {0, 0};
-        render_pass_info.renderArea.extent = SwapChain::getSingleton()->swapChainExtent; // Has to be larger than the area we're going to draw.
+        render_pass_info.renderArea.extent =
+            SwapChain::getSingleton()->swapChainExtent; // Has to be larger than the area we're going to draw.
 
         // Clear color.
         std::array<VkClearValue, 2> clear_values{};
@@ -48,9 +49,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
         render_pass_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
         render_pass_info.pClearValues = clear_values.data();
 
-        vkCmdBeginRenderPass(command_buffers[image_index],
-                             &render_pass_info,
-                             VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBeginRenderPass(command_buffers[image_index], &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
     }
 
     VectorServer::get_singleton()->clear_scene();
@@ -94,14 +93,9 @@ App::App(uint32_t window_width, uint32_t window_height) {
 
     // 5. Initialize vector server.
     std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(
-            platform->device,
-            platform->physicalDevice,
-            platform->graphicsQueue,
-            render_server->commandPool);
+        platform->device, platform->physicalDevice, platform->graphicsQueue, render_server->commandPool);
     auto vector_server = VectorServer::get_singleton();
-    vector_server->init(driver,
-                        window_width,
-                        window_height);
+    vector_server->init(driver, window_width, window_height);
 
     tree = std::make_unique<Flint::SceneTree>();
     world = std::make_unique<World>();

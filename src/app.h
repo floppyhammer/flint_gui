@@ -1,27 +1,22 @@
 #ifndef FLINT_APP_H
 #define FLINT_APP_H
 
-#define GLFW_INCLUDE_VULKAN
-
-#include "GLFW/glfw3.h"
-
-#include "glm/glm.hpp"
-
-#include <vector>
-#include <optional>
-#include <iostream>
-#include <fstream>
 #include <array>
 #include <cstring>
+#include <fstream>
+#include <iostream>
+#include <optional>
 #include <queue>
+#include <vector>
 
-#include "resources/surface.h"
+#define GLFW_INCLUDE_VULKAN
+#include "GLFW/glfw3.h"
+#include "glm/glm.hpp"
 #include "resources/image_texture.h"
-
-#include "scene/node/scene_tree.h"
-
+#include "resources/surface.h"
 #include "scene/ecs/entity.h"
 #include "scene/ecs/world.h"
+#include "scene/node/scene_tree.h"
 
 class App {
 public:
@@ -38,9 +33,10 @@ public:
 private:
     /**
      * Record commands into the current command buffer.
-     * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline layout.
+     * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline
+     * layout.
      */
     void record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_t image_index) const;
 };
 
-#endif //FLINT_APP_H
+#endif // FLINT_APP_H

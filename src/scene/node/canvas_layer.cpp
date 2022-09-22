@@ -1,7 +1,7 @@
 #include "canvas_layer.h"
 
 namespace Flint {
-    CanvasLayer::CanvasLayer() {
-        type = NodeType::CanvasLayer;
-    }
+CanvasLayer::CanvasLayer() {
+    type = NodeType::CanvasLayer;
 }
+} // namespace Flint

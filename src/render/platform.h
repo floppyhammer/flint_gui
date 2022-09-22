@@ -3,24 +3,20 @@
 
 #define GLFW_INCLUDE_VULKAN
 
-#include "GLFW/glfw3.h"
-
 #include <iostream>
-#include <vector>
 #include <optional>
+#include <vector>
+
+#include "GLFW/glfw3.h"
 
 /// How many frames should be processed concurrently.
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
 /// List of required validation layers.
-const std::vector<const char *> validationLayers = {
-        "VK_LAYER_KHRONOS_validation"
-};
+const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 
 /// List of required device extensions.
-const std::vector<const char *> deviceExtensions = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME
-};
+const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
 struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
@@ -104,10 +100,10 @@ public:
         std::vector<VkLayerProperties> availableLayers(layerCount);
         vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
 
-        for (const char *layerName: validationLayers) {
+        for (const char *layerName : validationLayers) {
             bool layerFound = false;
 
-            for (const auto &layerProperties: availableLayers) {
+            for (const auto &layerProperties : availableLayers) {
                 if (strcmp(layerName, layerProperties.layerName) == 0) {
                     layerFound = true;
                     break;
@@ -172,4 +168,4 @@ private:
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
 };
 
-#endif //FLINT_PLATFORM_H
+#endif // FLINT_PLATFORM_H

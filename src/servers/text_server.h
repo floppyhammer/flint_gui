@@ -8,4 +8,4 @@ private:
     std::wstring clipboard;
 };
 
-#endif //FLINT_TEXT_SERVER_H
+#endif // FLINT_TEXT_SERVER_H

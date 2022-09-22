@@ -3,4 +3,4 @@
 
 #include "pathfinder.h"
 
-#endif //FLINT_GEOMETRY_H
+#endif // FLINT_GEOMETRY_H

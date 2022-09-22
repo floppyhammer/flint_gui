@@ -1,120 +1,120 @@
 #ifndef FLINT_LABEL_H
 #define FLINT_LABEL_H
 
-#include "control.h"
-#include "../../../resources/style_box.h"
-#include "../../../resources/font.h"
-#include "../../../resources/resource_manager.h"
-#include "../../../common/geometry.h"
-
 #include <cstdint>
 #include <memory>
+
+#include "../../../common/geometry.h"
+#include "../../../resources/font.h"
+#include "../../../resources/resource_manager.h"
+#include "../../../resources/style_box.h"
+#include "control.h"
 
 using Pathfinder::Rect;
 
 namespace Flint {
-    enum class Alignment {
-        Begin,
-        Center,
-        End,
-    };
+enum class Alignment {
+    Begin,
+    Center,
+    End,
+};
 
-    struct Glyph {
-        int start = -1; // Start offset in the source string.
-        int end = -1; // End offset in the source string.
+struct Glyph {
+    int start = -1; // Start offset in the source string.
+    int end = -1;   // End offset in the source string.
 
-        uint8_t count = 0; // Number of glyphs in the grapheme, set in the first glyph only.
-        uint8_t repeat = 1; // Draw multiple times in the row.
-        uint16_t flags = 0; // Grapheme flags (valid, rtl, virtual), set in the first glyph only.
+    uint8_t count = 0;  // Number of glyphs in the grapheme, set in the first glyph only.
+    uint8_t repeat = 1; // Draw multiple times in the row.
+    uint16_t flags = 0; // Grapheme flags (valid, rtl, virtual), set in the first glyph only.
 
-        float x_off = 0.f; // Offset from the origin of the glyph on baseline.
-        float y_off = 0.f;
-        float advance = 0.f; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
+    float x_off = 0.f; // Offset from the origin of the glyph on baseline.
+    float y_off = 0.f;
+    float advance = 0.f; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
 
-        int font_size = 0; // Font size;
-        char32_t text{};
-        int32_t index = 0; // Glyph index (font specific) or UTF-32 codepoint (for the invalid glyphs).
+    int font_size = 0; // Font size;
+    char32_t text{};
+    int32_t index = 0; // Glyph index (font specific) or UTF-32 codepoint (for the invalid glyphs).
 
-        Pathfinder::Outline outline; // Glyph outline.
+    Pathfinder::Outline outline; // Glyph outline.
 
-        // For visual debugging.
-        Rect<float> layout_box;
-        Rect<float> bbox;
-    };
+    // For visual debugging.
+    Rect<float> layout_box;
+    Rect<float> bbox;
+};
 
-    class Label : public Control {
-    public:
-        Label(const std::string &p_text);
+class Label : public Control {
+public:
+    Label(const std::string &p_text);
 
-        /**
-         * Set text context.
-         * @note See https://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html for glyph conventions.
-         * @param p_text Text string.
-         */
-        void set_text(const std::string &p_text);
+    /**
+     * Set text context.
+     * @note See https://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html for glyph conventions.
+     * @param p_text Text string.
+     */
+    void set_text(const std::string &p_text);
 
-        std::string get_text() const;
+    std::string get_text() const;
 
-        void insert_text(uint32_t position, const std::string &p_text);
+    void insert_text(uint32_t position, const std::string &p_text);
 
-        void remove_text(uint32_t position, uint32_t count);
+    void remove_text(uint32_t position, uint32_t count);
 
-        void set_size(Vec2<float> p_size) override;
+    void set_size(Vec2<float> p_size) override;
 
-        void set_font(std::shared_ptr<Font> p_font);
+    void set_font(std::shared_ptr<Font> p_font);
 
-        void set_text_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color);
+    void set_text_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color);
 
-        void update(double dt) override;
+    void update(double dt) override;
 
-        void draw(VkCommandBuffer p_command_buffer) override;
+    void draw(VkCommandBuffer p_command_buffer) override;
 
-        bool debug = false;
+    bool debug = false;
 
-        void set_horizontal_alignment(Alignment alignment);
+    void set_horizontal_alignment(Alignment alignment);
 
-        void set_vertical_alignment(Alignment alignment);
+    void set_vertical_alignment(Alignment alignment);
 
-        Vec2<float> calculate_minimum_size() const override;
+    Vec2<float> calculate_minimum_size() const override;
 
-        std::vector<Glyph> &get_glyphs();
+    std::vector<Glyph> &get_glyphs();
 
-        float get_font_size() const;
+    float get_font_size() const;
 
-    private:
-        void measure();
+private:
+    void measure();
 
-        void consider_alignment();
+    void consider_alignment();
 
-        Vec2<float> get_text_size() const;
+    Vec2<float> get_text_size() const;
 
-    private:
-        std::wstring text;
+private:
+    std::wstring text;
 
-        std::shared_ptr<Font> font;
+    std::shared_ptr<Font> font;
 
-        bool clip = false;
+    bool clip = false;
 
-        float font_size = 32;
+    float font_size = 32;
 
-        std::vector<Glyph> glyphs;
+    std::vector<Glyph> glyphs;
 
-        mutable Rect<float> layout_box;
+    mutable Rect<float> layout_box;
 
-        // Fill
-        ColorU color{163, 163, 163, 255};
+    // Fill
+    ColorU color{163, 163, 163, 255};
 
-        // Stroke
-        float stroke_width = 0;
-        ColorU stroke_color;
+    // Stroke
+    float stroke_width = 0;
+    ColorU stroke_color;
 
-        // Layout
-        Alignment horizontal_alignment = Alignment::Begin;
-        Alignment vertical_alignment = Alignment::Begin;
-        Vec2<float> alignment_shift{0};
+    // Layout
+    Alignment horizontal_alignment = Alignment::Begin;
+    Alignment vertical_alignment = Alignment::Begin;
+    Vec2<float> alignment_shift{0};
 
-        std::optional<StyleBox> theme_background;
-    };
-}
+    std::optional<StyleBox> theme_background;
+};
+} // namespace Flint
 
-#endif //FLINT_LABEL_H
+#endif // FLINT_LABEL_H

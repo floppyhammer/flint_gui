@@ -1,12 +1,12 @@
 #ifndef FLINT_IO_H
 #define FLINT_IO_H
 
-#include <vector>
-#include <string>
-#include <istream>
-#include <iostream>
 #include <fstream>
+#include <iostream>
+#include <istream>
 #include <sstream>
+#include <string>
+#include <vector>
 
 inline std::string load_file_as_string(const char *file_path) {
     std::string output;
@@ -38,8 +38,7 @@ inline std::string load_file_as_string(const char *file_path) {
 inline std::vector<char> load_file_as_bytes(const char *file_path) {
     std::ifstream input(file_path, std::ios::binary);
 
-    std::vector<char> bytes((std::istreambuf_iterator<char>(input)),
-                            (std::istreambuf_iterator<char>()));
+    std::vector<char> bytes((std::istreambuf_iterator<char>(input)), (std::istreambuf_iterator<char>()));
 
     input.close();
 
@@ -49,11 +48,11 @@ inline std::vector<char> load_file_as_bytes(const char *file_path) {
 inline void split_path(const std::string &str, std::string &file_directory) {
     size_t found = str.find_last_of("/\\");
 
-//    std::cout << "Splitting: " << str << std::endl;
-//    std::cout << "Folder: " << str.substr(0, found) << std::endl;
-//    std::cout << "File: " << str.substr(found + 1) << std::endl;
+    //    std::cout << "Splitting: " << str << std::endl;
+    //    std::cout << "Folder: " << str.substr(0, found) << std::endl;
+    //    std::cout << "File: " << str.substr(found + 1) << std::endl;
 
     file_directory = str.substr(0, found);
 }
 
-#endif //FLINT_IO_H
+#endif // FLINT_IO_H

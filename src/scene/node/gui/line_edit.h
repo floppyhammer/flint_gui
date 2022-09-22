@@ -1,62 +1,63 @@
 #ifndef FLINT_LINE_EDIT_H
 #define FLINT_LINE_EDIT_H
 
-#include "label.h"
-#include "../../../resources/style_box.h"
-#include "../../../common/geometry.h"
-
 #include <cstdint>
 #include <memory>
 
+#include "../../../common/geometry.h"
+#include "../../../resources/style_box.h"
+#include "label.h"
+
 namespace Flint {
-    /**
-     * Single-Line text input field.
-     */
-    class LineEdit : public Control {
-    public:
-        LineEdit();
+/**
+ * Single-Line text input field.
+ */
+class LineEdit : public Control {
+public:
+    LineEdit();
 
-        void set_text(const std::string &p_text);
+    void set_text(const std::string &p_text);
 
-        std::string get_text() const;
+    std::string get_text() const;
 
-        void input(std::vector<InputEvent> &input_queue) override;
+    void input(std::vector<InputEvent> &input_queue) override;
 
-        void update(double dt) override;
+    void update(double dt) override;
 
-        void draw(VkCommandBuffer p_command_buffer) override;
+    void draw(VkCommandBuffer p_command_buffer) override;
 
-        Vec2<float> calculate_minimum_size() const override;
+    Vec2<float> calculate_minimum_size() const override;
 
-        void grab_focus() override;
-        void release_focus() override;
+    void grab_focus() override;
 
-    private:
-        bool editable = true;
+    void release_focus() override;
 
-        int32_t selected_caret_index = -1;
-        int32_t current_caret_index = -1;
-        Vec2F caret_position;
+private:
+    bool editable = true;
 
-        StyleLine theme_caret;
-        StyleBox theme_selection_box;
+    int32_t selected_caret_index = -1;
+    int32_t current_caret_index = -1;
+    Vec2F caret_position;
 
-        std::shared_ptr<Label> label;
+    StyleLine theme_caret;
+    StyleBox theme_selection_box;
 
-        float caret_blink_timer = 0;
+    std::shared_ptr<Label> label;
 
-        void cursor_entered() override;
+    float caret_blink_timer = 0;
 
-        void cursor_exited() override;
+    void cursor_entered() override;
 
-        int32_t calculate_caret_index(Vec2F local_cursor_position);
+    void cursor_exited() override;
 
-        Vec2F calculate_caret_position(int32_t caret_index);
+    int32_t calculate_caret_index(Vec2F local_cursor_position);
 
-        std::optional<StyleBox> theme_normal;
-        std::optional<StyleBox> theme_focused;
-        std::optional<StyleBox> theme_uneditable;
-    };
-}
+    Vec2F calculate_caret_position(int32_t caret_index);
 
-#endif //FLINT_LINE_EDIT_H
+    std::optional<StyleBox> theme_normal;
+    std::optional<StyleBox> theme_focused;
+    std::optional<StyleBox> theme_uneditable;
+};
+} // namespace Flint
+
+#endif // FLINT_LINE_EDIT_H

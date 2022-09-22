@@ -1,13 +1,13 @@
 #include "platform.h"
 
-#include <stdexcept>
 #include <set>
+#include <stdexcept>
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
                                       const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
                                       const VkAllocationCallbacks *pAllocator,
                                       VkDebugUtilsMessengerEXT *pDebugMessenger) {
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+    auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
     if (func != nullptr) {
         return func(instance, pCreateInfo, pAllocator, pDebugMessenger);
     } else {
@@ -15,10 +15,10 @@ VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
     }
 }
 
-void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger,
+void DestroyDebugUtilsMessengerEXT(VkInstance instance,
+                                   VkDebugUtilsMessengerEXT debugMessenger,
                                    const VkAllocationCallbacks *pAllocator) {
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance,
-                                                                            "vkDestroyDebugUtilsMessengerEXT");
+    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
     if (func != nullptr) {
         func(instance, debugMessenger, pAllocator);
     }
@@ -69,9 +69,8 @@ void Platform::initWindow(uint32_t window_width, uint32_t window_height) {
     window = glfwCreateWindow(window_width, window_height, "Vulkan", nullptr, nullptr);
 
     // Center window.
-    glfwSetWindowPos(window,
-                     monitor_x + (videoMode->width - window_width) / 2,
-                     monitor_y + (videoMode->height - window_height) / 2);
+    glfwSetWindowPos(
+        window, monitor_x + (videoMode->width - window_width) / 2, monitor_y + (videoMode->height - window_height) / 2);
 
     // Show window.
     glfwShowWindow(window);
@@ -112,7 +111,8 @@ void Platform::createInstance() {
         createInfo.ppEnabledLayerNames = validationLayers.data();
 
         populateDebugMessengerCreateInfo(debugCreateInfo);
-        createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *) &debugCreateInfo; // Pointer to a structure extending this structure.
+        createInfo.pNext =
+            (VkDebugUtilsMessengerCreateInfoEXT *)&debugCreateInfo; // Pointer to a structure extending this structure.
     } else {
         createInfo.enabledLayerCount = 0;
 
@@ -132,10 +132,7 @@ VkExtent2D Platform::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabiliti
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
 
-        VkExtent2D actualExtent = {
-                static_cast<uint32_t>(width),
-                static_cast<uint32_t>(height)
-        };
+        VkExtent2D actualExtent = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
 
         actualExtent.width = std::max(capabilities.minImageExtent.width,
                                       std::min(capabilities.maxImageExtent.width, actualExtent.width));
@@ -149,12 +146,12 @@ VkExtent2D Platform::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabiliti
 void Platform::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
     createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-    createInfo.messageSeverity =
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
-    createInfo.messageType =
-            VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
-            VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+                                 VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                 VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    createInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                             VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                             VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     createInfo.pfnUserCallback = debugCallback;
 }
 
@@ -184,7 +181,7 @@ bool Platform::checkDeviceExtensionSupport(VkPhysicalDevice pPhysicalDevice) con
 
     std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
-    for (const auto &extension: availableExtensions) {
+    for (const auto &extension : availableExtensions) {
         requiredExtensions.erase(extension.extensionName);
     }
 
@@ -209,10 +206,8 @@ SwapChainSupportDetails Platform::querySwapChainSupport(VkPhysicalDevice pPhysic
 
     if (presentModeCount != 0) {
         details.presentModes.resize(presentModeCount);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(pPhysicalDevice,
-                                                  surface,
-                                                  &presentModeCount,
-                                                  details.presentModes.data());
+        vkGetPhysicalDeviceSurfacePresentModesKHR(
+            pPhysicalDevice, surface, &presentModeCount, details.presentModes.data());
     }
 
     return details;
@@ -249,7 +244,7 @@ void Platform::pickPhysicalDevice() {
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
     // Pick a suitable one among the physical devices.
-    for (const auto &d: devices) {
+    for (const auto &d : devices) {
         if (isDeviceSuitable(d)) {
             physicalDevice = d;
             break;
@@ -262,7 +257,7 @@ void Platform::pickPhysicalDevice() {
 }
 
 VkSurfaceFormatKHR Platform::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats) {
-    for (const auto &availableFormat: availableFormats) {
+    for (const auto &availableFormat : availableFormats) {
         if (availableFormat.format == VK_FORMAT_R8G8B8A8_UNORM &&
             availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
             return availableFormat;
@@ -273,7 +268,7 @@ VkSurfaceFormatKHR Platform::chooseSwapSurfaceFormat(const std::vector<VkSurface
 }
 
 VkPresentModeKHR Platform::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
-    for (const auto &availablePresentMode: availablePresentModes) {
+    for (const auto &availablePresentMode : availablePresentModes) {
         if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
             return availablePresentMode;
         }
@@ -294,7 +289,7 @@ QueueFamilyIndices Platform::findQueueFamilies(VkPhysicalDevice pPhysicalDevice)
     vkGetPhysicalDeviceQueueFamilyProperties(pPhysicalDevice, &queueFamilyCount, queueFamilies.data());
 
     int i = 0;
-    for (const auto &queueFamily: queueFamilies) {
+    for (const auto &queueFamily : queueFamilies) {
         // queueFlags is a bitmask of VkQueueFlagBits indicating capabilities of the queues in this queue family.
         if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
             qfIndices.graphicsFamily = i;
@@ -328,7 +323,7 @@ void Platform::createLogicalDevice() {
     std::set<uint32_t> uniqueQueueFamilies = {qfIndices.graphicsFamily.value(), qfIndices.presentFamily.value()};
 
     float queuePriority = 1.0f;
-    for (uint32_t queueFamily: uniqueQueueFamilies) {
+    for (uint32_t queueFamily : uniqueQueueFamilies) {
         VkDeviceQueueCreateInfo queueCreateInfo{};
         queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
         queueCreateInfo.queueFamilyIndex = queueFamily;
@@ -340,7 +335,8 @@ void Platform::createLogicalDevice() {
     // Structure describing the fine-grained features that can be supported by an implementation.
     VkPhysicalDeviceFeatures deviceFeatures{};
     // Specifies whether anisotropic filtering is supported.
-    // If this feature is not enabled, the anisotropyEnable member of the VkSamplerCreateInfo structure must be VK_FALSE.
+    // If this feature is not enabled, the anisotropyEnable member of the VkSamplerCreateInfo structure must be
+    // VK_FALSE.
     deviceFeatures.samplerAnisotropy = VK_TRUE;
 
     VkDeviceCreateInfo createInfo{};
@@ -373,9 +369,9 @@ void Platform::createLogicalDevice() {
 }
 
 VkFormat Platform::findSupportedFormat(const std::vector<VkFormat> &candidates,
-                                     VkImageTiling tiling,
-                                     VkFormatFeatureFlags features) const {
-    for (VkFormat format: candidates) {
+                                       VkImageTiling tiling,
+                                       VkFormatFeatureFlags features) const {
+    for (VkFormat format : candidates) {
         VkFormatProperties props;
         vkGetPhysicalDeviceFormatProperties(Platform::getSingleton()->physicalDevice, format, &props);
 
@@ -390,11 +386,9 @@ VkFormat Platform::findSupportedFormat(const std::vector<VkFormat> &candidates,
 }
 
 VkFormat Platform::findDepthFormat() const {
-    return findSupportedFormat(
-            {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
-            VK_IMAGE_TILING_OPTIMAL,
-            VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
-    );
+    return findSupportedFormat({VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
+                               VK_IMAGE_TILING_OPTIMAL,
+                               VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 }
 
 void Platform::cleanup() {
