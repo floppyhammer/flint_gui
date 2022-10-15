@@ -10,6 +10,7 @@ Label::Label(const std::string &p_text) {
 
     font = ResourceManager::get_singleton()->load<Font>("../assets/unifont-14.0.03.ttf");
 
+    debug_size_box.border_width = 2;
     set_text(p_text);
 
 //    debug = true;
@@ -97,9 +98,6 @@ void Label::measure() {
         // Get the glyph path's bounding box. The Y axis points down.
         Rect<int> bounding_box = font->get_bounds(g.index);
 
-        // Offset
-        //        float byte_offset = x + roundf(left_side_bearing * scale) + (y * size.y);
-
         // Set glyph path.
         g.path = font->get_glyph_path(g.index);
 
@@ -111,16 +109,16 @@ void Label::measure() {
 
         // The glyph's layout box in the glyph's local coordinates. The origin is the baseline.
         // The Y axis is downward.
-        g.layout_box = Rect<float>(0, -ascent, g.advance, -descent);
+        g.box = Rect<float>(0, -ascent, g.advance, -descent);
 
         // BBox in the glyph's local coordinates.
         g.bbox = bounding_box.to_f32();
 
         // The glyph's layout box in the text's local coordinates. The origin is the top-left corner of the text box.
-        auto glyph_layout_box2 = Rect<float>(x, y, x + g.advance, y + font_size);
+        g.layout_box = Rect<float>(x, y, x + g.advance, y + font_size);
 
         // The whole text's layout box.
-        layout_box = layout_box.union_rect(glyph_layout_box2);
+        layout_box = layout_box.union_rect(g.layout_box);
 
         // Advance x.
         x += roundf(g.advance);

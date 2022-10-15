@@ -13,6 +13,7 @@
 using Pathfinder::Rect;
 
 namespace Flint {
+
 enum class Alignment {
     Begin,
     Center,
@@ -39,9 +40,14 @@ struct Glyph {
 
     Pathfinder::Path2d path; // Glyph path.
 
-    // For visual debugging.
-    Rect<float> layout_box;
+    /// Glyph box in the baseline coordinates.
+    Rect<float> box;
+
+    /// Glyph path's bounding box in the baseline coordinates.
     Rect<float> bbox;
+
+    /// Layout box in the text.
+    Rect<float> layout_box;
 };
 
 class Label : public Control {

@@ -9,6 +9,7 @@ Flint::LineEdit::LineEdit() {
     type = NodeType::LineEdit;
 
     label = std::make_shared<Label>("");
+    label->set_vertical_alignment(Alignment::Center);
     label->set_parent(this);
 
     theme_normal = std::optional(StyleBox());
