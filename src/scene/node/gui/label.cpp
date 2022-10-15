@@ -11,6 +11,8 @@ Label::Label(const std::string &p_text) {
     set_font(ResourceManager::get_singleton()->load<Font>("../assets/unifont-14.0.03.ttf"));
 
     set_text(p_text);
+
+    debug = true;
 }
 
 void Label::set_text(const std::string &p_text) {
@@ -54,7 +56,7 @@ void Label::set_size(Vec2<float> p_size) {
 void Label::measure() {
     // Get font info. Get font scaling.
     int ascent, descent, line_gap;
-    float scale = font->get_metrics(font_size, ascent, descent, line_gap);
+    font->get_metrics(font_size, ascent, descent, line_gap);
 
     // Convert text string to utf32 string.
     std::u32string utf32_str(text.begin(), text.end());
@@ -75,7 +77,7 @@ void Label::measure() {
         g.text = u_codepoint;
 
         // Set glyph index.
-        g.index = stbtt_FindGlyphIndex(&font->info, (int)u_codepoint);
+        g.index = font->find_index(u_codepoint);
 
         g.x_off = x;
         g.y_off = y;
@@ -87,58 +89,34 @@ void Label::measure() {
             continue;
         }
 
-        // The horizontal distance to increment (for left-to-right writing) or decrement (for right-to-left writing)
-        // the pen position after a glyph has been rendered when processing text.
-        // It is always positive for horizontal layouts, and zero for vertical ones.
-        int advance_width;
-
-        // The horizontal distance from the current pen position to the glyph's left bbox edge.
-        // It is positive for horizontal layouts, and in most cases negative for vertical ones.
-        int left_side_bearing;
-
-        stbtt_GetGlyphHMetrics(&font->info, g.index, &advance_width, &left_side_bearing);
-
-        g.advance = (float)advance_width * scale;
+        g.advance = font->get_advance(g.index);
 
         // Get bounding box for character (maybe offset to account for chars that dip above or below the line).
-        Rect<int> bounding_box;
-        stbtt_GetGlyphBitmapBox(&font->info,
-                                g.index,
-                                scale,
-                                scale,
-                                &bounding_box.left,
-                                &bounding_box.top,
-                                &bounding_box.right,
-                                &bounding_box.bottom);
+        Rect<int> bounding_box = font->get_bounds(g.index);
 
         // Compute baseline height (different characters have different heights).
         float local_y = ascent + bounding_box.top;
 
         // Offset
-        float byte_offset = x + roundf(left_side_bearing * scale) + (y * size.y);
+        //        float byte_offset = x + roundf(left_side_bearing * scale) + (y * size.y);
 
         // Set glyph shape.
-        // --------------------------------
-        g.outline = font->get_glyph_outline(g.index);
+        g.path = font->get_glyph_path(g.index);
 
-        g.outline.scale(Pathfinder::Vec2<float>(scale, -scale));
-        g.outline.translate(Pathfinder::Vec2<float>(x, font_size + descent + y));
-        // --------------------------------
+        g.position = Vec2<float>(x, font_size + descent + y);
 
         // Layout box.
-        g.layout_box = Rect<float>(x, font_size + descent - ascent + y, x + advance_width * scale, font_size + y);
+        g.layout_box = Rect<float>(0, +descent - ascent, x + g.advance, 0);
 
         // Update text's layout box.
         layout_box = layout_box.union_rect(g.layout_box);
 
         // Bbox.
-        g.bbox = Rect<float>(x + bounding_box.left,
-                             font_size + descent + bounding_box.bottom + y,
-                             x + bounding_box.right,
-                             font_size + descent + bounding_box.top + y);
+        g.bbox = Rect<float>(
+            bounding_box.left, descent + bounding_box.bottom, bounding_box.right, descent + bounding_box.top);
 
         // Advance x.
-        x += roundf(advance_width * scale);
+        x += roundf(g.advance);
 
         glyphs.push_back(g);
     }
@@ -195,64 +173,56 @@ void Label::set_text_style(float p_size, ColorU p_color, float p_stroke_width, C
 void Label::draw(VkCommandBuffer p_command_buffer) {
     auto global_position = get_global_position();
 
-    //        VectorServer::get_singleton()->submit();
-    //        VectorServer::get_singleton()->push_scene({global_position.x,
-    //                                                   global_position.y,
-    //                                                   global_position.x + size.x,
-    //                                                   global_position.y + size.y});
-
     auto canvas = VectorServer::get_singleton()->canvas;
-    canvas->save_state();
 
     if (theme_background.has_value()) {
         theme_background.value().add_to_canvas(global_position, size, canvas);
     }
 
+    canvas->save_state();
+
     auto translation = global_position + alignment_shift;
-    auto transform = Pathfinder::Transform2::from_translation({translation.x, translation.y});
-    canvas->set_transform(transform);
 
     canvas->set_shadow_blur(0);
 
     // Draw glyphs.
     for (Glyph &g : glyphs) {
+        auto transform = Pathfinder::Transform2::from_translation(translation + g.position);
+        canvas->set_transform(transform);
+
         // Add fill.
-        canvas->set_fill_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU(color.r, color.g, color.b, color.a)));
-        canvas->fill_path(g.outline, Pathfinder::FillRule::Winding);
+        canvas->set_fill_paint(Pathfinder::Paint::from_color(color));
+        canvas->fill_path(g.path, Pathfinder::FillRule::Winding);
 
         // Add stroke if needed.
-        canvas->set_stroke_paint(Pathfinder::Paint::from_color(
-            Pathfinder::ColorU(stroke_color.r, stroke_color.g, stroke_color.b, stroke_color.a)));
+        canvas->set_stroke_paint(Pathfinder::Paint::from_color(stroke_color));
         canvas->set_line_width(stroke_width);
-        canvas->stroke_path(g.outline);
+        canvas->stroke_path(g.path);
 
         if (debug) {
             canvas->set_line_width(1);
 
             // Add layout box.
             // --------------------------------
-            Pathfinder::Outline layout_outline;
-            layout_outline.add_rect(g.layout_box);
+            Pathfinder::Path2d layout_path;
+            layout_path.add_rect(g.layout_box);
 
             canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::green()));
-            canvas->stroke_path(layout_outline);
+            canvas->stroke_path(layout_path);
             // --------------------------------
 
             // Add bbox.
             // --------------------------------
-            Pathfinder::Outline bbox_outline;
-            bbox_outline.add_rect(g.bbox);
+            Pathfinder::Path2d bbox_path;
+            bbox_path.add_rect(g.bbox);
 
             canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::red()));
-            canvas->stroke_path(bbox_outline);
+            canvas->stroke_path(bbox_path);
             // --------------------------------
         }
     }
 
     canvas->restore_state();
-
-    //        VectorServer::get_singleton()->submit();
-    //        VectorServer::get_singleton()->pop_scene();
 
     Control::draw(p_command_buffer);
 }

@@ -6,34 +6,42 @@
 #include <memory>
 
 #include "../common/geometry.h"
-#include "../servers/vector_server.h"
 #include "texture.h"
 
 using Pathfinder::ColorU;
 using Pathfinder::Vec2;
+using Pathfinder::Transform2;
 
 namespace Flint {
+
+/// A thin wrapper over Pathfinder::Path2d.
+struct VectorPath {
+    Pathfinder::Path2d path2d;
+    ColorU fill_color = ColorU();
+    ColorU stroke_color = ColorU();
+    float stroke_width = 0;
+    float opacity = 1;
+};
+
+/// A SVG analogy.
 class VectorTexture : public Texture {
 public:
-    VectorTexture();
+    VectorTexture(uint32_t p_width, uint32_t p_height);
 
-    /// Create vector texture from a svg file.
+    /// Create from a SVG file.
     explicit VectorTexture(const std::string &path);
 
-    ~VectorTexture() override;
-
-    /// Create an empty texture with a specific size.
+    /// Create empty with a specific size.
     static std::shared_ptr<VectorTexture> from_empty(uint32_t p_width, uint32_t p_height);
 
-    /// Draw vector paths.
-    void add_to_canvas(const Vec2<float> &position, const std::shared_ptr<Pathfinder::Canvas> &canvas);
+    void add_path(const VectorPath &new_path);
 
-    /// Replace vector paths.
-    void set_vector_paths(const std::vector<VectorPath> &p_vector_paths);
+    std::vector<VectorPath>& get_paths();
 
 protected:
-    std::vector<VectorPath> vector_paths;
+    std::vector<VectorPath> paths;
 };
+
 } // namespace Flint
 
 #endif // FLINT_VECTOR_TEXTURE_H

@@ -76,25 +76,27 @@ TreeItem::TreeItem() {
     {
         collapse_icon = VectorTexture::from_empty(24, 24);
         VectorPath vp;
-        vp.outline.move_to(-6, -3);
-        vp.outline.line_to(0, 3);
-        vp.outline.line_to(6, -3);
-        vp.outline.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
+        float x = collapse_icon->get_width() * 0.5f;
+        float y = collapse_icon->get_height() * 0.5f;
+        vp.path2d.move_to(-6 + x, -3 + y);
+        vp.path2d.line_to(0 + x, 3 + y);
+        vp.path2d.line_to(6 + x, -3 + y);
         vp.stroke_color = ColorU(163, 163, 163, 255);
         vp.stroke_width = 2;
-        collapse_icon->set_vector_paths({vp});
+        collapse_icon->add_path(vp);
     }
 
     {
         expand_icon = VectorTexture::from_empty(24, 24);
         VectorPath vp;
-        vp.outline.move_to(-3, -6);
-        vp.outline.line_to(3, 0);
-        vp.outline.line_to(-3, 6);
-        vp.outline.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
+        float x = expand_icon->get_width() * 0.5f;
+        float y = expand_icon->get_height() * 0.5f;
+        vp.path2d.move_to(-3 + x, -6 + y);
+        vp.path2d.line_to(3 + x, 0 + y);
+        vp.path2d.line_to(-3 + x, 6 + y);
         vp.stroke_color = ColorU(163, 163, 163, 255);
         vp.stroke_width = 2;
-        expand_icon->set_vector_paths({vp});
+        expand_icon->add_path(vp);
     }
 
     collapse_button = std::make_shared<Button>();

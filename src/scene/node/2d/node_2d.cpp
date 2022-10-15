@@ -8,10 +8,10 @@ Node2d::Node2d() {
 
     mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
 
-    position_indicator.outline.move_to(-12, 0);
-    position_indicator.outline.line_to(12, 0);
-    position_indicator.outline.move_to(0, -12);
-    position_indicator.outline.line_to(0, 12);
+    position_indicator.path2d.move_to(-12, 0);
+    position_indicator.path2d.line_to(12, 0);
+    position_indicator.path2d.move_to(0, -12);
+    position_indicator.path2d.line_to(0, 12);
     position_indicator.stroke_width = 2;
     position_indicator.stroke_color = ColorU::red();
 }

@@ -31,11 +31,13 @@ struct Glyph {
     float y_off = 0.f;
     float advance = 0.f; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
 
+    Vec2<float> position;
+
     int font_size = 0; // Font size;
     char32_t text{};
     int32_t index = 0; // Glyph index (font specific) or UTF-32 codepoint (for the invalid glyphs).
 
-    Pathfinder::Outline outline; // Glyph outline.
+    Pathfinder::Path2d path; // Glyph path.
 
     // For visual debugging.
     Rect<float> layout_box;

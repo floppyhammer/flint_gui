@@ -29,11 +29,10 @@ Button::Button() {
 
     auto vector_texture = VectorTexture::from_empty(24, 24);
     VectorPath vp;
-    vp.outline.add_circle({}, 8);
-    vp.outline.translate({vector_texture->get_width() * 0.5f, vector_texture->get_height() * 0.5f});
+    vp.path2d.add_circle({vector_texture->get_width() * 0.5f, vector_texture->get_height() * 0.5f}, 8);
     vp.stroke_color = ColorU(163, 163, 163, 255);
     vp.stroke_width = 2;
-    vector_texture->set_vector_paths({vp});
+    vector_texture->add_path(vp);
     icon_rect = std::make_shared<TextureRect>();
     icon_rect->set_texture(vector_texture);
 

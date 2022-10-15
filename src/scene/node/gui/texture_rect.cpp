@@ -16,6 +16,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 namespace Flint {
+
 TextureRect::TextureRect() {
     type = NodeType::TextureRect;
 
@@ -73,17 +74,19 @@ void TextureRect::draw(VkCommandBuffer p_command_buffer) {
                                                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(
                                                    SwapChain::getSingleton()->currentImage));
         } else { // Vector texture.
-            auto canvas = VectorServer::get_singleton()->canvas;
-            auto global_position = get_global_position();
+            auto vector_server = VectorServer::get_singleton();
 
             auto vector_texture = static_cast<VectorTexture *>(texture.get());
+
+            auto global_position = get_global_position();
 
             if (stretch_mode == StretchMode::KEEP_CENTER) {
                 auto texture_size = vector_texture->get_size();
                 auto offset = (size - Vec2<float>(texture_size.x, texture_size.y)) * 0.5f;
-                vector_texture->add_to_canvas(global_position + offset, canvas);
+
+                vector_server->draw_texture(*vector_texture, Transform2::from_translation(global_position + offset));
             } else {
-                vector_texture->add_to_canvas(global_position, canvas);
+                vector_server->draw_texture(*vector_texture, Transform2::from_translation(global_position));
             }
         }
     }
@@ -115,4 +118,5 @@ void TextureRect::update_mvp() {
 Vec2<float> TextureRect::calculate_minimum_size() const {
     return minimum_size.max(texture ? Vec2<float>(texture->get_width(), texture->get_height()) : Vec2<float>(0));
 }
+
 } // namespace Flint

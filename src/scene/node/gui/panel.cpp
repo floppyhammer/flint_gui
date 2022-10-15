@@ -20,27 +20,30 @@ Panel::Panel() {
     {
         collapse_icon = VectorTexture::from_empty(24, 24);
         VectorPath vp;
-        vp.outline.move_to(6, -6);
-        vp.outline.line_to(0, 7);
-        vp.outline.line_to(-6, -6);
-        vp.outline.close();
-        vp.outline.translate({collapse_icon->get_width() * 0.5f, collapse_icon->get_height() * 0.5f});
+        float x = collapse_icon->get_width() * 0.5f;
+        float y = collapse_icon->get_height() * 0.5f;
+        vp.path2d.move_to(6 + x, -6 + y);
+        vp.path2d.line_to(0 + x, 7 + y);
+        vp.path2d.line_to(-6 + x, -6 + y);
+        vp.path2d.close_path();
         vp.stroke_color = ColorU(163, 163, 163, 255);
         vp.stroke_width = 2;
-        collapse_icon->set_vector_paths({vp});
+        collapse_icon->add_path(vp);
     }
 
     {
         expand_icon = VectorTexture::from_empty(24, 24);
         VectorPath vp;
-        vp.outline.move_to(-6, -6);
-        vp.outline.line_to(6, 0);
-        vp.outline.line_to(-6, 6);
-        vp.outline.close();
-        vp.outline.translate({expand_icon->get_width() * 0.5f, expand_icon->get_height() * 0.5f});
+        float x = expand_icon->get_width() * 0.5f;
+        float y = expand_icon->get_height() * 0.5f;
+        vp.path2d.move_to(-6 + x, -6 + y);
+        vp.path2d.line_to(6 + x, 0 + y);
+        vp.path2d.line_to(-6 + x, 6 + y);
+        vp.path2d.close_path();
+
         vp.stroke_color = ColorU(163, 163, 163, 255);
         vp.stroke_width = 2;
-        expand_icon->set_vector_paths({vp});
+        expand_icon->add_path(vp);
     }
 
     {
@@ -55,12 +58,14 @@ Panel::Panel() {
     {
         auto close_icon = VectorTexture::from_empty(24, 24);
         VectorPath vp;
-        vp.outline.add_line({-8, -8}, {8, 8});
-        vp.outline.add_line({-8, 8}, {8, -8});
-        vp.outline.translate({close_icon->get_width() * 0.5f, close_icon->get_height() * 0.5f});
+        float x = close_icon->get_width() * 0.5f;
+        float y = close_icon->get_height() * 0.5f;
+        vp.path2d.add_line({-8 + x, -8 + y}, {8 + x, 8 + y});
+        vp.path2d.add_line({-8 + x, 8 + y}, {8 + x, -8 + y});
+
         vp.stroke_color = ColorU(163, 163, 163, 255);
         vp.stroke_width = 2;
-        close_icon->set_vector_paths({vp});
+        close_icon->add_path(vp);
 
         close_button = std::make_shared<Button>();
         close_button->set_text("");

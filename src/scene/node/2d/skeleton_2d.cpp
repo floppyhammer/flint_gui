@@ -59,11 +59,11 @@ Transform2 Bone2d::get_global_rest_transform() {
 
 VectorPath get_bone_body_path(float head_length, float bone_length) {
     VectorPath vp_body;
-    vp_body.outline.move_to(head_length, 0);
-    vp_body.outline.line_to(head_length * 2, -head_length);
-    vp_body.outline.line_to(bone_length, 0);
-    vp_body.outline.line_to(head_length * 2, head_length);
-    vp_body.outline.close();
+    vp_body.path2d.move_to(head_length, 0);
+    vp_body.path2d.line_to(head_length * 2, -head_length);
+    vp_body.path2d.line_to(bone_length, 0);
+    vp_body.path2d.line_to(head_length * 2, head_length);
+    vp_body.path2d.close_path();
     vp_body.fill_color = ColorU(200, 200, 200, 255);
     vp_body.stroke_color = ColorU(0, 0, 0, 150);
     vp_body.stroke_width = 1;
@@ -76,7 +76,7 @@ void Bone2d::draw() {
     VectorPath vp_head;
 
     // Bone starting point.
-    vp_head.outline.add_circle({0, 0}, 5);
+    vp_head.path2d.add_circle({0, 0}, 5);
     vp_head.stroke_color = ColorU(200, 200, 200, 255);
     vp_head.stroke_width = 3;
 

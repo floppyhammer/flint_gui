@@ -7,9 +7,13 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "pathfinder.h"
 #include "resource.h"
 
+using Pathfinder::Rect;
+
 namespace Flint {
+
 class Font : public Resource {
 public:
     explicit Font(const std::string &path);
@@ -30,14 +34,23 @@ public:
 
     stbtt_fontinfo info{};
 
-    float get_metrics(float line_height, int &ascent, int &descent, int &line_gap) const;
+    void get_metrics(float line_height, int &ascent, int &descent, int &line_gap);
 
-    Pathfinder::Outline get_glyph_outline(int glyph_index) const;
+    Pathfinder::Path2d get_glyph_path(int glyph_index) const;
+
+    int32_t Font::find_index(int codepoint);
+
+    float get_advance(int32_t glyph_index);
+
+    Rect<int> get_bounds(int32_t glyph_index);
 
 private:
     /// Stores font data, should not be freed until font is deleted.
     unsigned char *buffer;
+
+    float scale;
 };
+
 } // namespace Flint
 
 #endif // FLINT_FONT_H
