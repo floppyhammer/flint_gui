@@ -13,7 +13,7 @@ Control::Control() {
 
     debug_size_box.bg_color = ColorU();
 #ifdef FLINT_DEBUG
-    debug_size_box.border_width = 1;
+    debug_size_box.border_width = 0;
 #endif
     debug_size_box.border_color = ColorU(202, 130, 94, 255);
 }

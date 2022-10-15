@@ -8,11 +8,11 @@ Label::Label(const std::string &p_text) {
 
     debug_size_box.border_color = ColorU::red();
 
-    set_font(ResourceManager::get_singleton()->load<Font>("../assets/unifont-14.0.03.ttf"));
+    font = ResourceManager::get_singleton()->load<Font>("../assets/unifont-14.0.03.ttf");
 
     set_text(p_text);
 
-    debug = true;
+//    debug = true;
 }
 
 void Label::set_text(const std::string &p_text) {
@@ -54,9 +54,9 @@ void Label::set_size(Vec2<float> p_size) {
 }
 
 void Label::measure() {
-    // Get font info. Get font scaling.
-    int ascent, descent, line_gap;
-    font->get_metrics(font_size, ascent, descent, line_gap);
+    // Get font info.
+    int ascent = font->get_ascent();
+    int descent = font->get_descent();
 
     // Convert text string to utf32 string.
     std::u32string utf32_str(text.begin(), text.end());
@@ -79,9 +79,11 @@ void Label::measure() {
         // Set glyph index.
         g.index = font->find_index(u_codepoint);
 
+        // Baseline offset.
         g.x_off = x;
         g.y_off = y;
 
+        // Line break.
         if (u_codepoint == '\n') {
             x = 0;
             y += font_size;
@@ -89,31 +91,36 @@ void Label::measure() {
             continue;
         }
 
+        // Glyph width.
         g.advance = font->get_advance(g.index);
 
-        // Get bounding box for character (maybe offset to account for chars that dip above or below the line).
+        // Get the glyph path's bounding box. The Y axis points down.
         Rect<int> bounding_box = font->get_bounds(g.index);
-
-        // Compute baseline height (different characters have different heights).
-        float local_y = ascent + bounding_box.top;
 
         // Offset
         //        float byte_offset = x + roundf(left_side_bearing * scale) + (y * size.y);
 
-        // Set glyph shape.
+        // Set glyph path.
         g.path = font->get_glyph_path(g.index);
 
-        g.position = Vec2<float>(x, font_size + descent + y);
+        // The position of the left point of the glyph's baseline in the whole text.
+        g.position = Vec2<float>(x, y);
 
-        // Layout box.
-        g.layout_box = Rect<float>(0, +descent - ascent, x + g.advance, 0);
+        // Move the center to the top-left corner of the glyph's layout box.
+        g.position.y += ascent;
 
-        // Update text's layout box.
-        layout_box = layout_box.union_rect(g.layout_box);
+        // The glyph's layout box in the glyph's local coordinates. The origin is the baseline.
+        // The Y axis is downward.
+        g.layout_box = Rect<float>(0, -ascent, g.advance, -descent);
 
-        // Bbox.
-        g.bbox = Rect<float>(
-            bounding_box.left, descent + bounding_box.bottom, bounding_box.right, descent + bounding_box.top);
+        // BBox in the glyph's local coordinates.
+        g.bbox = bounding_box.to_f32();
+
+        // The glyph's layout box in the text's local coordinates. The origin is the top-left corner of the text box.
+        auto glyph_layout_box2 = Rect<float>(x, y, x + g.advance, y + font_size);
+
+        // The whole text's layout box.
+        layout_box = layout_box.union_rect(glyph_layout_box2);
 
         // Advance x.
         x += roundf(g.advance);

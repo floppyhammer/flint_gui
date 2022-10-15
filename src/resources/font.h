@@ -32,23 +32,34 @@ public:
         return font;
     }
 
-    stbtt_fontinfo info{};
-
-    void get_metrics(float line_height, int &ascent, int &descent, int &line_gap);
+    void set_size(uint32_t new_font_size);
 
     Pathfinder::Path2d get_glyph_path(int glyph_index) const;
 
-    int32_t Font::find_index(int codepoint);
+    int32_t find_index(int codepoint);
 
     float get_advance(int32_t glyph_index);
 
     Rect<int> get_bounds(int32_t glyph_index);
 
+    int get_ascent() const;
+
+    int get_descent() const;
+
 private:
     /// Stores font data, should not be freed until font is deleted.
     unsigned char *buffer;
 
+    stbtt_fontinfo info{};
+
+    uint32_t font_size = 32;
+
     float scale;
+
+    int ascent;
+    int descent;
+
+    void get_metrics();
 };
 
 } // namespace Flint

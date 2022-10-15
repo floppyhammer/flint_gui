@@ -9,6 +9,8 @@ Button::Button() {
 
     theme_normal = std::optional(StyleBox());
     theme_normal.value().bg_color = ColorU(27, 27, 27, 255);
+    theme_normal.value().border_color = ColorU(100, 100, 100, 255);
+    theme_normal.value().border_width = 2;
 
     theme_hovered = std::optional(StyleBox());
     theme_hovered.value().border_color = ColorU(163, 163, 163, 255);

@@ -14,6 +14,7 @@ namespace Flint {
 
 Font::Font(const std::string &path) : Resource(path) {
     auto bytes = load_file_as_bytes(path.c_str());
+
     auto byte_size = bytes.size() * sizeof(unsigned char);
 
     buffer = static_cast<unsigned char *>(malloc(byte_size));
@@ -23,21 +24,42 @@ Font::Font(const std::string &path) : Resource(path) {
     if (!stbtt_InitFont(&info, buffer, 0)) {
         Logger::error("Failed to prepare font info!", "Font");
     }
+
+    get_metrics();
+}
+
+Font::Font(std::vector<char> &bytes) {
+    auto byte_size = bytes.size() * sizeof(unsigned char);
+
+    buffer = static_cast<unsigned char *>(malloc(byte_size));
+    memcpy(buffer, bytes.data(), byte_size);
+
+    // Prepare font info.
+    if (!stbtt_InitFont(&info, buffer, 0)) {
+        Logger::error("Failed to prepare font info!", "Font");
+    }
+
+    get_metrics();
 }
 
 Font::~Font() {
     free(buffer);
 }
 
-void Font::get_metrics(float line_height, int &ascent, int &descent, int &line_gap) {
+void Font::get_metrics() {
     // Calculate font scaling.
-    scale = stbtt_ScaleForPixelHeight(&info, line_height);
+    scale = stbtt_ScaleForPixelHeight(&info, font_size);
 
-    stbtt_GetFontVMetrics(&info, &ascent, &descent, &line_gap);
+    /// The origin is baseline and the Y axis points u.
+    /// So, ascent is usually positive, and descent negative.
+    int unscaled_ascent;
+    int unscaled_descent;
+    int unscaled_line_gap;
+    stbtt_GetFontVMetrics(&info, &unscaled_ascent, &unscaled_descent, &unscaled_line_gap);
 
     // Take scale into account.
-    ascent = int(roundf(float(ascent) * scale));
-    descent = int(roundf(float(descent) * scale));
+    ascent = roundf(float(unscaled_ascent) * scale);
+    descent = roundf(float(unscaled_descent) * scale);
 }
 
 Pathfinder::Path2d Font::get_glyph_path(int glyph_index) const {
@@ -113,7 +135,25 @@ float Font::get_advance(int32_t glyph_index) {
 
     stbtt_GetGlyphHMetrics(&info, glyph_index, &advance_width, &left_side_bearing);
 
-    return advance_width * scale;
+    return (float)advance_width * scale;
+}
+
+void Font::set_size(uint32_t new_font_size) {
+    if (new_font_size == font_size) {
+        return;
+    }
+
+    font_size = new_font_size;
+
+    get_metrics();
+}
+
+int Font::get_ascent() const {
+    return ascent;
+}
+
+int Font::get_descent() const {
+    return descent;
 }
 
 } // namespace Flint
