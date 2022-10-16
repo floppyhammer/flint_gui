@@ -7,6 +7,7 @@
 using Pathfinder::Vec2;
 
 namespace Flint {
+
 enum class TextureType {
     IMAGE,
     VECTOR,
@@ -34,6 +35,7 @@ protected:
     uint32_t width = 0;
     uint32_t height = 0;
 };
+
 } // namespace Flint
 
 #endif // FLINT_TEXTURE_H

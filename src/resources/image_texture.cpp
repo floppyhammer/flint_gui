@@ -11,6 +11,7 @@
 #include "stb_image.h"
 
 namespace Flint {
+
 ImageTexture::ImageTexture() {
     type = TextureType::IMAGE;
 }
@@ -134,6 +135,8 @@ void ImageTexture::set_filter(VkFilter filter) {
 }
 
 ImageTexture::ImageTexture(const std::string &path) : Texture(path) {
+    type = TextureType::IMAGE;
+
     // The STBI_rgb_alpha value forces the image to be loaded with an alpha channel,
     // even if it doesn't have one, which is nice for consistency with other textures in the future.
     int tex_width, tex_height, tex_channels;
@@ -172,4 +175,5 @@ std::shared_ptr<ImageTexture> ImageTexture::from_wrapper(VkImageView p_image_vie
 
     return texture;
 }
+
 } // namespace Flint

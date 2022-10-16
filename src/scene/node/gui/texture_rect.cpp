@@ -19,8 +19,6 @@ namespace Flint {
 
 TextureRect::TextureRect() {
     type = NodeType::TextureRect;
-
-    debug_size_box.border_color = ColorU::blue();
 }
 
 void TextureRect::set_texture(const std::shared_ptr<Texture> &p_texture) {
@@ -44,6 +42,12 @@ std::shared_ptr<Texture> TextureRect::get_texture() const {
 
 void TextureRect::update(double dt) {
     update_mvp();
+
+    if (debug_mode) {
+        debug_size_box.border_width = 2;
+    } else {
+        debug_size_box.border_width = 0;
+    }
 }
 
 void TextureRect::draw(VkCommandBuffer p_command_buffer) {
@@ -73,6 +77,14 @@ void TextureRect::draw(VkCommandBuffer p_command_buffer) {
                                                pipeline,
                                                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(
                                                    SwapChain::getSingleton()->currentImage));
+
+            // Visual debugging.
+            {
+                //
+                auto vector_server = VectorServer::get_singleton();
+
+//                vector_server->draw_rectangle()
+            }
         } else { // Vector texture.
             auto vector_server = VectorServer::get_singleton();
 

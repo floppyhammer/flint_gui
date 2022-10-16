@@ -4,9 +4,7 @@
 
 namespace Flint {
 
-void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver,
-                        int p_canvas_width,
-                        int p_canvas_height) {
+void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver, int p_canvas_width, int p_canvas_height) {
     canvas = std::make_shared<Pathfinder::Canvas>(driver);
     canvas->set_size({p_canvas_width, p_canvas_height});
 
@@ -15,7 +13,7 @@ void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver,
 
     default_canvas_size = {p_canvas_width, p_canvas_height};
 
-//    push_scene({0, 0, p_canvas_width, p_canvas_height});
+    //    push_scene({0, 0, p_canvas_width, p_canvas_height});
 }
 
 void VectorServer::cleanup() {
@@ -46,7 +44,7 @@ void VectorServer::pop_scene() {
 void VectorServer::clear_scene() {
     scene_stack.clear();
     canvas->clear();
-//    push_scene({0, 0, default_canvas_size.x, default_canvas_size.y});
+    //    push_scene({0, 0, default_canvas_size.x, default_canvas_size.y});
 }
 
 void VectorServer::submit() {
@@ -54,11 +52,11 @@ void VectorServer::submit() {
 }
 
 void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) {
-//    if (scene_stack.empty()) {
-//        return;
-//    }
-//
-//    canvas->set_scene(scene_stack.back());
+    //    if (scene_stack.empty()) {
+    //        return;
+    //    }
+    //
+    //    canvas->set_scene(scene_stack.back());
 
     Pathfinder::Path2d path;
     path.add_line({start.x, start.y}, {end.x, end.y});
@@ -73,12 +71,25 @@ void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) 
     canvas->restore_state();
 }
 
+void VectorServer::draw_rectangle(const Rect<float> &rect, float line_width, ColorU color) {
+    Pathfinder::Path2d path;
+    path.add_rect(rect);
+
+    canvas->save_state();
+
+    canvas->set_stroke_paint(Pathfinder::Paint::from_color(color));
+    canvas->set_line_width(line_width);
+    canvas->stroke_path(path);
+
+    canvas->restore_state();
+}
+
 void VectorServer::draw_circle(Vec2F center, float radius, float line_width, bool fill, ColorU color) {
-//    if (scene_stack.empty()) {
-//        return;
-//    }
-//
-//    canvas->set_scene(scene_stack.back());
+    //    if (scene_stack.empty()) {
+    //        return;
+    //    }
+    //
+    //    canvas->set_scene(scene_stack.back());
 
     Pathfinder::Path2d path;
     path.add_circle({center.x, center.y}, radius);

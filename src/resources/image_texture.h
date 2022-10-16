@@ -10,6 +10,7 @@
 #include "texture.h"
 
 namespace Flint {
+
 class ImageTexture : public Texture {
 public:
     ImageTexture();
@@ -50,6 +51,7 @@ public:
 private:
     void create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height, VkFormat tex_format);
 };
+
 } // namespace Flint
 
 #endif // FLINT_IMAGE_TEXTURE_H

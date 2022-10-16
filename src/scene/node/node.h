@@ -10,6 +10,7 @@
 #include "../../servers/input_server.h"
 
 namespace Flint {
+
 enum class NodeType {
     // General.
     Node = 0,
@@ -154,6 +155,8 @@ public:
 
     void connect_signal(const std::string &signal, const std::function<void()> &callback);
 
+    void set_debug_mode(bool enabled);
+
 protected:
     bool visible = true;
 
@@ -164,7 +167,10 @@ protected:
     Node *parent{};
 
     std::vector<std::function<void()>> subtree_changed_callbacks;
+
+    bool debug_mode = false;
 };
+
 } // namespace Flint
 
 #endif // FLINT_NODE_H

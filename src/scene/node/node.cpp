@@ -6,6 +6,7 @@
 #include "sub_viewport.h"
 
 namespace Flint {
+
 void Node::propagate_update(double dt) {
     update(dt);
 
@@ -178,4 +179,9 @@ void Node::connect_signal(const std::string &signal, const std::function<void()>
         subtree_changed_callbacks.push_back(callback);
     }
 }
+
+void Node::set_debug_mode(bool enabled) {
+    debug_mode = enabled;
+}
+
 } // namespace Flint

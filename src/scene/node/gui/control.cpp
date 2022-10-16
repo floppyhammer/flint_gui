@@ -12,10 +12,11 @@ Control::Control() {
     type = NodeType::Control;
 
     debug_size_box.bg_color = ColorU();
+    debug_size_box.corner_radius = 0;
+    debug_size_box.border_color = ColorU::red();
 #ifdef FLINT_DEBUG
     debug_size_box.border_width = 0;
 #endif
-    debug_size_box.border_color = ColorU(202, 130, 94, 255);
 }
 
 Vec2<float> Control::calculate_minimum_size() const {
@@ -103,7 +104,9 @@ void Control::set_position(Vec2<float> p_position) {
 }
 
 void Control::set_size(Vec2<float> p_size) {
-    if (size == p_size) return;
+    if (size == p_size) {
+        return;
+    }
 
     size = p_size.max(calculate_minimum_size());
 }
