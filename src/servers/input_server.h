@@ -47,7 +47,8 @@ public:
             Vec2<float> position;
         } mouse_button;
         struct {
-            float delta;
+            float x_delta;
+            float y_delta;
         } mouse_scroll;
         struct {
             Vec2<float> relative;

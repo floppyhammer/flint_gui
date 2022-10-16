@@ -13,6 +13,7 @@
 #include "gui/margin_container.h"
 #include "gui/panel.h"
 #include "gui/progress_bar.h"
+#include "gui/scroll_container.h"
 #include "gui/spin_box.h"
 #include "gui/stack_container.h"
 #include "gui/sub_viewport_container.h"
@@ -22,6 +23,7 @@
 #include "sub_viewport.h"
 
 namespace Flint {
+
 class SceneTree {
 public:
     SceneTree();
@@ -32,11 +34,13 @@ public:
 
     void draw(VkCommandBuffer p_command_buffer) const;
 
+    /// The Root of the scene tree is a Node.
     std::shared_ptr<Node> get_root() const;
 
 private:
     std::shared_ptr<Node> root;
 };
+
 } // namespace Flint
 
 #endif // FLINT_SCENE_TREE_H

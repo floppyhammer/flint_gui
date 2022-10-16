@@ -4,6 +4,7 @@
 #include <utility>
 
 namespace Flint {
+
 SceneTree::SceneTree() {
     root = std::make_shared<Node>();
     root->name = "root";
@@ -30,4 +31,5 @@ void SceneTree::input(std::vector<InputEvent> &input_queue) const {
 
     root->propagate_input(input_queue);
 }
+
 } // namespace Flint

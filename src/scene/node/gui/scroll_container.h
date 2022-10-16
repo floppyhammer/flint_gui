@@ -2,14 +2,15 @@
 #define FLINT_SCROLL_CONTAINER_H
 
 #include "container.h"
+#include "tree.h"
 
 namespace Flint {
 
 class ScrollContainer : public Container {
 public:
-    ScrollContainer() {
-        type = NodeType::ScrollContainer;
-    }
+    ScrollContainer();
+
+    void input(std::vector<InputEvent> &input_queue) override;
 
     void update(double dt) override;
 
@@ -38,7 +39,13 @@ protected:
     /// Scroll container should use a separate Pathfinder::SceneBuilder
     /// and use the ViewBox property to achieve element clipping.
     std::shared_ptr<Pathfinder::SceneBuilder> scene_builder;
+
+    StyleBox theme_scroll_bar;
+    StyleBox theme_scroll_grabber;
+
+    std::shared_ptr<Tree> test_content;
 };
+
 } // namespace Flint
 
 #endif // FLINT_SCROLL_CONTAINER_H

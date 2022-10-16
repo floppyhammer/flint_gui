@@ -42,12 +42,6 @@ std::shared_ptr<Texture> TextureRect::get_texture() const {
 
 void TextureRect::update(double dt) {
     update_mvp();
-
-    if (debug_mode) {
-        debug_size_box.border_width = 2;
-    } else {
-        debug_size_box.border_width = 0;
-    }
 }
 
 void TextureRect::draw(VkCommandBuffer p_command_buffer) {

@@ -86,6 +86,17 @@ void InputServer::init(GLFWwindow *window) {
     };
     glfwSetMouseButtonCallback(window, cursor_button_callback);
 
+    auto cursor_scroll_callback = [](GLFWwindow *window, double x_offset, double y_offset) {
+        InputEvent input_event{};
+        input_event.type = InputEventType::MouseScroll;
+        input_event.args.mouse_scroll.x_delta = x_offset;
+        input_event.args.mouse_scroll.y_delta = y_offset;
+
+        auto input_server = InputServer::get_singleton();
+        input_server->input_queue.push_back(input_event);
+    };
+    glfwSetScrollCallback(window, cursor_scroll_callback);
+
     auto key_callback = [](GLFWwindow *window, int key, int scancode, int action, int mods) {
         auto input_server = InputServer::get_singleton();
 

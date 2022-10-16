@@ -12,11 +12,9 @@ Control::Control() {
     type = NodeType::Control;
 
     debug_size_box.bg_color = ColorU();
-    debug_size_box.corner_radius = 0;
     debug_size_box.border_color = ColorU::red();
-#ifdef FLINT_DEBUG
     debug_size_box.border_width = 0;
-#endif
+    debug_size_box.corner_radius = 0;
 }
 
 Vec2<float> Control::calculate_minimum_size() const {
@@ -30,6 +28,11 @@ void Control::draw(VkCommandBuffer p_command_buffer) {
 }
 
 void Control::update(double dt) {
+    if (debug_mode) {
+        debug_size_box.border_width = 2;
+    } else {
+        debug_size_box.border_width = 0;
+    }
 }
 
 void Control::input(std::vector<InputEvent> &input_queue) {
