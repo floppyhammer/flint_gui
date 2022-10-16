@@ -41,7 +41,7 @@ void ScrollContainer::input(std::vector<InputEvent> &input_queue) {
 
                 if (active_rect.contains_point(InputServer::get_singleton()->cursor_position)) {
                     if (!event.is_consumed()) {
-                        vscroll += delta * 10;
+                        vscroll -= delta * 10;
 
                         auto grabber_size = Vec2F(16, size.y / test_content->get_size().y * size.y);
                         vscroll = clamp(vscroll, 0, int32_t(size.y - grabber_size.y));
@@ -93,7 +93,10 @@ void ScrollContainer::draw(VkCommandBuffer p_command_buffer) {
     theme_scroll_grabber.add_to_canvas(grabber_pos, grabber_size, vector_server->canvas);
 
     test_content->set_position(global_pos - Vec2F(0, (float)vscroll));
+
+    vector_server->set_clipping_box({position, position + size});
     test_content->draw(p_command_buffer);
+    vector_server->unset_clipping_box();
 
     Control::draw(p_command_buffer);
 }

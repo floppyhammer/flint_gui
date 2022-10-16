@@ -15,6 +15,7 @@
 using Pathfinder::ColorF;
 
 namespace Flint {
+
 /// How a GUI node handles mouse input propagation.
 enum class MouseFilter {
     Stop,   // Use input and mark it as consumed.
@@ -150,6 +151,7 @@ protected:
 
     MouseFilter mouse_filter = MouseFilter::Stop;
 };
+
 } // namespace Flint
 
 #endif // FLINT_CONTROL_H

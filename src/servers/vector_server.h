@@ -36,6 +36,17 @@ public:
 
     void submit();
 
+    /**
+     * Enable clipping box, portion of anything drawn afterward
+     * outside the clipping box will not show.
+     */
+    void set_clipping_box(const Rect<float> &box);
+
+    /**
+     * Disable the previously set clipping box.
+     */
+    void unset_clipping_box();
+
     void push_scene(const Rect<float> &view_box);
 
     void pop_scene();

@@ -142,4 +142,11 @@ std::shared_ptr<ImageTexture> VectorServer::get_texture() {
 void VectorServer::set_render_target(std::shared_ptr<ImageTexture> dest_texture) {
 }
 
+void VectorServer::set_clipping_box(const Rect<float> &box) {
+    canvas->set_clipping_box(box);
+}
+
+void VectorServer::unset_clipping_box() {
+}
+
 } // namespace Flint
