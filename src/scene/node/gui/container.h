@@ -12,7 +12,7 @@ class Container : public Control {
 public:
     Container();
 
-    void set_size(Vec2<float> p_size) override;
+    void set_size(Vec2F p_size) override;
 
     void update(double dt) override;
 
@@ -20,7 +20,7 @@ public:
      * One of the most important methods to containers.
      * Calculate the minimum size of this node, considering all its children' sizing effect.
      */
-    Vec2<float> calculate_minimum_size() const override;
+    Vec2F calculate_minimum_size() const override;
 
 protected:
     /**

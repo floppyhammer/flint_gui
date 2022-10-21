@@ -44,15 +44,15 @@ public:
         struct {
             uint8_t button;
             bool pressed;
-            Vec2<float> position;
+            Vec2F position;
         } mouse_button;
         struct {
             float x_delta;
             float y_delta;
         } mouse_scroll;
         struct {
-            Vec2<float> relative;
-            Vec2<float> position;
+            Vec2F relative;
+            Vec2F position;
         } mouse_motion;
         struct {
             uint32_t codepoint;

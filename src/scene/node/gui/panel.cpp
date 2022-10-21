@@ -71,13 +71,13 @@ Panel::Panel() {
         close_button->set_text("");
         close_button->set_parent(this);
         close_button->set_icon(close_icon);
-        close_button->set_minimum_size(Vec2<float>(title_bar_height));
+        close_button->set_minimum_size(Vec2F(title_bar_height));
     }
 
     collapse_button = std::make_shared<Button>();
     collapse_button->set_text("");
     collapse_button->set_icon(collapse_icon);
-    collapse_button->set_minimum_size(Vec2<float>(title_bar_height));
+    collapse_button->set_minimum_size(Vec2F(title_bar_height));
 
     title_container = std::make_shared<HStackContainer>();
     title_container->set_parent(this);
@@ -142,7 +142,7 @@ void Panel::input(std::vector<InputEvent> &input_queue) {
                 consume_flag = true;
             }
 
-            Rect<float> active_rect;
+            RectF active_rect;
             active_rect.left = global_position.x;
             active_rect.top = 0;
             active_rect.right = size.x;
@@ -157,7 +157,7 @@ void Panel::input(std::vector<InputEvent> &input_queue) {
             auto args = event.args.mouse_button;
 
             if (!event.is_consumed()) {
-                if (Rect<float>(global_position, global_position + Vec2<float>(size.x, title_bar_height))
+                if (RectF(global_position, global_position + Vec2<float>(size.x, title_bar_height))
                         .contains_point(args.position)) {
                     title_bar_pressed = args.pressed;
 

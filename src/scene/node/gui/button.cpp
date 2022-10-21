@@ -50,7 +50,7 @@ Button::Button() {
     margin_container->set_size(size);
 }
 
-Vec2<float> Button::calculate_minimum_size() const {
+Vec2F Button::calculate_minimum_size() const {
     auto container_size = margin_container->calculate_minimum_size();
 
     return container_size.max(minimum_size);
@@ -70,7 +70,7 @@ void Button::input(std::vector<InputEvent> &input_queue) {
                 pressed = false;
                 pressed_inside = false;
             } else {
-                if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
+                if (RectF(global_position, global_position + size).contains_point(args.position)) {
                     hovered = true;
                     consume_flag = true;
                 } else {
@@ -86,13 +86,13 @@ void Button::input(std::vector<InputEvent> &input_queue) {
 
             if (event.is_consumed()) {
                 if (!args.pressed) {
-                    if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
+                    if (RectF(global_position, global_position + size).contains_point(args.position)) {
                         pressed = false;
                         pressed_inside = false;
                     }
                 }
             } else {
-                if (Rect<float>(global_position, global_position + size).contains_point(args.position)) {
+                if (RectF(global_position, global_position + size).contains_point(args.position)) {
                     pressed = args.pressed;
                     if (pressed) {
                         pressed_inside = true;
@@ -144,11 +144,11 @@ void Button::draw(VkCommandBuffer p_command_buffer) {
     Control::draw(p_command_buffer);
 }
 
-void Button::set_position(Vec2<float> p_position) {
+void Button::set_position(Vec2F p_position) {
     position = p_position;
 }
 
-void Button::set_size(Vec2<float> p_size) {
+void Button::set_size(Vec2F p_size) {
     if (size == p_size) return;
 
     auto path = get_node_path();

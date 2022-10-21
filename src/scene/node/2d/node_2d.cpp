@@ -16,7 +16,7 @@ Node2d::Node2d() {
     position_indicator.stroke_color = ColorU::red();
 }
 
-Vec2<float> Node2d::get_global_position() const {
+Vec2F Node2d::get_global_position() const {
     if (parent != nullptr && parent->extended_from_which_base_node() == NodeType::Node2D) {
         auto cast_parent = dynamic_cast<Node2d *>(parent);
 

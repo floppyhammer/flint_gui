@@ -12,7 +12,7 @@ public:
 
     void adjust_layout() override;
 
-    Vec2<float> calculate_minimum_size() const override;
+    Vec2F calculate_minimum_size() const override;
 
     void set_separation(float new_separation);
 

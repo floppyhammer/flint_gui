@@ -36,7 +36,7 @@ SpinBox::SpinBox() {
     container_h->set_size(size);
 }
 
-Vec2<float> SpinBox::calculate_minimum_size() const {
+Vec2F SpinBox::calculate_minimum_size() const {
     auto container_size = container_h->calculate_minimum_size();
 
     return container_size.max(minimum_size);
@@ -44,7 +44,7 @@ Vec2<float> SpinBox::calculate_minimum_size() const {
 
 void SpinBox::input(std::vector<InputEvent> &input_queue) {
     auto global_position = get_global_position();
-    auto active_rect = Rect<float>(global_position, global_position + size);
+    auto active_rect = RectF(global_position, global_position + size);
 
     for (auto &event : input_queue) {
         bool consume_flag = false;
@@ -142,11 +142,11 @@ void SpinBox::draw(VkCommandBuffer p_command_buffer) {
     Control::draw(p_command_buffer);
 }
 
-void SpinBox::set_position(Vec2<float> p_position) {
+void SpinBox::set_position(Vec2F p_position) {
     position = p_position;
 }
 
-void SpinBox::set_size(Vec2<float> p_size) {
+void SpinBox::set_size(Vec2F p_size) {
     if (size == p_size) return;
 
     auto path = get_node_path();

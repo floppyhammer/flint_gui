@@ -29,11 +29,11 @@ public:
 
     void draw(VkCommandBuffer p_command_buffer) override;
 
-    void set_position(Vec2<float> p_position) override;
+    void set_position(Vec2F p_position) override;
 
-    void set_size(Vec2<float> p_size) override;
+    void set_size(Vec2F p_size) override;
 
-    Vec2<float> calculate_minimum_size() const override;
+    Vec2F calculate_minimum_size() const override;
 
     void connect_signal(std::string signal, std::function<void()> callback);
 

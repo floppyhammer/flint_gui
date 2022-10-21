@@ -19,7 +19,7 @@ public:
 
     [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
 
-    virtual Vec2<float> calculate_minimum_size() const override;
+    virtual Vec2F calculate_minimum_size() const override;
 
     enum class StretchMode {
         SCALE,

@@ -27,8 +27,8 @@ void Container::adjust_layout() {
     }
 }
 
-Vec2<float> Container::calculate_minimum_size() const {
-    Vec2<float> min_size;
+Vec2F Container::calculate_minimum_size() const {
+    Vec2F min_size;
     for (auto &child : children) {
         if (child->is_gui_node()) {
             auto cast_child = dynamic_cast<Control *>(child.get());
@@ -39,7 +39,7 @@ Vec2<float> Container::calculate_minimum_size() const {
     return minimum_size.max(min_size);
 }
 
-void Container::set_size(Vec2<float> p_size) {
+void Container::set_size(Vec2F p_size) {
     if (size == p_size) {
         return;
     }

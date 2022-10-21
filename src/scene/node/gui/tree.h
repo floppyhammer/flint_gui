@@ -29,15 +29,15 @@ public:
 
     TreeItem *get_parent();
 
-    void propagate_input(std::vector<InputEvent> &input_queue, Vec2<float> global_position);
+    void propagate_input(std::vector<InputEvent> &input_queue, Vec2F global_position);
 
-    void input(std::vector<InputEvent> &input_queue, Vec2<float> global_position);
+    void input(std::vector<InputEvent> &input_queue, Vec2F global_position);
 
     void propagate_draw(float folding_width,
                         uint32_t depth,
                         VkCommandBuffer p_command_buffer,
                         float &offset_y,
-                        Vec2<float> global_position);
+                        Vec2F global_position);
 
     void set_text(const std::string &text);
 
@@ -48,7 +48,7 @@ private:
     bool selected = false;
 
     // Local position in the tree.
-    Vec2<float> position;
+    Vec2F position;
 
     std::shared_ptr<Button> collapse_button;
     std::shared_ptr<VectorTexture> collapse_icon, expand_icon;

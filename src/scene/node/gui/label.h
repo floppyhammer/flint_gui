@@ -37,7 +37,7 @@ public:
 
     void remove_text(uint32_t position, uint32_t count);
 
-    void set_size(Vec2<float> p_size) override;
+    void set_size(Vec2F p_size) override;
 
     void set_font(std::shared_ptr<Font> p_font);
 
@@ -51,7 +51,7 @@ public:
 
     void set_vertical_alignment(Alignment alignment);
 
-    Vec2<float> calculate_minimum_size() const override;
+    Vec2F calculate_minimum_size() const override;
 
     std::vector<Glyph> &get_glyphs();
 
@@ -62,7 +62,7 @@ private:
 
     void consider_alignment();
 
-    Vec2<float> get_text_size() const;
+    Vec2F get_text_size() const;
 
 private:
     std::wstring text;
@@ -75,7 +75,7 @@ private:
 
     std::vector<Glyph> glyphs;
 
-    mutable Rect<float> layout_box;
+    mutable RectF layout_box;
 
     FontStyle font_style;
     // Fill
@@ -88,7 +88,7 @@ private:
     // Layout
     Alignment horizontal_alignment = Alignment::Begin;
     Alignment vertical_alignment = Alignment::Begin;
-    Vec2<float> alignment_shift{0};
+    Vec2F alignment_shift{0};
 
     std::optional<StyleBox> theme_background;
 };

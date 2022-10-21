@@ -33,7 +33,7 @@ public:
 
     void propagate_draw(VkCommandBuffer p_command_buffer) override;
 
-    void set_size(Vec2<float> p_size) override;
+    void set_size(Vec2F p_size) override;
 
     /// Set title text.
     void set_title(std::string title);
@@ -52,8 +52,8 @@ private:
     float title_bar_height = 48;
 
     bool title_bar_pressed = false;
-    Vec2<float> title_bar_pressed_mouse_position;
-    Vec2<float> title_bar_pressed_position;
+    Vec2F title_bar_pressed_mouse_position;
+    Vec2F title_bar_pressed_position;
 
     std::shared_ptr<Label> title_label;
     std::shared_ptr<Button> collapse_button, close_button;

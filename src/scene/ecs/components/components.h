@@ -47,9 +47,9 @@ struct Transform3dComponent {
 };
 
 struct Transform2dComponent {
-    Vec2<float> position{0.0f};
-    Vec2<float> scale{1.0f};
-    Vec2<float> offset{0.0f}; // Center as the origin.
+    Vec2F position{0.0f};
+    Vec2F scale{1.0f};
+    Vec2F offset{0.0f}; // Center as the origin.
     float rotation = 0;
 };
 
@@ -72,10 +72,10 @@ struct ZSort2d {
 struct Sprite3dComponent {};
 
 struct TransformGuiComponent {
-    Vec2<float> position{0};
-    Vec2<float> size{128};
-    Vec2<float> scale{1};
-    Vec2<float> pivot_offset{0}; // Top-left as the origin.
+    Vec2F position{0};
+    Vec2F size{128};
+    Vec2F scale{1};
+    Vec2F pivot_offset{0}; // Top-left as the origin.
     float rotation = 0;
 };
 

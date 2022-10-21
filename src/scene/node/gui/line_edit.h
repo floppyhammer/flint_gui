@@ -26,7 +26,7 @@ public:
 
     void draw(VkCommandBuffer p_command_buffer) override;
 
-    Vec2<float> calculate_minimum_size() const override;
+    Vec2F calculate_minimum_size() const override;
 
     void grab_focus() override;
 

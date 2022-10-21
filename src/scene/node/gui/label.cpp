@@ -50,7 +50,7 @@ std::string Label::get_text() const {
     return ws_to_utf8(text);
 }
 
-void Label::set_size(Vec2<float> p_size) {
+void Label::set_size(Vec2F p_size) {
     if (size == p_size) return;
 
     size = p_size;
@@ -72,7 +72,7 @@ void Label::measure() {
     glyphs.reserve(utf32_str.size());
 
     // Reset text's layout box.
-    layout_box = Rect<float>();
+    layout_box = RectF();
 
     for (char32_t u_codepoint : utf32_str) {
         Glyph g;
@@ -99,26 +99,26 @@ void Label::measure() {
         g.advance = font->get_advance(g.index);
 
         // Get the glyph path's bounding box. The Y axis points down.
-        Rect<int> bounding_box = font->get_bounds(g.index);
+        RectI bounding_box = font->get_bounds(g.index);
 
         // Set glyph path.
         g.path = font->get_glyph_path(g.index);
 
         // The position of the left point of the glyph's baseline in the whole text.
-        g.position = Vec2<float>(x, y);
+        g.position = Vec2F(x, y);
 
         // Move the center to the top-left corner of the glyph's layout box.
         g.position.y += ascent;
 
         // The glyph's layout box in the glyph's local coordinates. The origin is the baseline.
         // The Y axis is downward.
-        g.box = Rect<float>(0, -ascent, g.advance, -descent);
+        g.box = RectF(0, -ascent, g.advance, -descent);
 
         // BBox in the glyph's local coordinates.
         g.bbox = bounding_box.to_f32();
 
         // The glyph's layout box in the text's local coordinates. The origin is the top-left corner of the text box.
-        g.layout_box = Rect<float>(x, y, x + g.advance, y + font_size);
+        g.layout_box = RectF(x, y, x + g.advance, y + font_size);
 
         // The whole text's layout box.
         layout_box = layout_box.union_rect(g.layout_box);
@@ -141,7 +141,7 @@ void Label::set_font(std::shared_ptr<Font> p_font) {
 }
 
 void Label::consider_alignment() {
-    alignment_shift = Vec2<float>(0);
+    alignment_shift = Vec2F(0);
 
     switch (horizontal_alignment) {
         case Alignment::Begin:

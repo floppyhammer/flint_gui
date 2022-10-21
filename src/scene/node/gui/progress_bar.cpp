@@ -27,7 +27,7 @@ ProgressBar::ProgressBar() {
     label->set_size(size);
 }
 
-Vec2<float> ProgressBar::calculate_minimum_size() const {
+Vec2F ProgressBar::calculate_minimum_size() const {
     return label->calculate_minimum_size().max(minimum_size);
 }
 
@@ -55,11 +55,11 @@ void ProgressBar::draw(VkCommandBuffer p_command_buffer) {
     label->draw(p_command_buffer);
 }
 
-void ProgressBar::set_position(Vec2<float> p_position) {
+void ProgressBar::set_position(Vec2F p_position) {
     position = p_position;
 }
 
-void ProgressBar::set_size(Vec2<float> p_size) {
+void ProgressBar::set_size(Vec2F p_size) {
     size = p_size;
     label->set_size(p_size);
 }

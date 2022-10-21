@@ -16,14 +16,14 @@ public:
 
     void adjust_layout() override;
 
-    Vec2<float> calculate_minimum_size() const override;
+    Vec2F calculate_minimum_size() const override;
 
-    void set_margin(const Rect<float> &p_margin);
+    void set_margin(const RectF &p_margin);
 
     void set_margin_all(float value);
 
 private:
-    Rect<float> margin = {8, 8, 8, 8};
+    RectF margin = {8, 8, 8, 8};
 };
 } // namespace Flint
 

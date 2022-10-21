@@ -6,11 +6,11 @@ void StackContainer::adjust_layout() {
 
     auto path = get_node_path();
 
-    Vec2<float> total_size;
+    Vec2F total_size;
     std::vector<float> max_child_width;
     std::vector<Control *> expanding_children;
 
-    std::vector<std::pair<Control *, Vec2<float>>> child_cache;
+    std::vector<std::pair<Control *, Vec2F>> child_cache;
 
     // In the first loop, we only do some statistics.
     for (auto &child : children) {
@@ -176,8 +176,8 @@ void StackContainer::update(double dt) {
     Control::update(dt);
 }
 
-Vec2<float> StackContainer::calculate_minimum_size() const {
-    Vec2<float> min_size;
+Vec2F StackContainer::calculate_minimum_size() const {
+    Vec2F min_size;
 
     uint32_t visible_child_count = 0;
 

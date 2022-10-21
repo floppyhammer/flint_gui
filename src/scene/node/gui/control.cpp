@@ -17,7 +17,7 @@ Control::Control() {
     debug_size_box.corner_radius = 0;
 }
 
-Vec2<float> Control::calculate_minimum_size() const {
+Vec2F Control::calculate_minimum_size() const {
     return minimum_size;
 }
 
@@ -41,7 +41,7 @@ void Control::input(std::vector<InputEvent> &input_queue) {
 
     auto global_position = get_global_position();
 
-    auto active_rect = Rect<float>(global_position, global_position + size);
+    auto active_rect = RectF(global_position, global_position + size);
 
     // Handle mouse input propagation.
     for (auto &event : input_queue) {
@@ -89,7 +89,7 @@ void Control::input(std::vector<InputEvent> &input_queue) {
     }
 }
 
-Vec2<float> Control::get_global_position() const {
+Vec2F Control::get_global_position() const {
     if (parent != nullptr && parent->is_gui_node()) {
         auto cast_parent = dynamic_cast<Control *>(parent);
 
@@ -103,11 +103,11 @@ void Control::set_mouse_filter(MouseFilter filter) {
     mouse_filter = filter;
 }
 
-void Control::set_position(Vec2<float> p_position) {
+void Control::set_position(Vec2F p_position) {
     position = p_position;
 }
 
-void Control::set_size(Vec2<float> p_size) {
+void Control::set_size(Vec2F p_size) {
     if (size == p_size) {
         return;
     }
@@ -115,19 +115,19 @@ void Control::set_size(Vec2<float> p_size) {
     size = p_size.max(calculate_minimum_size());
 }
 
-Vec2<float> Control::get_position() const {
+Vec2F Control::get_position() const {
     return position;
 }
 
-Vec2<float> Control::get_size() const {
+Vec2F Control::get_size() const {
     return size;
 }
 
-void Control::set_minimum_size(Vec2<float> p_minimum_size) {
+void Control::set_minimum_size(Vec2F p_minimum_size) {
     minimum_size = p_minimum_size;
 }
 
-Vec2<float> Control::get_minimum_size() const {
+Vec2F Control::get_minimum_size() const {
     return minimum_size;
 }
 

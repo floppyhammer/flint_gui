@@ -3,7 +3,7 @@
 namespace Flint {
 void MarginContainer::adjust_layout() {
     // Child's local position.
-    Vec2<float> child_position;
+    Vec2F child_position;
     child_position.x += margin.left;
     child_position.y += margin.top;
 
@@ -21,10 +21,10 @@ void MarginContainer::adjust_layout() {
     }
 }
 
-Vec2<float> MarginContainer::calculate_minimum_size() const {
-    Vec2<float> margin_size = {margin.left + margin.right, margin.top + margin.bottom};
+Vec2F MarginContainer::calculate_minimum_size() const {
+    Vec2F margin_size = {margin.left + margin.right, margin.top + margin.bottom};
 
-    Vec2<float> max_child_min_size;
+    Vec2F max_child_min_size;
     for (auto &child : children) {
         if (child->is_gui_node()) {
             auto cast_child = dynamic_cast<Control *>(child.get());
@@ -47,7 +47,7 @@ void MarginContainer::set_margin_all(float value) {
     set_margin({value, value, value, value});
 }
 
-void MarginContainer::set_margin(const Rect<float> &p_margin) {
+void MarginContainer::set_margin(const RectF &p_margin) {
     margin = p_margin;
 }
 } // namespace Flint

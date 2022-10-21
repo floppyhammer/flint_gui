@@ -14,13 +14,13 @@ public:
 
     // Transform.
     // ----------------------------
-    Vec2<float> position{0};
-    Vec2<float> scale{1};
-    Vec2<float> offset{0}; // Center as the origin.
+    Vec2F position{0};
+    Vec2F scale{1};
+    Vec2F offset{0}; // Center as the origin.
     float rotation = 0;
     // ----------------------------
 
-    Vec2<float> get_global_position() const;
+    Vec2F get_global_position() const;
 
 protected:
     void draw(VkCommandBuffer p_command_buffer) override;

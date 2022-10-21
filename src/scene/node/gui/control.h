@@ -68,22 +68,22 @@ class Control : public Node {
 public:
     Control();
 
-    virtual void set_position(Vec2<float> p_position);
+    virtual void set_position(Vec2F p_position);
 
-    virtual Vec2<float> get_position() const;
+    virtual Vec2F get_position() const;
 
-    virtual void set_size(Vec2<float> p_size);
+    virtual void set_size(Vec2F p_size);
 
-    virtual Vec2<float> get_size() const;
+    virtual Vec2F get_size() const;
 
-    virtual void set_minimum_size(Vec2<float> p_minimum_size);
+    virtual void set_minimum_size(Vec2F p_minimum_size);
 
-    virtual Vec2<float> get_minimum_size() const;
+    virtual Vec2F get_minimum_size() const;
 
     /// Return `minimum_size` directly for non-container nodes.
-    virtual Vec2<float> calculate_minimum_size() const;
+    virtual Vec2F calculate_minimum_size() const;
 
-    Vec2<float> get_global_position() const;
+    Vec2F get_global_position() const;
 
     void draw(VkCommandBuffer p_command_buffer) override;
 
@@ -120,8 +120,8 @@ public:
     void get_anchor_flag();
 
 protected:
-    Vec2<float> position{0};
-    Vec2<float> size{128};
+    Vec2F position{0};
+    Vec2F size{128};
     Vec2<float> scale{1};
     Vec2<float> pivot_offset{0}; // Top-left as the default pivot.
     float rotation = 0;

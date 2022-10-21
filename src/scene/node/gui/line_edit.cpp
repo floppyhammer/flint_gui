@@ -47,7 +47,7 @@ void LineEdit::input(std::vector<InputEvent> &input_queue) {
         int32_t glyph_count = glyphs.size();
 
         auto global_position = get_global_position();
-        auto active_rect = Rect<float>(global_position, global_position + size);
+        auto active_rect = RectF(global_position, global_position + size);
 
         switch (event.type) {
             case InputEventType::MouseButton: {
@@ -178,7 +178,7 @@ void LineEdit::draw(VkCommandBuffer p_command_buffer) {
     if (focused) {
         theme_caret.color.a = 255.0f * std::ceil(std::sin(caret_blink_timer * 5.0f));
 
-        auto current_glyph_box = Rect<float>({0, 0}, {0, label->get_font_size()});
+        auto current_glyph_box = RectF({0, 0}, {0, label->get_font_size()});
         if (current_caret_index > -1 && current_caret_index < label->get_glyphs().size()) {
             current_glyph_box = label->get_glyphs()[current_caret_index].layout_box;
         }
@@ -193,7 +193,7 @@ void LineEdit::draw(VkCommandBuffer p_command_buffer) {
     Control::draw(p_command_buffer);
 }
 
-Vec2<float> LineEdit::calculate_minimum_size() const {
+Vec2F LineEdit::calculate_minimum_size() const {
     return label->calculate_minimum_size();
 }
 

@@ -29,7 +29,7 @@ void ScrollContainer::input(std::vector<InputEvent> &input_queue) {
 
     auto global_position = get_global_position();
 
-    auto active_rect = Rect<float>(global_position, global_position + size);
+    auto active_rect = RectF(global_position, global_position + size);
 
     // Handle mouse input propagation.
     for (auto &event : input_queue) {
@@ -70,8 +70,8 @@ void ScrollContainer::update(double dt) {
     Control::update(dt);
 }
 
-Vec2<float> ScrollContainer::calculate_minimum_size() const {
-    Vec2<float> min_size;
+Vec2F ScrollContainer::calculate_minimum_size() const {
+    Vec2F min_size;
 
     return min_size.max(minimum_size);
 }

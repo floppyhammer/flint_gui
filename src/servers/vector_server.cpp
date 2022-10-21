@@ -133,7 +133,7 @@ void VectorServer::draw_texture(VectorTexture &texture, Transform2 transform) {
     }
 }
 
-void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2<float> &position, const Vec2<float> &size) {
+void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size) {
     canvas->save_state();
 
     // Rebuild & draw the style box.
@@ -157,7 +157,7 @@ void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2<float> &
     canvas->restore_state();
 }
 
-void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2<float> &start, const Vec2<float> &end) {
+void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2F &start, const Vec2F &end) {
     canvas->save_state();
 
     auto path = Pathfinder::Path2d();

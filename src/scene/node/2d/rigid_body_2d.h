@@ -8,9 +8,9 @@ class RigidBody2d : public Node2d {
 public:
     RigidBody2d();
 
-    Vec2<float> velocity{0};
-    Vec2<float> acceleration{0};
-    Vec2<float> gravity{0};
+    Vec2F velocity{0};
+    Vec2F acceleration{0};
+    Vec2F gravity{0};
 
 protected:
     void update(double dt) override;

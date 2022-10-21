@@ -88,7 +88,7 @@ void TextureRect::draw(VkCommandBuffer p_command_buffer) {
 
             if (stretch_mode == StretchMode::KEEP_CENTER) {
                 auto texture_size = vector_texture->get_size();
-                auto offset = (size - Vec2<float>(texture_size.x, texture_size.y)) * 0.5f;
+                auto offset = (size - Vec2F(texture_size.x, texture_size.y)) * 0.5f;
 
                 vector_server->draw_texture(*vector_texture, Transform2::from_translation(global_position + offset));
             } else {
@@ -121,8 +121,8 @@ void TextureRect::update_mvp() {
     push_constant.mvp = mvp.model;
 }
 
-Vec2<float> TextureRect::calculate_minimum_size() const {
-    return minimum_size.max(texture ? Vec2<float>(texture->get_width(), texture->get_height()) : Vec2<float>(0));
+Vec2F TextureRect::calculate_minimum_size() const {
+    return minimum_size.max(texture ? Vec2F(texture->get_width(), texture->get_height()) : Vec2<float>(0));
 }
 
 } // namespace Flint
