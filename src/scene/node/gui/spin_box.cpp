@@ -125,7 +125,7 @@ void SpinBox::update(double dt) {
 void SpinBox::draw(VkCommandBuffer p_command_buffer) {
     if (!visible) return;
 
-    auto canvas = VectorServer::get_singleton()->canvas;
+    auto vector_server = VectorServer::get_singleton();
 
     auto global_position = get_global_position();
 
@@ -134,7 +134,7 @@ void SpinBox::draw(VkCommandBuffer p_command_buffer) {
     active_style_box = focused ? theme_focused : theme_normal;
 
     if (active_style_box.has_value()) {
-        active_style_box.value().add_to_canvas(global_position, size, canvas);
+        vector_server->draw_style_box(active_style_box.value(), global_position, size);
     }
 
     container_h->propagate_draw(p_command_buffer);

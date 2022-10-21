@@ -2,7 +2,10 @@
 
 #include <string>
 
+using Pathfinder::Transform2;
+
 namespace Flint {
+
 Label::Label(const std::string &p_text) {
     type = NodeType::Label;
 
@@ -13,7 +16,7 @@ Label::Label(const std::string &p_text) {
     debug_size_box.border_width = 2;
     set_text(p_text);
 
-//    debug = true;
+    font_style.color = {163, 163, 163, 255};
 }
 
 void Label::set_text(const std::string &p_text) {
@@ -178,56 +181,15 @@ void Label::set_text_style(float p_size, ColorU p_color, float p_stroke_width, C
 void Label::draw(VkCommandBuffer p_command_buffer) {
     auto global_position = get_global_position();
 
-    auto canvas = VectorServer::get_singleton()->canvas;
+    auto vector_server = VectorServer::get_singleton();
 
     if (theme_background.has_value()) {
-        theme_background.value().add_to_canvas(global_position, size, canvas);
+        vector_server->draw_style_box(theme_background.value(), global_position, size);
     }
-
-    canvas->save_state();
 
     auto translation = global_position + alignment_shift;
 
-    canvas->set_shadow_blur(0);
-
-    // Draw glyphs.
-    for (Glyph &g : glyphs) {
-        auto transform = Pathfinder::Transform2::from_translation(translation + g.position);
-        canvas->set_transform(transform);
-
-        // Add fill.
-        canvas->set_fill_paint(Pathfinder::Paint::from_color(color));
-        canvas->fill_path(g.path, Pathfinder::FillRule::Winding);
-
-        // Add stroke if needed.
-        canvas->set_stroke_paint(Pathfinder::Paint::from_color(stroke_color));
-        canvas->set_line_width(stroke_width);
-        canvas->stroke_path(g.path);
-
-        if (debug) {
-            canvas->set_line_width(1);
-
-            // Add layout box.
-            // --------------------------------
-            Pathfinder::Path2d layout_path;
-            layout_path.add_rect(g.layout_box);
-
-            canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::green()));
-            canvas->stroke_path(layout_path);
-            // --------------------------------
-
-            // Add bbox.
-            // --------------------------------
-            Pathfinder::Path2d bbox_path;
-            bbox_path.add_rect(g.bbox);
-
-            canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::red()));
-            canvas->stroke_path(bbox_path);
-            // --------------------------------
-        }
-    }
-
-    canvas->restore_state();
+    vector_server->draw_glyphs(glyphs, font_style, Transform2::from_translation(translation));
 
     Control::draw(p_command_buffer);
 }
@@ -266,4 +228,5 @@ std::vector<Glyph> &Label::get_glyphs() {
 float Label::get_font_size() const {
     return font_size;
 }
+
 } // namespace Flint

@@ -38,12 +38,19 @@ void ProgressBar::update(double dt) {
 }
 
 void ProgressBar::draw(VkCommandBuffer p_command_buffer) {
-    auto canvas = VectorServer::get_singleton()->canvas;
+    auto vector_server = VectorServer::get_singleton();
 
-    if (theme_bg.has_value()) theme_bg.value().add_to_canvas(get_global_position(), size, canvas);
-    if (theme_progress.has_value())
-        theme_progress.value().add_to_canvas(get_global_position(), {size.x * ratio, size.y}, canvas);
-    if (theme_fg.has_value()) theme_fg.value().add_to_canvas(get_global_position(), size, canvas);
+    if (theme_bg.has_value()) {
+        vector_server->draw_style_box(theme_bg.value(), get_global_position(), size);
+    }
+
+    if (theme_progress.has_value()) {
+        vector_server->draw_style_box(theme_progress.value(), get_global_position(), {size.x * ratio, size.y});
+    }
+
+    if (theme_fg.has_value()) {
+        vector_server->draw_style_box(theme_fg.value(), get_global_position(), size);
+    }
 
     label->draw(p_command_buffer);
 }

@@ -144,7 +144,7 @@ void LineEdit::update(double dt) {
 }
 
 void LineEdit::draw(VkCommandBuffer p_command_buffer) {
-    auto canvas = VectorServer::get_singleton()->canvas;
+    auto vector_server = VectorServer::get_singleton();
 
     auto global_position = get_global_position();
 
@@ -154,7 +154,7 @@ void LineEdit::draw(VkCommandBuffer p_command_buffer) {
         active_style_box = focused ? theme_focused : theme_normal;
 
         if (active_style_box.has_value()) {
-            active_style_box.value().add_to_canvas(global_position, size, canvas);
+            vector_server->draw_style_box(active_style_box.value(), global_position, size);
         }
     }
 
@@ -165,7 +165,7 @@ void LineEdit::draw(VkCommandBuffer p_command_buffer) {
             auto end = calculate_caret_position(std::max(current_caret_index, selected_caret_index));
             auto box_position = label->get_global_position() + start;
             auto box_size = Vec2F(0, label->get_font_size()) + (end - start);
-            theme_selection_box.add_to_canvas(box_position, box_size, canvas);
+            vector_server->draw_style_box(theme_selection_box, box_position, box_size);
         }
     }
 
@@ -187,7 +187,7 @@ void LineEdit::draw(VkCommandBuffer p_command_buffer) {
 
         auto start = label->get_global_position() + Vec2F(caret_offset, 3);
         auto end = start + Vec2F(0, label->get_font_size() - 6);
-        theme_caret.add_to_canvas(start, end, canvas);
+        vector_server->draw_style_line(theme_caret, start, end);
     }
 
     Control::draw(p_command_buffer);

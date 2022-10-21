@@ -200,7 +200,7 @@ void Panel::propagate_draw(VkCommandBuffer p_command_buffer) {
 }
 
 void Panel::draw(VkCommandBuffer p_command_buffer) {
-    auto canvas = VectorServer::get_singleton()->canvas;
+    auto vector_server = VectorServer::get_singleton();
 
     auto global_position = get_global_position();
 
@@ -208,21 +208,22 @@ void Panel::draw(VkCommandBuffer p_command_buffer) {
         if (title_bar) {
             if (collapsed) {
                 // Only draw title bar.
-                theme_panel.value().add_to_canvas(get_global_position(), Vec2<float>(size.x, title_bar_height), canvas);
+                vector_server->draw_style_box(
+                    theme_panel.value(), get_global_position(), Vec2<float>(size.x, title_bar_height));
             } else {
                 // Draw title bar + panel.
-                theme_panel.value().add_to_canvas(
-                    get_global_position(), size + Vec2<float>(0, title_bar_height), canvas);
+                vector_server->draw_style_box(
+                    theme_panel.value(), get_global_position(), size + Vec2<float>(0, title_bar_height));
 
-                theme_title_bar_line->add_to_canvas({global_position.x, global_position.y + title_bar_height},
-                                                    {global_position.x + size.x, global_position.y + title_bar_height},
-                                                    canvas);
+                vector_server->draw_style_line(theme_title_bar_line.value(),
+                                               {global_position.x, global_position.y + title_bar_height},
+                                               {global_position.x + size.x, global_position.y + title_bar_height});
             }
 
             title_container->propagate_draw(p_command_buffer);
         } else {
             if (!collapsed) {
-                theme_panel.value().add_to_canvas(get_global_position(), size, canvas);
+                vector_server->draw_style_box(theme_panel.value(), get_global_position(), size);
             }
         }
     }

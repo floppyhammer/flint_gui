@@ -85,18 +85,18 @@ void ScrollContainer::draw(VkCommandBuffer p_command_buffer) {
     auto scroll_bar_pos = Vec2F(global_pos.x + size.x - 16, global_pos.y);
     auto scroll_bar_size = Vec2F(16, size.y);
 
-    theme_scroll_bar.add_to_canvas(scroll_bar_pos, scroll_bar_size, vector_server->canvas);
+    vector_server->draw_style_box(theme_scroll_bar, scroll_bar_pos, scroll_bar_size);
 
     auto grabber_pos = Vec2F(global_pos.x + size.x - 16, global_pos.y + vscroll);
     auto grabber_size = Vec2F(16, size.y / test_content->get_size().y * size.y);
 
-    theme_scroll_grabber.add_to_canvas(grabber_pos, grabber_size, vector_server->canvas);
+    vector_server->draw_style_box(theme_scroll_grabber, grabber_pos, grabber_size);
 
     test_content->set_position(global_pos - Vec2F(0, (float)vscroll));
 
-    vector_server->set_clipping_box({position, position + size});
+    vector_server->set_global_clip_box(std::make_optional<RectF>({position, position + size}));
     test_content->draw(p_command_buffer);
-    vector_server->unset_clipping_box();
+    vector_server->set_global_clip_box(std::optional<RectF>());
 
     Control::draw(p_command_buffer);
 }

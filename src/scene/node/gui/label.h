@@ -20,36 +20,6 @@ enum class Alignment {
     End,
 };
 
-struct Glyph {
-    int start = -1; // Start offset in the source string.
-    int end = -1;   // End offset in the source string.
-
-    uint8_t count = 0;  // Number of glyphs in the grapheme, set in the first glyph only.
-    uint8_t repeat = 1; // Draw multiple times in the row.
-    uint16_t flags = 0; // Grapheme flags (valid, rtl, virtual), set in the first glyph only.
-
-    float x_off = 0.f; // Offset from the origin of the glyph on baseline.
-    float y_off = 0.f;
-    float advance = 0.f; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
-
-    Vec2<float> position;
-
-    int font_size = 0; // Font size;
-    char32_t text{};
-    int32_t index = 0; // Glyph index (font specific) or UTF-32 codepoint (for the invalid glyphs).
-
-    Pathfinder::Path2d path; // Glyph path.
-
-    /// Glyph box in the baseline coordinates.
-    Rect<float> box;
-
-    /// Glyph path's bounding box in the baseline coordinates.
-    Rect<float> bbox;
-
-    /// Layout box in the text.
-    Rect<float> layout_box;
-};
-
 class Label : public Control {
 public:
     Label(const std::string &p_text);
@@ -76,8 +46,6 @@ public:
     void update(double dt) override;
 
     void draw(VkCommandBuffer p_command_buffer) override;
-
-    bool debug = false;
 
     void set_horizontal_alignment(Alignment alignment);
 
@@ -109,6 +77,7 @@ private:
 
     mutable Rect<float> layout_box;
 
+    FontStyle font_style;
     // Fill
     ColorU color{163, 163, 163, 255};
 

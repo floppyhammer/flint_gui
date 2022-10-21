@@ -33,16 +33,16 @@ void Tree::update(double delta) {
 }
 
 void Tree::draw(VkCommandBuffer p_command_buffer) {
-    auto canvas = VectorServer::get_singleton()->canvas;
+    auto vector_server = VectorServer::get_singleton();
 
     if (theme_bg.has_value()) {
-        theme_bg.value().add_to_canvas(get_global_position(), size, canvas);
+        vector_server->draw_style_box(theme_bg.value(), get_global_position(), size);
     }
 
     float offset_y = 0;
     root->propagate_draw(folding_width, 0, p_command_buffer, offset_y, get_global_position());
 
-    debug_size_box.add_to_canvas(get_global_position(), size, canvas);
+    vector_server->draw_style_box(debug_size_box, get_global_position(), size);
 }
 
 void Tree::input(std::vector<InputEvent> &input_queue) {
@@ -149,10 +149,10 @@ TreeItem *TreeItem::get_parent() {
     return parent;
 }
 
-void TreeItem::propagate_input(std::vector<InputEvent> &input_queue, Vec2<float> global_position) {
-    auto canvas = VectorServer::get_singleton()->canvas;
-
-    if (!children.empty()) collapse_button->input(input_queue);
+void TreeItem::propagate_input(std::vector<InputEvent> &input_queue, Vec2F global_position) {
+    if (!children.empty()) {
+        collapse_button->input(input_queue);
+    }
 
     if (!collapsed) {
         auto it = children.rbegin();
@@ -165,12 +165,9 @@ void TreeItem::propagate_input(std::vector<InputEvent> &input_queue, Vec2<float>
     input(input_queue, global_position);
 }
 
-void TreeItem::propagate_draw(float folding_width,
-                              uint32_t depth,
-                              VkCommandBuffer p_command_buffer,
-                              float &offset_y,
-                              Vec2<float> global_position) {
-    auto canvas = VectorServer::get_singleton()->canvas;
+void TreeItem::propagate_draw(
+    float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y, Vec2F global_position) {
+    auto vector_server = VectorServer::get_singleton();
 
     float offset_x = (float)depth * folding_width;
 
@@ -179,8 +176,8 @@ void TreeItem::propagate_draw(float folding_width,
     position = {offset_x, offset_y};
 
     if (tree->selected_item == this) {
-        theme_selected.add_to_canvas(
-            Vec2<float>(0, offset_y) + global_position, {tree->get_size().x, item_height}, canvas);
+        vector_server->draw_style_box(
+            theme_selected, Vec2F(0, offset_y) + global_position, {tree->get_size().x, item_height});
     }
 
     if (children.empty()) {
@@ -189,12 +186,12 @@ void TreeItem::propagate_draw(float folding_width,
         collapse_button->set_icon(nullptr);
     }
 
-    container->set_position(Vec2<float>(offset_x, offset_y) + global_position);
+    container->set_position(Vec2F(offset_x, offset_y) + global_position);
     container->set_size({item_height, item_height});
     container->propagate_update(0);
     container->propagate_draw(p_command_buffer);
 
-    //        collapse_button->set_position(Vec2<float>(offset_x, offset_y) + global_position);
+    //        collapse_button->set_position(Vec2F(offset_x, offset_y) + global_position);
     //        collapse_button->set_size({item_height, item_height});
     //        collapse_button->update(0);
     //        if (!children.empty()) {
@@ -202,7 +199,7 @@ void TreeItem::propagate_draw(float folding_width,
     //        }
     //
     //        // The attached label has no parent.
-    //        label->set_position(Vec2<float>(offset_x + collapse_button->get_size().x, offset_y) + global_position);
+    //        label->set_position(Vec2F(offset_x + collapse_button->get_size().x, offset_y) + global_position);
     //        label->set_size(label->calculate_minimum_size());
     //        label->update(0);
     //        label->draw(p_command_buffer);
@@ -216,10 +213,9 @@ void TreeItem::propagate_draw(float folding_width,
     }
 }
 
-void TreeItem::input(std::vector<InputEvent> &input_queue, Vec2<float> global_position) {
+void TreeItem::input(std::vector<InputEvent> &input_queue, Vec2F global_position) {
     float item_height = label->calculate_minimum_size().y;
-    auto item_global_rect =
-        (Rect<float>(0, position.y, tree->get_size().x, position.y + item_height) + global_position);
+    auto item_global_rect = (RectF(0, position.y, tree->get_size().x, position.y + item_height) + global_position);
 
     for (auto &event : input_queue) {
         if (event.type == InputEventType::MouseButton) {

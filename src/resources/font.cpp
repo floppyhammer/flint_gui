@@ -108,8 +108,8 @@ int32_t Font::find_index(int codepoint) {
     return stbtt_FindGlyphIndex(&info, codepoint);
 }
 
-Rect<int> Font::get_bounds(int32_t glyph_index) {
-    Rect<int> bounding_box;
+RectI Font::get_bounds(int32_t glyph_index) {
+    RectI bounding_box;
 
     stbtt_GetGlyphBitmapBox(&info,
                             glyph_index,

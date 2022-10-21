@@ -22,7 +22,7 @@ void VectorServer::cleanup() {
 
 // TODO: It might not be a good idea to use view box for clipping.
 // Viewport may be a better choice?
-void VectorServer::push_scene(const Rect<float> &view_box) {
+void VectorServer::push_scene(const RectF &view_box) {
     canvas->set_size(view_box.size().to_i32());
     scene_stack.push_back(canvas->get_scene());
 }
@@ -71,7 +71,7 @@ void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) 
     canvas->restore_state();
 }
 
-void VectorServer::draw_rectangle(const Rect<float> &rect, float line_width, ColorU color) {
+void VectorServer::draw_rectangle(const RectF &rect, float line_width, ColorU color) {
     Pathfinder::Path2d path;
     path.add_rect(rect);
 
@@ -133,6 +133,90 @@ void VectorServer::draw_texture(VectorTexture &texture, Transform2 transform) {
     }
 }
 
+void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2<float> &position, const Vec2<float> &size) {
+    canvas->save_state();
+
+    // Rebuild & draw the style box.
+    auto path = Pathfinder::Path2d();
+    path.add_rect({0, 0, size.x, size.y}, style_box.corner_radius);
+
+    canvas->set_shadow_color(style_box.shadow_color);
+    canvas->set_shadow_blur(style_box.shadow_size);
+
+    auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
+    canvas->set_transform(transform);
+    canvas->set_fill_paint(Pathfinder::Paint::from_color(style_box.bg_color));
+    canvas->fill_path(path, Pathfinder::FillRule::Winding);
+
+    if (style_box.border_width > 0) {
+        canvas->set_stroke_paint(Pathfinder::Paint::from_color(style_box.border_color));
+        canvas->set_line_width(style_box.border_width);
+        canvas->stroke_path(path);
+    }
+
+    canvas->restore_state();
+}
+
+void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2<float> &start, const Vec2<float> &end) {
+    canvas->save_state();
+
+    auto path = Pathfinder::Path2d();
+    path.add_line({start.x, start.y}, {end.x, end.y});
+
+    auto transform = Pathfinder::Transform2::from_translation({0, 0});
+    canvas->set_transform(transform);
+    canvas->set_stroke_paint(Pathfinder::Paint::from_color(style_line.color));
+    canvas->set_line_width(style_line.width);
+    canvas->stroke_path(path);
+
+    canvas->restore_state();
+}
+
+void VectorServer::draw_glyphs(const std::vector<Glyph> &glyphs,
+                               FontStyle font_style,
+                               const Transform2 &global_transform) {
+    canvas->save_state();
+
+    // Draw glyphs.
+    for (Glyph g : glyphs) {
+        auto transform = Pathfinder::Transform2::from_translation(g.position) * global_transform;
+        canvas->set_transform(transform);
+
+        // Add fill.
+        canvas->set_fill_paint(Pathfinder::Paint::from_color(font_style.color));
+        canvas->fill_path(g.path, Pathfinder::FillRule::Winding);
+
+        // Add stroke if needed.
+        canvas->set_stroke_paint(Pathfinder::Paint::from_color(font_style.stroke_color));
+        canvas->set_line_width(font_style.stroke_width);
+        canvas->stroke_path(g.path);
+
+        if (font_style.debug) {
+            canvas->set_line_width(1);
+
+            // Add layout box.
+            // --------------------------------
+            Pathfinder::Path2d layout_path;
+            layout_path.add_rect(g.layout_box);
+
+            canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::green()));
+            canvas->stroke_path(layout_path);
+            // --------------------------------
+
+            // Add bbox.
+            // --------------------------------
+            Pathfinder::Path2d bbox_path;
+            bbox_path.add_rect(g.bbox);
+
+            canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::red()));
+            canvas->stroke_path(bbox_path);
+            // --------------------------------
+        }
+    }
+
+    canvas->restore_state();
+}
+
 std::shared_ptr<ImageTexture> VectorServer::get_texture() {
     auto texture_vk = static_cast<Pathfinder::TextureVk *>(canvas->get_dest_texture().get());
     return ImageTexture::from_wrapper(
@@ -142,11 +226,12 @@ std::shared_ptr<ImageTexture> VectorServer::get_texture() {
 void VectorServer::set_render_target(std::shared_ptr<ImageTexture> dest_texture) {
 }
 
-void VectorServer::set_clipping_box(const Rect<float> &box) {
-    canvas->set_clipping_box(box);
+void VectorServer::set_global_clip_box(std::optional<RectF> clip_box) {
+    global_clip_box = clip_box;
 }
 
-void VectorServer::unset_clipping_box() {
+std::optional<RectF> VectorServer::get_global_clip_box() {
+    return global_clip_box;
 }
 
 } // namespace Flint
