@@ -82,6 +82,8 @@ private:
     std::shared_ptr<Pathfinder::Canvas> canvas;
 
     std::optional<RectF> global_clip_box;
+
+    void apply_global_clip_box();
 };
 
 } // namespace Flint

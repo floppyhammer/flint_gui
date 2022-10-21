@@ -11,8 +11,10 @@
 #include <vector>
 
 using Pathfinder::Vec2;
+using Pathfinder::Vec2F;
 
 namespace Flint {
+
 enum class InputEventType {
     MouseButton = 0,
     MouseMotion,
@@ -104,8 +106,8 @@ public:
 
     void collect_events();
 
-    Vec2<float> cursor_position;
-    Vec2<float> last_cursor_position;
+    Vec2F cursor_position;
+    Vec2F last_cursor_position;
 
     std::vector<InputEvent> input_queue;
 
@@ -122,6 +124,7 @@ public:
 private:
     GLFWcursor *arrow_cursor, *ibeam_cursor, *crosshair_cursor, *hand_cursor, *resize_cursor_h, *resize_cursor_v;
 };
+
 } // namespace Flint
 
 #endif // FLINT_INPUT_SERVER_H

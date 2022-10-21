@@ -57,11 +57,12 @@ void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) 
     //    }
     //
     //    canvas->set_scene(scene_stack.back());
+    canvas->save_state();
+
+    apply_global_clip_box();
 
     Pathfinder::Path2d path;
     path.add_line({start.x, start.y}, {end.x, end.y});
-
-    canvas->save_state();
 
     canvas->set_stroke_paint(Pathfinder::Paint::from_color(color));
     canvas->set_line_width(width);
@@ -72,10 +73,12 @@ void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) 
 }
 
 void VectorServer::draw_rectangle(const RectF &rect, float line_width, ColorU color) {
+    canvas->save_state();
+
+    apply_global_clip_box();
+
     Pathfinder::Path2d path;
     path.add_rect(rect);
-
-    canvas->save_state();
 
     canvas->set_stroke_paint(Pathfinder::Paint::from_color(color));
     canvas->set_line_width(line_width);
@@ -91,10 +94,12 @@ void VectorServer::draw_circle(Vec2F center, float radius, float line_width, boo
     //
     //    canvas->set_scene(scene_stack.back());
 
+    canvas->save_state();
+
+    apply_global_clip_box();
+
     Pathfinder::Path2d path;
     path.add_circle({center.x, center.y}, radius);
-
-    canvas->save_state();
 
     if (fill) {
         canvas->set_fill_paint(Pathfinder::Paint::from_color(color));
@@ -110,6 +115,8 @@ void VectorServer::draw_circle(Vec2F center, float radius, float line_width, boo
 
 void VectorServer::draw_path(VectorPath &vector_path, Transform2 transform) {
     canvas->save_state();
+
+    apply_global_clip_box();
 
     canvas->set_transform(transform);
 
@@ -136,6 +143,8 @@ void VectorServer::draw_texture(VectorTexture &texture, Transform2 transform) {
 void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size) {
     canvas->save_state();
 
+    apply_global_clip_box();
+
     // Rebuild & draw the style box.
     auto path = Pathfinder::Path2d();
     path.add_rect({0, 0, size.x, size.y}, style_box.corner_radius);
@@ -160,6 +169,8 @@ void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &positi
 void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2F &start, const Vec2F &end) {
     canvas->save_state();
 
+    apply_global_clip_box();
+
     auto path = Pathfinder::Path2d();
     path.add_line({start.x, start.y}, {end.x, end.y});
 
@@ -176,6 +187,8 @@ void VectorServer::draw_glyphs(const std::vector<Glyph> &glyphs,
                                FontStyle font_style,
                                const Transform2 &global_transform) {
     canvas->save_state();
+
+    apply_global_clip_box();
 
     // Draw glyphs.
     for (Glyph g : glyphs) {
@@ -232,6 +245,14 @@ void VectorServer::set_global_clip_box(std::optional<RectF> clip_box) {
 
 std::optional<RectF> VectorServer::get_global_clip_box() {
     return global_clip_box;
+}
+
+void VectorServer::apply_global_clip_box() {
+    if (global_clip_box) {
+        auto clip_path = Pathfinder::Path2d();
+        clip_path.add_rect(*global_clip_box, 0);
+        canvas->clip_path(clip_path, Pathfinder::FillRule::Winding);
+    }
 }
 
 } // namespace Flint
