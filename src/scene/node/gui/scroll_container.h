@@ -43,7 +43,10 @@ protected:
     StyleBox theme_scroll_bar;
     StyleBox theme_scroll_grabber;
 
-    std::shared_ptr<Tree> test_content;
+private:
+    void propagate_draw(VkCommandBuffer p_command_buffer) override;
+
+    void propagate_input(std::vector<InputEvent> &input_queue) override;
 };
 
 } // namespace Flint

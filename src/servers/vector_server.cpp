@@ -1,7 +1,5 @@
 #include "vector_server.h"
 
-#include "resources/vector_texture.h"
-
 namespace Flint {
 
 void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver, int p_canvas_width, int p_canvas_height) {
@@ -12,54 +10,21 @@ void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver, int p
     canvas->set_empty_dest_texture(p_canvas_width, p_canvas_height);
 
     default_canvas_size = {p_canvas_width, p_canvas_height};
-
-    //    push_scene({0, 0, p_canvas_width, p_canvas_height});
 }
 
 void VectorServer::cleanup() {
     canvas.reset();
 }
 
-// TODO: It might not be a good idea to use view box for clipping.
-// Viewport may be a better choice?
-void VectorServer::push_scene(const RectF &view_box) {
-    canvas->set_size(view_box.size().to_i32());
-    scene_stack.push_back(canvas->get_scene());
-}
-
-void VectorServer::pop_scene() {
-    if (scene_stack.empty()) {
-        return;
-    }
-
-    scene_stack.erase(scene_stack.end() - 1);
-
-    if (scene_stack.empty()) {
-        canvas->set_scene(nullptr);
-    } else {
-        canvas->set_scene(scene_stack.back());
-    }
-}
-
-void VectorServer::clear_scene() {
-    scene_stack.clear();
-    canvas->clear();
-    //    push_scene({0, 0, default_canvas_size.x, default_canvas_size.y});
-}
-
 void VectorServer::submit() {
     canvas->draw();
+    canvas->clear();
 }
 
 void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) {
-    //    if (scene_stack.empty()) {
-    //        return;
-    //    }
-    //
-    //    canvas->set_scene(scene_stack.back());
     canvas->save_state();
 
-    apply_global_clip_box();
+    apply_content_clip_box();
 
     Pathfinder::Path2d path;
     path.add_line({start.x, start.y}, {end.x, end.y});
@@ -75,7 +40,7 @@ void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) 
 void VectorServer::draw_rectangle(const RectF &rect, float line_width, ColorU color) {
     canvas->save_state();
 
-    apply_global_clip_box();
+    apply_content_clip_box();
 
     Pathfinder::Path2d path;
     path.add_rect(rect);
@@ -88,15 +53,9 @@ void VectorServer::draw_rectangle(const RectF &rect, float line_width, ColorU co
 }
 
 void VectorServer::draw_circle(Vec2F center, float radius, float line_width, bool fill, ColorU color) {
-    //    if (scene_stack.empty()) {
-    //        return;
-    //    }
-    //
-    //    canvas->set_scene(scene_stack.back());
-
     canvas->save_state();
 
-    apply_global_clip_box();
+    apply_content_clip_box();
 
     Pathfinder::Path2d path;
     path.add_circle({center.x, center.y}, radius);
@@ -116,7 +75,7 @@ void VectorServer::draw_circle(Vec2F center, float radius, float line_width, boo
 void VectorServer::draw_path(VectorPath &vector_path, Transform2 transform) {
     canvas->save_state();
 
-    apply_global_clip_box();
+    apply_content_clip_box();
 
     canvas->set_transform(transform);
 
@@ -143,7 +102,7 @@ void VectorServer::draw_texture(VectorTexture &texture, Transform2 transform) {
 void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size) {
     canvas->save_state();
 
-    apply_global_clip_box();
+    apply_content_clip_box();
 
     // Rebuild & draw the style box.
     auto path = Pathfinder::Path2d();
@@ -169,7 +128,7 @@ void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &positi
 void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2F &start, const Vec2F &end) {
     canvas->save_state();
 
-    apply_global_clip_box();
+    apply_content_clip_box();
 
     auto path = Pathfinder::Path2d();
     path.add_line({start.x, start.y}, {end.x, end.y});
@@ -188,7 +147,7 @@ void VectorServer::draw_glyphs(const std::vector<Glyph> &glyphs,
                                const Transform2 &global_transform) {
     canvas->save_state();
 
-    apply_global_clip_box();
+    apply_content_clip_box();
 
     // Draw glyphs.
     for (Glyph g : glyphs) {
@@ -236,21 +195,21 @@ std::shared_ptr<ImageTexture> VectorServer::get_texture() {
         texture_vk->get_image_view(), texture_vk->get_sampler(), texture_vk->get_width(), texture_vk->get_height());
 }
 
-void VectorServer::set_render_target(std::shared_ptr<ImageTexture> dest_texture) {
+void VectorServer::set_render_target(const std::shared_ptr<ImageTexture> &dest_texture) {
 }
 
-void VectorServer::set_global_clip_box(std::optional<RectF> clip_box) {
-    global_clip_box = clip_box;
+void VectorServer::set_content_clip_box(std::optional<RectF> clip_box) {
+    content_clip_box = clip_box;
 }
 
-std::optional<RectF> VectorServer::get_global_clip_box() {
-    return global_clip_box;
+std::optional<RectF> VectorServer::get_content_clip_box() {
+    return content_clip_box;
 }
 
-void VectorServer::apply_global_clip_box() {
-    if (global_clip_box) {
+void VectorServer::apply_content_clip_box() {
+    if (content_clip_box) {
         auto clip_path = Pathfinder::Path2d();
-        clip_path.add_rect(*global_clip_box, 0);
+        clip_path.add_rect(*content_clip_box, 0);
         canvas->clip_path(clip_path, Pathfinder::FillRule::Winding);
     }
 }

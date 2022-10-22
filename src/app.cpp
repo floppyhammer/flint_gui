@@ -52,9 +52,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
         vkCmdBeginRenderPass(command_buffers[image_index], &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
     }
 
-    VectorServer::get_singleton()->clear_scene();
-
-    // Record commands from the scene manager.
+    // Record drawing commands from the scene manager.
     {
         tree->draw(command_buffers[image_index]);
 
@@ -121,10 +119,11 @@ void App::main_loop() {
             return;
         }
 
-        // Update the scene.
-        {
-            tree->input(InputServer::get_singleton()->input_queue);
+        // Propagate input events.
+        tree->input(InputServer::get_singleton()->input_queue);
 
+        // Update the scene tree.
+        {
             // Node scene manager.
             tree->update(dt);
 
@@ -144,7 +143,7 @@ void App::main_loop() {
 }
 
 void App::cleanup() {
-    // Clean up the scene.
+    // Clean up the scene tree.
     tree.reset();
     world.reset();
 

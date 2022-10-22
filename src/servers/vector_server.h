@@ -31,31 +31,22 @@ public:
 
     void init(const std::shared_ptr<Pathfinder::Driver> &driver, int p_canvas_width, int p_canvas_height);
 
-    void set_render_target(std::shared_ptr<ImageTexture> dest_texture);
+    void set_render_target(const std::shared_ptr<ImageTexture> &dest_texture);
 
     void cleanup();
-
-    void clear_scene();
 
     void submit();
 
     /**
-     * Enable clipping box, portion of anything drawn afterward
-     * outside the clipping box will not show.
+     * Enable content clip, portion of anything drawn afterward
+     * outside the clip box will not show.
      */
-    void set_global_clip_box(std::optional<RectF> clip_box);
+    void set_content_clip_box(std::optional<RectF> clip_box);
 
     /**
-     * Disable the previously set clip box.
+     * Disable the previously set content clip box.
      */
-    std::optional<RectF> get_global_clip_box();
-
-    void push_scene(const RectF &view_box);
-
-    void pop_scene();
-
-    /// Following paths will be added to the scene attached to the top scene builder.
-    std::vector<std::shared_ptr<Pathfinder::Scene>> scene_stack;
+    std::optional<RectF> get_content_clip_box();
 
     std::shared_ptr<ImageTexture> get_texture();
 
@@ -81,9 +72,13 @@ private:
     // Never expose this.
     std::shared_ptr<Pathfinder::Canvas> canvas;
 
-    std::optional<RectF> global_clip_box;
+    /// If set, paths drawn afterward will be clipped.
+    /// The clip box is in the global coordinates.
+    std::optional<RectF> content_clip_box;
 
-    void apply_global_clip_box();
+private:
+    /// Add clip path to canvas.
+    void apply_content_clip_box();
 };
 
 } // namespace Flint

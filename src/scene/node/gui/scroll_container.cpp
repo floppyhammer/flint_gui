@@ -13,19 +13,23 @@ ScrollContainer::ScrollContainer() {
 
     theme_scroll_grabber.bg_color = ColorU(163, 163, 163, 255);
     theme_scroll_grabber.corner_radius = 0;
-
-    test_content = std::make_shared<Tree>();
-    test_content->set_size({400, 600});
 }
 
 void ScrollContainer::adjust_layout() {
-    if (children.empty()) return;
+    if (children.empty()) {
+        return;
+    }
 }
 
 void ScrollContainer::input(std::vector<InputEvent> &input_queue) {
-    if (mouse_filter != MouseFilter::Stop) {
+    Control::input(input_queue);
+
+    if (children.empty() || !children.front()->is_gui_node()) {
         return;
     }
+
+    // Scroll container can only have one effective control child.
+    auto content = (Control *)children.front().get();
 
     auto global_position = get_global_position();
 
@@ -43,11 +47,14 @@ void ScrollContainer::input(std::vector<InputEvent> &input_queue) {
                     if (!event.is_consumed()) {
                         vscroll -= delta * 10;
 
-                        auto grabber_size = Vec2F(16, size.y / test_content->get_size().y * size.y);
+                        auto grabber_size = Vec2F(16, size.y / content->get_size().y * size.y);
                         vscroll = clamp(vscroll, 0, int32_t(size.y - grabber_size.y));
                     }
 
-                    consume_flag = true;
+                    // Will stop input propagation.
+                    if (mouse_filter == MouseFilter::Stop) {
+                        consume_flag = true;
+                    }
                 } else {
                 }
             } break;
@@ -59,13 +66,17 @@ void ScrollContainer::input(std::vector<InputEvent> &input_queue) {
             event.consume();
         }
     }
-
-    Control::input(input_queue);
 }
 
 void ScrollContainer::update(double dt) {
-    auto self_size = size.y;
-    auto scroller_size = 800;
+    if (children.empty() || !children.front()->is_gui_node()) {
+        return;
+    }
+
+    // Scroll container can only have one effective control child.
+    auto content = (Control *)children.front().get();
+
+    content->set_position({0, (float)-vscroll});
 
     Control::update(dt);
 }
@@ -77,6 +88,13 @@ Vec2F ScrollContainer::calculate_minimum_size() const {
 }
 
 void ScrollContainer::draw(VkCommandBuffer p_command_buffer) {
+    if (children.empty() || !children.front()->is_gui_node()) {
+        return;
+    }
+
+    // Scroll container can only have one effective control child.
+    auto content = (Control *)children.front().get();
+
     auto vector_server = VectorServer::get_singleton();
 
     auto global_pos = get_global_position();
@@ -88,15 +106,9 @@ void ScrollContainer::draw(VkCommandBuffer p_command_buffer) {
     vector_server->draw_style_box(theme_scroll_bar, scroll_bar_pos, scroll_bar_size);
 
     auto grabber_pos = Vec2F(global_pos.x + size.x - 16, global_pos.y + vscroll);
-    auto grabber_size = Vec2F(16, size.y / test_content->get_size().y * size.y);
+    auto grabber_size = Vec2F(16, size.y / content->get_size().y * size.y);
 
     vector_server->draw_style_box(theme_scroll_grabber, grabber_pos, grabber_size);
-
-    test_content->set_position(global_pos - Vec2F(0, (float)vscroll));
-
-    vector_server->set_global_clip_box(std::make_optional<RectF>({position, position + size}));
-    test_content->draw(p_command_buffer);
-    vector_server->set_global_clip_box(std::optional<RectF>());
 
     Control::draw(p_command_buffer);
 }
@@ -123,6 +135,24 @@ void ScrollContainer::set_vscroll(int32_t value) {
 
 int32_t ScrollContainer::get_vscroll() {
     return vscroll;
+}
+
+void ScrollContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
+    draw(p_command_buffer);
+
+    auto global_pos = get_global_position();
+    auto size = get_size();
+
+    auto vector_server = VectorServer::get_singleton();
+
+    vector_server->set_content_clip_box(std::make_optional<RectF>({global_pos, global_pos + size}));
+    Node::propagate_draw(p_command_buffer);
+    vector_server->set_content_clip_box(std::optional<RectF>());
+}
+
+void ScrollContainer::propagate_input(std::vector<InputEvent> &input_queue) {
+    // TODO: We should also clip mouse input events as we do to drawing.
+    Node::propagate_input(input_queue);
 }
 
 } // namespace Flint

@@ -2,7 +2,9 @@
 
 namespace Flint {
 void StackContainer::adjust_layout() {
-    if (children.empty()) return;
+    if (children.empty()) {
+        return;
+    }
 
     auto path = get_node_path();
 

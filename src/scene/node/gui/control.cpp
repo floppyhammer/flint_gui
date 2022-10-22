@@ -37,7 +37,9 @@ void Control::update(double dt) {
 }
 
 void Control::input(std::vector<InputEvent> &input_queue) {
-    if (mouse_filter != MouseFilter::Stop) return;
+    if (mouse_filter != MouseFilter::Stop) {
+        return;
+    }
 
     auto global_position = get_global_position();
 

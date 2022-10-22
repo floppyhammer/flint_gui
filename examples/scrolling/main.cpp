@@ -29,6 +29,10 @@ int main() {
         scroll_container->set_size({400, 300});
         scroll_container->set_position({200, 200});
         node_gui->add_child(scroll_container);
+
+        auto scroll_content = std::make_shared<Tree>();
+        scroll_content->set_size({400, 600});
+        scroll_container->add_child(scroll_content);
         // ----------------------------------------------------
     }
 
