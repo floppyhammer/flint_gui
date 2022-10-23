@@ -24,11 +24,17 @@ int main() {
         vector_layer->set_mouse_filter(MouseFilter::Ignore);
         node_gui->add_child(vector_layer);
 
+        auto panel = std::make_shared<Panel>();
+        panel->set_position({400, 300});
+        panel->set_position({200, 200});
+        panel->set_size({400, 400});
+        node_gui->add_child(panel);
+
         auto scroll_container = std::make_shared<ScrollContainer>();
         scroll_container->set_debug_mode(true);
         scroll_container->set_size({400, 300});
-        scroll_container->set_position({200, 200});
-        node_gui->add_child(scroll_container);
+        scroll_container->set_position({0, 48});
+        panel->add_child(scroll_container);
 
         auto scroll_content = std::make_shared<Tree>();
         scroll_content->set_size({400, 600});
