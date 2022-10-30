@@ -6,6 +6,9 @@
 
 #include "../common/io.h"
 #include "../common/logger.h"
+#include "../servers/vector_server.h"
+
+using std::vector;
 
 namespace Flint {
 
@@ -25,43 +28,19 @@ std::shared_ptr<VectorTexture> VectorTexture::from_empty(uint32_t p_width, uint3
 }
 
 VectorTexture::VectorTexture(const std::string &path) : Texture(path) {
-    auto svg_data = load_file_as_bytes(path.c_str());
-
-//    auto canvas = VectorServer::get_singleton()->canvas;
-//
-//    svg_scene = std::make_shared<Pathfinder::SvgScene>();
-//    svg_scene->load_file(svg_data, *canvas);
-
-
-    //    auto canvas = VectorServer::get_singleton()->canvas;
-    //
-    //    auto old_scene = canvas->replace_scene(svg_scene->get_scene());
-    //
-    //    canvas->save_state();
-    //
-    //    auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
-    //    canvas->set_transform(transform);
-    //
-    //    for (auto &vp : vector_paths) {
-    //        canvas->set_fill_paint(Pathfinder::Paint::from_color({vp.fill_color}));
-    //        canvas->fill_path(vp.path2d, Pathfinder::FillRule::Winding);
-    //
-    //        canvas->set_line_width(vp.stroke_width);
-    //        canvas->set_stroke_paint(Pathfinder::Paint::from_color({vp.stroke_color}));
-    //        canvas->stroke_path(vp.path2d);
-    //    }
-    //
-    //    canvas->restore_state();
-    //
-    //    canvas->set_scene(old_scene);
+    svg_scene = VectorServer::get_singleton()->load_svg(path);
 }
 
 void VectorTexture::add_path(const VectorPath &new_path) {
     paths.push_back(new_path);
 }
 
-std::vector<VectorPath> &VectorTexture::get_paths() {
+vector<VectorPath> &VectorTexture::get_paths() {
     return paths;
+}
+
+shared_ptr<Pathfinder::SvgScene> VectorTexture::get_svg_scene() {
+    return svg_scene;
 }
 
 } // namespace Flint

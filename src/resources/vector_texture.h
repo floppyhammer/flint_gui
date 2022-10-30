@@ -9,8 +9,8 @@
 #include "texture.h"
 
 using Pathfinder::ColorU;
-using Pathfinder::Vec2;
 using Pathfinder::Transform2;
+using Pathfinder::Vec2;
 
 namespace Flint {
 
@@ -36,10 +36,14 @@ public:
 
     void add_path(const VectorPath &new_path);
 
-    std::vector<VectorPath>& get_paths();
+    std::vector<VectorPath> &get_paths();
+
+    shared_ptr<Pathfinder::SvgScene> get_svg_scene();
 
 protected:
     std::vector<VectorPath> paths;
+
+    shared_ptr<Pathfinder::SvgScene> svg_scene;
 };
 
 } // namespace Flint

@@ -26,6 +26,7 @@ int main() {
         vector_layer->set_mouse_filter(MouseFilter::Ignore);
 
         auto image_texture = ResourceManager::get_singleton()->load<ImageTexture>("../assets/duck.png");
+        auto vector_texture = ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Button.svg");
 
         auto texture_rect_image = std::make_shared<TextureRect>();
         texture_rect_image->set_texture(image_texture);
@@ -33,8 +34,12 @@ int main() {
         texture_rect_image->set_size({400, 200});
         node_gui->add_child(texture_rect_image);
 
-//        auto texture_rect_svg = std::make_shared<TextureRect>();
-//        node_gui->add_child(texture_rect_svg);
+        auto texture_rect_svg = std::make_shared<TextureRect>();
+        texture_rect_svg->set_texture(vector_texture);
+        texture_rect_svg->set_debug_mode(true);
+        texture_rect_svg->set_position({500, 300});
+        texture_rect_svg->set_size({400, 200});
+        node_gui->add_child(texture_rect_svg);
 
         node->add_child(vector_layer);
         app.tree->get_root()->add_child(node);

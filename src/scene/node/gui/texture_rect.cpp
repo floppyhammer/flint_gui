@@ -41,6 +41,8 @@ std::shared_ptr<Texture> TextureRect::get_texture() const {
 }
 
 void TextureRect::update(double dt) {
+    Control::update(dt);
+
     update_mvp();
 }
 

@@ -97,6 +97,11 @@ void VectorServer::draw_texture(VectorTexture &texture, Transform2 transform) {
     for (auto &path : texture.get_paths()) {
         draw_path(path, transform);
     }
+
+    if (texture.get_svg_scene()) {
+        // TODO: We should have a way to apply transform to the SVG scene.
+        canvas->get_scene()->append_scene(*texture.get_svg_scene()->get_scene());
+    }
 }
 
 void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size) {
@@ -187,6 +192,15 @@ void VectorServer::draw_glyphs(const std::vector<Glyph> &glyphs,
     }
 
     canvas->restore_state();
+}
+
+shared_ptr<Pathfinder::SvgScene> VectorServer::load_svg(const std::string &path) {
+    auto svg_bytes = Pathfinder::load_file_as_bytes(path);
+
+    auto svg_scene = std::make_shared<Pathfinder::SvgScene>();
+    svg_scene->load_file(svg_bytes, *canvas);
+
+    return svg_scene;
 }
 
 std::shared_ptr<ImageTexture> VectorServer::get_texture() {

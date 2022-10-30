@@ -66,6 +66,8 @@ public:
 
     void draw_glyphs(const std::vector<Glyph> &glyphs, FontStyle font_style, const Transform2 &global_transform);
 
+    shared_ptr<Pathfinder::SvgScene> load_svg(const std::string &path);
+
     Vec2I default_canvas_size;
 
 private:
