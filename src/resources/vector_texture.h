@@ -14,6 +14,7 @@ using Pathfinder::Vec2;
 
 namespace Flint {
 
+// TODO: Merge this with VectorTexture.
 /// A thin wrapper over Pathfinder::Path2d.
 struct VectorPath {
     Pathfinder::Path2d path2d;

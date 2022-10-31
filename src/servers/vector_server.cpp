@@ -194,10 +194,10 @@ void VectorServer::draw_glyphs(const std::vector<Glyph> &glyphs,
 }
 
 shared_ptr<Pathfinder::SvgScene> VectorServer::load_svg(const std::string &path) {
-    auto svg_bytes = Pathfinder::load_file_as_bytes(path);
+    auto bytes = Pathfinder::load_file_as_bytes(path);
 
     auto svg_scene = std::make_shared<Pathfinder::SvgScene>();
-    svg_scene->load_file(svg_bytes, *canvas);
+    svg_scene->load_from_memory(bytes, *canvas);
 
     return svg_scene;
 }
@@ -220,6 +220,8 @@ std::optional<RectF> VectorServer::get_content_clip_box() {
 }
 
 void VectorServer::apply_content_clip_box() {
+    // TODO: We shouldn't really use clip path to achieve content clip
+    // since it's quite performance heavy and easily produces nested clipping.
     if (content_clip_box) {
         auto clip_path = Pathfinder::Path2d();
         clip_path.add_rect(*content_clip_box, 0);
