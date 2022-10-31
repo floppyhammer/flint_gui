@@ -50,8 +50,8 @@ void Font::get_metrics() {
     // Calculate font scaling.
     scale = stbtt_ScaleForPixelHeight(&info, font_size);
 
-    /// The origin is baseline and the Y axis points u.
-    /// So, ascent is usually positive, and descent negative.
+    // The origin is baseline and the Y axis points u.
+    // So, ascent is usually positive, and descent negative.
     int unscaled_ascent;
     int unscaled_descent;
     int unscaled_line_gap;
@@ -87,11 +87,10 @@ Pathfinder::Path2d Font::get_glyph_path(int glyph_index) const {
                 path.line_to(v.x * scale, v.y * -scale);
             } break;
             case STBTT_vcurve: {
-                path.quadratic_curve_to(v.cx * scale, v.cy * -scale, v.x * scale, v.y * -scale);
+                path.quadratic_to(v.cx * scale, v.cy * -scale, v.x * scale, v.y * -scale);
             } break;
             case STBTT_vcubic: {
-                path.bezier_curve_to(
-                    v.cx * scale, v.cy * -scale, v.cx1 * scale, v.cy1 * -scale, v.x * scale, v.y * -scale);
+                path.cubic_to(v.cx * scale, v.cy * -scale, v.cx1 * scale, v.cy1 * -scale, v.x * scale, v.y * -scale);
             } break;
         }
     }
