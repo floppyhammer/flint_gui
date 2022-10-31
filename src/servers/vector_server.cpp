@@ -99,8 +99,7 @@ void VectorServer::draw_texture(VectorTexture &texture, Transform2 transform) {
     }
 
     if (texture.get_svg_scene()) {
-        // TODO: We should have a way to apply transform to the SVG scene.
-        canvas->get_scene()->append_scene(*texture.get_svg_scene()->get_scene());
+        canvas->get_scene()->append_scene(*texture.get_svg_scene()->get_scene(), transform);
     }
 }
 
