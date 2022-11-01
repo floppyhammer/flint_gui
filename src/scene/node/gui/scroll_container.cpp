@@ -146,7 +146,10 @@ void ScrollContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
     auto vector_server = VectorServer::get_singleton();
 
 //    vector_server->set_content_clip_box(std::make_optional<RectF>({global_pos, global_pos + size}));
+    // TODO: Use a RenderTarget to achieve content clip, instead of using clip path.
+
     Node::propagate_draw(p_command_buffer);
+
 //    vector_server->set_content_clip_box(std::optional<RectF>());
 }
 
