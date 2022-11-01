@@ -2,14 +2,11 @@
 
 namespace Flint {
 
-void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver, int p_canvas_width, int p_canvas_height) {
+void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver, int canvas_width, int canvas_height) {
     canvas = std::make_shared<Pathfinder::Canvas>(driver);
-    canvas->set_size({p_canvas_width, p_canvas_height});
+    canvas->set_size({canvas_width, canvas_height});
 
-    // TODO
-    canvas->set_empty_dest_texture(p_canvas_width, p_canvas_height);
-
-    default_canvas_size = {p_canvas_width, p_canvas_height};
+    canvas->set_new_render_target({canvas_width, canvas_height});
 }
 
 void VectorServer::cleanup() {
@@ -23,8 +20,6 @@ void VectorServer::submit() {
 
 void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) {
     canvas->save_state();
-
-    apply_content_clip_box();
 
     Pathfinder::Path2d path;
     path.add_line({start.x, start.y}, {end.x, end.y});
@@ -40,8 +35,6 @@ void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) 
 void VectorServer::draw_rectangle(const RectF &rect, float line_width, ColorU color) {
     canvas->save_state();
 
-    apply_content_clip_box();
-
     Pathfinder::Path2d path;
     path.add_rect(rect);
 
@@ -54,8 +47,6 @@ void VectorServer::draw_rectangle(const RectF &rect, float line_width, ColorU co
 
 void VectorServer::draw_circle(Vec2F center, float radius, float line_width, bool fill, ColorU color) {
     canvas->save_state();
-
-    apply_content_clip_box();
 
     Pathfinder::Path2d path;
     path.add_circle({center.x, center.y}, radius);
@@ -74,8 +65,6 @@ void VectorServer::draw_circle(Vec2F center, float radius, float line_width, boo
 
 void VectorServer::draw_path(VectorPath &vector_path, Transform2 transform) {
     canvas->save_state();
-
-    apply_content_clip_box();
 
     canvas->set_transform(transform);
 
@@ -106,8 +95,6 @@ void VectorServer::draw_texture(VectorTexture &texture, Transform2 transform) {
 void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size) {
     canvas->save_state();
 
-    apply_content_clip_box();
-
     // Rebuild & draw the style box.
     auto path = Pathfinder::Path2d();
     path.add_rect({0, 0, size.x, size.y}, style_box.corner_radius);
@@ -132,8 +119,6 @@ void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &positi
 void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2F &start, const Vec2F &end) {
     canvas->save_state();
 
-    apply_content_clip_box();
-
     auto path = Pathfinder::Path2d();
     path.add_line({start.x, start.y}, {end.x, end.y});
 
@@ -148,10 +133,17 @@ void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2F &sta
 
 void VectorServer::draw_glyphs(const std::vector<Glyph> &glyphs,
                                FontStyle font_style,
-                               const Transform2 &global_transform) {
+                               const Transform2 &global_transform,
+                               const RectF &clip_box) {
     canvas->save_state();
 
-    apply_content_clip_box();
+    // Text clip.
+    if (clip_box.is_valid()) {
+        auto clip_path = Pathfinder::Path2d();
+        clip_path.add_rect(clip_box, 0);
+        canvas->set_transform(global_transform);
+        canvas->clip_path(clip_path, Pathfinder::FillRule::Winding);
+    }
 
     // Draw glyphs.
     for (Glyph g : glyphs) {
@@ -203,30 +195,13 @@ shared_ptr<Pathfinder::SvgScene> VectorServer::load_svg(const std::string &path)
 }
 
 std::shared_ptr<ImageTexture> VectorServer::get_texture() {
-    auto texture_vk = static_cast<Pathfinder::TextureVk *>(canvas->get_dest_texture().get());
+    auto texture_vk =
+        static_cast<Pathfinder::TextureVk *>(canvas->get_render_target().framebuffer->get_texture().get());
     return ImageTexture::from_wrapper(
         texture_vk->get_image_view(), texture_vk->get_sampler(), texture_vk->get_width(), texture_vk->get_height());
 }
 
 void VectorServer::set_render_target(const std::shared_ptr<ImageTexture> &dest_texture) {
-}
-
-void VectorServer::set_content_clip_box(std::optional<RectF> clip_box) {
-    content_clip_box = clip_box;
-}
-
-std::optional<RectF> VectorServer::get_content_clip_box() {
-    return content_clip_box;
-}
-
-void VectorServer::apply_content_clip_box() {
-    // TODO: We shouldn't really use clip path to achieve content clip
-    // since it's quite performance heavy and easily produces nested clipping.
-    if (content_clip_box) {
-        auto clip_path = Pathfinder::Path2d();
-        clip_path.add_rect(*content_clip_box, 0);
-        canvas->clip_path(clip_path, Pathfinder::FillRule::Winding);
-    }
 }
 
 } // namespace Flint

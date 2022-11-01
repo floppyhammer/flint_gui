@@ -145,9 +145,9 @@ void ScrollContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
 
     auto vector_server = VectorServer::get_singleton();
 
-    vector_server->set_content_clip_box(std::make_optional<RectF>({global_pos, global_pos + size}));
+//    vector_server->set_content_clip_box(std::make_optional<RectF>({global_pos, global_pos + size}));
     Node::propagate_draw(p_command_buffer);
-    vector_server->set_content_clip_box(std::optional<RectF>());
+//    vector_server->set_content_clip_box(std::optional<RectF>());
 }
 
 void ScrollContainer::propagate_input(std::vector<InputEvent> &input_queue) {

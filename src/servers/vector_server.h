@@ -37,17 +37,6 @@ public:
 
     void submit();
 
-    /**
-     * Enable content clip, portion of anything drawn afterward
-     * outside the clip box will not show.
-     */
-    void set_content_clip_box(std::optional<RectF> clip_box);
-
-    /**
-     * Disable the previously set content clip box.
-     */
-    std::optional<RectF> get_content_clip_box();
-
     std::shared_ptr<ImageTexture> get_texture();
 
     void draw_line(Vec2F start, Vec2F end, float width, ColorU color);
@@ -64,23 +53,23 @@ public:
 
     void draw_style_line(const StyleLine &style_line, const Vec2F &start, const Vec2F &end);
 
-    void draw_glyphs(const std::vector<Glyph> &glyphs, FontStyle font_style, const Transform2 &global_transform);
+    /**
+     * @param global_transform
+     * @param clip_box Enable content clip, portion of anything drawn afterward
+     * outside the clip box will not show. The rect is in local coordinates and the transform will be applied to it.
+     * We shouldn't use clip path to achieve general content clip (like scrolling)
+     * since it's quite performance heavy and easily produces nested clipping.
+     */
+    void draw_glyphs(const std::vector<Glyph> &glyphs,
+                     FontStyle font_style,
+                     const Transform2 &global_transform,
+                     const RectF &clip_box);
 
     shared_ptr<Pathfinder::SvgScene> load_svg(const std::string &path);
-
-    Vec2I default_canvas_size;
 
 private:
     // Never expose this.
     std::shared_ptr<Pathfinder::Canvas> canvas;
-
-    /// If set, paths drawn afterward will be clipped.
-    /// The clip box is in the global coordinates.
-    std::optional<RectF> content_clip_box;
-
-private:
-    /// Add clip path to canvas.
-    void apply_content_clip_box();
 };
 
 } // namespace Flint

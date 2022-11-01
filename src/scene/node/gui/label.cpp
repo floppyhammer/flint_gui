@@ -189,7 +189,7 @@ void Label::draw(VkCommandBuffer p_command_buffer) {
 
     auto translation = global_position + alignment_shift;
 
-    vector_server->draw_glyphs(glyphs, font_style, Transform2::from_translation(translation));
+    vector_server->draw_glyphs(glyphs, font_style, Transform2::from_translation(translation), RectF{{}, size});
 
     Control::draw(p_command_buffer);
 }
