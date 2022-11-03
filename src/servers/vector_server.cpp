@@ -4,9 +4,7 @@ namespace Flint {
 
 void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver, int canvas_width, int canvas_height) {
     canvas = std::make_shared<Pathfinder::Canvas>(driver);
-    canvas->set_size({canvas_width, canvas_height});
-
-    canvas->set_new_render_target({canvas_width, canvas_height});
+    canvas->set_new_dst_texture({canvas_width, canvas_height});
 }
 
 void VectorServer::cleanup() {
@@ -16,6 +14,19 @@ void VectorServer::cleanup() {
 void VectorServer::submit() {
     canvas->draw();
     canvas->clear();
+
+    // Get the dst texture.
+    auto texture_vk = static_cast<Pathfinder::TextureVk *>(canvas->get_dst_texture().get());
+
+    // Transition the dst texture to ShaderReadOnly layout, so we can use it as a sampler.
+    // Its layout may be Undefined or ColorAttachment.
+    RenderServer::getSingleton()->transitionImageLayout(texture_vk->get_image(),
+                                                        Pathfinder::to_vk_texture_format(texture_vk->get_format()),
+                                                        Pathfinder::to_vk_layout(texture_vk->get_layout()),
+                                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                                        1,
+                                                        1);
+    texture_vk->set_layout(Pathfinder::TextureLayout::ShaderReadOnly);
 }
 
 void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) {
@@ -66,7 +77,7 @@ void VectorServer::draw_circle(Vec2F center, float radius, float line_width, boo
 void VectorServer::draw_path(VectorPath &vector_path, Transform2 transform) {
     canvas->save_state();
 
-    canvas->set_transform(transform);
+    canvas->set_transform(global_transform_offset * transform);
 
     if (vector_path.fill_color.is_opaque()) {
         canvas->set_fill_paint(Pathfinder::Paint::from_color(vector_path.fill_color));
@@ -88,22 +99,22 @@ void VectorServer::draw_texture(VectorTexture &texture, Transform2 transform) {
     }
 
     if (texture.get_svg_scene()) {
-        canvas->get_scene()->append_scene(*texture.get_svg_scene()->get_scene(), transform);
+        canvas->get_scene()->append_scene(*texture.get_svg_scene()->get_scene(), global_transform_offset * transform);
     }
 }
 
 void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size) {
-    canvas->save_state();
-
-    // Rebuild & draw the style box.
     auto path = Pathfinder::Path2d();
-    path.add_rect({0, 0, size.x, size.y}, style_box.corner_radius);
+    path.add_rect({{}, size}, style_box.corner_radius);
+
+    canvas->save_state();
 
     canvas->set_shadow_color(style_box.shadow_color);
     canvas->set_shadow_blur(style_box.shadow_size);
 
-    auto transform = Pathfinder::Transform2::from_translation({position.x, position.y});
-    canvas->set_transform(transform);
+    auto transform = Pathfinder::Transform2::from_translation(position);
+    canvas->set_transform(global_transform_offset * transform);
+
     canvas->set_fill_paint(Pathfinder::Paint::from_color(style_box.bg_color));
     canvas->fill_path(path, Pathfinder::FillRule::Winding);
 
@@ -117,13 +128,12 @@ void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &positi
 }
 
 void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2F &start, const Vec2F &end) {
+    auto path = Pathfinder::Path2d();
+    path.add_line(start, end);
+
     canvas->save_state();
 
-    auto path = Pathfinder::Path2d();
-    path.add_line({start.x, start.y}, {end.x, end.y});
-
-    auto transform = Pathfinder::Transform2::from_translation({0, 0});
-    canvas->set_transform(transform);
+    canvas->set_transform(global_transform_offset);
     canvas->set_stroke_paint(Pathfinder::Paint::from_color(style_line.color));
     canvas->set_line_width(style_line.width);
     canvas->stroke_path(path);
@@ -133,7 +143,7 @@ void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2F &sta
 
 void VectorServer::draw_glyphs(const std::vector<Glyph> &glyphs,
                                FontStyle font_style,
-                               const Transform2 &global_transform,
+                               const Transform2 &transform,
                                const RectF &clip_box) {
     canvas->save_state();
 
@@ -141,14 +151,14 @@ void VectorServer::draw_glyphs(const std::vector<Glyph> &glyphs,
     if (clip_box.is_valid()) {
         auto clip_path = Pathfinder::Path2d();
         clip_path.add_rect(clip_box, 0);
-        canvas->set_transform(global_transform);
+        canvas->set_transform(global_transform_offset * transform);
         canvas->clip_path(clip_path, Pathfinder::FillRule::Winding);
     }
 
     // Draw glyphs.
     for (Glyph g : glyphs) {
-        auto transform = Pathfinder::Transform2::from_translation(g.position) * global_transform;
-        canvas->set_transform(transform);
+        canvas->set_transform(global_transform_offset * Pathfinder::Transform2::from_translation(g.position) *
+                              transform);
 
         // Add fill.
         canvas->set_fill_paint(Pathfinder::Paint::from_color(font_style.color));
@@ -195,13 +205,13 @@ shared_ptr<Pathfinder::SvgScene> VectorServer::load_svg(const std::string &path)
 }
 
 std::shared_ptr<ImageTexture> VectorServer::get_texture() {
-    auto texture_vk =
-        static_cast<Pathfinder::TextureVk *>(canvas->get_render_target().framebuffer->get_texture().get());
+    auto texture_vk = static_cast<Pathfinder::TextureVk *>(canvas->get_dst_texture().get());
     return ImageTexture::from_wrapper(
         texture_vk->get_image_view(), texture_vk->get_sampler(), texture_vk->get_width(), texture_vk->get_height());
 }
 
-void VectorServer::set_render_target(const std::shared_ptr<ImageTexture> &dest_texture) {
+std::shared_ptr<Pathfinder::Canvas> VectorServer::get_canvas() const {
+    return canvas;
 }
 
 } // namespace Flint

@@ -31,8 +31,6 @@ public:
 
     void init(const std::shared_ptr<Pathfinder::Driver> &driver, int p_canvas_width, int p_canvas_height);
 
-    void set_render_target(const std::shared_ptr<ImageTexture> &dest_texture);
-
     void cleanup();
 
     void submit();
@@ -54,7 +52,7 @@ public:
     void draw_style_line(const StyleLine &style_line, const Vec2F &start, const Vec2F &end);
 
     /**
-     * @param global_transform
+     * @param transform
      * @param clip_box Enable content clip, portion of anything drawn afterward
      * outside the clip box will not show. The rect is in local coordinates and the transform will be applied to it.
      * We shouldn't use clip path to achieve general content clip (like scrolling)
@@ -62,10 +60,14 @@ public:
      */
     void draw_glyphs(const std::vector<Glyph> &glyphs,
                      FontStyle font_style,
-                     const Transform2 &global_transform,
+                     const Transform2 &transform,
                      const RectF &clip_box);
 
     shared_ptr<Pathfinder::SvgScene> load_svg(const std::string &path);
+
+    std::shared_ptr<Pathfinder::Canvas> get_canvas() const;
+
+    Transform2 global_transform_offset;
 
 private:
     // Never expose this.

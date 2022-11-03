@@ -59,7 +59,6 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
         world->draw(command_buffers[image_index]);
     }
 
-    // FIXME: When nothing is drawn, the dest image layout will not be set to SHADER_READ_ONLY.
     VectorServer::get_singleton()->submit();
 
     // End main render pass.

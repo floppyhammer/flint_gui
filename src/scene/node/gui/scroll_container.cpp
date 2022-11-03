@@ -100,12 +100,12 @@ void ScrollContainer::draw(VkCommandBuffer p_command_buffer) {
     auto global_pos = get_global_position();
     auto size = get_size();
 
-    auto scroll_bar_pos = Vec2F(global_pos.x + size.x - 16, global_pos.y);
+    auto scroll_bar_pos = Vec2F(size.x - 16, 0) + global_pos;
     auto scroll_bar_size = Vec2F(16, size.y);
 
     vector_server->draw_style_box(theme_scroll_bar, scroll_bar_pos, scroll_bar_size);
 
-    auto grabber_pos = Vec2F(global_pos.x + size.x - 16, global_pos.y + vscroll);
+    auto grabber_pos = Vec2F(size.x - 16, vscroll) + global_pos;
     auto grabber_size = Vec2F(16, size.y / content->get_size().y * size.y);
 
     vector_server->draw_style_box(theme_scroll_grabber, grabber_pos, grabber_size);
@@ -114,7 +114,9 @@ void ScrollContainer::draw(VkCommandBuffer p_command_buffer) {
 }
 
 void ScrollContainer::set_hscroll(int32_t value) {
-    if (children.empty()) return;
+    if (children.empty()) {
+        return;
+    }
 
     Vec2F max_child_min_size = get_max_child_min_size();
 
@@ -126,7 +128,9 @@ int32_t ScrollContainer::get_hscroll() {
 }
 
 void ScrollContainer::set_vscroll(int32_t value) {
-    if (children.empty()) return;
+    if (children.empty()) {
+        return;
+    }
 
     Vec2F max_child_min_size = get_max_child_min_size();
 
@@ -142,15 +146,28 @@ void ScrollContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
 
     auto global_pos = get_global_position();
     auto size = get_size();
+    auto dst_rect = RectF(global_pos, global_pos + size);
 
     auto vector_server = VectorServer::get_singleton();
 
-//    vector_server->set_content_clip_box(std::make_optional<RectF>({global_pos, global_pos + size}));
-    // TODO: Use a RenderTarget to achieve content clip, instead of using clip path.
+    auto canvas = vector_server->get_canvas();
+
+    // Use a RenderTarget to achieve content clip, instead of using clip path.
+    if (sub_render_target.size == Vec2I()) {
+        sub_render_target = Pathfinder::RenderTarget(canvas->get_driver(), size.to_i32());
+    }
+
+    auto render_target_id = canvas->get_scene()->push_render_target(sub_render_target);
+
+    vector_server->global_transform_offset = Transform2::from_translation(-global_pos);
 
     Node::propagate_draw(p_command_buffer);
 
-//    vector_server->set_content_clip_box(std::optional<RectF>());
+    vector_server->global_transform_offset = Transform2();
+
+    canvas->get_scene()->pop_render_target();
+
+    vector_server->get_canvas()->draw_render_target(render_target_id, dst_rect);
 }
 
 void ScrollContainer::propagate_input(std::vector<InputEvent> &input_queue) {

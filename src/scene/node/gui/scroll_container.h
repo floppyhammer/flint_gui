@@ -36,9 +36,7 @@ protected:
     int32_t hscroll = 0;
     int32_t vscroll = 0;
 
-    /// Scroll container should use a separate Pathfinder::SceneBuilder
-    /// and use the ViewBox property to achieve element clipping.
-    std::shared_ptr<Pathfinder::SceneBuilder> scene_builder;
+    Pathfinder::RenderTarget sub_render_target;
 
     StyleBox theme_scroll_bar;
     StyleBox theme_scroll_grabber;

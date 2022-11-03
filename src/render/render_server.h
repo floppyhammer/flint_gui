@@ -15,6 +15,7 @@
 #include "glm/glm.hpp"
 
 namespace Flint {
+
 class RenderServer {
 public:
     static RenderServer *getSingleton() {
@@ -227,6 +228,7 @@ private:
 
     void create_skybox_layouts();
 };
+
 } // namespace Flint
 
 #endif // FLINT_RENDER_SERVER_H
