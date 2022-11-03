@@ -31,7 +31,9 @@ int main() {
 
         auto hbox_container = std::make_shared<HStackContainer>();
         hbox_container->set_separation(8);
+        hbox_container->set_debug_mode(true);
         node_gui->add_child(hbox_container);
+
         for (int _ = 0; _ < 4; _++) {
             auto button = std::make_shared<Button>();
             button->set_text("button");
@@ -58,7 +60,9 @@ int main() {
         auto vbox_container = std::make_shared<VStackContainer>();
         vbox_container->set_separation(8);
         vbox_container->set_position({0, 200});
+        vbox_container->set_debug_mode(true);
         node_gui->add_child(vbox_container);
+
         for (int _ = 0; _ < 4; _++) {
             auto button = std::make_shared<Button>();
             button->set_text("button");

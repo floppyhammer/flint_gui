@@ -28,18 +28,46 @@ int main() {
         auto image_texture = ResourceManager::get_singleton()->load<ImageTexture>("../assets/duck.png");
         auto vector_texture = ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Button.svg");
 
-        auto texture_rect_image = std::make_shared<TextureRect>();
-        texture_rect_image->set_texture(image_texture);
-        texture_rect_image->set_debug_mode(true);
-        texture_rect_image->set_size({400, 200});
-        node_gui->add_child(texture_rect_image);
+        for (int i = 0; i < 7; i++) {
+            auto texture_rect_svg = std::make_shared<TextureRect>();
+            texture_rect_svg->set_position({400.0f, i * 100.0f});
+            texture_rect_svg->set_size({200, 100});
+            texture_rect_svg->set_texture(vector_texture);
+            texture_rect_svg->set_debug_mode(true);
+            node_gui->add_child(texture_rect_svg);
 
-        auto texture_rect_svg = std::make_shared<TextureRect>();
-        texture_rect_svg->set_texture(vector_texture);
-        texture_rect_svg->set_debug_mode(true);
-        texture_rect_svg->set_position({500, 300});
-        texture_rect_svg->set_size({400, 200});
-        node_gui->add_child(texture_rect_svg);
+            auto texture_rect_image = std::make_shared<TextureRect>();
+            texture_rect_image->set_texture(image_texture);
+            texture_rect_image->set_position({0.0f, i * 100.0f});
+            texture_rect_image->set_debug_mode(true);
+            texture_rect_image->set_size({200, 100});
+            node_gui->add_child(texture_rect_image);
+
+            if (i == 0) {
+                texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::Keep);
+                texture_rect_image->set_stretch_mode(TextureRect::StretchMode::Keep);
+            }
+            if (i == 1) {
+                texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
+                texture_rect_image->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
+            }
+            if (i == 2) {
+                texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::Scale);
+                texture_rect_image->set_stretch_mode(TextureRect::StretchMode::Scale);
+            }
+            if (i == 4) {
+                texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::KeepAspect);
+                texture_rect_image->set_stretch_mode(TextureRect::StretchMode::KeepAspect);
+            }
+            if (i == 5) {
+                texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
+                texture_rect_image->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
+            }
+            if (i == 6) {
+                texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::KeepCovered);
+                texture_rect_image->set_stretch_mode(TextureRect::StretchMode::KeepCovered);
+            }
+        }
 
         node->add_child(vector_layer);
         app.tree->get_root()->add_child(node);

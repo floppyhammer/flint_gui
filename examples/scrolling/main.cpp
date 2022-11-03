@@ -25,9 +25,8 @@ int main() {
         node_gui->add_child(vector_layer);
 
         auto panel = std::make_shared<Panel>();
-        panel->set_position({400, 300});
         panel->set_position({200, 200});
-        panel->set_size({400, 400});
+        panel->set_size({400, 300});
         node_gui->add_child(panel);
 
         auto scroll_container = std::make_shared<ScrollContainer>();
@@ -37,7 +36,7 @@ int main() {
         panel->add_child(scroll_container);
 
         auto scroll_content = std::make_shared<Tree>();
-        scroll_content->set_size({400, 600});
+        scroll_content->set_size({400, 800});
         scroll_container->add_child(scroll_content);
         // ----------------------------------------------------
     }

@@ -22,12 +22,17 @@ public:
     virtual Vec2F calculate_minimum_size() const override;
 
     enum class StretchMode {
-        SCALE,
-        TILE,
-        KEEP,
-        KEEP_CENTER,
-        KEEP_ASPECT,
-    } stretch_mode = StretchMode::KEEP_CENTER;
+        Scale,        // Scale it to the TextureRect size.
+        Keep,         // Do nothing.
+        KeepCentered, // Center it but do not scale it.
+        KeepAspect,
+        KeepAspectCentered,
+        KeepCovered,
+        Tile, // Do not work.
+        Max,
+    };
+
+    void set_stretch_mode(StretchMode new_stretch_mode);
 
 private:
     void update(double delta) override;
@@ -35,6 +40,8 @@ private:
     void draw(VkCommandBuffer p_command_buffer) override;
 
     void update_mvp();
+
+    StretchMode stretch_mode = StretchMode::Scale;
 
     std::shared_ptr<Mesh2d> mesh;
 

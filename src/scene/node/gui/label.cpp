@@ -13,7 +13,6 @@ Label::Label(const std::string &p_text) {
 
     font = ResourceManager::get_singleton()->load<Font>("../assets/unifont-14.0.03.ttf");
 
-    debug_size_box.border_width = 2;
     set_text(p_text);
 
     font_style.color = {163, 163, 163, 255};

@@ -4,6 +4,7 @@
 #include "../../../resources/vector_texture.h"
 
 namespace Flint {
+
 Button::Button() {
     type = NodeType::Button;
 
@@ -36,6 +37,7 @@ Button::Button() {
     vp.stroke_width = 2;
     vector_texture->add_path(vp);
     icon_rect = std::make_shared<TextureRect>();
+    icon_rect->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
     icon_rect->set_texture(vector_texture);
 
     hbox_container = std::make_shared<HStackContainer>();
@@ -179,4 +181,5 @@ void Button::set_text(const std::string &text) {
 void Button::set_icon(const std::shared_ptr<Texture> &p_icon) {
     icon_rect->set_texture(p_icon);
 }
+
 } // namespace Flint

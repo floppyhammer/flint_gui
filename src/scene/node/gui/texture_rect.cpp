@@ -73,14 +73,6 @@ void TextureRect::draw(VkCommandBuffer p_command_buffer) {
                                                pipeline,
                                                mesh->surface->get_material()->get_desc_set()->getDescriptorSet(
                                                    SwapChain::getSingleton()->currentImage));
-
-            // Visual debugging.
-            {
-                //
-                auto vector_server = VectorServer::get_singleton();
-
-//                vector_server->draw_rectangle()
-            }
         } else { // Vector texture.
             auto vector_server = VectorServer::get_singleton();
 
@@ -88,14 +80,31 @@ void TextureRect::draw(VkCommandBuffer p_command_buffer) {
 
             auto global_position = get_global_position();
 
-            if (stretch_mode == StretchMode::KEEP_CENTER) {
-                auto texture_size = vector_texture->get_size();
-                auto offset = (size - Vec2F(texture_size.x, texture_size.y)) * 0.5f;
+            auto texture_size = vector_texture->get_size().to_f32();
 
-                vector_server->draw_texture(*vector_texture, Transform2::from_translation(global_position + offset));
-            } else {
-                vector_server->draw_texture(*vector_texture, Transform2::from_translation(global_position));
+            Pathfinder::Transform2 transform;
+
+            switch (stretch_mode) {
+                case StretchMode::KeepCentered: {
+                    auto offset = (size - texture_size) * 0.5f;
+
+                    transform = Transform2::from_translation(global_position + offset);
+                } break;
+                case StretchMode::Scale: {
+                    if (texture_size.area() == 0) {
+                        Logger::error("Vector texture size is invalid!", "TextureRect");
+                        return;
+                    }
+                    auto scale = size / vector_texture->get_size().to_f32();
+
+                    transform = Transform2::from_scale(scale).translate(global_position);
+                } break;
+                default: {
+                    transform = Transform2::from_translation(global_position);
+                } break;
             }
+
+            vector_server->draw_texture(*vector_texture, transform);
         }
     }
 
@@ -125,6 +134,10 @@ void TextureRect::update_mvp() {
 
 Vec2F TextureRect::calculate_minimum_size() const {
     return minimum_size.max(texture ? Vec2F(texture->get_width(), texture->get_height()) : Vec2<float>(0));
+}
+
+void TextureRect::set_stretch_mode(TextureRect::StretchMode new_stretch_mode) {
+    stretch_mode = new_stretch_mode;
 }
 
 } // namespace Flint
