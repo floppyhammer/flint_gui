@@ -44,7 +44,7 @@ public:
 
     void init(uint32_t window_width, uint32_t window_height);
 
-    GLFWwindow *window;
+    GLFWwindow *window{};
 
     /// Native platform surface or window objects are abstracted by surface objects.
     VkSurfaceKHR surface{};
@@ -120,8 +120,8 @@ public:
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice pPhysicalDevice) const;
 
-    VkQueue graphicsQueue;
-    VkQueue presentQueue;
+    VkQueue graphicsQueue{};
+    VkQueue presentQueue{};
 
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice pPhysicalDevice) const;
 
@@ -137,9 +137,9 @@ private:
     // There is no global state in Vulkan and all per-application state is stored in a VkInstance object.
     // Creating a VkInstance object initializes the Vulkan library and allows the application to pass
     // information about itself to the implementation.
-    VkInstance instance;
+    VkInstance instance{};
 
-    VkDebugUtilsMessengerEXT debugMessenger;
+    VkDebugUtilsMessengerEXT debugMessenger{};
 
     static const bool enableValidationLayers = true;
 

@@ -33,11 +33,8 @@ public:
 
     void input(std::vector<InputEvent> &input_queue, Vec2F global_position);
 
-    void propagate_draw(float folding_width,
-                        uint32_t depth,
-                        VkCommandBuffer p_command_buffer,
-                        float &offset_y,
-                        Vec2F global_position);
+    void propagate_draw(
+        float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y, Vec2F global_position);
 
     void set_text(const std::string &text);
 
@@ -83,7 +80,13 @@ public:
 
     TreeItem *selected_item{};
 
+    void set_item_height(float new_item_height);
+
+    float get_item_height();
+
 private:
+    float item_height;
+
     std::shared_ptr<TreeItem> root;
     std::optional<StyleBox> theme_bg;
     std::optional<StyleBox> theme_bg_focused;

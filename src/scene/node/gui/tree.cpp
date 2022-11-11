@@ -68,10 +68,20 @@ std::shared_ptr<TreeItem> Tree::create_item(const std::shared_ptr<TreeItem> &par
     return item;
 }
 
+void Tree::set_item_height(float new_item_height) {
+    item_height = new_item_height;
+}
+
+float Tree::get_item_height() {
+    return item_height;
+}
+
 TreeItem::TreeItem() {
     label = std::make_shared<Label>("");
 
     icon = std::make_shared<TextureRect>();
+    icon->set_minimum_size({24, 24});
+    icon->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
 
     {
         collapse_icon = VectorTexture::from_empty(24, 24);
@@ -119,6 +129,12 @@ TreeItem::TreeItem() {
     container->add_child(collapse_button);
     container->add_child(icon);
     container->add_child(label);
+
+    collapse_button->container_sizing.expand_v = true;
+    collapse_button->container_sizing.flag_v = ContainerSizingFlag::Fill;
+
+    label->container_sizing.expand_v = true;
+    label->container_sizing.flag_v = ContainerSizingFlag::Fill;
 
     theme_selected.bg_color = ColorU(100, 100, 100, 150);
 }
@@ -171,7 +187,11 @@ void TreeItem::propagate_draw(
 
     float offset_x = (float)depth * folding_width;
 
-    float item_height = label->calculate_minimum_size().y;
+    // Firstly, the item height will be decided by the minimum height of the icon and label.
+    float item_height = std::max(label->calculate_minimum_size().y, icon->get_minimum_size().y);
+
+    // Then the value set by the tree is considered.
+    item_height = std::max(tree->get_item_height(), item_height);
 
     position = {offset_x, offset_y};
 
@@ -182,27 +202,18 @@ void TreeItem::propagate_draw(
 
     if (children.empty()) {
         // We should make the button invisible by changing the alpha value instead of the visibility.
-        // collapse_button->set_visibility(false);
+        // Otherwise, the container layout will change and the intent will be gone.
+        collapse_button->modulate = ColorU::transparent_black();
+
         collapse_button->set_icon(nullptr);
+    } else {
+        collapse_button->modulate = ColorU::white();
     }
 
     container->set_position(Vec2F(offset_x, offset_y) + global_position);
     container->set_size({item_height, item_height});
     container->propagate_update(0);
     container->propagate_draw(p_command_buffer);
-
-    //        collapse_button->set_position(Vec2F(offset_x, offset_y) + global_position);
-    //        collapse_button->set_size({item_height, item_height});
-    //        collapse_button->update(0);
-    //        if (!children.empty()) {
-    //            collapse_button->draw(p_command_buffer);
-    //        }
-    //
-    //        // The attached label has no parent.
-    //        label->set_position(Vec2F(offset_x + collapse_button->get_size().x, offset_y) + global_position);
-    //        label->set_size(label->calculate_minimum_size());
-    //        label->update(0);
-    //        label->draw(p_command_buffer);
 
     offset_y += item_height;
 
@@ -239,4 +250,5 @@ void TreeItem::set_text(const std::string &text) {
 void TreeItem::set_icon(const std::shared_ptr<Texture> &texture) {
     icon->set_texture(texture);
 }
+
 } // namespace Flint

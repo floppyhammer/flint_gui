@@ -97,7 +97,7 @@ public:
 
     virtual void release_focus();
 
-    ColorF get_global_modulate();
+    ColorU get_global_modulate();
 
     /**
      * Check if the node is a child of a container.
@@ -107,8 +107,8 @@ public:
 
     Vec2F get_max_child_min_size() const;
 
-    ColorF modulate;
-    ColorF self_modulate;
+    ColorU modulate = ColorU::white();
+    ColorU self_modulate = ColorU::white();
 
     /**
      * Adjust the node's position and size according to the anchor flag.

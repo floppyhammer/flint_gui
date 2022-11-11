@@ -11,6 +11,7 @@
 #include "texture_rect.h"
 
 namespace Flint {
+
 class Button : public Control {
 public:
     Button();
@@ -22,11 +23,11 @@ public:
 
     void update(double dt) override;
 
-    void draw(VkCommandBuffer p_command_buffer) override;
+    void draw(VkCommandBuffer _command_buffer) override;
 
-    void set_position(Vec2F p_position) override;
+    void set_position(Vec2F _position) override;
 
-    void set_size(Vec2F p_size) override;
+    void set_size(Vec2F _size) override;
 
     Vec2F calculate_minimum_size() const override;
 
@@ -34,12 +35,15 @@ public:
 
     void set_text(const std::string &text);
 
-    void set_icon(const std::shared_ptr<Texture> &p_icon);
+    void set_icon(const std::shared_ptr<Texture> &_icon);
 
-    bool expand_icon = false;
+    /// The icon will expand until it's height matches that of the button.
+    void set_expand_icon(bool enable);
 
 protected:
     bool pressed_inside = false;
+
+    bool expand_icon = false;
 
     /// Button[HStackContainer[TextureRect, Label]]
     std::shared_ptr<MarginContainer> margin_container;

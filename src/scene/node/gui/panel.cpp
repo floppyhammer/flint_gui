@@ -72,12 +72,14 @@ Panel::Panel() {
         close_button->set_parent(this);
         close_button->set_icon(close_icon);
         close_button->set_minimum_size(Vec2F(title_bar_height));
+        close_button->set_expand_icon(true);
     }
 
     collapse_button = std::make_shared<Button>();
     collapse_button->set_text("");
     collapse_button->set_icon(collapse_icon);
     collapse_button->set_minimum_size(Vec2F(title_bar_height));
+    collapse_button->set_expand_icon(true);
 
     title_container = std::make_shared<HStackContainer>();
     title_container->set_parent(this);

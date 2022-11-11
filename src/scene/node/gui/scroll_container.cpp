@@ -142,8 +142,6 @@ int32_t ScrollContainer::get_vscroll() {
 }
 
 void ScrollContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
-    draw(p_command_buffer);
-
     auto global_pos = get_global_position();
     auto size = get_size();
     auto dst_rect = RectF(global_pos, global_pos + size);
@@ -154,7 +152,7 @@ void ScrollContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
 
     // Use a RenderTarget to achieve content clip, instead of using clip path.
     if (sub_render_target.size == Vec2I()) {
-        sub_render_target = Pathfinder::RenderTarget(canvas->get_driver(), size.to_i32());
+        sub_render_target = Pathfinder::RenderTarget(canvas->get_driver(), size.to_i32(), "Scroller render target");
     }
 
     auto render_target_id = canvas->get_scene()->push_render_target(sub_render_target);
@@ -168,6 +166,9 @@ void ScrollContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
     canvas->get_scene()->pop_render_target();
 
     vector_server->get_canvas()->draw_render_target(render_target_id, dst_rect);
+
+    // Draw scroll bar overlay.
+    draw(p_command_buffer);
 }
 
 void ScrollContainer::propagate_input(std::vector<InputEvent> &input_queue) {

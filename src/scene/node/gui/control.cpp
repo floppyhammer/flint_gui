@@ -145,12 +145,12 @@ void Control::release_focus() {
     focused = false;
 }
 
-ColorF Control::get_global_modulate() {
+ColorU Control::get_global_modulate() {
     if (parent && parent->is_gui_node()) {
         auto cast_parent = dynamic_cast<Control *>(parent);
-        return modulate * cast_parent->get_global_modulate();
+        return ColorU(modulate.to_f32() * cast_parent->get_global_modulate().to_f32());
     } else {
-        return {1, 1, 1, 1};
+        return ColorU::white();
     }
 }
 

@@ -39,6 +39,7 @@ Button::Button() {
     icon_rect = std::make_shared<TextureRect>();
     icon_rect->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
     icon_rect->set_texture(vector_texture);
+    icon_rect->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
 
     hbox_container = std::make_shared<HStackContainer>();
     hbox_container->add_child(icon_rect);
@@ -46,7 +47,7 @@ Button::Button() {
     hbox_container->set_separation(0);
 
     margin_container = std::make_shared<MarginContainer>();
-    margin_container->set_margin_all(4);
+    margin_container->set_margin_all(0);
     margin_container->add_child(hbox_container);
     margin_container->set_parent(this);
     margin_container->set_size(size);
@@ -137,6 +138,9 @@ void Button::draw(VkCommandBuffer p_command_buffer) {
         active_style_box = theme_normal;
     }
 
+    active_style_box->bg_color = ColorU(active_style_box->bg_color.to_f32() * modulate.to_f32());
+    active_style_box->border_color = ColorU(active_style_box->border_color.to_f32() * modulate.to_f32());
+
     if (active_style_box.has_value()) {
         vector_server->draw_style_box(active_style_box.value(), global_position, size);
     }
@@ -180,6 +184,15 @@ void Button::set_text(const std::string &text) {
 
 void Button::set_icon(const std::shared_ptr<Texture> &p_icon) {
     icon_rect->set_texture(p_icon);
+}
+
+void Button::set_expand_icon(bool enable) {
+    if (enable) {
+        icon_rect->container_sizing.expand_h = true;
+        icon_rect->container_sizing.flag_h = ContainerSizingFlag::Fill;
+    } else {
+        icon_rect->container_sizing.expand_h = false;
+    }
 }
 
 } // namespace Flint
