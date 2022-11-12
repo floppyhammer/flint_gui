@@ -16,15 +16,15 @@ class LineEdit : public Control {
 public:
     LineEdit();
 
-    void set_text(const std::string &p_text);
+    void set_text(const std::string &new_text);
 
     std::string get_text() const;
 
-    void input(std::vector<InputEvent> &input_queue) override;
+    void input(InputEvent &event) override;
 
     void update(double dt) override;
 
-    void draw(VkCommandBuffer p_command_buffer) override;
+    void draw(VkCommandBuffer _command_buffer) override;
 
     Vec2F calculate_minimum_size() const override;
 

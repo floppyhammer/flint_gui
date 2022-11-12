@@ -104,9 +104,9 @@ public:
 
     virtual void propagate_notify(Signal signal);
 
-    virtual void propagate_input(std::vector<InputEvent> &input_queue);
+    virtual void propagate_input(InputEvent &event);
 
-    virtual void propagate_draw(VkCommandBuffer p_command_buffer);
+    virtual void propagate_draw(VkCommandBuffer _command_buffer);
 
     virtual void propagate_cleanup();
 
@@ -114,11 +114,11 @@ public:
 
     virtual void notify(Signal signal);
 
-    virtual void input(std::vector<InputEvent> &input_queue);
+    virtual void input(InputEvent &event);
 
-    virtual void draw(VkCommandBuffer p_command_buffer);
+    virtual void draw(VkCommandBuffer _command_buffer);
 
-    void add_child(const std::shared_ptr<Node> &p_child);
+    void add_child(const std::shared_ptr<Node> &new_child);
 
     /**
      * Get the viewport this node belongs to.

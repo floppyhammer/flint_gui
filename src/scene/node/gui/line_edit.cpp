@@ -36,102 +36,102 @@ std::string LineEdit::get_text() const {
     return label->get_text();
 }
 
-void LineEdit::input(std::vector<InputEvent> &input_queue) {
-    Control::input(input_queue);
+void LineEdit::input(InputEvent &event) {
+    Control::input(event);
 
     // Handle mouse input propagation.
-    for (auto &event : input_queue) {
-        bool consume_flag = false;
+    bool consume_flag = false;
 
-        auto &glyphs = label->get_glyphs();
-        int32_t glyph_count = glyphs.size();
+    auto &glyphs = label->get_glyphs();
+    int32_t glyph_count = glyphs.size();
 
-        auto global_position = get_global_position();
-        auto active_rect = RectF(global_position, global_position + size);
+    auto global_position = get_global_position();
+    auto active_rect = RectF(global_position, global_position + size);
 
-        switch (event.type) {
-            case InputEventType::MouseButton: {
-                auto args = event.args.mouse_button;
+    switch (event.type) {
+        case InputEventType::MouseButton: {
+            auto args = event.args.mouse_button;
 
-                if (active_rect.contains_point(args.position)) {
-                    if (args.pressed) {
-                        // Decide caret position.
-                        auto local_mouse_pos = get_local_mouse_position();
-                        current_caret_index = calculate_caret_index(local_mouse_pos);
-                        selected_caret_index = current_caret_index;
+            if (active_rect.contains_point(args.position)) {
+                if (args.pressed) {
+                    // Decide caret position.
+                    auto local_mouse_pos = get_local_mouse_position();
+                    current_caret_index = calculate_caret_index(local_mouse_pos);
+                    selected_caret_index = current_caret_index;
 
-                        is_pressed_inside = true;
-                    } else {
-                        is_pressed_inside = false;
-                    }
-                    consume_flag = true;
-                }
-
-                if (!args.pressed) {
+                    is_pressed_inside = true;
+                } else {
                     is_pressed_inside = false;
                 }
-            } break;
-            case InputEventType::MouseMotion: {
-                auto args = event.args.mouse_motion;
-
-                if (active_rect.contains_point(args.position)) {
-                    consume_flag = true;
-                }
-
-                if (is_pressed_inside) {
-                    current_caret_index = calculate_caret_index(get_local_mouse_position());
-                    caret_blink_timer = 0;
-                }
-            } break;
-            case InputEventType::Text: {
-                if (!focused) continue;
-
-                if (current_caret_index < (int32_t)glyph_count) {
-                    label->insert_text(current_caret_index + 1, cpp11_codepoint_to_utf8(event.args.text.codepoint));
-                    current_caret_index++;
-                    caret_blink_timer = 0;
-                }
-
                 consume_flag = true;
-            } break;
-            case InputEventType::Key: {
-                auto key_args = event.args.key;
+            }
 
-                if (key_args.key == KeyCode::BACKSPACE && current_caret_index > -1) {
-                    if (key_args.pressed || key_args.repeated) {
-                        if (selected_caret_index != current_caret_index) {
-                            auto start_index = std::min(selected_caret_index, current_caret_index) + 1;
-                            auto count = std::abs(selected_caret_index - current_caret_index);
-                            label->remove_text(start_index, count);
-                            current_caret_index = selected_caret_index;
-                        } else {
-                            label->remove_text(current_caret_index, 1);
-                            current_caret_index--;
-                            selected_caret_index--;
-                        }
-                        caret_blink_timer = 0;
-                    }
-                }
+            if (!args.pressed) {
+                is_pressed_inside = false;
+            }
+        } break;
+        case InputEventType::MouseMotion: {
+            auto args = event.args.mouse_motion;
 
+            if (active_rect.contains_point(args.position)) {
+                consume_flag = true;
+            }
+
+            if (is_pressed_inside) {
+                current_caret_index = calculate_caret_index(get_local_mouse_position());
+                caret_blink_timer = 0;
+            }
+        } break;
+        case InputEventType::Text: {
+            if (!focused) {
+                break;
+            }
+
+            if (current_caret_index < (int32_t)glyph_count) {
+                label->insert_text(current_caret_index + 1, cpp11_codepoint_to_utf8(event.args.text.codepoint));
+                current_caret_index++;
+                caret_blink_timer = 0;
+            }
+
+            consume_flag = true;
+        } break;
+        case InputEventType::Key: {
+            auto key_args = event.args.key;
+
+            if (key_args.key == KeyCode::BACKSPACE && current_caret_index > -1) {
                 if (key_args.pressed || key_args.repeated) {
-                    if (key_args.key == KeyCode::LEFT && current_caret_index > -1) {
+                    if (selected_caret_index != current_caret_index) {
+                        auto start_index = std::min(selected_caret_index, current_caret_index) + 1;
+                        auto count = std::abs(selected_caret_index - current_caret_index);
+                        label->remove_text(start_index, count);
+                        current_caret_index = selected_caret_index;
+                    } else {
+                        label->remove_text(current_caret_index, 1);
                         current_caret_index--;
                         selected_caret_index--;
-                        caret_blink_timer = 0;
-                    } else if (key_args.key == KeyCode::RIGHT && current_caret_index < glyph_count - 1) {
-                        current_caret_index++;
-                        selected_caret_index++;
-                        caret_blink_timer = 0;
                     }
+                    caret_blink_timer = 0;
                 }
-            } break;
-            default:
-                break;
-        }
+            }
 
-        if (consume_flag) {
-            event.consume();
-        }
+            if (key_args.pressed || key_args.repeated) {
+                if (key_args.key == KeyCode::LEFT && current_caret_index > -1) {
+                    current_caret_index--;
+                    selected_caret_index--;
+                    caret_blink_timer = 0;
+                } else if (key_args.key == KeyCode::RIGHT && current_caret_index < glyph_count - 1) {
+                    current_caret_index++;
+                    selected_caret_index++;
+                    caret_blink_timer = 0;
+                }
+            }
+        } break;
+        default:
+            break;
+    }
+
+    if (consume_flag) {
+        event.consume();
     }
 }
 

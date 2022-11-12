@@ -31,14 +31,14 @@ void Node::propagate_notify(Signal signal) {
     }
 }
 
-void Node::propagate_input(std::vector<InputEvent> &input_queue) {
+void Node::propagate_input(InputEvent &event) {
     auto it = children.rbegin();
     while (it != children.rend()) {
-        (*it)->propagate_input(input_queue);
+        (*it)->propagate_input(event);
         it++;
     }
 
-    input(input_queue);
+    input(event);
 }
 
 void Node::propagate_cleanup() {
@@ -47,7 +47,7 @@ void Node::propagate_cleanup() {
     }
 }
 
-void Node::input(std::vector<InputEvent> &input_queue) {
+void Node::input(InputEvent &event) {
 }
 
 void Node::update(double delta) {
@@ -93,9 +93,9 @@ std::vector<std::shared_ptr<Node>> Node::get_children() {
     return children;
 }
 
-void Node::add_child(const std::shared_ptr<Node> &p_child) {
+void Node::add_child(const std::shared_ptr<Node> &new_child) {
     // Set self as the parent of the new node.
-    p_child->parent = this;
+    new_child->parent = this;
 
     //        if (p_child->name.empty()) {
     //            auto node_type_name = NodeTypeName[(uint32_t) p_child->type];
@@ -110,7 +110,7 @@ void Node::add_child(const std::shared_ptr<Node> &p_child) {
     //            p_child->name = node_type_name + std::to_string(children.size());
     //        }
 
-    children.push_back(p_child);
+    children.push_back(new_child);
 
     //        get_tree()->
 }

@@ -21,7 +21,7 @@ class Panel : public Control {
 public:
     Panel();
 
-    void input(std::vector<InputEvent> &input_queue) override;
+    void input(InputEvent &event) override;
 
     void update(double dt) override;
 
@@ -29,7 +29,7 @@ public:
 
     void enable_title_bar(bool enabled);
 
-    void propagate_input(std::vector<InputEvent> &input_queue) override;
+    void propagate_input(InputEvent &event) override;
 
     void propagate_draw(VkCommandBuffer p_command_buffer) override;
 

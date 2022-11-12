@@ -36,7 +36,7 @@ void Control::update(double dt) {
     }
 }
 
-void Control::input(std::vector<InputEvent> &input_queue) {
+void Control::input(InputEvent &event) {
     if (mouse_filter != MouseFilter::Stop) {
         return;
     }
@@ -46,48 +46,46 @@ void Control::input(std::vector<InputEvent> &input_queue) {
     auto active_rect = RectF(global_position, global_position + size);
 
     // Handle mouse input propagation.
-    for (auto &event : input_queue) {
-        bool consume_flag = false;
+    bool consume_flag = false;
 
-        switch (event.type) {
-            case InputEventType::MouseMotion: {
-                // Mouse position relative to the node's origin.
-                local_mouse_position = event.args.mouse_motion.position - global_position;
+    switch (event.type) {
+        case InputEventType::MouseMotion: {
+            // Mouse position relative to the node's origin.
+            local_mouse_position = event.args.mouse_motion.position - global_position;
 
-                if (active_rect.contains_point(event.args.mouse_motion.position)) {
-                    if (!event.is_consumed()) {
-                        is_cursor_inside = true;
-                        cursor_entered();
-                    }
+            if (active_rect.contains_point(event.args.mouse_motion.position)) {
+                if (!event.is_consumed()) {
+                    is_cursor_inside = true;
+                    cursor_entered();
+                }
+
+                consume_flag = true;
+            } else {
+                if (is_cursor_inside) {
+                    is_cursor_inside = false;
+                    cursor_exited();
+                }
+            }
+        } break;
+        case InputEventType::MouseButton: {
+            auto args = event.args.mouse_button;
+
+            if (args.pressed) {
+                if (active_rect.contains_point(args.position)) {
+                    grab_focus();
 
                     consume_flag = true;
                 } else {
-                    if (is_cursor_inside) {
-                        is_cursor_inside = false;
-                        cursor_exited();
-                    }
+                    release_focus();
                 }
-            } break;
-            case InputEventType::MouseButton: {
-                auto args = event.args.mouse_button;
+            }
+        } break;
+        default:
+            break;
+    }
 
-                if (args.pressed) {
-                    if (active_rect.contains_point(args.position)) {
-                        grab_focus();
-
-                        consume_flag = true;
-                    } else {
-                        release_focus();
-                    }
-                }
-            } break;
-            default:
-                break;
-        }
-
-        if (consume_flag) {
-            event.consume();
-        }
+    if (consume_flag) {
+        event.consume();
     }
 }
 

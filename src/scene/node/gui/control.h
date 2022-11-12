@@ -138,7 +138,7 @@ protected:
 
     void update(double dt) override;
 
-    void input(std::vector<InputEvent> &input_queue) override;
+    void input(InputEvent &input_event) override;
 
     bool is_cursor_inside = false;
 

@@ -118,70 +118,68 @@ Panel::Panel() {
     // ---------------------------------------------------------
 }
 
-void Panel::propagate_input(std::vector<InputEvent> &input_queue) {
+void Panel::propagate_input(InputEvent &event) {
     if (title_bar) {
-        title_container->propagate_input(input_queue);
+        title_container->propagate_input(event);
     }
 
     if (collapsed) {
-        input(input_queue);
+        input(event);
     } else {
-        Node::propagate_input(input_queue);
+        Node::propagate_input(event);
     }
 }
 
-void Panel::input(std::vector<InputEvent> &input_queue) {
+void Panel::input(InputEvent &event) {
     auto global_position = get_global_position();
 
-    for (auto &event : input_queue) {
-        bool consume_flag = false;
+    bool consume_flag = false;
 
-        if (event.type == InputEventType::MouseMotion) {
-            auto args = event.args.mouse_motion;
+    if (event.type == InputEventType::MouseMotion) {
+        auto args = event.args.mouse_motion;
 
-            if (title_bar_pressed) {
-                set_position(title_bar_pressed_position + args.position - title_bar_pressed_mouse_position);
-                consume_flag = true;
-            }
-
-            RectF active_rect;
-            active_rect.left = global_position.x;
-            active_rect.top = 0;
-            active_rect.right = size.x;
-            active_rect.bottom = collapsed ? title_bar_height : size.y + title_bar_height;
-
-            if (active_rect.contains_point(args.position)) {
-                consume_flag = true;
-            }
+        if (title_bar_pressed) {
+            set_position(title_bar_pressed_position + args.position - title_bar_pressed_mouse_position);
+            consume_flag = true;
         }
 
-        if (event.type == InputEventType::MouseButton) {
-            auto args = event.args.mouse_button;
+        RectF active_rect;
+        active_rect.left = global_position.x;
+        active_rect.top = 0;
+        active_rect.right = size.x;
+        active_rect.bottom = collapsed ? title_bar_height : size.y + title_bar_height;
 
-            if (!event.is_consumed()) {
-                if (RectF(global_position, global_position + Vec2<float>(size.x, title_bar_height))
-                        .contains_point(args.position)) {
-                    title_bar_pressed = args.pressed;
-
-                    if (title_bar_pressed) {
-                        title_bar_pressed_mouse_position = args.position;
-                        title_bar_pressed_position = position;
-                    }
-
-                    consume_flag = true;
-                }
-            }
-
-            if (!args.pressed) title_bar_pressed = false;
-        }
-
-        if (consume_flag) {
-            event.consume();
+        if (active_rect.contains_point(args.position)) {
+            consume_flag = true;
         }
     }
 
+    if (event.type == InputEventType::MouseButton) {
+        auto args = event.args.mouse_button;
+
+        if (!event.is_consumed()) {
+            if (RectF(global_position, global_position + Vec2<float>(size.x, title_bar_height))
+                    .contains_point(args.position)) {
+                title_bar_pressed = args.pressed;
+
+                if (title_bar_pressed) {
+                    title_bar_pressed_mouse_position = args.position;
+                    title_bar_pressed_position = position;
+                }
+
+                consume_flag = true;
+            }
+        }
+
+        if (!args.pressed) title_bar_pressed = false;
+    }
+
+    if (consume_flag) {
+        event.consume();
+    }
+
     if (!collapsed) {
-        Control::input(input_queue);
+        Control::input(event);
     }
 }
 

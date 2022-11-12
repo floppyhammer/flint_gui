@@ -45,10 +45,10 @@ void Tree::draw(VkCommandBuffer p_command_buffer) {
     vector_server->draw_style_box(debug_size_box, get_global_position(), size);
 }
 
-void Tree::input(std::vector<InputEvent> &input_queue) {
-    root->propagate_input(input_queue, get_global_position());
+void Tree::input(InputEvent &event) {
+    root->propagate_input(event, get_global_position());
 
-    Control::input(input_queue);
+    Control::input(event);
 }
 
 std::shared_ptr<TreeItem> Tree::create_item(const std::shared_ptr<TreeItem> &parent, const std::string &text) {
@@ -165,20 +165,20 @@ TreeItem *TreeItem::get_parent() {
     return parent;
 }
 
-void TreeItem::propagate_input(std::vector<InputEvent> &input_queue, Vec2F global_position) {
+void TreeItem::propagate_input(InputEvent &event, Vec2F global_position) {
     if (!children.empty()) {
-        collapse_button->input(input_queue);
+        collapse_button->input(event);
     }
 
     if (!collapsed) {
         auto it = children.rbegin();
         while (it != children.rend()) {
-            (*it)->propagate_input(input_queue, global_position);
+            (*it)->propagate_input(event, global_position);
             it++;
         }
     }
 
-    input(input_queue, global_position);
+    input(event, global_position);
 }
 
 void TreeItem::propagate_draw(
@@ -224,20 +224,18 @@ void TreeItem::propagate_draw(
     }
 }
 
-void TreeItem::input(std::vector<InputEvent> &input_queue, Vec2F global_position) {
+void TreeItem::input(InputEvent &event, Vec2F global_position) {
     float item_height = label->calculate_minimum_size().y;
     auto item_global_rect = (RectF(0, position.y, tree->get_size().x, position.y + item_height) + global_position);
 
-    for (auto &event : input_queue) {
-        if (event.type == InputEventType::MouseButton) {
-            auto button_event = event.args.mouse_button;
+    if (event.type == InputEventType::MouseButton) {
+        auto button_event = event.args.mouse_button;
 
-            if (!event.is_consumed() && button_event.pressed) {
-                if (item_global_rect.contains_point(button_event.position)) {
-                    selected = true;
-                    tree->selected_item = this;
-                    Logger::verbose("Item selected: " + label->get_text(), "Tree");
-                }
+        if (!event.is_consumed() && button_event.pressed) {
+            if (item_global_rect.contains_point(button_event.position)) {
+                selected = true;
+                tree->selected_item = this;
+                Logger::verbose("Item selected: " + label->get_text(), "Tree");
             }
         }
     }

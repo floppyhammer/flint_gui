@@ -29,9 +29,9 @@ public:
 
     TreeItem *get_parent();
 
-    void propagate_input(std::vector<InputEvent> &input_queue, Vec2F global_position);
+    void propagate_input(InputEvent &event, Vec2F global_position);
 
-    void input(std::vector<InputEvent> &input_queue, Vec2F global_position);
+    void input(InputEvent &event, Vec2F global_position);
 
     void propagate_draw(
         float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y, Vec2F global_position);
@@ -68,7 +68,7 @@ class Tree : public Control {
 public:
     Tree();
 
-    void input(std::vector<InputEvent> &input_queue) override;
+    void input(InputEvent &event) override;
 
     void update(double delta) override;
 

@@ -42,59 +42,57 @@ Vec2F SpinBox::calculate_minimum_size() const {
     return container_size.max(minimum_size);
 }
 
-void SpinBox::input(std::vector<InputEvent> &input_queue) {
+void SpinBox::input(InputEvent &event) {
     auto global_position = get_global_position();
     auto active_rect = RectF(global_position, global_position + size);
 
-    for (auto &event : input_queue) {
-        bool consume_flag = false;
+    bool consume_flag = false;
 
-        if (event.type == InputEventType::MouseMotion) {
-            auto args = event.args.mouse_motion;
+    if (event.type == InputEventType::MouseMotion) {
+        auto args = event.args.mouse_motion;
 
-            if (pressed_inside) {
-                if (drag_to_adjust_value) {
-                    set_value(value + args.relative.x * step);
-                }
-
-                drag_to_adjust_value = true;
-
-                // Capture cursor when dragging.
-                InputServer::get_singleton()->set_cursor_captured(true);
+        if (pressed_inside) {
+            if (drag_to_adjust_value) {
+                set_value(value + args.relative.x * step);
             }
 
-            if (active_rect.contains_point(args.position)) {
-                consume_flag = true;
-            }
+            drag_to_adjust_value = true;
+
+            // Capture cursor when dragging.
+            InputServer::get_singleton()->set_cursor_captured(true);
         }
 
-        if (event.type == InputEventType::MouseButton) {
-            auto args = event.args.mouse_button;
+        if (active_rect.contains_point(args.position)) {
+            consume_flag = true;
+        }
+    }
 
-            if (!args.pressed) {
-                if (pressed_inside) {
-                    // Release cursor when dragging ends.
-                    InputServer::get_singleton()->set_cursor_captured(false);
-                }
+    if (event.type == InputEventType::MouseButton) {
+        auto args = event.args.mouse_button;
 
-                pressed_inside = false;
-                drag_to_adjust_value = false;
+        if (!args.pressed) {
+            if (pressed_inside) {
+                // Release cursor when dragging ends.
+                InputServer::get_singleton()->set_cursor_captured(false);
             }
 
-            if (event.is_consumed()) {
-                focused = false;
-                pressed_inside = false;
-            } else {
-                if (active_rect.contains_point(args.position)) {
-                    if (args.pressed) {
-                        focused = true;
-                        pressed_inside = true;
-                    }
+            pressed_inside = false;
+            drag_to_adjust_value = false;
+        }
 
-                    consume_flag = true;
-                } else {
-                    focused = false;
+        if (event.is_consumed()) {
+            focused = false;
+            pressed_inside = false;
+        } else {
+            if (active_rect.contains_point(args.position)) {
+                if (args.pressed) {
+                    focused = true;
+                    pressed_inside = true;
                 }
+
+                consume_flag = true;
+            } else {
+                focused = false;
             }
         }
 
@@ -103,7 +101,7 @@ void SpinBox::input(std::vector<InputEvent> &input_queue) {
         }
     }
 
-    Control::input(input_queue);
+    Control::input(event);
 }
 
 void SpinBox::update(double dt) {

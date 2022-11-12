@@ -10,7 +10,7 @@ class ScrollContainer : public Container {
 public:
     ScrollContainer();
 
-    void input(std::vector<InputEvent> &input_queue) override;
+    void input(InputEvent &event) override;
 
     void update(double dt) override;
 
@@ -44,7 +44,7 @@ protected:
 private:
     void propagate_draw(VkCommandBuffer p_command_buffer) override;
 
-    void propagate_input(std::vector<InputEvent> &input_queue) override;
+    void propagate_input(InputEvent &event) override;
 };
 
 } // namespace Flint

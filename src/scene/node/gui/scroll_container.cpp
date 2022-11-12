@@ -21,8 +21,8 @@ void ScrollContainer::adjust_layout() {
     }
 }
 
-void ScrollContainer::input(std::vector<InputEvent> &input_queue) {
-    Control::input(input_queue);
+void ScrollContainer::input(InputEvent &event) {
+    Control::input(event);
 
     if (children.empty() || !children.front()->is_gui_node()) {
         return;
@@ -36,35 +36,33 @@ void ScrollContainer::input(std::vector<InputEvent> &input_queue) {
     auto active_rect = RectF(global_position, global_position + size);
 
     // Handle mouse input propagation.
-    for (auto &event : input_queue) {
-        bool consume_flag = false;
+    bool consume_flag = false;
 
-        switch (event.type) {
-            case InputEventType::MouseScroll: {
-                float delta = event.args.mouse_scroll.y_delta;
+    switch (event.type) {
+        case InputEventType::MouseScroll: {
+            float delta = event.args.mouse_scroll.y_delta;
 
-                if (active_rect.contains_point(InputServer::get_singleton()->cursor_position)) {
-                    if (!event.is_consumed()) {
-                        vscroll -= delta * 10;
+            if (active_rect.contains_point(InputServer::get_singleton()->cursor_position)) {
+                if (!event.is_consumed()) {
+                    vscroll -= delta * 10;
 
-                        auto grabber_size = Vec2F(16, size.y / content->get_size().y * size.y);
-                        vscroll = clamp(vscroll, 0, int32_t(size.y - grabber_size.y));
-                    }
-
-                    // Will stop input propagation.
-                    if (mouse_filter == MouseFilter::Stop) {
-                        consume_flag = true;
-                    }
-                } else {
+                    auto grabber_size = Vec2F(16, size.y / content->get_size().y * size.y);
+                    vscroll = clamp(vscroll, 0, int32_t(size.y - grabber_size.y));
                 }
-            } break;
-            default:
-                break;
-        }
 
-        if (consume_flag) {
-            event.consume();
-        }
+                // Will stop input propagation.
+                if (mouse_filter == MouseFilter::Stop) {
+                    consume_flag = true;
+                }
+            } else {
+            }
+        } break;
+        default:
+            break;
+    }
+
+    if (consume_flag) {
+        event.consume();
     }
 }
 
@@ -171,9 +169,23 @@ void ScrollContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
     draw(p_command_buffer);
 }
 
-void ScrollContainer::propagate_input(std::vector<InputEvent> &input_queue) {
-    // TODO: We should also clip mouse input events as we do to drawing.
-    Node::propagate_input(input_queue);
+void ScrollContainer::propagate_input(InputEvent &event) {
+    // Intercept out-of-scope mouse input events.
+    auto global_position = get_global_position();
+
+    auto active_rect = RectF(global_position, global_position + size);
+
+    switch (event.type) {
+        case InputEventType::MouseMotion:
+        case InputEventType::MouseButton:
+        case InputEventType::MouseScroll: {
+            if (active_rect.contains_point(InputServer::get_singleton()->cursor_position)) {
+                Node::propagate_input(event);
+            }
+        } break;
+        default:
+            break;
+    }
 }
 
 } // namespace Flint

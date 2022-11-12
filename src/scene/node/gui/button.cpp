@@ -59,60 +59,58 @@ Vec2F Button::calculate_minimum_size() const {
     return container_size.max(minimum_size);
 }
 
-void Button::input(std::vector<InputEvent> &input_queue) {
+void Button::input(InputEvent &event) {
     auto global_position = get_global_position();
 
-    for (auto &event : input_queue) {
-        bool consume_flag = false;
+    bool consume_flag = false;
 
-        if (event.type == InputEventType::MouseMotion) {
-            auto args = event.args.mouse_motion;
+    if (event.type == InputEventType::MouseMotion) {
+        auto args = event.args.mouse_motion;
 
-            if (event.is_consumed()) {
+        if (event.is_consumed()) {
+            hovered = false;
+            pressed = false;
+            pressed_inside = false;
+        } else {
+            if (RectF(global_position, global_position + size).contains_point(args.position)) {
+                hovered = true;
+                consume_flag = true;
+            } else {
                 hovered = false;
                 pressed = false;
                 pressed_inside = false;
-            } else {
+            }
+        }
+    }
+
+    if (event.type == InputEventType::MouseButton) {
+        auto args = event.args.mouse_button;
+
+        if (event.is_consumed()) {
+            if (!args.pressed) {
                 if (RectF(global_position, global_position + size).contains_point(args.position)) {
-                    hovered = true;
-                    consume_flag = true;
-                } else {
-                    hovered = false;
                     pressed = false;
                     pressed_inside = false;
                 }
             }
-        }
-
-        if (event.type == InputEventType::MouseButton) {
-            auto args = event.args.mouse_button;
-
-            if (event.is_consumed()) {
-                if (!args.pressed) {
-                    if (RectF(global_position, global_position + size).contains_point(args.position)) {
-                        pressed = false;
-                        pressed_inside = false;
-                    }
+        } else {
+            if (RectF(global_position, global_position + size).contains_point(args.position)) {
+                pressed = args.pressed;
+                if (pressed) {
+                    pressed_inside = true;
+                } else {
+                    if (pressed_inside) when_pressed();
                 }
-            } else {
-                if (RectF(global_position, global_position + size).contains_point(args.position)) {
-                    pressed = args.pressed;
-                    if (pressed) {
-                        pressed_inside = true;
-                    } else {
-                        if (pressed_inside) when_pressed();
-                    }
-                    consume_flag = true;
-                }
+                consume_flag = true;
             }
-        }
-
-        if (consume_flag) {
-            event.consume();
         }
     }
 
-    Control::input(input_queue);
+    if (consume_flag) {
+        event.consume();
+    }
+
+    Control::input(event);
 }
 
 void Button::update(double dt) {
