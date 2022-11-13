@@ -23,8 +23,8 @@ Tree::Tree() {
     child_node_3d->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Node3D.svg"));
     auto child_label = create_item(child_control, "Label");
     child_label->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Label.svg"));
-    auto child_line_edit = create_item(child_control, "LineEdit");
-    child_line_edit->set_icon(
+    auto child_text_edit = create_item(child_control, "TextEdit");
+    child_text_edit->set_icon(
         ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_LineEdit.svg"));
 }
 

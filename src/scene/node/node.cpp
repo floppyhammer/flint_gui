@@ -132,8 +132,8 @@ bool Node::is_gui_node() const {
     return type >= NodeType::Control && type < NodeType::Node2D;
 }
 
-void Node::set_visibility(bool p_visible) {
-    visible = p_visible;
+void Node::set_visibility(bool _visible) {
+    visible = _visible;
 }
 
 bool Node::get_visibility() const {

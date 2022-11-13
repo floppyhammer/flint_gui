@@ -54,8 +54,8 @@ int main() {
         auto file_dialog = std::make_shared<FileDialog>();
         vbox_container->add_child(file_dialog);
 
-        auto line_edit = std::make_shared<LineEdit>();
-        hbox_container->add_child(line_edit);
+        auto text_edit = std::make_shared<TextEdit>();
+        hbox_container->add_child(text_edit);
 
         auto button = std::make_shared<Button>();
         button->set_text("Open");

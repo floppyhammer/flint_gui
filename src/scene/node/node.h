@@ -30,7 +30,6 @@ enum class NodeType {
     ItemList,
     Label,
     RichLabel,
-    LineEdit,
     TextEdit,
     Panel,
     TextureRect,
@@ -73,7 +72,6 @@ const std::array<std::string, 29> NodeTypeName{
     "ItemList",
     "Label",
     "RichLabel",
-    "LineEdit",
     "TextEdit",
     "Panel",
     "TextureRect",
@@ -144,7 +142,7 @@ public:
 
     std::string get_node_path() const;
 
-    void set_visibility(bool p_visible);
+    void set_visibility(bool _visible);
 
     bool get_visibility() const;
 
