@@ -50,10 +50,10 @@ int main() {
         auto hbox_container = std::make_shared<HStackContainer>();
         vbox_container->add_child(hbox_container);
 
-        auto line_edit = std::make_shared<LineEdit>();
-        line_edit->container_sizing.expand_h = true;
-        line_edit->container_sizing.flag_h = ContainerSizingFlag::Fill;
-        hbox_container->add_child(line_edit);
+        auto text_edit = std::make_shared<TextEdit>();
+        text_edit->container_sizing.expand_h = true;
+        text_edit->container_sizing.flag_h = ContainerSizingFlag::Fill;
+        hbox_container->add_child(text_edit);
 
         auto file_dialog = std::make_shared<FileDialog>();
         node->add_child(file_dialog);
@@ -61,8 +61,8 @@ int main() {
         auto select_button = std::make_shared<Button>();
         select_button->set_text("Select");
         // Callback to clean up staging resources.
-        auto callback = [file_dialog, line_edit] {
-            line_edit->set_text(file_dialog->show());
+        auto callback = [file_dialog, text_edit] {
+            text_edit->set_text(file_dialog->show());
         };
         select_button->connect_signal("pressed", callback);
         hbox_container->add_child(select_button);

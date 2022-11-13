@@ -1,12 +1,12 @@
-#include "line_edit.h"
+#include "text_edit.h"
 
 #include <string>
 
 #include "label.h"
 
 namespace Flint {
-Flint::LineEdit::LineEdit() {
-    type = NodeType::LineEdit;
+Flint::TextEdit::TextEdit() {
+    type = NodeType::TextEdit;
 
     label = std::make_shared<Label>("");
     label->set_vertical_alignment(Alignment::Center);
@@ -25,27 +25,27 @@ Flint::LineEdit::LineEdit() {
     theme_selection_box.border_width = 0;
     theme_selection_box.corner_radius = 0;
 
-    set_text("Enter text here");
+    set_text("Enter text");
 }
 
-void LineEdit::set_text(const std::string &p_text) {
-    label->set_text(p_text);
+void TextEdit::set_text(const std::string &_text) {
+    label->set_text(_text);
 }
 
-std::string LineEdit::get_text() const {
+std::string TextEdit::get_text() const {
     return label->get_text();
 }
 
-void LineEdit::input(InputEvent &event) {
+void TextEdit::input(InputEvent &event) {
     Control::input(event);
 
     // Handle mouse input propagation.
     bool consume_flag = false;
 
-    auto &glyphs = label->get_glyphs();
-    int32_t glyph_count = glyphs.size();
+    int32_t glyph_count = label->get_glyphs().size();
 
     auto global_position = get_global_position();
+
     auto active_rect = RectF(global_position, global_position + size);
 
     switch (event.type) {
@@ -80,6 +80,10 @@ void LineEdit::input(InputEvent &event) {
             if (is_pressed_inside) {
                 current_caret_index = calculate_caret_index(get_local_mouse_position());
                 caret_blink_timer = 0;
+
+                Logger::verbose("Caret position: current - " + std::to_string(current_caret_index) + ", selected - " +
+                                    std::to_string(selected_caret_index),
+                                "TextEdit");
             }
         } break;
         case InputEventType::Text: {
@@ -88,8 +92,14 @@ void LineEdit::input(InputEvent &event) {
             }
 
             if (current_caret_index < (int32_t)glyph_count) {
+                if (selected_caret_index != current_caret_index) {
+                    delete_selection();
+                }
+
                 label->insert_text(current_caret_index + 1, cpp11_codepoint_to_utf8(event.args.text.codepoint));
+
                 current_caret_index++;
+                selected_caret_index = current_caret_index;
                 caret_blink_timer = 0;
             }
 
@@ -101,10 +111,7 @@ void LineEdit::input(InputEvent &event) {
             if (key_args.key == KeyCode::BACKSPACE && current_caret_index > -1) {
                 if (key_args.pressed || key_args.repeated) {
                     if (selected_caret_index != current_caret_index) {
-                        auto start_index = std::min(selected_caret_index, current_caret_index) + 1;
-                        auto count = std::abs(selected_caret_index - current_caret_index);
-                        label->remove_text(start_index, count);
-                        current_caret_index = selected_caret_index;
+                        delete_selection();
                     } else {
                         label->remove_text(current_caret_index, 1);
                         current_caret_index--;
@@ -135,7 +142,7 @@ void LineEdit::input(InputEvent &event) {
     }
 }
 
-void LineEdit::update(double dt) {
+void TextEdit::update(double dt) {
     Control::update(dt);
 
     caret_blink_timer += dt;
@@ -143,7 +150,7 @@ void LineEdit::update(double dt) {
     label->update(dt);
 }
 
-void LineEdit::draw(VkCommandBuffer p_command_buffer) {
+void TextEdit::draw(VkCommandBuffer p_command_buffer) {
     auto vector_server = VectorServer::get_singleton();
 
     auto global_position = get_global_position();
@@ -193,11 +200,11 @@ void LineEdit::draw(VkCommandBuffer p_command_buffer) {
     Control::draw(p_command_buffer);
 }
 
-Vec2F LineEdit::calculate_minimum_size() const {
+Vec2F TextEdit::calculate_minimum_size() const {
     return label->calculate_minimum_size();
 }
 
-int32_t LineEdit::calculate_caret_index(Vec2F local_cursor_position) {
+int32_t TextEdit::calculate_caret_index(Vec2F local_cursor_position) {
     auto closest_glyph_index = -1;
     auto closest_distance = std::numeric_limits<float>::max();
     auto &glyphs = label->get_glyphs();
@@ -222,7 +229,7 @@ int32_t LineEdit::calculate_caret_index(Vec2F local_cursor_position) {
     return closest_glyph_index;
 }
 
-Vec2F LineEdit::calculate_caret_position(int32_t target_caret_index) {
+Vec2F TextEdit::calculate_caret_position(int32_t target_caret_index) {
     auto closest_glyph_index = -1;
     auto closest_distance = std::numeric_limits<float>::max();
     auto &glyphs = label->get_glyphs();
@@ -234,19 +241,27 @@ Vec2F LineEdit::calculate_caret_position(int32_t target_caret_index) {
     }
 }
 
-void LineEdit::grab_focus() {
+void TextEdit::grab_focus() {
     focused = true;
 }
 
-void LineEdit::release_focus() {
+void TextEdit::release_focus() {
     focused = false;
 }
 
-void LineEdit::cursor_entered() {
+void TextEdit::cursor_entered() {
     InputServer::get_singleton()->set_cursor(CursorShape::IBeam);
 }
 
-void LineEdit::cursor_exited() {
+void TextEdit::cursor_exited() {
     InputServer::get_singleton()->set_cursor(CursorShape::Arrow);
 }
+
+void TextEdit::delete_selection() {
+    auto start_index = std::min(selected_caret_index, current_caret_index) + 1;
+    auto count = std::abs(selected_caret_index - current_caret_index);
+    label->remove_text(start_index, count);
+    current_caret_index = selected_caret_index = start_index - 1;
+}
+
 } // namespace Flint

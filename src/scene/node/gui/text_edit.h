@@ -1,5 +1,5 @@
-#ifndef FLINT_LINE_EDIT_H
-#define FLINT_LINE_EDIT_H
+#ifndef FLINT_TEXT_EDIT_H
+#define FLINT_TEXT_EDIT_H
 
 #include <cstdint>
 #include <memory>
@@ -12,9 +12,9 @@ namespace Flint {
 /**
  * Single-Line text input field.
  */
-class LineEdit : public Control {
+class TextEdit : public Control {
 public:
-    LineEdit();
+    TextEdit();
 
     void set_text(const std::string &new_text);
 
@@ -34,6 +34,7 @@ public:
 
 private:
     bool editable = true;
+    bool single_line = false;
 
     int32_t selected_caret_index = -1;
     int32_t current_caret_index = -1;
@@ -45,6 +46,8 @@ private:
     std::shared_ptr<Label> label;
 
     float caret_blink_timer = 0;
+
+    void delete_selection();
 
     void cursor_entered() override;
 
@@ -60,4 +63,4 @@ private:
 };
 } // namespace Flint
 
-#endif // FLINT_LINE_EDIT_H
+#endif // FLINT_TEXT_EDIT_H
