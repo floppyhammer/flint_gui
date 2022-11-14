@@ -16,6 +16,10 @@ class Button : public Control {
 public:
     Button();
 
+    /**
+     * Pressed == ture && hovered == true: Normal buttons
+     * Pressed == ture && hovered == false: Toggled buttons
+     */
     bool pressed = false;
     bool hovered = false;
 
@@ -40,8 +44,17 @@ public:
     /// The icon will expand until it's height matches that of the button.
     void set_expand_icon(bool enable);
 
+    void set_toggle_mode(bool enable);
+
+    // Styles.
+    std::optional<StyleBox> theme_normal;
+    std::optional<StyleBox> theme_hovered;
+    std::optional<StyleBox> theme_pressed;
+
 protected:
     bool pressed_inside = false;
+
+    bool toggle_mode = false;
 
     bool expand_icon = false;
 
@@ -56,11 +69,6 @@ protected:
     std::vector<std::function<void()>> hovered_callbacks;
     std::vector<std::function<void()>> down_callbacks;
     std::vector<std::function<void()>> up_callbacks;
-
-    // Styles.
-    std::optional<StyleBox> theme_normal;
-    std::optional<StyleBox> theme_hovered;
-    std::optional<StyleBox> theme_pressed;
 
 protected:
     void when_pressed();

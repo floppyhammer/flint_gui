@@ -8,16 +8,28 @@ namespace Flint {
 
 class TabContainer : public Container {
 public:
+    TabContainer();
+
     void update(double dt) override;
 
     void adjust_layout() override;
 
     Vec2F calculate_minimum_size() const override;
 
+    void set_current_tab(int32_t tab);
+
+    void draw(VkCommandBuffer cmd_buffer) override;
+
+    void input(InputEvent& event) override;
+
 protected:
     int32_t current_tab = -1;
 
-    std::vector<Button> tab_buttons;
+    std::shared_ptr<HStackContainer> button_container;
+
+    std::vector<std::shared_ptr<Button>> tab_buttons;
+
+    std::optional<StyleBox> theme_panel, theme_button_panel;
 };
 
 } // namespace Flint

@@ -19,6 +19,7 @@
 #include "gui/text_edit.h"
 #include "gui/texture_rect.h"
 #include "gui/tree.h"
+#include "gui/tab_container.h"
 #include "node.h"
 #include "sub_viewport.h"
 

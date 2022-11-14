@@ -178,6 +178,10 @@ void Label::set_text_style(float p_size, ColorU p_color, float p_stroke_width, C
 }
 
 void Label::draw(VkCommandBuffer p_command_buffer) {
+    if (!visible) {
+        return;
+    }
+
     auto global_position = get_global_position();
 
     auto vector_server = VectorServer::get_singleton();

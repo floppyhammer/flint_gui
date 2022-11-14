@@ -43,7 +43,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
 
         // Clear color.
         std::array<VkClearValue, 2> clear_values{};
-        clear_values[0].color = {{0.2f, 0.2f, 0.2f, 1.0f}};
+        clear_values[0].color = {{0.1f, 0.1f, 0.1f, 1.0f}};
         clear_values[1].depthStencil = {1.0f, 0};
 
         render_pass_info.clearValueCount = static_cast<uint32_t>(clear_values.size());

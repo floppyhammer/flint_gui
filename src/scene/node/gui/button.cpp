@@ -69,7 +69,9 @@ void Button::input(InputEvent &event) {
 
         if (event.is_consumed()) {
             hovered = false;
-            pressed = false;
+            if (!toggle_mode) {
+                pressed = false;
+            }
             pressed_inside = false;
         } else {
             if (RectF(global_position, global_position + size).contains_point(args.position)) {
@@ -77,7 +79,9 @@ void Button::input(InputEvent &event) {
                 consume_flag = true;
             } else {
                 hovered = false;
-                pressed = false;
+                if (!toggle_mode) {
+                    pressed = false;
+                }
                 pressed_inside = false;
             }
         }
@@ -89,18 +93,29 @@ void Button::input(InputEvent &event) {
         if (event.is_consumed()) {
             if (!args.pressed) {
                 if (RectF(global_position, global_position + size).contains_point(args.position)) {
-                    pressed = false;
-                    pressed_inside = false;
+                    if (!toggle_mode) {
+                        pressed = false;
+                        pressed_inside = false;
+                    }
                 }
             }
         } else {
             if (RectF(global_position, global_position + size).contains_point(args.position)) {
-                pressed = args.pressed;
-                if (pressed) {
-                    pressed_inside = true;
+                if (!toggle_mode) {
+                    pressed = args.pressed;
+                    if (pressed) {
+                        pressed_inside = true;
+                    } else {
+                        if (pressed_inside) {
+                            when_pressed();
+                        }
+                    }
                 } else {
-                    if (pressed_inside) when_pressed();
+                    if (args.pressed) {
+                        pressed = true;
+                    }
                 }
+
                 consume_flag = true;
             }
         }
@@ -130,8 +145,10 @@ void Button::draw(VkCommandBuffer p_command_buffer) {
 
     // Draw bg.
     std::optional<StyleBox> active_style_box;
-    if (hovered) {
-        active_style_box = pressed ? theme_pressed : theme_hovered;
+    if (pressed) {
+        active_style_box = theme_pressed;
+    } else if (hovered) {
+        active_style_box = theme_hovered;
     } else {
         active_style_box = theme_normal;
     }
@@ -191,6 +208,10 @@ void Button::set_expand_icon(bool enable) {
     } else {
         icon_rect->container_sizing.expand_h = false;
     }
+}
+
+void Button::set_toggle_mode(bool enable) {
+    toggle_mode = enable;
 }
 
 } // namespace Flint
