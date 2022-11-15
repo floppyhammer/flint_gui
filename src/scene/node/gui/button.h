@@ -35,7 +35,7 @@ public:
 
     Vec2F calculate_minimum_size() const override;
 
-    void connect_signal(std::string signal, const std::function<void()> &callback);
+    void connect_signal(const std::string &signal, const std::function<void()> &callback);
 
     void set_text(const std::string &text);
 
@@ -73,6 +73,19 @@ protected:
 protected:
     void when_pressed();
 };
+
+class ButtonGroup {
+public:
+    void add_button(const std::weak_ptr<Button> &new_button);
+
+    void update();
+
+    std::vector<std::weak_ptr<Button>> buttons;
+    std::weak_ptr<Button> pressed_button;
+
+    std::vector<std::function<void()>> pressed_callbacks;
+};
+
 } // namespace Flint
 
 #endif // FLINT_BUTTON_H

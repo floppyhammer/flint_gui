@@ -152,7 +152,7 @@ public:
      */
     void when_subtree_changed();
 
-    void connect_signal(const std::string &signal, const std::function<void()> &callback);
+    virtual void connect_signal(const std::string &signal, const std::function<void()> &callback);
 
     void set_debug_mode(bool enabled);
 

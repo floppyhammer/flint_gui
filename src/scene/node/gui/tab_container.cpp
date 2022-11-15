@@ -38,6 +38,8 @@ TabContainer::TabContainer() {
         button->theme_pressed.value().bg_color = ColorU(48, 48, 48);
 
         button_container->add_child(button);
+
+        tab_button_group.add_button(button);
     }
 
     set_debug_mode(true);
@@ -70,6 +72,8 @@ void TabContainer::update(double dt) {
     adjust_layout();
 
     button_container->propagate_update(dt);
+
+    tab_button_group.update();
 }
 
 Vec2F TabContainer::calculate_minimum_size() const {

@@ -112,7 +112,12 @@ void Button::input(InputEvent &event) {
                     }
                 } else {
                     if (args.pressed) {
-                        pressed = true;
+                        pressed_inside = true;
+                    } else {
+                        if (pressed_inside && !pressed) {
+                            pressed = true;
+                            when_pressed();
+                        }
                     }
                 }
 
@@ -187,7 +192,9 @@ void Button::when_pressed() {
     }
 }
 
-void Button::connect_signal(std::string signal, const std::function<void()> &callback) {
+void Button::connect_signal(const std::string &signal, const std::function<void()> &callback) {
+    Control::connect_signal(signal, callback);
+    
     if (signal == "pressed") {
         pressed_callbacks.push_back(callback);
     }
@@ -212,6 +219,26 @@ void Button::set_expand_icon(bool enable) {
 
 void Button::set_toggle_mode(bool enable) {
     toggle_mode = enable;
+}
+
+void ButtonGroup::update() {
+    // We should not trigger any button signals when changing their states from ButtonGroup.
+    for (auto &b : buttons) {
+        if (b.lock() == pressed_button.lock()) {
+            b.lock()->pressed = true;
+        } else {
+            b.lock()->pressed = false;
+        }
+    }
+}
+
+void ButtonGroup::add_button(const std::weak_ptr<Button> &new_button) {
+    buttons.push_back(new_button);
+
+    auto callback = [this, new_button] {
+        this->pressed_button = new_button;
+    };
+    new_button.lock()->connect_signal("pressed", callback);
 }
 
 } // namespace Flint

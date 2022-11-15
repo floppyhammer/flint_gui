@@ -25,6 +25,7 @@
 
 namespace Flint {
 
+/// Processing order: Input -> Update -> Draw.
 class SceneTree {
 public:
     SceneTree();
