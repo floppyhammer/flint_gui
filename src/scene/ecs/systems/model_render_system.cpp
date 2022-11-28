@@ -1,6 +1,5 @@
 #include "model_render_system.h"
 
-#include "../../../core/engine.h"
 #include "../../../render/mvp.h"
 #include "../../../render/swap_chain.h"
 #include "../../../resources/surface.h"
@@ -8,6 +7,7 @@
 #include "../coordinator.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "servers/core_server.h"
 
 namespace Flint {
 void ModelRenderSystem::update(const std::weak_ptr<Coordinator> &p_coordinator) {
@@ -25,7 +25,7 @@ void ModelRenderSystem::update(const std::weak_ptr<Coordinator> &p_coordinator) 
                                    glm::vec3(transform.position.x, transform.position.y, transform.position.z));
         mvp.model = glm::scale(mvp.model, glm::vec3(transform.scale.x, transform.scale.y, transform.scale.z));
         mvp.model = glm::rotate(mvp.model,
-                                (float)Engine::get_singleton()->get_elapsed() * glm::radians(90.0f),
+                                (float)CoreServer::get_singleton()->get_elapsed() * glm::radians(90.0f),
                                 glm::vec3(0.0f, 0.0f, 1.0f));
 
         mvp.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));

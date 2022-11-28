@@ -1,11 +1,11 @@
 #include "texture_rect.h"
 
-#include "../../../core/engine.h"
 #include "../../../render/swap_chain.h"
 #include "../../../resources/default_resource.h"
 #include "../../../resources/image_texture.h"
 #include "../../../resources/vector_texture.h"
 #include "../sub_viewport.h"
+#include "servers/core_server.h"
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 

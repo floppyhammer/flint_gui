@@ -408,7 +408,7 @@ void Skeleton2d::update(double delta) {
 
     pc_skeleton_transform.mvp = mvp.calculate_mvp();
 
-    float time = Engine::get_singleton()->get_elapsed();
+    float time = CoreServer::get_singleton()->get_elapsed();
     bones[3]->rotation = std::sin(time);
     bones[4]->rotation = std::sin(time);
 

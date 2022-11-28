@@ -1,15 +1,16 @@
-#include "engine.h"
+#include "core_server.h"
 
 #include <sstream>
 
 #include "../common/logger.h"
 
 namespace Flint {
-Engine::Engine() {
+
+CoreServer::CoreServer() {
     last_time_updated_fps = std::chrono::high_resolution_clock::now();
 }
 
-void Engine::tick() {
+void CoreServer::tick() {
     static auto start_time = std::chrono::high_resolution_clock::now();
     auto current_time = std::chrono::high_resolution_clock::now();
 
@@ -29,19 +30,20 @@ void Engine::tick() {
         // Set frame time.
         std::ostringstream string_stream;
         string_stream << "FPS " << round(fps * 10.f) * 0.1f;
-        Logger::verbose(string_stream.str(), "Engine");
+        Logger::verbose(string_stream.str(), "CoreServer");
     }
 }
 
-double Engine::get_delta() const {
+double CoreServer::get_delta() const {
     return delta;
 }
 
-double Engine::get_elapsed() const {
+double CoreServer::get_elapsed() const {
     return elapsed;
 }
 
-float Engine::get_fps() const {
+float CoreServer::get_fps() const {
     return fps;
 }
+
 } // namespace Flint

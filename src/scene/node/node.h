@@ -5,9 +5,9 @@
 #include <vector>
 
 #include "../../common/logger.h"
-#include "../../core/engine.h"
 #include "../../render/render_server.h"
 #include "../../servers/input_server.h"
+#include "servers/core_server.h"
 
 namespace Flint {
 

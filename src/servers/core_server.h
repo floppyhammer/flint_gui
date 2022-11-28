@@ -1,23 +1,24 @@
-#ifndef FLINT_ENGINE_H
-#define FLINT_ENGINE_H
+#ifndef FLINT_CORE_SERVER_H
+#define FLINT_CORE_SERVER_H
 
 #include <chrono>
 
 namespace Flint {
+
 enum class Signal {
     SwapChainChanged,
     RebuildCommandBuffer,
 };
 
-class Engine {
+class CoreServer {
 public:
-    static Engine *get_singleton() {
-        static Engine singleton;
+    static CoreServer *get_singleton() {
+        static CoreServer singleton;
 
         return &singleton;
     }
 
-    Engine();
+    CoreServer();
 
     void tick();
 
@@ -33,6 +34,7 @@ private:
     double elapsed = 0;
     double delta = 0;
 };
+
 } // namespace Flint
 
-#endif // FLINT_ENGINE_H
+#endif // FLINT_CORE_SERVER_H

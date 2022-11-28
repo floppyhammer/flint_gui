@@ -40,6 +40,12 @@ TabContainer::TabContainer() {
         button_container->add_child(button);
 
         tab_button_group.add_button(button);
+
+//        auto close_button = std::make_shared<Button>();
+//        close_button->set_text("X");
+//        close_button->set_size({24, 24});
+//        button->add_child(close_button);
+//        close_button->set_anchor_flag(AnchorFlag::CenterRight);
     }
 
     set_debug_mode(true);

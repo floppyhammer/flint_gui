@@ -4,7 +4,6 @@
 #include <memory>
 
 #include "common/io.h"
-#include "core/engine.h"
 #include "io/obj_importer.h"
 #include "render/platform.h"
 #include "render/render_server.h"
@@ -13,6 +12,7 @@
 #include "resources/mesh.h"
 #include "resources/resource_manager.h"
 #include "scene/ecs/components/components.h"
+#include "servers/core_server.h"
 #include "servers/input_server.h"
 #include "servers/vector_server.h"
 
@@ -104,10 +104,10 @@ void App::main_loop() {
         InputServer::get_singleton()->collect_events();
 
         // Engine processing.
-        Engine::get_singleton()->tick();
+        CoreServer::get_singleton()->tick();
 
         // Get frame time.
-        auto dt = Engine::get_singleton()->get_delta();
+        auto dt = CoreServer::get_singleton()->get_delta();
 
         // Acquire next image.
         // We should do this before updating the scenes as we need to modify different
