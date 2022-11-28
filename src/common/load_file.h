@@ -1,5 +1,5 @@
-#ifndef FLINT_IO_H
-#define FLINT_IO_H
+#ifndef FLINT_LOAD_FILE_H
+#define FLINT_LOAD_FILE_H
 
 #include <fstream>
 #include <iostream>
@@ -55,4 +55,4 @@ inline void split_path(const std::string &str, std::string &file_directory) {
     file_directory = str.substr(0, found);
 }
 
-#endif // FLINT_IO_H
+#endif // FLINT_LOAD_FILE_H

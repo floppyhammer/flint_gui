@@ -3,7 +3,7 @@
 #include <set>
 #include <stdexcept>
 
-#include "../common/io.h"
+#include "../common/load_file.h"
 #include "../resources/default_resource.h"
 #include "../resources/surface.h"
 

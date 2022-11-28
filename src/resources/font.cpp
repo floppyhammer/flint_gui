@@ -1,6 +1,6 @@
 #include "font.h"
 
-#include "../common/io.h"
+#include "../common/load_file.h"
 #include "../common/logger.h"
 
 #define STB_TRUETYPE_IMPLEMENTATION

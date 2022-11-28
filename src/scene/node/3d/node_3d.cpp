@@ -6,7 +6,7 @@
 
 #include <chrono>
 
-#include "../../../common/io.h"
+#include "../../../common/load_file.h"
 #include "../../../render/swap_chain.h"
 #include "../sub_viewport.h"
 #include "camera_3d.h"

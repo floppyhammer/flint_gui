@@ -1,8 +1,8 @@
 #include "obj_importer.h"
 
-#include "../common/io.h"
-#include "../common/logger.h"
-#include "../resources/resource_manager.h"
+#include "load_file.h"
+#include "logger.h"
+#include "resources/resource_manager.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 

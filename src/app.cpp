@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <memory>
 
-#include "common/io.h"
-#include "io/obj_importer.h"
+#include "common/load_file.h"
+#include "common/obj_importer.h"
 #include "render/platform.h"
 #include "render/render_server.h"
 #include "render/swap_chain.h"

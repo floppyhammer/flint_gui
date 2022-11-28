@@ -1,11 +1,11 @@
 #include "skybox.h"
 
-#include "../../../common/io.h"
-#include "../../../io/obj_importer.h"
+#include "../../../common/load_file.h"
 #include "../../../render/swap_chain.h"
 #include "../../../resources/default_resource.h"
 #include "../../../resources/resource_manager.h"
 #include "../sub_viewport.h"
+#include "common/obj_importer.h"
 
 namespace Flint {
 Skybox::Skybox() {

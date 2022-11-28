@@ -4,7 +4,7 @@
 #include <stdexcept>
 #include <utility>
 
-#include "../common/io.h"
+#include "../common/load_file.h"
 #include "../common/logger.h"
 #include "../servers/vector_server.h"
 
