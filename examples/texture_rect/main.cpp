@@ -28,7 +28,7 @@ int main() {
         auto image_texture = ResourceManager::get_singleton()->load<ImageTexture>("../assets/duck.png");
         auto vector_texture = ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Button.svg");
 
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 6; i++) {
             auto texture_rect_svg = std::make_shared<TextureRect>();
             texture_rect_svg->set_position({400.0f, i * 100.0f});
             texture_rect_svg->set_size({200, 100});
@@ -55,15 +55,15 @@ int main() {
                 texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::Scale);
                 texture_rect_image->set_stretch_mode(TextureRect::StretchMode::Scale);
             }
-            if (i == 4) {
+            if (i == 3) {
                 texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::KeepAspect);
                 texture_rect_image->set_stretch_mode(TextureRect::StretchMode::KeepAspect);
             }
-            if (i == 5) {
+            if (i == 4) {
                 texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
                 texture_rect_image->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
             }
-            if (i == 6) {
+            if (i == 5) {
                 texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::KeepCovered);
                 texture_rect_image->set_stretch_mode(TextureRect::StretchMode::KeepCovered);
             }

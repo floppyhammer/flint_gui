@@ -27,8 +27,8 @@ public:
         KeepCentered, // Center it but do not scale it.
         KeepAspect,
         KeepAspectCentered,
-        KeepCovered,
-        Tile, // Do not work.
+        KeepCovered, // Not available for VectorTexture.
+        Tile,        // Do not work.
         Max,
     };
 
