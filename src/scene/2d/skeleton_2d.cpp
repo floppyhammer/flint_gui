@@ -1,10 +1,10 @@
 #include "skeleton_2d.h"
 
+#include "../../common/logger.h"
 #include "../../render/mvp.h"
 #include "../../render/render_server.h"
 #include "../../render/swap_chain.h"
 #include "../../resources/resource_manager.h"
-#include "../../common/logger.h"
 #include "../sub_viewport.h"
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

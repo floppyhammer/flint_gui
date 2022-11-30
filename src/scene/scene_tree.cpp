@@ -1,30 +1,15 @@
 #include "scene_tree.h"
 
-#include <array>
-#include <utility>
-
 namespace Flint {
 
 SceneTree::SceneTree() {
     // TODO: make the root a SubViewport.
     root = std::make_shared<Node>();
-    root->name = "root";
+    root->name = "main_viewport";
 }
 
 std::shared_ptr<Node> SceneTree::get_root() const {
     return root;
-}
-
-void SceneTree::update(double dt) const {
-    if (root == nullptr) return;
-
-    root->propagate_update(dt);
-}
-
-void SceneTree::draw(VkCommandBuffer p_command_buffer) const {
-    if (root == nullptr) return;
-
-    root->propagate_draw(p_command_buffer);
 }
 
 void SceneTree::input(std::vector<InputEvent>& input_queue) const {
@@ -32,9 +17,25 @@ void SceneTree::input(std::vector<InputEvent>& input_queue) const {
         return;
     }
 
-    for (auto& event : InputServer::get_singleton()->input_queue) {
+    for (auto& event : input_queue) {
         root->propagate_input(event);
     }
+}
+
+void SceneTree::update(double dt) const {
+    if (root == nullptr) {
+        return;
+    }
+
+    root->propagate_update(dt);
+}
+
+void SceneTree::draw(VkCommandBuffer cmd_buffer) const {
+    if (root == nullptr) {
+        return;
+    }
+
+    root->propagate_draw(cmd_buffer);
 }
 
 } // namespace Flint

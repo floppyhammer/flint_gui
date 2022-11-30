@@ -11,6 +11,7 @@
 #include <vector>
 
 namespace Flint {
+
 /// MVP, which will be sent to the vertex stage.
 /// Shared by 2D and 3D.
 struct ModelViewProjection {
@@ -52,6 +53,7 @@ private:
 
     void free_uniform_buffers();
 };
+
 } // namespace Flint
 
 #endif // FLINT_MVP_H

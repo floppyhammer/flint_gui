@@ -194,7 +194,7 @@ void Button::when_pressed() {
 
 void Button::connect_signal(const std::string &signal, const std::function<void()> &callback) {
     Control::connect_signal(signal, callback);
-    
+
     if (signal == "pressed") {
         pressed_callbacks.push_back(callback);
     }
@@ -235,9 +235,7 @@ void ButtonGroup::update() {
 void ButtonGroup::add_button(const std::weak_ptr<Button> &new_button) {
     buttons.push_back(new_button);
 
-    auto callback = [this, new_button] {
-        this->pressed_button = new_button;
-    };
+    auto callback = [this, new_button] { this->pressed_button = new_button; };
     new_button.lock()->connect_signal("pressed", callback);
 }
 

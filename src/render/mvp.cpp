@@ -1,13 +1,10 @@
-//
-// Created by tannh on 4/3/2022.
-//
-
 #include "mvp.h"
 
 #include "render_server.h"
 #include "swap_chain.h"
 
 namespace Flint {
+
 glm::mat4 ModelViewProjection::calculate_mvp() const {
     return proj * view * model;
 }
@@ -56,4 +53,5 @@ void MvpBuffer::free_uniform_buffers() {
         vkFreeMemory(device, uniform_buffers_memory[i], nullptr);
     }
 }
+
 } // namespace Flint

@@ -47,7 +47,7 @@ void SubViewportContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
     draw(p_command_buffer);
 }
 
-void SubViewportContainer::draw(VkCommandBuffer p_command_buffer) {
+void SubViewportContainer::draw(VkCommandBuffer cmd_buffer) {
     Node *viewport_node = get_viewport();
 
     VkPipeline pipeline = RenderServer::getSingleton()->blitGraphicsPipeline;
@@ -60,11 +60,10 @@ void SubViewportContainer::draw(VkCommandBuffer p_command_buffer) {
 
     // Upload the model matrix to the GPU via push constants.
     vkCmdPushConstants(
-        p_command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
+        cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
 
-    VkBuffer vertexBuffers[] = {mesh->surface->get_vertex_buffer()};
     RenderServer::getSingleton()->blit(
-        p_command_buffer,
+        cmd_buffer,
         pipeline,
         mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage));
 }
@@ -89,4 +88,5 @@ void SubViewportContainer::update_mvp() {
 
     push_constant.mvp = mvp.model;
 }
+
 } // namespace Flint

@@ -34,9 +34,9 @@ public:
 
     void update(double dt) const;
 
-    void draw(VkCommandBuffer p_command_buffer) const;
+    void draw(VkCommandBuffer cmd_buffer) const;
 
-    /// The Root of the scene tree is a Node.
+    /// The Root of the scene tree is always a SubViewport.
     std::shared_ptr<Node> get_root() const;
 
 private:

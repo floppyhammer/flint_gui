@@ -1,6 +1,6 @@
 #include <iostream>
-#include <stdexcept>
 #include <random>
+#include <stdexcept>
 
 #include "app.h"
 
@@ -61,9 +61,7 @@ int main() {
         auto select_button = std::make_shared<Button>();
         select_button->set_text("Select");
         // Callback to clean up staging resources.
-        auto callback = [file_dialog, text_edit] {
-            text_edit->set_text(file_dialog->show());
-        };
+        auto callback = [file_dialog, text_edit] { text_edit->set_text(file_dialog->show()); };
         select_button->connect_signal("pressed", callback);
         hbox_container->add_child(select_button);
 

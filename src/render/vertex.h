@@ -4,6 +4,7 @@
 #include "render_server.h"
 
 namespace Flint {
+
 /// Vertex for 2D and 3D meshes.
 struct Vertex {
     glm::vec3 pos;
@@ -30,20 +31,11 @@ struct Vertex {
     static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
         std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
 
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+        attributeDescriptions[0] = {0, 0, VK_FORMAT_R32G32B32_SFLOAT, (uint32_t)offsetof(Vertex, pos)};
 
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(Vertex, color);
+        attributeDescriptions[1] = {1, 0, VK_FORMAT_R32G32B32_SFLOAT, (uint32_t)offsetof(Vertex, color)};
 
-        attributeDescriptions[2].binding = 0;
-        attributeDescriptions[2].location = 2;
-        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[2].offset = offsetof(Vertex, uv);
+        attributeDescriptions[2] = {2, 0, VK_FORMAT_R32G32_SFLOAT, (uint32_t)offsetof(Vertex, uv)};
 
         return attributeDescriptions;
     }
@@ -59,10 +51,7 @@ struct SkeletonVertex {
 
     /// Vertex binding description.
     static VkVertexInputBindingDescription getBindingDescription() {
-        VkVertexInputBindingDescription bindingDescription{};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(SkeletonVertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+        VkVertexInputBindingDescription bindingDescription = {0, sizeof(SkeletonVertex), VK_VERTEX_INPUT_RATE_VERTEX};
 
         return bindingDescription;
     }
@@ -71,30 +60,13 @@ struct SkeletonVertex {
     static std::array<VkVertexInputAttributeDescription, 5> getAttributeDescriptions() {
         std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions{};
 
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(SkeletonVertex, pos);
-
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(SkeletonVertex, color);
-
-        attributeDescriptions[2].binding = 0;
-        attributeDescriptions[2].location = 2;
-        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[2].offset = offsetof(SkeletonVertex, uv);
-
-        attributeDescriptions[3].binding = 0;
-        attributeDescriptions[3].location = 3;
-        attributeDescriptions[3].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        attributeDescriptions[3].offset = offsetof(SkeletonVertex, bone_indices);
-
-        attributeDescriptions[4].binding = 0;
-        attributeDescriptions[4].location = 4;
-        attributeDescriptions[4].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        attributeDescriptions[4].offset = offsetof(SkeletonVertex, bone_weights);
+        attributeDescriptions[0] = {0, 0, VK_FORMAT_R32G32B32_SFLOAT, (uint32_t)offsetof(SkeletonVertex, pos)};
+        attributeDescriptions[1] = {1, 0, VK_FORMAT_R32G32B32_SFLOAT, (uint32_t)offsetof(SkeletonVertex, color)};
+        attributeDescriptions[2] = {2, 0, VK_FORMAT_R32G32_SFLOAT, (uint32_t)offsetof(SkeletonVertex, uv)};
+        attributeDescriptions[3] = {
+            3, 0, VK_FORMAT_R32G32B32A32_SFLOAT, (uint32_t)offsetof(SkeletonVertex, bone_indices)};
+        attributeDescriptions[4] = {
+            4, 0, VK_FORMAT_R32G32B32A32_SFLOAT, (uint32_t)offsetof(SkeletonVertex, bone_weights)};
 
         return attributeDescriptions;
     }
@@ -106,11 +78,7 @@ struct SkyboxVertex {
 
     /// Vertex binding description.
     static VkVertexInputBindingDescription getBindingDescription() {
-        VkVertexInputBindingDescription bindingDescription{};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(SkyboxVertex);
-        bindingDescription.inputRate =
-            VK_VERTEX_INPUT_RATE_VERTEX; // Specify rate at which vertex attributes are pulled from buffers.
+        VkVertexInputBindingDescription bindingDescription = {0, sizeof(SkyboxVertex), VK_VERTEX_INPUT_RATE_VERTEX};
 
         return bindingDescription;
     }
@@ -119,10 +87,7 @@ struct SkyboxVertex {
     static std::array<VkVertexInputAttributeDescription, 1> getAttributeDescriptions() {
         std::array<VkVertexInputAttributeDescription, 1> attributeDescriptions{};
 
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[0].offset = 0;
+        attributeDescriptions[0] = {0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0};
 
         return attributeDescriptions;
     }
@@ -236,6 +201,7 @@ private:
         vkFreeMemory(Platform::getSingleton()->device, staging_buffer_memory, nullptr);
     }
 };
+
 } // namespace Flint
 
 #endif // FLINT_VERTEX_H

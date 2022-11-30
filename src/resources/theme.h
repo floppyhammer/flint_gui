@@ -1,6 +1,6 @@
-#include "style_box.h"
-
 #include <map>
+
+#include "style_box.h"
 
 struct Theme {
     struct {

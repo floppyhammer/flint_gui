@@ -4,7 +4,7 @@
 #include "../common/macros.h"
 
 // Already defined in Pathfinder.
-//#define STB_IMAGE_IMPLEMENTATION
+// #define STB_IMAGE_IMPLEMENTATION
 
 #include <stdexcept>
 

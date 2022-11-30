@@ -1,6 +1,6 @@
 #include <iostream>
-#include <stdexcept>
 #include <random>
+#include <stdexcept>
 
 #include "app.h"
 
@@ -9,8 +9,8 @@ using namespace Flint;
 using Pathfinder::Vec2;
 using Pathfinder::Vec3;
 
-const uint32_t WINDOW_WIDTH = 1920;
-const uint32_t WINDOW_HEIGHT = 1080;
+const uint32_t WINDOW_WIDTH = 1280;
+const uint32_t WINDOW_HEIGHT = 720;
 
 int main() {
     App app(WINDOW_WIDTH, WINDOW_HEIGHT);
