@@ -45,7 +45,9 @@ public:
 
     void draw_path(VectorPath &vector_path, Transform2 transform);
 
-    void draw_texture(VectorTexture &texture, Transform2 transform);
+    void draw_image_texture(ImageTexture &texture, Transform2 transform);
+
+    void draw_vector_texture(VectorTexture &texture, Transform2 transform);
 
     void draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size);
 

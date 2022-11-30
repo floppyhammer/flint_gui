@@ -14,9 +14,7 @@
 #include "glm/glm.hpp"
 #include "resources/image_texture.h"
 #include "resources/surface.h"
-#include "scene/ecs/entity.h"
-#include "scene/ecs/world.h"
-#include "scene/node/scene_tree.h"
+#include "scene/scene_tree.h"
 
 class App {
 public:
@@ -27,8 +25,6 @@ public:
     void cleanup();
 
     std::unique_ptr<Flint::SceneTree> tree;
-
-    std::unique_ptr<Flint::World> world;
 
 private:
     /**

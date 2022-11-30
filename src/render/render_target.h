@@ -6,7 +6,7 @@
 #include "render_server.h"
 
 using Pathfinder::Transform2;
-using Pathfinder::Vec2;
+using Pathfinder::Vec2I;
 
 namespace Flint {
 /**
@@ -44,12 +44,12 @@ public:
      * When extent is changed, we need to recreate some Vulkan resources.
      * @param p_extent New extent
      */
-    void set_extent(Vec2<uint32_t> p_extent);
+    void set_extent(Vec2I _extent);
 
-    Vec2<uint32_t> get_extent();
+    Vec2I get_extent();
 
 private:
-    Vec2<uint32_t> extent = {512, 512};
+    Vec2I extent = {512, 512};
 
     // Render pass doesn't care about extent.
     void create_render_pass();

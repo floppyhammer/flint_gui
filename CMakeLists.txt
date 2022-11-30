@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.16.1)
+
 project(flint)
 
 # Has to be 17 or above.
@@ -42,7 +43,6 @@ add_library(flint ${SOURCE_FILES})
 add_subdirectory(examples/file_selection)
 add_subdirectory(examples/2d_skeleton)
 add_subdirectory(examples/3d_model_viewer)
-add_subdirectory(examples/ecs_test)
 add_subdirectory(examples/layout)
 add_subdirectory(examples/texture_rect)
 add_subdirectory(examples/scrolling)

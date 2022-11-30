@@ -155,30 +155,32 @@ VkRenderPassBeginInfo RenderTarget::getRenderPassInfo() {
     renderPassInfo.renderPass = renderPass;
     renderPassInfo.framebuffer = framebuffer; // Set target framebuffer.
     renderPassInfo.renderArea.offset = {0, 0};
-    renderPassInfo.renderArea.extent = VkExtent2D{extent.x, extent.y};
+    renderPassInfo.renderArea.extent = VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y};
 
     return renderPassInfo;
 }
 
 void RenderTarget::create_pipelines() {
     // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
-    RenderServer::getSingleton()->createMeshPipeline(renderPass, VkExtent2D{extent.x, extent.y}, meshGraphicsPipeline);
+    RenderServer::getSingleton()->createMeshPipeline(
+        renderPass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, meshGraphicsPipeline);
 
-    RenderServer::getSingleton()->createBlitPipeline(renderPass, VkExtent2D{extent.x, extent.y}, blitGraphicsPipeline);
+    RenderServer::getSingleton()->createBlitPipeline(
+        renderPass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, blitGraphicsPipeline);
 
     RenderServer::getSingleton()->create_skybox_pipeline(
-        renderPass, VkExtent2D{extent.x, extent.y}, skybox_graphics_pipeline);
+        renderPass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, skybox_graphics_pipeline);
 }
 
-void RenderTarget::set_extent(Vec2<uint32_t> p_extent) {
-    if (extent != p_extent) {
-        extent = p_extent;
+void RenderTarget::set_extent(Vec2I _extent) {
+    if (extent != _extent) {
+        extent = _extent;
         extent_dependent_cleanup();
         extent_dependent_init();
     }
 }
 
-Vec2<uint32_t> RenderTarget::get_extent() {
+Vec2I RenderTarget::get_extent() {
     return extent;
 }
 

@@ -8,10 +8,10 @@
 #include "render/platform.h"
 #include "render/render_server.h"
 #include "render/swap_chain.h"
+#include "resources/default_resource.h"
 #include "resources/image_texture.h"
 #include "resources/mesh.h"
 #include "resources/resource_manager.h"
-#include "scene/ecs/components/components.h"
 #include "servers/core_server.h"
 #include "servers/input_server.h"
 #include "servers/vector_server.h"
@@ -53,11 +53,7 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
     }
 
     // Record drawing commands from the scene manager.
-    {
-        tree->draw(command_buffers[image_index]);
-
-        world->draw(command_buffers[image_index]);
-    }
+    tree->draw(command_buffers[image_index]);
 
     VectorServer::get_singleton()->submit();
 
@@ -95,7 +91,6 @@ App::App(uint32_t window_width, uint32_t window_height) {
     vector_server->init(driver, window_width, window_height);
 
     tree = std::make_unique<Flint::SceneTree>();
-    world = std::make_unique<World>();
 }
 
 void App::main_loop() {
@@ -122,13 +117,7 @@ void App::main_loop() {
         tree->input(InputServer::get_singleton()->input_queue);
 
         // Update the scene tree.
-        {
-            // Node scene manager.
-            tree->update(dt);
-
-            // ECS scene manager.
-            world->update(dt);
-        }
+        tree->update(dt);
 
         // Record draw calls.
         record_commands(SwapChain::getSingleton()->commandBuffers, image_index);
@@ -144,7 +133,6 @@ void App::main_loop() {
 void App::cleanup() {
     // Clean up the scene tree.
     tree.reset();
-    world.reset();
 
     VectorServer::get_singleton()->cleanup();
     Logger::verbose("Cleaned up VectorServer.", "App");
