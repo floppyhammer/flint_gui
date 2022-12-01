@@ -13,3 +13,9 @@ Flint is a vector-based GUI framework in development.
 ![Example 2](screenshot_2.png)
 
 ![Example 2](screenshot_3.gif)
+
+## How to run examples
+
+### Shader generation
+
+* Run `src/shaders/compile.ps1` to generate shader headers. You should have Vulkan SDK installed first.
