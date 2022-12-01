@@ -672,7 +672,7 @@ void Skeleton2d::allocate_bone_transforms(uint32_t new_bone_count) {
     uint32_t tex_height = height * (true ? 2 : 3); // 2D/3D.
 
     bone_transforms.resize(tex_width * tex_height * 4);
-    bone_transforms_texture = ImageTexture::from_empty(tex_width, tex_height, VK_FORMAT_R32G32B32A32_SFLOAT);
+    bone_transforms_texture = ImageTexture::from_empty(Vec2I(tex_width, tex_height), VK_FORMAT_R32G32B32A32_SFLOAT);
 
     // Need a sampler of nearest.
     bone_transforms_texture->set_filter(VK_FILTER_NEAREST);

@@ -59,7 +59,7 @@ private:
     std::shared_ptr<Label> title_label;
     std::shared_ptr<Button> collapse_button, close_button;
     std::shared_ptr<HStackContainer> title_container;
-    std::shared_ptr<VectorTexture> collapse_icon, expand_icon;
+    std::shared_ptr<VectorTexture> collapsed_tex, expanded_tex, close_tex;
 
     std::optional<StyleBox> theme_panel;
     std::optional<StyleLine> theme_title_bar_line;

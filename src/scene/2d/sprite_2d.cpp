@@ -46,8 +46,7 @@ void Sprite2d::update_mvp() {
 
     Vec2I viewport_extent = get_viewport_size();
 
-    float scaled_sprite_width = mesh->surface->get_material()->get_texture()->get_width() * scale.x;
-    float scaled_sprite_height = mesh->surface->get_material()->get_texture()->get_height() * scale.y;
+    auto scaled_size = mesh->surface->get_material()->get_texture()->get_size().to_f32() * scale;
 
     auto global_position = get_global_position();
 
@@ -57,16 +56,14 @@ void Sprite2d::update_mvp() {
     // The actual application order of these matrices is reverse.
     // 3.
     mvp.model = glm::translate(glm::mat4(1.0f),
-                               glm::vec3((global_position.x - scaled_sprite_width * 0.5) / viewport_extent.x * 2.0f,
-                                         (global_position.y - scaled_sprite_height * 0.5) / viewport_extent.y * 2.0f,
+                               glm::vec3((global_position.x - scaled_size.x * 0.5) / viewport_extent.x * 2.0f,
+                                         (global_position.y - scaled_size.y * 0.5) / viewport_extent.y * 2.0f,
                                          0.0f));
     // 2.
     mvp.model = glm::translate(mvp.model, glm::vec3(-1.0, -1.0, 0.0f));
     // 1.
     mvp.model = glm::scale(
-        mvp.model,
-        glm::vec3(
-            scaled_sprite_width / viewport_extent.x * 2.0f, scaled_sprite_height / viewport_extent.y * 2.0f, 1.0f));
+        mvp.model, glm::vec3(scaled_size.x / viewport_extent.x * 2.0f, scaled_size.y / viewport_extent.y * 2.0f, 1.0f));
 
     push_constant.mvp = mvp.model;
 }

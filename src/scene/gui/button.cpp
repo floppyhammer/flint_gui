@@ -30,16 +30,11 @@ Button::Button() {
     label->set_horizontal_alignment(Alignment::Center);
     label->set_vertical_alignment(Alignment::Center);
 
-    auto vector_texture = VectorTexture::from_empty(24, 24);
-    VectorPath vp;
-    vp.path2d.add_circle({vector_texture->get_width() * 0.5f, vector_texture->get_height() * 0.5f}, 8);
-    vp.stroke_color = ColorU(163, 163, 163, 255);
-    vp.stroke_width = 2;
-    vector_texture->add_path(vp);
+    auto icon_tex = std::make_shared<VectorTexture>("../assets/icons/Node_Button.svg");
+
     icon_rect = std::make_shared<TextureRect>();
     icon_rect->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
-    icon_rect->set_texture(vector_texture);
-    icon_rect->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
+    icon_rect->set_texture(icon_tex);
 
     hbox_container = std::make_shared<HStackContainer>();
     hbox_container->add_child(icon_rect);

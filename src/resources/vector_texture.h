@@ -27,13 +27,13 @@ struct VectorPath {
 /// A SVG analogy.
 class VectorTexture : public Texture {
 public:
-    VectorTexture(uint32_t _width, uint32_t _height);
+    explicit VectorTexture(Vec2I _size);
 
     /// Create from a SVG file.
     explicit VectorTexture(const std::string &path);
 
     /// Create empty with a specific size.
-    static std::shared_ptr<VectorTexture> from_empty(uint32_t _width, uint32_t _height);
+    static std::shared_ptr<VectorTexture> from_empty(Vec2I _size);
 
     void add_path(const VectorPath &new_path);
 

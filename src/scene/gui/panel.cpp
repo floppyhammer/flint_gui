@@ -11,7 +11,7 @@ Panel::Panel() {
 
     theme_panel = std::make_optional(StyleBox());
     theme_panel.value().bg_color = ColorU(27, 27, 27, 255);
-    theme_panel.value().border_color = {50, 50, 50, 100};
+    theme_panel.value().border_color = {75, 75, 75, 100};
     theme_panel.value().border_width = 2;
     theme_panel.value().corner_radius = 8;
 
@@ -20,34 +20,9 @@ Panel::Panel() {
     theme_title_bar_line = std::make_optional(StyleLine());
     theme_title_bar_line.value().color = {50, 50, 50, 255};
 
-    {
-        collapse_icon = VectorTexture::from_empty(24, 24);
-        VectorPath vp;
-        float x = collapse_icon->get_width() * 0.5f;
-        float y = collapse_icon->get_height() * 0.5f;
-        vp.path2d.move_to(6 + x, -6 + y);
-        vp.path2d.line_to(0 + x, 7 + y);
-        vp.path2d.line_to(-6 + x, -6 + y);
-        vp.path2d.close_path();
-        vp.stroke_color = ColorU(163, 163, 163, 255);
-        vp.stroke_width = 2;
-        collapse_icon->add_path(vp);
-    }
-
-    {
-        expand_icon = VectorTexture::from_empty(24, 24);
-        VectorPath vp;
-        float x = expand_icon->get_width() * 0.5f;
-        float y = expand_icon->get_height() * 0.5f;
-        vp.path2d.move_to(-6 + x, -6 + y);
-        vp.path2d.line_to(6 + x, 0 + y);
-        vp.path2d.line_to(-6 + x, 6 + y);
-        vp.path2d.close_path();
-
-        vp.stroke_color = ColorU(163, 163, 163, 255);
-        vp.stroke_width = 2;
-        expand_icon->add_path(vp);
-    }
+    collapsed_tex = std::make_shared<VectorTexture>("../assets/icons/ArrowRight.svg");
+    expanded_tex = std::make_shared<VectorTexture>("../assets/icons/ArrowDown.svg");
+    close_tex = std::make_shared<VectorTexture>("../assets/icons/Close.svg");
 
     {
         title_label = std::make_shared<Label>("Panel");
@@ -59,21 +34,10 @@ Panel::Panel() {
     }
 
     {
-        auto close_icon = VectorTexture::from_empty(24, 24);
-        VectorPath vp;
-        float x = close_icon->get_width() * 0.5f;
-        float y = close_icon->get_height() * 0.5f;
-        vp.path2d.add_line({-8 + x, -8 + y}, {8 + x, 8 + y});
-        vp.path2d.add_line({-8 + x, 8 + y}, {8 + x, -8 + y});
-
-        vp.stroke_color = ColorU(163, 163, 163, 255);
-        vp.stroke_width = 2;
-        close_icon->add_path(vp);
-
         close_button = std::make_shared<Button>();
         close_button->set_text("");
         close_button->set_parent(this);
-        close_button->set_icon(close_icon);
+        close_button->set_icon(close_tex);
         close_button->set_minimum_size(Vec2F(title_bar_height));
         close_button->set_expand_icon(true);
         close_button->theme_normal.value().border_width = 0.0;
@@ -82,7 +46,7 @@ Panel::Panel() {
 
     collapse_button = std::make_shared<Button>();
     collapse_button->set_text("");
-    collapse_button->set_icon(collapse_icon);
+    collapse_button->set_icon(expanded_tex);
     collapse_button->set_minimum_size(Vec2F(title_bar_height));
     collapse_button->set_expand_icon(true);
     collapse_button->theme_normal.value().border_width = 0.0;
@@ -101,7 +65,7 @@ Panel::Panel() {
     auto callback = [this] {
         collapsed = !collapsed;
         if (collapsed) {
-            collapse_button->set_icon(expand_icon);
+            collapse_button->set_icon(collapsed_tex);
 
             // Store width.
             expanded_width = size.x;
@@ -112,7 +76,7 @@ Panel::Panel() {
 
             Logger::verbose("Collapsed", "Panel");
         } else {
-            collapse_button->set_icon(collapse_icon);
+            collapse_button->set_icon(expanded_tex);
 
             set_size({expanded_width, size.y});
 

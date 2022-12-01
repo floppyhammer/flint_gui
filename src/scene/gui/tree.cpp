@@ -84,45 +84,25 @@ TreeItem::TreeItem() {
 
     icon = std::make_shared<TextureRect>();
     icon->set_minimum_size({24, 24});
-    icon->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
+    icon->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
 
-    {
-        collapse_icon = VectorTexture::from_empty(24, 24);
-        VectorPath vp;
-        float x = collapse_icon->get_width() * 0.5f;
-        float y = collapse_icon->get_height() * 0.5f;
-        vp.path2d.move_to(-6 + x, -3 + y);
-        vp.path2d.line_to(0 + x, 3 + y);
-        vp.path2d.line_to(6 + x, -3 + y);
-        vp.stroke_color = ColorU(163, 163, 163, 255);
-        vp.stroke_width = 2;
-        collapse_icon->add_path(vp);
-    }
-
-    {
-        expand_icon = VectorTexture::from_empty(24, 24);
-        VectorPath vp;
-        float x = expand_icon->get_width() * 0.5f;
-        float y = expand_icon->get_height() * 0.5f;
-        vp.path2d.move_to(-3 + x, -6 + y);
-        vp.path2d.line_to(3 + x, 0 + y);
-        vp.path2d.line_to(-3 + x, 6 + y);
-        vp.stroke_color = ColorU(163, 163, 163, 255);
-        vp.stroke_width = 2;
-        expand_icon->add_path(vp);
-    }
+    collapsed_tex = std::make_shared<VectorTexture>("../assets/icons/ArrowRight.svg");
+    expanded_tex = std::make_shared<VectorTexture>("../assets/icons/ArrowDown.svg");
 
     collapse_button = std::make_shared<Button>();
-    collapse_button->set_icon(collapse_icon);
+    collapse_button->set_icon(expanded_tex);
     collapse_button->set_text("");
+    collapse_button->set_expand_icon(true);
     collapse_button->set_minimum_size({24, 24});
+    collapse_button->theme_normal.value().border_width = 0;
+    collapse_button->theme_normal.value().bg_color = ColorU::transparent_black();
 
     auto callback = [this] {
         collapsed = !collapsed;
         if (collapsed) {
-            collapse_button->set_icon(expand_icon);
+            collapse_button->set_icon(collapsed_tex);
         } else {
-            collapse_button->set_icon(collapse_icon);
+            collapse_button->set_icon(expanded_tex);
         }
     };
     collapse_button->connect_signal("pressed", callback);

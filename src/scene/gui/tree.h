@@ -48,7 +48,7 @@ private:
     Vec2F position;
 
     std::shared_ptr<Button> collapse_button;
-    std::shared_ptr<VectorTexture> collapse_icon, expand_icon;
+    std::shared_ptr<VectorTexture> collapsed_tex, expanded_tex;
 
     std::shared_ptr<TextureRect> icon;
 

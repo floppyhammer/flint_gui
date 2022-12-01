@@ -29,13 +29,13 @@ void CubemapTexture::load_from_file(const std::string &path) {
         throw std::runtime_error("Failed to load texture image!");
     }
 
-    width = tex_width;
-    height = tex_height / 6;
+    size.x = tex_width;
+    size.y = tex_height / 6;
 
     format = VK_FORMAT_R8G8B8A8_UNORM;
 
     // Image layer data size per layer in bytes.
-    VkDeviceSize layer_data_size = width * height * 4;
+    VkDeviceSize layer_data_size = size.area() * 4;
 
     // Temporary buffer and device memory.
     VkBuffer staging_buffer;
@@ -56,8 +56,8 @@ void CubemapTexture::load_from_file(const std::string &path) {
     stbi_image_free(pixels);
 
     // Create optimal tiled target image.
-    rs->createImage(width,
-                    height,
+    rs->createImage(size.x,
+                    size.y,
                     format,
                     VK_IMAGE_TILING_OPTIMAL,
                     VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
@@ -82,8 +82,8 @@ void CubemapTexture::load_from_file(const std::string &path) {
             buffer_copy_region.imageSubresource.mipLevel = level;
             buffer_copy_region.imageSubresource.baseArrayLayer = face;
             buffer_copy_region.imageSubresource.layerCount = 1;
-            buffer_copy_region.imageExtent.width = width >> level;
-            buffer_copy_region.imageExtent.height = height >> level;
+            buffer_copy_region.imageExtent.width = size.x >> level;
+            buffer_copy_region.imageExtent.height = size.y >> level;
             buffer_copy_region.imageExtent.depth = 1;
             buffer_copy_region.bufferOffset = offset;
             buffer_copy_regions.push_back(buffer_copy_region);

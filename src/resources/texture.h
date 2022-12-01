@@ -4,8 +4,6 @@
 #include "../common/geometry.h"
 #include "resource.h"
 
-using Pathfinder::Vec2;
-
 namespace Flint {
 
 enum class TextureType {
@@ -21,19 +19,14 @@ public:
 
     explicit Texture(const std::string &path);
 
-    uint32_t get_width();
-
-    uint32_t get_height();
-
-    Vec2<uint32_t> get_size();
+    Vec2I get_size();
 
     TextureType get_type();
 
 protected:
     TextureType type = TextureType::MAX;
 
-    uint32_t width = 0;
-    uint32_t height = 0;
+    Vec2I size;
 };
 
 } // namespace Flint

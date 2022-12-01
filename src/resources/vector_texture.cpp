@@ -12,17 +12,16 @@ using std::vector;
 
 namespace Flint {
 
-VectorTexture::VectorTexture(uint32_t _width, uint32_t _height) {
+VectorTexture::VectorTexture(Vec2I _size) {
     type = TextureType::VECTOR;
 
-    width = _width;
-    height = _height;
+    size = _size;
 }
 
-std::shared_ptr<VectorTexture> VectorTexture::from_empty(uint32_t _width, uint32_t _height) {
-    assert(_width != 0 && _height != 0 && "Creating texture with zero size!");
+std::shared_ptr<VectorTexture> VectorTexture::from_empty(Vec2I _size) {
+    assert(_size.area() != 0 && "Creating texture with zero size!");
 
-    auto texture = std::make_shared<VectorTexture>(_width, _height);
+    auto texture = std::make_shared<VectorTexture>(_size);
 
     return texture;
 }
@@ -30,9 +29,7 @@ std::shared_ptr<VectorTexture> VectorTexture::from_empty(uint32_t _width, uint32
 VectorTexture::VectorTexture(const std::string &path) : Texture(path) {
     svg_scene = VectorServer::get_singleton()->load_svg(path);
 
-    auto view_box_size = svg_scene->get_scene()->get_view_box().size();
-    width = view_box_size.x;
-    height = view_box_size.y;
+    size = svg_scene->get_scene()->get_view_box().size().to_i32();
 }
 
 void VectorTexture::add_path(const VectorPath &new_path) {

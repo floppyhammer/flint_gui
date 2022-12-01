@@ -211,8 +211,7 @@ shared_ptr<Pathfinder::SvgScene> VectorServer::load_svg(const std::string &path)
 
 std::shared_ptr<ImageTexture> VectorServer::get_texture() {
     auto texture_vk = static_cast<Pathfinder::TextureVk *>(canvas->get_dst_texture().get());
-    return ImageTexture::from_wrapper(
-        texture_vk->get_image_view(), texture_vk->get_sampler(), texture_vk->get_width(), texture_vk->get_height());
+    return ImageTexture::from_wrapper(texture_vk->get_image_view(), texture_vk->get_sampler(), texture_vk->get_size());
 }
 
 std::shared_ptr<Pathfinder::Canvas> VectorServer::get_canvas() const {

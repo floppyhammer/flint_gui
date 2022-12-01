@@ -34,8 +34,8 @@ ImageTexture::~ImageTexture() {
 }
 
 void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uint32_t tex_height, VkFormat tex_format) {
-    width = tex_width;
-    height = tex_height;
+    size.x = tex_width;
+    size.y = tex_height;
 
     // Data size per pixel.
     int pixel_bytes;
@@ -48,7 +48,7 @@ void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uin
     }
 
     // In bytes.
-    VkDeviceSize imageSize = width * height * pixel_bytes;
+    VkDeviceSize imageSize = size.area() * pixel_bytes;
 
     // Temporary buffer and device memory.
     VkBuffer stagingBuffer;
@@ -65,8 +65,8 @@ void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uin
     RenderServer::getSingleton()->copyDataToMemory(pixels, stagingBufferMemory, imageSize);
 
     RenderServer::getSingleton()->createImage(
-        width,
-        height,
+        size.x,
+        size.y,
         tex_format,
         VK_IMAGE_TILING_OPTIMAL,
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
@@ -79,8 +79,7 @@ void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uin
         image, tex_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     // Execute the buffer to image copy operation.
-    RenderServer::getSingleton()->copyBufferToImage(
-        stagingBuffer, image, 0, 0, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+    RenderServer::getSingleton()->copyBufferToImage(stagingBuffer, image, 0, 0, size.x, size.y);
 
     // To be able to start sampling from the texture image in the shader, we need one last transition to prepare it for
     // shader access.
@@ -92,32 +91,31 @@ void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uin
     vkFreeMemory(Platform::getSingleton()->device, stagingBufferMemory, nullptr);
 }
 
-std::shared_ptr<ImageTexture> ImageTexture::from_empty(uint32_t p_width, uint32_t p_height, VkFormat tex_format) {
-    assert(p_width != 0 && p_height != 0 && "Creating texture with zero size.");
+std::shared_ptr<ImageTexture> ImageTexture::from_empty(Vec2I size, VkFormat format) {
+    assert(size.area() != 0 && "Creating texture with zero size.");
 
     auto texture = std::make_shared<ImageTexture>();
-    texture->width = p_width;
-    texture->height = p_height;
+    texture->size = size;
 
     // Pixel data.
-    std::vector<unsigned char> i8_pixels(p_width * p_height * 4, 0);
-    std::vector<float> f32_pixels(p_width * p_height * 4, 0);
+    std::vector<unsigned char> i8_pixels(size.area() * 4, 0);
+    std::vector<float> f32_pixels(size.area() * 4, 0);
 
     void *pixel_data{};
-    if (tex_format == VK_FORMAT_R8G8B8A8_UNORM) {
+    if (format == VK_FORMAT_R8G8B8A8_UNORM) {
         pixel_data = i8_pixels.data();
-    } else if (tex_format == VK_FORMAT_R32G32B32A32_SFLOAT) {
+    } else if (format == VK_FORMAT_R32G32B32A32_SFLOAT) {
         pixel_data = f32_pixels.data();
     } else {
         abort();
     }
 
     // Create image and image memory.
-    texture->create_image_from_bytes(pixel_data, p_width, p_height, tex_format);
+    texture->create_image_from_bytes(pixel_data, size.x, size.y, format);
 
     // Create image view.
     texture->imageView =
-        RenderServer::getSingleton()->createImageView(texture->image, tex_format, VK_IMAGE_ASPECT_COLOR_BIT);
+        RenderServer::getSingleton()->createImageView(texture->image, format, VK_IMAGE_ASPECT_COLOR_BIT);
 
     // Create sampler.
     RenderServer::getSingleton()->createTextureSampler(texture->sampler, VK_FILTER_LINEAR);
@@ -144,7 +142,6 @@ ImageTexture::ImageTexture(const std::string &path) : Texture(path) {
 
     if (!pixels) {
         Flint::Logger::warn("Failed to load image file " + path, "Texture");
-        // return Texture::from_empty(4, 4);
         throw std::runtime_error("Failed to load texture image!");
     }
 
@@ -162,16 +159,12 @@ ImageTexture::ImageTexture(const std::string &path) : Texture(path) {
     RenderServer::getSingleton()->createTextureSampler(sampler, VK_FILTER_LINEAR);
 }
 
-std::shared_ptr<ImageTexture> ImageTexture::from_wrapper(VkImageView p_image_view,
-                                                         VkSampler p_sampler,
-                                                         uint32_t p_width,
-                                                         uint32_t p_height) {
+std::shared_ptr<ImageTexture> ImageTexture::from_wrapper(VkImageView image_view, VkSampler sampler, Vec2I size) {
     auto texture = std::make_shared<ImageTexture>();
-    texture->width = p_width;
-    texture->height = p_height;
+    texture->size = size;
     texture->resource_ownership = false;
-    texture->imageView = p_image_view;
-    texture->sampler = p_sampler;
+    texture->imageView = image_view;
+    texture->sampler = sampler;
 
     return texture;
 }

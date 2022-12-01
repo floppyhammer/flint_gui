@@ -2,6 +2,8 @@
 
 #include "style_box.h"
 
+namespace Flint {
+
 struct Theme {
     struct {
         std::map<std::string, float> constants;
@@ -15,3 +17,5 @@ struct Theme {
         std::map<std::string, StyleBox> styles;
     } label;
 };
+
+} // namespace Flint

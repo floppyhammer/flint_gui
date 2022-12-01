@@ -20,7 +20,7 @@ RenderTarget::~RenderTarget() {
 
 void RenderTarget::create_images() {
     // Color.
-    texture = ImageTexture::from_empty(extent.x, extent.y, VK_FORMAT_R8G8B8A8_UNORM);
+    texture = ImageTexture::from_empty(extent, VK_FORMAT_R8G8B8A8_UNORM);
 
     // Depth.
     VkFormat depthFormat = Platform::getSingleton()->findDepthFormat();
