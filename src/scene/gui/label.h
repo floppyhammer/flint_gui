@@ -4,11 +4,11 @@
 #include <cstdint>
 #include <memory>
 
-#include "common/geometry.h"
+#include "../../common/geometry.h"
+#include "../../resources/font.h"
+#include "../../resources/resource_manager.h"
+#include "../../resources/style_box.h"
 #include "control.h"
-#include "resources/font.h"
-#include "resources/resource_manager.h"
-#include "resources/style_box.h"
 
 using Pathfinder::Rect;
 

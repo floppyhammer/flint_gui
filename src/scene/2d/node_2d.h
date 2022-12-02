@@ -1,11 +1,11 @@
 #ifndef FLINT_NODE_2D_H
 #define FLINT_NODE_2D_H
 
-#include "common/geometry.h"
-#include "render/mvp.h"
-#include "resources/mesh.h"
-#include "scene/node.h"
-#include "servers/vector_server.h"
+#include "../../common/geometry.h"
+#include "../../render/mvp.h"
+#include "../../resources/mesh.h"
+#include "../node.h"
+#include "../../servers/vector_server.h"
 
 namespace Flint {
 class Node2d : public Node {

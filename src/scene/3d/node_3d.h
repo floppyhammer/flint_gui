@@ -1,12 +1,10 @@
 #ifndef FLINT_NODE_3D_H
 #define FLINT_NODE_3D_H
 
+#include "../../render/mvp.h"
+#include "../../resources/surface.h"
+#include "../node.h"
 #include "glm/glm.hpp"
-#include "render/mvp.h"
-#include "render/render_server.h"
-#include "resources/surface.h"
-#include "scene/node.h"
-// #include <Eigen/Geometry>
 
 namespace Flint {
 class Node3D : public Node {

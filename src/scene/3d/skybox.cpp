@@ -1,13 +1,14 @@
 #include "skybox.h"
 
-#include "common/load_file.h"
-#include "common/obj_importer.h"
-#include "render/swap_chain.h"
-#include "resources/default_resource.h"
-#include "resources/resource_manager.h"
-#include "scene/sub_viewport.h"
+#include "../../common/load_file.h"
+#include "../../common/obj_importer.h"
+#include "../../render/swap_chain.h"
+#include "../../resources/default_resource.h"
+#include "../../resources/resource_manager.h"
+#include "../sub_viewport.h"
 
 namespace Flint {
+
 Skybox::Skybox() {
     type = NodeType::Skybox;
 
@@ -42,4 +43,5 @@ void Skybox::draw(VkCommandBuffer p_command_buffer) {
                                               skybox_gpu_resource->get_index_buffer(),
                                               skybox_gpu_resource->get_index_count());
 }
+
 } // namespace Flint

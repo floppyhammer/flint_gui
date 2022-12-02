@@ -1,14 +1,13 @@
 #include "sub_viewport_container.h"
 
-#include "render/swap_chain.h"
-#include "resources/default_resource.h"
-#include "scene/sub_viewport.h"
-
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-
 #include <array>
 #include <utility>
 
+#include "../../render/swap_chain.h"
+#include "../../resources/default_resource.h"
+#include "../sub_viewport.h"
+
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 

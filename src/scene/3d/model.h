@@ -1,9 +1,9 @@
 #ifndef FLINT_MODEL_H
 #define FLINT_MODEL_H
 
+#include "../../resources/image_texture.h"
+#include "../../resources/mesh.h"
 #include "node_3d.h"
-#include "resources/image_texture.h"
-#include "resources/mesh.h"
 
 namespace Flint {
 class Model : public Node3D {

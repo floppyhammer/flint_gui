@@ -2,11 +2,11 @@
 
 #include <utility>
 
-#include "common/load_file.h"
-#include "common/obj_importer.h"
-#include "render/swap_chain.h"
-#include "resources/resource_manager.h"
-#include "scene/sub_viewport.h"
+#include "../../common/load_file.h"
+#include "../../common/obj_importer.h"
+#include "../../render/swap_chain.h"
+#include "../../resources/resource_manager.h"
+#include "../sub_viewport.h"
 
 namespace Flint {
 Model::Model() {

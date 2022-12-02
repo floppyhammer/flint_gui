@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "render/swap_chain.h"
+#include "../render/swap_chain.h"
 #include "sub_viewport.h"
 
 namespace Flint {

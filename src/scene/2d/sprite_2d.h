@@ -1,9 +1,9 @@
 #ifndef FLINT_SPRITE_2D_H
 #define FLINT_SPRITE_2D_H
 
+#include "../../render/mvp.h"
+#include "../../resources/mesh.h"
 #include "node_2d.h"
-#include "render/mvp.h"
-#include "resources/mesh.h"
 
 namespace Flint {
 class Sprite2d : public Node2d {

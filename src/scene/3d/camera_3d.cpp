@@ -1,10 +1,11 @@
 #include "camera_3d.h"
 
+#include "../sub_viewport.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/rotate_vector.hpp"
-#include "scene/sub_viewport.h"
 
 namespace Flint {
+
 void Camera3D::look_at(const glm::vec3 &target) {
     auto distance = target - position;
     // direction = distance / glm::length(distance);
@@ -37,4 +38,5 @@ glm::mat4 Camera3D::get_view_matrix() const {
 glm::vec3 Camera3D::get_up_direction() const {
     return up;
 }
+
 } // namespace Flint

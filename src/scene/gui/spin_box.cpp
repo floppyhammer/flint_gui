@@ -3,10 +3,11 @@
 #include <iomanip>
 #include <iostream>
 
-#include "common/geometry.h"
-#include "resources/vector_texture.h"
+#include "../../common/geometry.h"
+#include "../../resources/vector_texture.h"
 
 namespace Flint {
+
 SpinBox::SpinBox() {
     type = NodeType::SpinBox;
 
@@ -184,4 +185,5 @@ void SpinBox::set_value(float p_value) {
         label->set_text(string_stream.str());
     }
 }
+
 } // namespace Flint

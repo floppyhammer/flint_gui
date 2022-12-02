@@ -1,9 +1,9 @@
 #include "control.h"
 
-#include "common/geometry.h"
-#include "render/swap_chain.h"
-#include "resources/default_resource.h"
-#include "scene/sub_viewport.h"
+#include "../../common/geometry.h"
+#include "../../render/swap_chain.h"
+#include "../../resources/default_resource.h"
+#include "../sub_viewport.h"
 
 using Pathfinder::Rect;
 

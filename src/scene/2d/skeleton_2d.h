@@ -1,13 +1,14 @@
 #ifndef FLINT_SKELETON_2D_H
 #define FLINT_SKELETON_2D_H
 
+#include "../../render/mvp.h"
+#include "../../resources/mesh.h"
+#include "../../servers/vector_server.h"
 #include "node_2d.h"
-#include "render/mvp.h"
-#include "resources/mesh.h"
-#include "servers/vector_server.h"
 #include "sprite_2d.h"
 
 namespace Flint {
+
 class Skeleton2d;
 
 struct Bone2d {
@@ -106,6 +107,7 @@ private:
 
     void upload_bone_transforms();
 };
+
 } // namespace Flint
 
 #endif // FLINT_SKELETON_2D_H

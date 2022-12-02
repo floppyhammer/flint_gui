@@ -3,11 +3,12 @@
 
 #include <memory>
 
+#include "../../resources/surface.h"
+#include "../../resources/texture.h"
 #include "control.h"
-#include "resources/surface.h"
-#include "resources/texture.h"
 
 namespace Flint {
+
 /**
  * Used to display an ImageTexture or a VectorTexture.
  */
@@ -49,6 +50,7 @@ private:
 
     std::shared_ptr<Texture> texture;
 };
+
 } // namespace Flint
 
 #endif // FLINT_TEXTURE_RECT_H

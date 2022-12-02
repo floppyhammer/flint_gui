@@ -3,14 +3,14 @@
 
 #include <vector>
 
-#include "common/geometry.h"
-#include "render/mvp.h"
-#include "render/render_server.h"
-#include "resources/mesh.h"
-#include "resources/style_box.h"
-#include "scene/node.h"
-#include "servers/input_server.h"
-#include "servers/vector_server.h"
+#include "../../common/geometry.h"
+#include "../../render/mvp.h"
+#include "../../render/render_server.h"
+#include "../../resources/mesh.h"
+#include "../../resources/style_box.h"
+#include "../../servers/input_server.h"
+#include "../../servers/vector_server.h"
+#include "../node.h"
 
 using Pathfinder::ColorF;
 

@@ -3,10 +3,10 @@
 
 #include <functional>
 
+#include "../../resources/style_box.h"
 #include "button.h"
 #include "control.h"
 #include "label.h"
-#include "resources/style_box.h"
 #include "stack_container.h"
 #include "texture_rect.h"
 

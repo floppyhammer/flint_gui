@@ -7,7 +7,7 @@
 #include "../resources/font.h"
 #include "../resources/image_texture.h"
 #include "../resources/vector_texture.h"
-#include "resources/style_box.h"
+#include "../resources/style_box.h"
 
 using Pathfinder::ColorU;
 using Pathfinder::RectF;

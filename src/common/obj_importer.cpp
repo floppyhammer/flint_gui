@@ -1,18 +1,16 @@
 #include "obj_importer.h"
 
+#include "../resources/resource_manager.h"
 #include "load_file.h"
 #include "logger.h"
-#include "resources/resource_manager.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
-
 #include "tiny_obj_loader.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/hash.hpp"
 
 #include <unordered_map>
-
-#include "glm/gtx/hash.hpp"
 
 namespace std {
 template <>

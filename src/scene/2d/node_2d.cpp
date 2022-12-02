@@ -1,8 +1,9 @@
 #include "node_2d.h"
 
-#include "resources/default_resource.h"
+#include "../../resources/default_resource.h"
 
 namespace Flint {
+
 Node2d::Node2d() {
     type = NodeType::Node2D;
 
@@ -29,4 +30,5 @@ Vec2F Node2d::get_global_position() const {
 void Node2d::draw(VkCommandBuffer p_command_buffer) {
     VectorServer::get_singleton()->draw_path(position_indicator, Transform2::from_translation(position));
 }
+
 } // namespace Flint

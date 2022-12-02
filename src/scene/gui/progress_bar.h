@@ -3,9 +3,9 @@
 
 #include <functional>
 
+#include "../../resources/style_box.h"
 #include "control.h"
 #include "label.h"
-#include "resources/style_box.h"
 
 namespace Flint {
 class ProgressBar : public Control {
@@ -14,19 +14,19 @@ public:
 
     void update(double dt) override;
 
-    void draw(VkCommandBuffer p_command_buffer) override;
+    void draw(VkCommandBuffer cmd_buffer) override;
 
-    void set_position(Vec2F p_position) override;
+    void set_position(Vec2F new_position) override;
 
-    void set_size(Vec2F p_size) override;
+    void set_size(Vec2F new_size) override;
 
     Vec2F calc_minimum_size() const override;
 
-    void set_value(float p_value);
+    void set_value(float new_value);
 
     void value_changed();
 
-    void connect_signal(const std::string &signal, std::function<void()> callback);
+    void connect_signal(const std::string& signal, const std::function<void()>& callback);
 
 protected:
     float value = 50, min_value = 0, max_value = 1000, step = 1;

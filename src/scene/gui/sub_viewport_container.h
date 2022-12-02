@@ -1,8 +1,8 @@
 #ifndef FLINT_SUB_VIEWPORT_CONTAINER_H
 #define FLINT_SUB_VIEWPORT_CONTAINER_H
 
+#include "../sub_viewport.h"
 #include "container.h"
-#include "scene/sub_viewport.h"
 
 namespace Flint {
 class SubViewportContainer : public Container {

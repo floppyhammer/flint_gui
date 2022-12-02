@@ -4,13 +4,13 @@
 #include <cstdint>
 #include <memory>
 
+#include "../../common/geometry.h"
+#include "../../resources/font.h"
+#include "../../resources/style_box.h"
+#include "../../resources/vector_texture.h"
 #include "button.h"
-#include "common/geometry.h"
 #include "control.h"
 #include "label.h"
-#include "resources/font.h"
-#include "resources/style_box.h"
-#include "resources/vector_texture.h"
 
 namespace Flint {
 

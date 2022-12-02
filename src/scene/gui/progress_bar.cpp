@@ -1,8 +1,9 @@
 #include "progress_bar.h"
 
-#include "common/geometry.h"
+#include "../../common/geometry.h"
 
 namespace Flint {
+
 ProgressBar::ProgressBar() {
     type = NodeType::ProgressBar;
 
@@ -37,7 +38,7 @@ void ProgressBar::update(double dt) {
     set_value(CoreServer::get_singleton()->get_fps());
 }
 
-void ProgressBar::draw(VkCommandBuffer p_command_buffer) {
+void ProgressBar::draw(VkCommandBuffer cmd_buffer) {
     auto vector_server = VectorServer::get_singleton();
 
     if (theme_bg.has_value()) {
@@ -52,20 +53,20 @@ void ProgressBar::draw(VkCommandBuffer p_command_buffer) {
         vector_server->draw_style_box(theme_fg.value(), get_global_position(), size);
     }
 
-    label->draw(p_command_buffer);
+    label->draw(cmd_buffer);
 }
 
-void ProgressBar::set_position(Vec2F p_position) {
-    position = p_position;
+void ProgressBar::set_position(Vec2F new_position) {
+    position = new_position;
 }
 
-void ProgressBar::set_size(Vec2F p_size) {
-    size = p_size;
-    label->set_size(p_size);
+void ProgressBar::set_size(Vec2F new_size) {
+    size = new_size;
+    label->set_size(size);
 }
 
-void ProgressBar::set_value(float p_value) {
-    value = std::clamp(p_value, min_value, max_value);
+void ProgressBar::set_value(float new_value) {
+    value = std::clamp(new_value, min_value, max_value);
 
     ratio = (value - min_value) / (max_value - min_value);
 
@@ -79,9 +80,10 @@ void ProgressBar::value_changed() {
     }
 }
 
-void ProgressBar::connect_signal(const std::string &signal, std::function<void()> callback) {
+void ProgressBar::connect_signal(const std::string &signal, const std::function<void()> &callback) {
     if (signal == "on_value_changed") {
         on_value_changed.push_back(callback);
     }
 }
+
 } // namespace Flint
