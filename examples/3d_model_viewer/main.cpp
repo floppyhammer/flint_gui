@@ -67,10 +67,6 @@ int main() {
         button->connect_signal("pressed", callback);
         hbox_container->add_child(button);
 
-        auto progress_bar = std::make_shared<ProgressBar>();
-        progress_bar->set_size({256, 24});
-        vbox_container->add_child(progress_bar);
-
         // Translation values.
         // ----------------------------------------------------
         auto translation_container = std::make_shared<HStackContainer>();

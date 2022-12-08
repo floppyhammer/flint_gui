@@ -34,6 +34,8 @@ void Control::update(double dt) {
     } else {
         debug_size_box.border_width = 0;
     }
+
+    apply_anchor();
 }
 
 void Control::input(InputEvent &event) {
@@ -181,7 +183,9 @@ Vec2F Control::get_max_child_min_size() const {
 }
 
 void Control::apply_anchor() {
-    if (is_inside_container()) return;
+    if (is_inside_container()) {
+        return;
+    }
 
     if (parent && parent->is_gui_node()) {
         auto cast_parent = dynamic_cast<Control *>(parent);
@@ -263,7 +267,9 @@ void Control::cursor_exited() {
 }
 
 void Control::set_anchor_flag(AnchorFlag anchor_flag) {
-    if (anchor_flag == anchor_mode) return;
+    if (anchor_flag == anchor_mode) {
+        return;
+    }
 
     anchor_mode = anchor_flag;
     apply_anchor();

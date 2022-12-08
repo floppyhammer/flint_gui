@@ -35,7 +35,7 @@ Vec2F ProgressBar::calc_minimum_size() const {
 void ProgressBar::update(double dt) {
     Control::update(dt);
 
-    set_value(CoreServer::get_singleton()->get_fps());
+    custom_update(dt);
 }
 
 void ProgressBar::draw(VkCommandBuffer cmd_buffer) {
@@ -72,6 +72,30 @@ void ProgressBar::set_value(float new_value) {
 
     label->set_text(std::to_string((int)round(ratio * 100)) + "%");
     label->update(0);
+}
+
+float ProgressBar::get_value() const {
+    return value;
+}
+
+void ProgressBar::set_min_value(float new_value) {
+    min_value = new_value;
+}
+
+float ProgressBar::get_min_value() const {
+    return min_value;
+}
+
+void ProgressBar::set_max_value(float new_value) {
+    max_value = new_value;
+}
+
+float ProgressBar::get_max_value() const {
+    return max_value;
+}
+
+void ProgressBar::set_step(float new_step) {
+    step = new_step;
 }
 
 void ProgressBar::value_changed() {

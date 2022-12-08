@@ -1,6 +1,7 @@
 #include "margin_container.h"
 
 namespace Flint {
+
 void MarginContainer::adjust_layout() {
     // Child's local position.
     Vec2F child_position;
@@ -43,11 +44,12 @@ void MarginContainer::update(double dt) {
     Control::update(dt);
 }
 
-void MarginContainer::set_margin_all(float value) {
-    set_margin({value, value, value, value});
+void MarginContainer::set_margin_all(float new_margin) {
+    margin = {new_margin, new_margin, new_margin, new_margin};
 }
 
-void MarginContainer::set_margin(const RectF &p_margin) {
-    margin = p_margin;
+void MarginContainer::set_margin(const RectF &new_margin) {
+    margin = new_margin;
 }
+
 } // namespace Flint
