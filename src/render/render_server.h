@@ -54,7 +54,8 @@ public:
      */
     void endSingleTimeCommands(VkCommandBuffer commandBuffer) const;
 
-    void transitionImageLayout(VkImage image,
+    void transitionImageLayout(VkCommandBuffer cmd_buffer,
+                               VkImage image,
                                VkFormat format,
                                VkImageLayout oldLayout,
                                VkImageLayout newLayout,
@@ -70,8 +71,13 @@ public:
      * @param width Image region width.
      * @param height Image region height.
      */
-    void copyBufferToImage(
-        VkBuffer buffer, VkImage image, uint32_t offset_x, uint32_t offset_y, uint32_t width, uint32_t height) const;
+    void copyBufferToImage(VkCommandBuffer cmd_buffer,
+                           VkBuffer buffer,
+                           VkImage image,
+                           uint32_t offset_x,
+                           uint32_t offset_y,
+                           uint32_t width,
+                           uint32_t height) const;
 
     static bool hasStencilComponent(VkFormat format);
 

@@ -179,8 +179,15 @@ void SwapChain::createDepthResources() {
                                               depthImageMemory);
     depthImageView = RenderServer::getSingleton()->createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 
-    RenderServer::getSingleton()->transitionImageLayout(
-        depthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+    auto cmd_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
+
+    RenderServer::getSingleton()->transitionImageLayout(cmd_buffer,
+                                                        depthImage,
+                                                        depthFormat,
+                                                        VK_IMAGE_LAYOUT_UNDEFINED,
+                                                        VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+
+    RenderServer::getSingleton()->endSingleTimeCommands(cmd_buffer);
 }
 
 void SwapChain::createRenderPass() {

@@ -48,9 +48,9 @@ public:
 
     Vec2I get_extent();
 
-private:
     Vec2I extent = {512, 512};
 
+private:
     // Render pass doesn't care about extent.
     void create_render_pass();
 

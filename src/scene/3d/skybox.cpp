@@ -5,7 +5,8 @@
 #include "../../render/swap_chain.h"
 #include "../../resources/default_resource.h"
 #include "../../resources/resource_manager.h"
-#include "../sub_viewport.h"
+#include "../world.h"
+#include "camera3d.h"
 
 namespace Flint {
 
@@ -16,27 +17,34 @@ Skybox::Skybox() {
     material->set_texture(std::make_shared<CubemapTexture>("../assets/skybox.png"));
 }
 
-void Skybox::draw(VkCommandBuffer p_command_buffer) {
-    Node *viewport_node = get_viewport();
+void Skybox::update(double dt) {
+    update_mvp();
+}
 
-    VkPipeline pipeline = RenderServer::getSingleton()->skybox_graphics_pipeline;
-    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->skybox_pipeline_layout;
-
-    if (viewport_node) {
-        auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-        pipeline = viewport->render_target->skybox_graphics_pipeline;
+void Skybox::draw(VkCommandBuffer cmd_buffer) {
+    auto world = get_world();
+    if (!world) {
+        return;
     }
+
+    auto camera = get_world()->current_camera3d;
+    if (!camera) {
+        return;
+    }
+
+    VkPipeline pipeline = camera->render_target->skybox_graphics_pipeline;
+    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->skybox_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
     vkCmdPushConstants(
-        p_command_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
+        cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
 
     const auto &desc_set = material->get_desc_set();
 
     auto skybox_gpu_resource = DefaultResource::get_singleton()->get_default_skybox_gpu_resources();
 
     VkBuffer vertexBuffers[] = {skybox_gpu_resource->get_vertex_buffer()};
-    RenderServer::getSingleton()->draw_skybox(p_command_buffer,
+    RenderServer::getSingleton()->draw_skybox(cmd_buffer,
                                               pipeline,
                                               desc_set->getDescriptorSet(SwapChain::getSingleton()->currentImage),
                                               vertexBuffers,

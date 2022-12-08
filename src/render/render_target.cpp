@@ -22,6 +22,17 @@ void RenderTarget::create_images() {
     // Color.
     texture = ImageTexture::from_empty(extent, VK_FORMAT_R8G8B8A8_UNORM);
 
+    // A render target image's layout will always be SHADER_READ_ONLY.
+    auto cmd_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
+    RenderServer::getSingleton()->transitionImageLayout(cmd_buffer,
+                                                        texture->image,
+                                                        texture->format,
+                                                        VK_IMAGE_LAYOUT_UNDEFINED,
+                                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                                        1,
+                                                        1);
+    RenderServer::getSingleton()->endSingleTimeCommands(cmd_buffer);
+
     // Depth.
     VkFormat depthFormat = Platform::getSingleton()->findDepthFormat();
     RenderServer::getSingleton()->createImage(extent.x,
@@ -50,7 +61,7 @@ void RenderTarget::create_render_pass() {
                                       // treated at the end of the subpass where it is last used.
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED; // The layout the attachment image subresource will be in
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // The layout the attachment image subresource will be in
                                                                // when a render pass instance begins.
     colorAttachment.finalLayout =
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // The layout the attachment image subresource will be transitioned to

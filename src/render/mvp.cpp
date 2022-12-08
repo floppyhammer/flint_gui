@@ -36,7 +36,9 @@ void MvpBuffer::create_uniform_buffers() {
 }
 
 void MvpBuffer::update_uniform_buffer(ModelViewProjection mvp) {
-    if (uniform_buffers_memory.empty()) return;
+    if (uniform_buffers_memory.empty()) {
+        return;
+    }
 
     // Copy the MVP data to the current uniform buffer.
     RenderServer::getSingleton()->copyDataToMemory(

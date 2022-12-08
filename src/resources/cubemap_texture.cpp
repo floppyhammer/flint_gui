@@ -11,6 +11,7 @@
 #include "stb_image.h"
 
 namespace Flint {
+
 CubemapTexture::CubemapTexture(const std::string &path) {
     load_from_file(path);
 }
@@ -90,25 +91,31 @@ void CubemapTexture::load_from_file(const std::string &path) {
         }
     }
 
+    // Copy the cube map faces from the staging buffer to the optimal tiled image.
+    VkCommandBuffer cmd_buffer = rs->beginSingleTimeCommands();
+
     // Image barrier for optimal image (target).
     // Set initial layout for all array layers (faces) of the optimal (target) tiled texture.
-    rs->transitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, 6);
+    rs->transitionImageLayout(
+        cmd_buffer, image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, 6);
 
-    // Copy the cube map faces from the staging buffer to the optimal tiled image.
-    VkCommandBuffer command_buffer = rs->beginSingleTimeCommands();
-
-    vkCmdCopyBufferToImage(command_buffer,
+    vkCmdCopyBufferToImage(cmd_buffer,
                            staging_buffer,
                            image,
                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
                            static_cast<uint32_t>(buffer_copy_regions.size()),
                            buffer_copy_regions.data());
 
-    rs->endSingleTimeCommands(command_buffer);
-
     // Change texture image layout to shader read after all faces have been copied.
-    rs->transitionImageLayout(
-        image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, 1, 6);
+    rs->transitionImageLayout(cmd_buffer,
+                              image,
+                              format,
+                              VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                              VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                              1,
+                              6);
+
+    rs->endSingleTimeCommands(cmd_buffer);
 
     // Create sampler.
     VkSamplerCreateInfo sampler_info{};
@@ -144,4 +151,5 @@ void CubemapTexture::load_from_file(const std::string &path) {
 
     VK_CHECK_RESULT(vkCreateImageView(device, &view_info, nullptr, &imageView));
 }
+
 } // namespace Flint

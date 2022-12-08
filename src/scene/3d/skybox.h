@@ -4,17 +4,19 @@
 #include "../../resources/cubemap_texture.h"
 #include "../../resources/mesh.h"
 #include "glm/glm.hpp"
-#include "node_3d.h"
+#include "node3d.h"
 
 namespace Flint {
 
 // TODO: skybox should not be a node.
-class Skybox : public Node3D {
+class Skybox : public Node3d {
 public:
     Skybox();
 
 protected:
-    void draw(VkCommandBuffer p_command_buffer) override;
+    void update(double dt) override;
+
+    void draw(VkCommandBuffer cmd_buffer) override;
 
     std::shared_ptr<MaterialSkybox> material;
 

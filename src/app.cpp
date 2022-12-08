@@ -55,8 +55,6 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
     // Record drawing commands from the scene manager.
     tree->draw(command_buffers[image_index]);
 
-    VectorServer::get_singleton()->submit();
-
     // End main render pass.
     vkCmdEndRenderPass(command_buffers[image_index]);
 

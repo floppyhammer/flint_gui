@@ -61,9 +61,6 @@ void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uin
         stagingBuffer,
         stagingBufferMemory);
 
-    // Copy the pixel values that we got from the image loading library to the buffer.
-    RenderServer::getSingleton()->copyDataToMemory(pixels, stagingBufferMemory, imageSize);
-
     RenderServer::getSingleton()->createImage(
         size.x,
         size.y,
@@ -74,17 +71,26 @@ void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uin
         image,
         imageMemory);
 
+    // Copy the pixel values that we got from the image loading library to the buffer.
+    RenderServer::getSingleton()->copyDataToMemory(pixels, stagingBufferMemory, imageSize);
+
+    VkCommandBuffer cmd_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
+
     // Transition the texture image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL.
     RenderServer::getSingleton()->transitionImageLayout(
-        image, tex_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        cmd_buffer, image, tex_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     // Execute the buffer to image copy operation.
-    RenderServer::getSingleton()->copyBufferToImage(stagingBuffer, image, 0, 0, size.x, size.y);
+    RenderServer::getSingleton()->copyBufferToImage(cmd_buffer, stagingBuffer, image, 0, 0, size.x, size.y);
 
     // To be able to start sampling from the texture image in the shader, we need one last transition to prepare it for
     // shader access.
     RenderServer::getSingleton()->transitionImageLayout(
-        image, tex_format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        cmd_buffer, image, tex_format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+    RenderServer::getSingleton()->endSingleTimeCommands(cmd_buffer);
+
+    layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     // Clean up staging stuff.
     vkDestroyBuffer(Platform::getSingleton()->device, stagingBuffer, nullptr);

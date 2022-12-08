@@ -3,7 +3,7 @@
 #include <string>
 
 #include "../render/swap_chain.h"
-#include "sub_viewport.h"
+#include "world.h"
 
 namespace Flint {
 
@@ -59,28 +59,12 @@ void Node::notify(Signal signal) {
 void Node::draw(VkCommandBuffer p_command_buffer) {
 }
 
-Node *Node::get_viewport() {
+World *Node::get_world() {
     if (parent == nullptr) {
         return nullptr;
     }
 
-    return parent->type == NodeType::SubViewport ? parent : parent->get_viewport();
-}
-
-Vec2I Node::get_viewport_size() {
-    Vec2I size;
-
-    Node *viewport_node = get_viewport();
-
-    if (viewport_node) {
-        auto viewport = dynamic_cast<SubViewport *>(viewport_node);
-        size = viewport->get_extent();
-    } else { // Default to swap chain image.
-        auto extent = SwapChain::getSingleton()->swapChainExtent;
-        size = Vec2I(extent.width, extent.height);
-    }
-
-    return size;
+    return parent->type == NodeType::World ? (World *)parent : parent->get_world();
 }
 
 void Node::set_parent(Node *node) {
@@ -130,8 +114,8 @@ void Node::remove_child(size_t index) {
     children.erase(children.begin() + index);
 }
 
-bool Node::is_gui_node() const {
-    return type >= NodeType::Control && type < NodeType::Node2D;
+bool Node::is_ui_node() const {
+    return type >= NodeType::NodeUi && type < NodeType::Node2d;
 }
 
 void Node::set_visibility(bool _visible) {
@@ -143,20 +127,20 @@ bool Node::get_visibility() const {
 }
 
 NodeType Node::extended_from_which_base_node() const {
-    if (type < NodeType::Control)
+    if (type < NodeType::NodeUi)
         return NodeType::Node;
-    else if (type < NodeType::Node2D)
-        return NodeType::Control;
-    else if (type < NodeType::Node3D)
-        return NodeType::Node2D;
+    else if (type < NodeType::Node2d)
+        return NodeType::NodeUi;
+    else if (type < NodeType::Node3d)
+        return NodeType::Node2d;
     else if (type < NodeType::Max)
-        return NodeType::Node3D;
+        return NodeType::Node3d;
     else
         return NodeType::Max;
 }
 
 std::string Node::get_node_path() const {
-    auto type_name = NodeTypeName[static_cast<unsigned __int64>(type)];
+    std::string type_name = ""; // NodeTypeName[static_cast<unsigned __int64>(type)];
 
     if (parent) {
         return parent->get_node_path() + "/" + type_name;

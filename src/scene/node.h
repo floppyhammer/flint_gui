@@ -4,31 +4,30 @@
 #include <memory>
 #include <vector>
 
-#include "common/logger.h"
 #include "../render/render_server.h"
 #include "../servers/core_server.h"
 #include "../servers/input_server.h"
+#include "common/logger.h"
 
 namespace Flint {
 
 enum class NodeType {
     // General.
     Node = 0,
-    SubViewport,
-    CanvasLayer,
+    World,
+    UiLayer,
 
-    // GUI.
-    Control,
+    // UI.
+    NodeUi,
     Container,
     CenterContainer,
     MarginContainer,
     HStackContainer,
     VStackContainer,
     ScrollContainer,
-    SubViewportContainer,
+    Window,
     TabContainer,
     Button,
-    ItemList,
     Label,
     TextEdit,
     Panel,
@@ -38,60 +37,20 @@ enum class NodeType {
     SpinBox,
 
     // 2D.
-    Node2D,
-    Sprite2D,
-    RigidBody2D,
-    Skeleton2D,
+    Node2d,
+    Sprite2d,
+    Skeleton2d,
 
     // 3D.
-    Node3D,
-    Sprite3D,
+    Node3d,
+    Sprite3d,
     Model,
     Skybox,
 
     Max,
 };
 
-/// Should be consistent with NodeType.
-const std::array<std::string, 29> NodeTypeName{
-    // General.
-    "Node",
-    "SubViewport",
-    "CanvasLayer",
-
-    // GUI.
-    "Control",
-    "Container",
-    "CenterContainer",
-    "MarginContainer",
-    "HStackContainer",
-    "VStackContainer",
-    "ScrollContainer",
-    "SubViewportContainer",
-    "TabContainer",
-    "Button",
-    "ItemList",
-    "Label",
-    "TextEdit",
-    "Panel",
-    "TextureRect",
-    "Tree",
-    "ProgressBar",
-
-    // 2D.
-    "Node2D",
-    "Sprite2D",
-    "RigidBody2D",
-    "Skeleton2D",
-
-    // 3D.
-    "Node3D",
-    "Sprite3D",
-    "Model",
-    "Skybox",
-
-    "Invalid",
-};
+class World;
 
 class Node {
 public:
@@ -104,7 +63,7 @@ public:
 
     virtual void propagate_notify(Signal signal);
 
-    virtual void propagate_draw(VkCommandBuffer _command_buffer);
+    virtual void propagate_draw(VkCommandBuffer cmd_buffer);
 
     virtual void propagate_cleanup();
 
@@ -114,7 +73,7 @@ public:
 
     virtual void notify(Signal signal);
 
-    virtual void draw(VkCommandBuffer _command_buffer);
+    virtual void draw(VkCommandBuffer cmd_buffer);
 
     void add_child(const std::shared_ptr<Node> &new_child);
 
@@ -124,9 +83,7 @@ public:
      * Get the viewport this node belongs to.
      * @return A pointer to the viewport.
      */
-    virtual Node *get_viewport();
-
-    Vec2I get_viewport_size();
+    World *get_world();
 
     void set_parent(Node *node);
 
@@ -140,7 +97,7 @@ public:
 
     NodeType extended_from_which_base_node() const;
 
-    bool is_gui_node() const;
+    bool is_ui_node() const;
 
     std::string get_node_path() const;
 

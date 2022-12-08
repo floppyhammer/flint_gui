@@ -1,15 +1,36 @@
 #include "scene_tree.h"
 
+#include "ui_layer.h"
+#include "window.h"
+
 namespace Flint {
 
 SceneTree::SceneTree() {
-    // TODO: make the root a SubViewport.
-    root = std::make_shared<Node>();
-    root->name = "main_viewport";
+    root = std::make_shared<Window>();
+    root->name = "Main Window";
 }
 
-std::shared_ptr<Node> SceneTree::get_root() const {
-    return root;
+void SceneTree::replace_scene(std::shared_ptr<Node> new_scene) {
+    switch (new_scene->extended_from_which_base_node()) {
+        case NodeType::Node:
+        case NodeType::Node3d: {
+            auto world = std::make_shared<World>(false);
+            world->add_child(new_scene);
+            root->add_child(world);
+        } break;
+        case NodeType::Node2d: {
+            auto world = std::make_shared<World>(true);
+            world->add_child(new_scene);
+            root->add_child(world);
+        } break;
+        case NodeType::NodeUi: {
+            auto ui_layer = std::make_shared<UiLayer>();
+            ui_layer->add_child(new_scene);
+            root->add_child(ui_layer);
+        } break;
+        default:
+            abort();
+    }
 }
 
 void SceneTree::input(std::vector<InputEvent>& input_queue) const {

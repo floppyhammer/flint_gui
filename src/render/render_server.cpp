@@ -138,7 +138,8 @@ void RenderServer::endSingleTimeCommands(VkCommandBuffer commandBuffer) const {
     vkFreeCommandBuffers(Platform::getSingleton()->device, commandPool, 1, &commandBuffer);
 }
 
-void RenderServer::transitionImageLayout(VkImage image,
+void RenderServer::transitionImageLayout(VkCommandBuffer cmd_buffer,
+                                         VkImage image,
                                          VkFormat format,
                                          VkImageLayout old_layout,
                                          VkImageLayout new_layout,
@@ -147,8 +148,6 @@ void RenderServer::transitionImageLayout(VkImage image,
     if (old_layout == new_layout) {
         return;
     }
-
-    VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkImageMemoryBarrier barrier{};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -290,16 +289,17 @@ void RenderServer::transitionImageLayout(VkImage image,
         throw std::invalid_argument("Unsupported layout transition!");
     }
 
-    vkCmdPipelineBarrier(commandBuffer, src_stage, dst_stage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
+    vkCmdPipelineBarrier(cmd_buffer, src_stage, dst_stage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
     // -----------------------------
-
-    endSingleTimeCommands(commandBuffer);
 }
 
-void RenderServer::copyBufferToImage(
-    VkBuffer buffer, VkImage image, uint32_t offset_x, uint32_t offset_y, uint32_t width, uint32_t height) const {
-    VkCommandBuffer commandBuffer = beginSingleTimeCommands();
-
+void RenderServer::copyBufferToImage(VkCommandBuffer cmd_buffer,
+                                     VkBuffer buffer,
+                                     VkImage image,
+                                     uint32_t offset_x,
+                                     uint32_t offset_y,
+                                     uint32_t width,
+                                     uint32_t height) const {
     // Structure specifying a buffer image copy operation.
     VkBufferImageCopy region{};
     region.bufferOffset =
@@ -321,9 +321,7 @@ void RenderServer::copyBufferToImage(
     region.imageExtent = {width, height, 1};
 
     // Copy data from a buffer into an image.
-    vkCmdCopyBufferToImage(commandBuffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-
-    endSingleTimeCommands(commandBuffer);
+    vkCmdCopyBufferToImage(cmd_buffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 }
 
 bool RenderServer::hasStencilComponent(VkFormat format) {
