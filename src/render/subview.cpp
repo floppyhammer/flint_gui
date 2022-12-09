@@ -18,7 +18,7 @@ Subview::~Subview() {
 
     extent_dependent_cleanup();
 
-    vkDestroyRenderPass(device, renderPass, nullptr);
+    vkDestroyRenderPass(device, render_pass, nullptr);
 }
 
 void Subview::create_images() {
@@ -44,9 +44,10 @@ void Subview::create_images() {
                                               VK_IMAGE_TILING_OPTIMAL,
                                               VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
                                               VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                              depthImage,
-                                              depthImageMemory);
-    depthImageView = RenderServer::getSingleton()->createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+                                              depth_image,
+                                              depth_image_memory);
+    depth_image_view =
+        RenderServer::getSingleton()->createImageView(depth_image, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
 void Subview::create_render_pass() {
@@ -133,7 +134,7 @@ void Subview::create_render_pass() {
     renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
     renderPassInfo.pDependencies = dependencies.data();
 
-    if (vkCreateRenderPass(Platform::getSingleton()->device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(Platform::getSingleton()->device, &renderPassInfo, nullptr, &render_pass) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create render pass!");
     }
 }
@@ -141,11 +142,11 @@ void Subview::create_render_pass() {
 void Subview::create_framebuffer() {
     // Create framebuffer.
     {
-        std::array<VkImageView, 2> attachments = {texture->imageView, depthImageView};
+        std::array<VkImageView, 2> attachments = {texture->imageView, depth_image_view};
 
         VkFramebufferCreateInfo framebufferInfo{};
         framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-        framebufferInfo.renderPass = renderPass;
+        framebufferInfo.renderPass = render_pass;
         framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
         framebufferInfo.pAttachments = attachments.data();
         framebufferInfo.width = extent.x;
@@ -164,10 +165,10 @@ void Subview::create_framebuffer() {
     descriptor.sampler = texture->sampler;
 }
 
-VkRenderPassBeginInfo Subview::getRenderPassInfo() {
+VkRenderPassBeginInfo Subview::get_render_pass_info() {
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = renderPass;
+    renderPassInfo.renderPass = render_pass;
     renderPassInfo.framebuffer = framebuffer; // Set target framebuffer.
     renderPassInfo.renderArea.offset = {0, 0};
     renderPassInfo.renderArea.extent = VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y};
@@ -178,18 +179,18 @@ VkRenderPassBeginInfo Subview::getRenderPassInfo() {
 void Subview::create_pipelines() {
     // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
     RenderServer::getSingleton()->createMeshPipeline(
-        renderPass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, meshGraphicsPipeline);
+        render_pass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, mesh_pipeline);
 
     RenderServer::getSingleton()->createBlitPipeline(
-        renderPass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, blitGraphicsPipeline);
+        render_pass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, blit_pipeline);
 
     RenderServer::getSingleton()->create_skybox_pipeline(
-        renderPass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, skybox_graphics_pipeline);
+        render_pass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, skybox_pipeline);
 }
 
-void Subview::set_extent(Vec2I _extent) {
-    if (extent != _extent) {
-        extent = _extent;
+void Subview::set_extent(Vec2I new_extent) {
+    if (extent != new_extent) {
+        extent = new_extent;
         extent_dependent_cleanup();
         extent_dependent_init();
     }
@@ -211,13 +212,13 @@ void Subview::extent_dependent_init() {
 void Subview::extent_dependent_cleanup() const {
     auto device = Platform::getSingleton()->device;
 
-    vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
-    vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);
+    vkDestroyPipeline(device, mesh_pipeline, nullptr);
+    vkDestroyPipeline(device, blit_pipeline, nullptr);
 
     // Depth resources.
-    vkDestroyImageView(device, depthImageView, nullptr);
-    vkDestroyImage(device, depthImage, nullptr);
-    vkFreeMemory(device, depthImageMemory, nullptr);
+    vkDestroyImageView(device, depth_image_view, nullptr);
+    vkDestroyImage(device, depth_image, nullptr);
+    vkFreeMemory(device, depth_image_memory, nullptr);
 
     vkDestroyFramebuffer(device, framebuffer, nullptr);
 }

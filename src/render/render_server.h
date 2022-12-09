@@ -138,21 +138,21 @@ public:
 public:
     // Various pipelines.
     // --------------------------------------------------
-    VkDescriptorSetLayout meshDescriptorSetLayout;
-    VkPipelineLayout meshPipelineLayout;
-    VkPipeline meshGraphicsPipeline;
+    VkDescriptorSetLayout meshDescriptorSetLayout{};
+    VkPipelineLayout meshPipelineLayout{};
+    VkPipeline meshPipeline{};
 
-    VkDescriptorSetLayout blitDescriptorSetLayout;
-    VkPipelineLayout blitPipelineLayout;
-    VkPipeline blitGraphicsPipeline;
+    VkDescriptorSetLayout blitDescriptorSetLayout{};
+    VkPipelineLayout blitPipelineLayout{};
+    VkPipeline blitPipeline{};
 
-    VkDescriptorSetLayout skeleton2dMeshDescriptorSetLayout;
-    VkPipelineLayout skeleton2dMeshPipelineLayout;
-    VkPipeline skeleton2dMeshGraphicsPipeline;
+    VkDescriptorSetLayout skeleton2dMeshDescriptorSetLayout{};
+    VkPipelineLayout skeleton2dMeshPipelineLayout{};
+    VkPipeline skeleton2dMeshPipeline{};
 
-    VkDescriptorSetLayout skybox_descriptor_set_layout;
-    VkPipelineLayout skybox_pipeline_layout;
-    VkPipeline skybox_graphics_pipeline;
+    VkDescriptorSetLayout skybox_descriptor_set_layout{};
+    VkPipelineLayout skybox_pipeline_layout{};
+    VkPipeline skybox_pipeline{};
 
     /**
      * Set up shaders, viewport, blend state, etc.
@@ -211,7 +211,7 @@ public:
 
     void createCommandPool();
 
-    VkCommandPool commandPool;
+    VkCommandPool commandPool{};
 
     void createBlitPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
 

@@ -7,40 +7,37 @@
 
 namespace Flint {
 
-/// Subview is basically a texture to which you can draw things.
+/// Subview is a texture to which you can draw things.
 class Subview {
 public:
     Subview(Vec2I view_size);
 
     ~Subview();
 
-    VkRenderPassBeginInfo getRenderPassInfo();
+    VkRenderPassBeginInfo get_render_pass_info();
 
     std::shared_ptr<ImageTexture> texture;
-
-    // Pipelines bound with the render pass of this sub viewport.
-    // ------------------------------------
-    VkPipeline meshGraphicsPipeline;
-    VkPipeline blitGraphicsPipeline;
-    VkPipeline skybox_graphics_pipeline;
-    // ------------------------------------
-
-    VkImage depthImage;
-    VkDeviceMemory depthImageMemory;
-    VkImageView depthImageView;
-
-    VkRenderPass renderPass;
-
-    VkFramebuffer framebuffer;
 
     /// For later use of the image as a sampler target.
     VkDescriptorImageInfo descriptor;
 
-    /**
-     * When extent is changed, we need to recreate some Vulkan resources.
-     * @param p_extent New extent
-     */
-    void set_extent(Vec2I _extent);
+    // Pipelines bound with the render pass of this sub viewport.
+    // ------------------------------------
+    VkPipeline mesh_pipeline;
+    VkPipeline blit_pipeline;
+    VkPipeline skybox_pipeline;
+    // ------------------------------------
+
+    VkImage depth_image;
+    VkDeviceMemory depth_image_memory;
+    VkImageView depth_image_view;
+
+    VkRenderPass render_pass;
+
+    VkFramebuffer framebuffer;
+
+    /// When extent is changed, we need to recreate some Vulkan resources.
+    void set_extent(Vec2I new_extent);
 
     Vec2I get_extent();
 

@@ -32,7 +32,7 @@ void Skybox::draw(VkCommandBuffer cmd_buffer) {
         return;
     }
 
-    VkPipeline pipeline = camera->subview->skybox_graphics_pipeline;
+    VkPipeline pipeline = camera->subview->skybox_pipeline;
     VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->skybox_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.

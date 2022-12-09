@@ -8,6 +8,7 @@
 #include "../resources/surface.h"
 
 namespace Flint {
+
 RenderServer::RenderServer() {
     createCommandPool();
 
@@ -19,19 +20,19 @@ RenderServer::RenderServer() {
 }
 
 void RenderServer::createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
-    createMeshPipeline(renderPass, swapChainExtent, meshGraphicsPipeline);
-    createBlitPipeline(renderPass, swapChainExtent, blitGraphicsPipeline);
-    createSkeleton2dMeshPipeline(renderPass, swapChainExtent, skeleton2dMeshGraphicsPipeline);
-    create_skybox_pipeline(renderPass, swapChainExtent, skybox_graphics_pipeline);
+    createMeshPipeline(renderPass, swapChainExtent, meshPipeline);
+    createBlitPipeline(renderPass, swapChainExtent, blitPipeline);
+    createSkeleton2dMeshPipeline(renderPass, swapChainExtent, skeleton2dMeshPipeline);
+    create_skybox_pipeline(renderPass, swapChainExtent, skybox_pipeline);
 }
 
 void RenderServer::cleanupSwapChainRelatedResources() const {
     auto device = Platform::getSingleton()->device;
 
     // Graphics pipeline resources.
-    vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
-    vkDestroyPipeline(device, blitGraphicsPipeline, nullptr);
-    vkDestroyPipeline(device, skeleton2dMeshGraphicsPipeline, nullptr);
+    vkDestroyPipeline(device, meshPipeline, nullptr);
+    vkDestroyPipeline(device, blitPipeline, nullptr);
+    vkDestroyPipeline(device, skeleton2dMeshPipeline, nullptr);
 }
 
 void RenderServer::cleanup() {
@@ -1407,4 +1408,5 @@ void RenderServer::create_skybox_pipeline(VkRenderPass renderPass, VkExtent2D vi
     vkDestroyShaderModule(device, fragShaderModule, nullptr);
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
+
 } // namespace Flint

@@ -13,6 +13,7 @@ enum class TextureType {
     MAX,
 };
 
+/// A texture's layout is always SHADER_READ_ONLY.
 class Texture : public Resource {
 public:
     Texture() = default;

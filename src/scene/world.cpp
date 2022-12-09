@@ -53,11 +53,10 @@ void World::draw_subtree(Subview* subview, ColorF clear_color, ImageTexture* ima
     // It seems not feasible to wrap begin info into rendering Viewport.
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = subview->renderPass;
+    renderPassInfo.renderPass = subview->render_pass;
     renderPassInfo.framebuffer = subview->framebuffer; // Set target framebuffer.
     renderPassInfo.renderArea.offset = {0, 0};
-    renderPassInfo.renderArea.extent =
-        VkExtent2D{(uint32_t)subview->get_extent().x, (uint32_t)subview->get_extent().y};
+    renderPassInfo.renderArea.extent = VkExtent2D{(uint32_t)subview->get_extent().x, (uint32_t)subview->get_extent().y};
 
     // Clear color.
     std::array<VkClearValue, 2> clearValues{};
@@ -70,7 +69,7 @@ void World::draw_subtree(Subview* subview, ColorF clear_color, ImageTexture* ima
     vkCmdBeginRenderPass(cmd_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
     // Start recursive calling to draw all node under this sub-viewport.
-    for (auto &child : children) {
+    for (auto& child : children) {
         child->propagate_draw(cmd_buffer);
     }
 
@@ -129,7 +128,7 @@ void World::draw(VkCommandBuffer cmd_buffer) {
 
     mesh->surface->get_material()->set_texture(image_texture.get());
 
-    VkPipeline pipeline = RenderServer::getSingleton()->blitGraphicsPipeline;
+    VkPipeline pipeline = RenderServer::getSingleton()->blitPipeline;
     VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blitPipelineLayout;
 
     // Upload the model matrix to the GPU via push constants.

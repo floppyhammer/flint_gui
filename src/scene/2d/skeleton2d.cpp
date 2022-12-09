@@ -434,7 +434,7 @@ void Skeleton2d::update(double delta) {
 
 void Skeleton2d::draw(VkCommandBuffer p_command_buffer) {
     // Draw all triangles with a single draw call.
-    VkPipeline pipeline = RenderServer::getSingleton()->skeleton2dMeshGraphicsPipeline;
+    VkPipeline pipeline = RenderServer::getSingleton()->skeleton2dMeshPipeline;
     VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->skeleton2dMeshPipelineLayout;
 
     // Upload the model matrix to the GPU via push constants.

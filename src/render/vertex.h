@@ -9,7 +9,7 @@ namespace Flint {
 struct Vertex {
     glm::vec3 pos;
     glm::vec3 color;
-    glm::vec2 uv; // Texture coordinates.
+    glm::vec2 uv;
 
     /// For hashmap.
     bool operator==(const Vertex &other) const {
@@ -45,7 +45,7 @@ struct Vertex {
 struct SkeletonVertex {
     glm::vec3 pos;
     glm::vec3 color;
-    glm::vec2 uv;           // Texture coordinates.
+    glm::vec2 uv;
     glm::vec4 bone_indices; // Can be affected by at most 4 bones.
     glm::vec4 bone_weights; // These 4 bones' weights.
 
