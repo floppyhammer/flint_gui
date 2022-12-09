@@ -1,16 +1,17 @@
-#include "render_target.h"
-
 #include <array>
 
+#include "subview.h"
+
 namespace Flint {
-RenderTarget::RenderTarget() {
+
+Subview::Subview() {
     // Render pass is not extent dependent.
     create_render_pass();
 
     extent_dependent_init();
 }
 
-RenderTarget::~RenderTarget() {
+Subview::~Subview() {
     auto device = Platform::getSingleton()->device;
 
     extent_dependent_cleanup();
@@ -18,7 +19,7 @@ RenderTarget::~RenderTarget() {
     vkDestroyRenderPass(device, renderPass, nullptr);
 }
 
-void RenderTarget::create_images() {
+void Subview::create_images() {
     // Color.
     texture = ImageTexture::from_empty(extent, VK_FORMAT_R8G8B8A8_UNORM);
 
@@ -46,7 +47,7 @@ void RenderTarget::create_images() {
     depthImageView = RenderServer::getSingleton()->createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
-void RenderTarget::create_render_pass() {
+void Subview::create_render_pass() {
     // Color attachment.
     // ----------------------------------------
     VkAttachmentDescription colorAttachment{};
@@ -134,7 +135,7 @@ void RenderTarget::create_render_pass() {
     }
 }
 
-void RenderTarget::create_framebuffer() {
+void Subview::create_framebuffer() {
     // Create framebuffer.
     {
         std::array<VkImageView, 2> attachments = {texture->imageView, depthImageView};
@@ -160,7 +161,7 @@ void RenderTarget::create_framebuffer() {
     descriptor.sampler = texture->sampler;
 }
 
-VkRenderPassBeginInfo RenderTarget::getRenderPassInfo() {
+VkRenderPassBeginInfo Subview::getRenderPassInfo() {
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     renderPassInfo.renderPass = renderPass;
@@ -171,7 +172,7 @@ VkRenderPassBeginInfo RenderTarget::getRenderPassInfo() {
     return renderPassInfo;
 }
 
-void RenderTarget::create_pipelines() {
+void Subview::create_pipelines() {
     // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
     RenderServer::getSingleton()->createMeshPipeline(
         renderPass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, meshGraphicsPipeline);
@@ -183,7 +184,7 @@ void RenderTarget::create_pipelines() {
         renderPass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, skybox_graphics_pipeline);
 }
 
-void RenderTarget::set_extent(Vec2I _extent) {
+void Subview::set_extent(Vec2I _extent) {
     if (extent != _extent) {
         extent = _extent;
         extent_dependent_cleanup();
@@ -191,11 +192,11 @@ void RenderTarget::set_extent(Vec2I _extent) {
     }
 }
 
-Vec2I RenderTarget::get_extent() {
+Vec2I Subview::get_extent() {
     return extent;
 }
 
-void RenderTarget::extent_dependent_init() {
+void Subview::extent_dependent_init() {
     // Create color & depth images.
     create_images();
 
@@ -204,7 +205,7 @@ void RenderTarget::extent_dependent_init() {
     create_pipelines();
 }
 
-void RenderTarget::extent_dependent_cleanup() const {
+void Subview::extent_dependent_cleanup() const {
     auto device = Platform::getSingleton()->device;
 
     vkDestroyPipeline(device, meshGraphicsPipeline, nullptr);
@@ -217,4 +218,5 @@ void RenderTarget::extent_dependent_cleanup() const {
 
     vkDestroyFramebuffer(device, framebuffer, nullptr);
 }
+
 } // namespace Flint

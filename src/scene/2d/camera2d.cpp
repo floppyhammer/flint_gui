@@ -18,7 +18,7 @@ Vec2I Camera2d::get_extent() const {
 }
 
 std::shared_ptr<ImageTexture> Camera2d::get_texture() const {
-    return render_target->texture;
+    return subview->texture;
 }
 
 } // namespace Flint

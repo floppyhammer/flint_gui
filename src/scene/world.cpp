@@ -19,44 +19,45 @@ World::World(bool _is_2d) {
 }
 
 void World::propagate_draw(VkCommandBuffer cmd_buffer) {
-    RenderTarget* render_target;
+    Subview* subview;
     ColorF clear_color;
+
     // Handle each active camera in this world, and redraw the subtree for each camera.
     if (is_2d) {
         for (auto& cam : camera2ds) {
             current_camera2d = cam;
-            render_target = current_camera2d->render_target.get();
+            subview = current_camera2d->subview.get();
             clear_color = current_camera2d->clear_color.to_f32();
 
-            draw_subtree(render_target, clear_color, current_camera2d->get_texture().get());
+            draw_subtree(subview, clear_color, current_camera2d->get_texture().get());
 
             draw(cmd_buffer);
         }
     } else {
         for (auto& cam : camera3ds) {
             current_camera3d = cam;
-            render_target = current_camera3d->render_target.get();
+            subview = current_camera3d->subview.get();
             clear_color = current_camera3d->clear_color.to_f32();
 
-            draw_subtree(render_target, clear_color, current_camera3d->get_texture().get());
+            draw_subtree(subview, clear_color, current_camera3d->get_texture().get());
 
             draw(cmd_buffer);
         }
     }
 }
 
-void World::draw_subtree(RenderTarget* render_target, ColorF clear_color, ImageTexture* image_texture) {
+void World::draw_subtree(Subview* subview, ColorF clear_color, ImageTexture* image_texture) {
     auto cmd_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
 
     // Begin render pass.
     // It seems not feasible to wrap begin info into rendering Viewport.
     VkRenderPassBeginInfo renderPassInfo{};
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = render_target->renderPass;
-    renderPassInfo.framebuffer = render_target->framebuffer; // Set target framebuffer.
+    renderPassInfo.renderPass = subview->renderPass;
+    renderPassInfo.framebuffer = subview->framebuffer; // Set target framebuffer.
     renderPassInfo.renderArea.offset = {0, 0};
     renderPassInfo.renderArea.extent =
-        VkExtent2D{(uint32_t)render_target->get_extent().x, (uint32_t)render_target->get_extent().y};
+        VkExtent2D{(uint32_t)subview->get_extent().x, (uint32_t)subview->get_extent().y};
 
     // Clear color.
     std::array<VkClearValue, 2> clearValues{};

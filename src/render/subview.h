@@ -1,22 +1,18 @@
-#ifndef FLINT_RENDER_TARGET_H
-#define FLINT_RENDER_TARGET_H
+#ifndef FLINT_SUBVIEW_H
+#define FLINT_SUBVIEW_H
 
 #include "../common/geometry.h"
 #include "../resources/image_texture.h"
 #include "render_server.h"
 
-using Pathfinder::Transform2;
-using Pathfinder::Vec2I;
-
 namespace Flint {
-/**
- * RenderTarget is basically a texture to which you can draw things.
- */
-class RenderTarget {
-public:
-    RenderTarget();
 
-    ~RenderTarget();
+/// Subview is basically a texture to which you can draw things.
+class Subview {
+public:
+    Subview();
+
+    ~Subview();
 
     VkRenderPassBeginInfo getRenderPassInfo();
 
@@ -66,6 +62,7 @@ private:
 
     void create_pipelines();
 };
+
 } // namespace Flint
 
-#endif // FLINT_RENDER_TARGET_H
+#endif // FLINT_SUBVIEW_H

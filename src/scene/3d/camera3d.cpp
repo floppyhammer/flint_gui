@@ -10,8 +10,7 @@
 namespace Flint {
 
 void Camera3d::look_at(const glm::vec3 &target) {
-    auto distance = target - position;
-    // direction = distance / glm::length(distance);
+    view_matrix = glm::lookAt(position, target, up);
 }
 
 void Camera3d::update(double dt) {
@@ -21,9 +20,6 @@ void Camera3d::update(double dt) {
     facing = glm::rotate(facing, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
     facing = glm::rotate(facing, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
     facing = glm::rotate(facing, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-
-    // FIXME: Modify center to camera direction.
-    view_matrix = glm::lookAt(position, position + facing, up);
 }
 
 glm::mat4 Camera3d::get_view_matrix() const {
@@ -39,7 +35,7 @@ glm::vec3 Camera3d::get_up_direction() const {
 }
 
 std::shared_ptr<ImageTexture> Camera3d::get_texture() const {
-    return render_target->texture;
+    return subview->texture;
 }
 
 } // namespace Flint

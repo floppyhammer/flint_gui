@@ -4,14 +4,14 @@
 #include "../../common/geometry.h"
 #include "glm/glm.hpp"
 #include "node2d.h"
-#include "render/render_target.h"
+#include "render/subview.h"
 
 namespace Flint {
 
 class Camera2d : public Node2d {
 public:
     Camera2d() {
-        render_target = std::make_shared<RenderTarget>();
+        subview = std::make_shared<Subview>();
     }
 
     /**
@@ -23,7 +23,7 @@ public:
 
     Vec2I get_extent() const;
 
-    std::shared_ptr<RenderTarget> render_target;
+    std::shared_ptr<Subview> subview;
 
     ColorU clear_color = {25, 50, 75};
 

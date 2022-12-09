@@ -5,14 +5,14 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "node3d.h"
-#include "render/render_target.h"
+#include "render/subview.h"
 
 namespace Flint {
 
 class Camera3d : public Node3d {
 public:
     Camera3d() {
-        render_target = std::make_shared<RenderTarget>();
+        subview = std::make_shared<Subview>();
     }
 
     /**
@@ -40,7 +40,8 @@ public:
     }
 
     glm::mat4 get_projection() const {
-        auto proj = glm::perspective(glm::radians(fov), (float)render_target->extent.x / (float)render_target->extent.y, z_near, z_far);
+        auto proj =
+            glm::perspective(glm::radians(fov), (float)subview->extent.x / (float)subview->extent.y, z_near, z_far);
 
         // GLM was originally designed for OpenGL,
         // where the Y coordinate of the clip coordinates is inverted.
@@ -49,7 +50,7 @@ public:
         return proj;
     }
 
-    std::shared_ptr<RenderTarget> render_target;
+    std::shared_ptr<Subview> subview;
 
     ColorU clear_color = {25, 50, 75};
 
@@ -64,6 +65,8 @@ protected:
     bool active = true;
 
     glm::mat4 view_matrix{};
+
+    glm::vec3 direction{};
 
     /// Defining the world's upwards direction, which always point towards positive Y.
     glm::vec3 up = glm::vec3(0, 0, 1);

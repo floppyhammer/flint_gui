@@ -14,7 +14,7 @@ Skybox::Skybox() {
     type = NodeType::Skybox;
 
     material = std::make_shared<MaterialSkybox>();
-    material->set_texture(std::make_shared<CubemapTexture>("../assets/skybox.png"));
+    material->set_texture(std::make_shared<CubemapTexture>("../assets/skybox.jpg"));
 }
 
 void Skybox::update(double dt) {
@@ -32,7 +32,7 @@ void Skybox::draw(VkCommandBuffer cmd_buffer) {
         return;
     }
 
-    VkPipeline pipeline = camera->render_target->skybox_graphics_pipeline;
+    VkPipeline pipeline = camera->subview->skybox_graphics_pipeline;
     VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->skybox_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.

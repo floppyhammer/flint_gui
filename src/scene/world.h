@@ -3,7 +3,7 @@
 
 #include "../common/geometry.h"
 #include "../render/render_server.h"
-#include "../render/render_target.h"
+#include "../render/subview.h"
 #include "../resources/image_texture.h"
 #include "node.h"
 #include "resources/mesh.h"
@@ -52,7 +52,7 @@ private:
     std::vector<Camera2d*> camera2ds{};
 
 private:
-    void draw_subtree(RenderTarget* render_target, ColorF clear_color, ImageTexture* image_texture);
+    void draw_subtree(Subview* subview, ColorF clear_color, ImageTexture* image_texture);
 };
 
 } // namespace Flint

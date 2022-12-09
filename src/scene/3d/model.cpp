@@ -26,8 +26,8 @@ void Model::draw(VkCommandBuffer cmd_buffer) {
         return;
     }
 
-    VkPipeline pipeline = camera->render_target->meshGraphicsPipeline;
-    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blitPipelineLayout;
+    VkPipeline pipeline = camera->subview->meshGraphicsPipeline;
+    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->meshPipelineLayout;
 
     // Upload the model matrix to the GPU via push constants.
     vkCmdPushConstants(
