@@ -17,22 +17,13 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto node = std::make_shared<Node>();
-
-        auto node_gui = std::make_shared<Control>();
-        node_gui->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
-        node->add_child(node_gui);
-
-        auto vector_layer = std::make_shared<TextureRect>();
-        vector_layer->name = "vector_layer";
-        vector_layer->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
-        vector_layer->set_texture(VectorServer::get_singleton()->get_texture());
-        vector_layer->set_mouse_filter(MouseFilter::Ignore);
+        auto node_ui = std::make_shared<NodeUi>();
+        app.tree->replace_scene(node_ui);
 
         auto panel = std::make_shared<Panel>();
         panel->enable_title_bar(false);
         panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
-        node_gui->add_child(panel);
+        node_ui->add_child(panel);
 
         auto margin_container = std::make_shared<MarginContainer>();
         margin_container->set_position({0, 0});
@@ -56,7 +47,7 @@ int main() {
         hbox_container->add_child(text_edit);
 
         auto file_dialog = std::make_shared<FileDialog>();
-        node->add_child(file_dialog);
+        node_ui->add_child(file_dialog);
 
         auto select_button = std::make_shared<Button>();
         select_button->set_text("Select");
@@ -69,9 +60,6 @@ int main() {
         confirm_button->set_text("Confirm");
         confirm_button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
         vbox_container->add_child(confirm_button);
-
-        node->add_child(vector_layer);
-        app.tree->get_root()->add_child(node);
         // ----------------------------------------------------
     }
 

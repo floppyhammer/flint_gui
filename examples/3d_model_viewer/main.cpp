@@ -55,27 +55,6 @@ int main() {
         auto vbox_container = std::make_shared<VStackContainer>();
         margin_container->add_child(vbox_container);
 
-        auto hbox_container = std::make_shared<HStackContainer>();
-        vbox_container->add_child(hbox_container);
-
-        auto file_dialog = std::make_shared<FileDialog>();
-        vbox_container->add_child(file_dialog);
-
-        auto text_edit = std::make_shared<TextEdit>();
-        text_edit->container_sizing.expand_h = true;
-        text_edit->set_editable(false);
-        hbox_container->add_child(text_edit);
-
-        auto button = std::make_shared<Button>();
-        button->set_text("Open");
-        // Callback to clean up staging resources.
-        auto callback = [file_dialog] {
-            Logger::verbose("Button pressed");
-            file_dialog->show();
-        };
-        button->connect_signal("pressed", callback);
-        hbox_container->add_child(button);
-
         // Translation values.
         // ----------------------------------------------------
         auto translation_container = std::make_shared<HStackContainer>();

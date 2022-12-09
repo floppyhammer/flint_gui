@@ -72,7 +72,7 @@ public:
 
     void update(double delta) override;
 
-    void draw(VkCommandBuffer p_command_buffer) override;
+    void draw() override;
 
     float folding_width = 24;
 

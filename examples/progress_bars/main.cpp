@@ -23,23 +23,12 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto node = std::make_shared<Node>();
-        app.tree->get_root()->add_child(node);
-
-        auto node_gui = std::make_shared<Control>();
-        node_gui->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
-        node->add_child(node_gui);
-
-        auto vector_layer = std::make_shared<TextureRect>();
-        vector_layer->name = "vector_layer";
-        vector_layer->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
-        vector_layer->set_texture(VectorServer::get_singleton()->get_texture());
-        vector_layer->set_mouse_filter(MouseFilter::Ignore);
-        node->add_child(vector_layer);
+        auto node_ui = std::make_shared<NodeUi>();
+        app.tree->replace_scene(node_ui);
 
         auto vstack_container = std::make_shared<VStackContainer>();
         vstack_container->set_debug_mode(true);
-        node->add_child(vstack_container);
+        node_ui->add_child(vstack_container);
 
         for (int i = 0; i < 5; i++) {
             auto progress_bar = std::make_shared<MyProgressBar>();

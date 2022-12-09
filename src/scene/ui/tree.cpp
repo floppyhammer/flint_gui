@@ -35,7 +35,7 @@ void Tree::update(double delta) {
     NodeUi::update(delta);
 }
 
-void Tree::draw(VkCommandBuffer p_command_buffer) {
+void Tree::draw() {
     auto vector_server = VectorServer::get_singleton();
 
     if (theme_bg.has_value()) {
@@ -43,7 +43,7 @@ void Tree::draw(VkCommandBuffer p_command_buffer) {
     }
 
     float offset_y = 0;
-    root->propagate_draw(folding_width, 0, p_command_buffer, offset_y, get_global_position());
+    root->propagate_draw(folding_width, 0, VK_NULL_HANDLE, offset_y, get_global_position());
 
     vector_server->draw_style_box(debug_size_box, get_global_position(), size);
 }
