@@ -22,7 +22,6 @@ int main() {
         node_ui->add_child(panel);
 
         auto scroll_container = std::make_shared<ScrollContainer>();
-        scroll_container->set_debug_mode(true);
         scroll_container->set_size({400, 300});
         scroll_container->set_position({0, 48});
         panel->add_child(scroll_container);

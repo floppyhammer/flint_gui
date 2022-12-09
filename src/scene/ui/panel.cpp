@@ -12,7 +12,7 @@ Panel::Panel() {
     theme_panel = std::make_optional(StyleBox());
     theme_panel.value().bg_color = ColorU(27, 27, 27, 255);
     theme_panel.value().border_color = {75, 75, 75, 100};
-    theme_panel.value().border_width = 2;
+    theme_panel.value().border_width = 3;
     theme_panel.value().corner_radius = 8;
 
     // Set up title bar.

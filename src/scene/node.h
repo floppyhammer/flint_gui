@@ -115,7 +115,7 @@ public:
 
     virtual void connect_signal(const std::string &signal, const std::function<void()> &callback);
 
-    void set_debug_mode(bool enabled);
+    void enable_visual_debug(bool enabled);
 
 protected:
     NodeType type = NodeType::Node;
@@ -131,7 +131,7 @@ protected:
     // Called when subtree structure changes.
     std::vector<std::function<void()>> subtree_changed_callbacks;
 
-    bool debug_mode = false;
+    bool visual_debug = false;
 };
 
 } // namespace Flint

@@ -22,7 +22,7 @@ int main() {
 
         auto hbox_container = std::make_shared<HStackContainer>();
         hbox_container->set_separation(8);
-        hbox_container->set_debug_mode(true);
+        hbox_container->enable_visual_debug(true);
         hbox_container->set_position({100, 100});
         node_ui->add_child(hbox_container);
 
@@ -52,7 +52,7 @@ int main() {
         auto vbox_container = std::make_shared<VStackContainer>();
         vbox_container->set_separation(8);
         vbox_container->set_position({100, 300});
-        vbox_container->set_debug_mode(true);
+        vbox_container->enable_visual_debug(true);
         node_ui->add_child(vbox_container);
 
         for (int _ = 0; _ < 4; _++) {

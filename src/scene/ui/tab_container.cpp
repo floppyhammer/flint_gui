@@ -47,8 +47,6 @@ TabContainer::TabContainer() {
         //        button->add_child(close_button);
         //        close_button->set_anchor_flag(AnchorFlag::CenterRight);
     }
-
-    set_debug_mode(true);
 }
 
 void TabContainer::adjust_layout() {

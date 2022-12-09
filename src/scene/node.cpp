@@ -174,8 +174,8 @@ void Node::connect_signal(const std::string &signal, const std::function<void()>
     }
 }
 
-void Node::set_debug_mode(bool enabled) {
-    debug_mode = enabled;
+void Node::enable_visual_debug(bool enabled) {
+    visual_debug = enabled;
 }
 
 NodeType Node::get_node_type() const {

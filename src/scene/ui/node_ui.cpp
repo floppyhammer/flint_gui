@@ -38,7 +38,7 @@ void NodeUi::draw() {
 }
 
 void NodeUi::update(double dt) {
-    if (debug_mode) {
+    if (visual_debug) {
         debug_size_box.border_width = 2;
     } else {
         debug_size_box.border_width = 0;

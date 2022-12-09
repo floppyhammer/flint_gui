@@ -13,6 +13,7 @@
 #include "stack_container.h"
 
 namespace Flint {
+
 class TreeItem {
     friend class Tree;
 
@@ -34,7 +35,7 @@ public:
     void input(InputEvent &event, Vec2F global_position);
 
     void propagate_draw(
-        float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y, Vec2F global_position);
+        float folding_width, uint32_t depth, float &offset_y, Vec2F global_position);
 
     void set_text(const std::string &text);
 
@@ -91,6 +92,7 @@ private:
     std::optional<StyleBox> theme_bg;
     std::optional<StyleBox> theme_bg_focused;
 };
+
 } // namespace Flint
 
 #endif // FLINT_NODE_TREE_H

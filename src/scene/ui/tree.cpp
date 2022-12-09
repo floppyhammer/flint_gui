@@ -18,17 +18,17 @@ Tree::Tree() {
 
     auto root_ = create_item(nullptr, "Node");
     root->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Node.svg"));
-    auto child_control = create_item(root_, "Control");
-    child_control->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Control.svg"));
-    auto child_node_2d = create_item(root_, "Node2D");
-    child_node_2d->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Node2D.svg"));
-    auto child_node_3d = create_item(root_, "Node3D");
-    child_node_3d->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Node3D.svg"));
-    auto child_label = create_item(child_control, "Label");
+    auto child_ui = create_item(root_, "NodeUi");
+    child_ui->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Control.svg"));
+    auto child_label = create_item(child_ui, "Label");
     child_label->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Label.svg"));
-    auto child_text_edit = create_item(child_control, "TextEdit");
+    auto child_text_edit = create_item(child_ui, "TextEdit");
     child_text_edit->set_icon(
         ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_LineEdit.svg"));
+    auto child_node_2d = create_item(root_, "Node2d");
+    child_node_2d->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Node2D.svg"));
+    auto child_node_3d = create_item(root_, "Node3d");
+    child_node_3d->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Node3D.svg"));
 }
 
 void Tree::update(double delta) {
@@ -43,7 +43,7 @@ void Tree::draw() {
     }
 
     float offset_y = 0;
-    root->propagate_draw(folding_width, 0, VK_NULL_HANDLE, offset_y, get_global_position());
+    root->propagate_draw(folding_width, 0, offset_y, get_global_position());
 
     vector_server->draw_style_box(debug_size_box, get_global_position(), size);
 }
@@ -164,8 +164,7 @@ void TreeItem::propagate_input(InputEvent &event, Vec2F global_position) {
     input(event, global_position);
 }
 
-void TreeItem::propagate_draw(
-    float folding_width, uint32_t depth, VkCommandBuffer p_command_buffer, float &offset_y, Vec2F global_position) {
+void TreeItem::propagate_draw(float folding_width, uint32_t depth, float &offset_y, Vec2F global_position) {
     auto vector_server = VectorServer::get_singleton();
 
     float offset_x = (float)depth * folding_width;
@@ -196,13 +195,13 @@ void TreeItem::propagate_draw(
     container->set_position(Vec2F(offset_x, offset_y) + global_position);
     container->set_size({item_height, item_height});
     container->propagate_update(0);
-    container->propagate_draw(p_command_buffer);
+    container->propagate_draw(VK_NULL_HANDLE);
 
     offset_y += item_height;
 
     if (!collapsed) {
         for (auto &child : children) {
-            child->propagate_draw(folding_width, depth + 1, p_command_buffer, offset_y, global_position);
+            child->propagate_draw(folding_width, depth + 1, offset_y, global_position);
         }
     }
 }
