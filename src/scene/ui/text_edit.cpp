@@ -97,7 +97,9 @@ void TextEdit::input(InputEvent &event) {
                     delete_selection();
                 }
 
-                label->insert_text(current_caret_index + 1, cpp11_codepoint_to_utf8(event.args.text.codepoint));
+                if (editable) {
+                    label->insert_text(current_caret_index + 1, cpp11_codepoint_to_utf8(event.args.text.codepoint));
+                }
 
                 current_caret_index++;
                 selected_caret_index = current_caret_index;
@@ -114,7 +116,10 @@ void TextEdit::input(InputEvent &event) {
                     if (selected_caret_index != current_caret_index) {
                         delete_selection();
                     } else {
-                        label->remove_text(current_caret_index, 1);
+                        if (editable) {
+                            label->remove_text(current_caret_index, 1);
+                        }
+
                         current_caret_index--;
                         selected_caret_index--;
                     }
@@ -183,7 +188,7 @@ void TextEdit::draw() {
     label->draw();
 
     // Draw blinking caret.
-    if (focused) {
+    if (focused && editable) {
         theme_caret.color.a = 255.0f * std::ceil(std::sin(caret_blink_timer * 5.0f));
 
         auto current_glyph_box = RectF({0, 0}, {0, label->get_font_size()});
@@ -250,6 +255,10 @@ void TextEdit::release_focus() {
     focused = false;
 }
 
+void TextEdit::set_editable(bool new_value) {
+    editable = new_value;
+}
+
 void TextEdit::cursor_entered() {
     InputServer::get_singleton()->set_cursor(CursorShape::IBeam);
 }
@@ -259,6 +268,9 @@ void TextEdit::cursor_exited() {
 }
 
 void TextEdit::delete_selection() {
+    if (!editable) {
+        return;
+    }
     auto start_index = std::min(selected_caret_index, current_caret_index) + 1;
     auto count = std::abs(selected_caret_index - current_caret_index);
     label->remove_text(start_index, count);

@@ -122,7 +122,9 @@ void SpinBox::update(double dt) {
 }
 
 void SpinBox::draw() {
-    if (!visible) return;
+    if (!visible) {
+        return;
+    }
 
     auto vector_server = VectorServer::get_singleton();
 
@@ -146,7 +148,9 @@ void SpinBox::set_position(Vec2F p_position) {
 }
 
 void SpinBox::set_size(Vec2F p_size) {
-    if (size == p_size) return;
+    if (size == p_size) {
+        return;
+    }
 
     auto path = get_node_path();
 
@@ -157,33 +161,49 @@ void SpinBox::set_size(Vec2F p_size) {
     size = final_size;
 }
 
-void SpinBox::on_focused() {
-    for (auto &callback : on_focused_callbacks) {
+void SpinBox::when_focused() {
+    for (auto &callback : focused_callbacks) {
         callback();
     }
 }
 
-void SpinBox::connect_signal(std::string signal, std::function<void()> callback) {
-    if (signal == "on_focused") {
-        on_focused_callbacks.push_back(callback);
+void SpinBox::when_value_changed() {
+    for (auto &callback : value_changed_callbacks) {
+        callback();
     }
 }
 
-void SpinBox::set_value(float p_value) {
+void SpinBox::connect_signal(const std::string &signal, std::function<void()> callback) {
+    if (signal == "focused") {
+        focused_callbacks.push_back(callback);
+    }
+
+    if (signal == "value_changed") {
+        value_changed_callbacks.push_back(callback);
+    }
+}
+
+void SpinBox::set_value(float new_value) {
     if (clamped) {
-        value = std::clamp(p_value, min_value, max_value);
+        value = std::clamp(new_value, min_value, max_value);
     } else {
-        value = p_value;
+        value = new_value;
     }
 
     if (is_integer) {
-        int32_t value_int = std::round(p_value);
-        label->set_text(std::to_string(value_int));
+        int32_t value_int = std::round(value);
+        label->set_text(std::to_string(abs(value_int)));
     } else {
         std::ostringstream string_stream;
-        string_stream << std::setprecision(rounding_digits) << p_value;
+        string_stream << std::setprecision(rounding_digits) << value;
         label->set_text(string_stream.str());
     }
+
+    when_value_changed();
+}
+
+float SpinBox::get_value() const {
+    return value;
 }
 
 } // namespace Flint

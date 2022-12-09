@@ -1,12 +1,14 @@
 #include "scene_tree.h"
 
+#include "render/swap_chain.h"
 #include "ui_layer.h"
 #include "window.h"
 
 namespace Flint {
 
 SceneTree::SceneTree() {
-    root = std::make_shared<Window>();
+    root = std::make_shared<Window>(
+        Vec2I(SwapChain::getSingleton()->swapChainExtent.width, SwapChain::getSingleton()->swapChainExtent.height));
     root->name = "Main Window";
 }
 

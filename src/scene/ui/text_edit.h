@@ -32,6 +32,8 @@ public:
 
     void release_focus() override;
 
+    void set_editable(bool new_value);
+
 private:
     bool editable = true;
     bool single_line = false;

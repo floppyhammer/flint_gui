@@ -51,6 +51,7 @@ enum class NodeType {
 };
 
 class World;
+class Window;
 
 class Node {
 public:
@@ -84,6 +85,8 @@ public:
      * @return A pointer to the viewport.
      */
     World *get_world();
+
+    Window *get_window();
 
     void set_parent(Node *node);
 

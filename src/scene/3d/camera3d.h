@@ -11,8 +11,8 @@ namespace Flint {
 
 class Camera3d : public Node3d {
 public:
-    Camera3d() {
-        subview = std::make_shared<Subview>();
+    Camera3d(Vec2I view_size) {
+        subview = std::make_shared<Subview>(view_size);
     }
 
     /**

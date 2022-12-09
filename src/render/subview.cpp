@@ -1,10 +1,12 @@
-#include <array>
-
 #include "subview.h"
+
+#include <array>
 
 namespace Flint {
 
-Subview::Subview() {
+Subview::Subview(Vec2I view_size) {
+    extent = view_size;
+
     // Render pass is not extent dependent.
     create_render_pass();
 
@@ -62,8 +64,9 @@ void Subview::create_render_pass() {
                                       // treated at the end of the subpass where it is last used.
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // The layout the attachment image subresource will be in
-                                                               // when a render pass instance begins.
+    colorAttachment.initialLayout =
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // The layout the attachment image subresource will be in
+                                                  // when a render pass instance begins.
     colorAttachment.finalLayout =
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // The layout the attachment image subresource will be transitioned to
                                                   // when a render pass instance ends.

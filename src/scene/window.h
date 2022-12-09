@@ -15,10 +15,11 @@ class Window : public Node {
     friend class SceneTree;
 
 public:
-    Window();
+    Window(Vec2I _size);
 
     Vec2I get_size() const;
 
+private:
     /// Window size.
     Vec2I size;
 };

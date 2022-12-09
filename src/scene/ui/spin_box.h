@@ -23,7 +23,7 @@ public:
     bool pressed_inside = false;
     bool drag_to_adjust_value = false;
 
-    void input(InputEvent &event) override;
+    void input(InputEvent& event) override;
 
     void update(double dt) override;
 
@@ -35,9 +35,11 @@ public:
 
     Vec2F calc_minimum_size() const override;
 
-    void connect_signal(std::string signal, std::function<void()> callback);
+    void connect_signal(const std::string& signal, std::function<void()> callback);
 
-    void set_value(float p_value);
+    void set_value(float new_value);
+
+    float get_value() const;
 
 protected:
     float value = 0;
@@ -52,7 +54,7 @@ protected:
     float min_value = 0;
     float max_value = 100;
 
-    float step = 1.4;
+    float step = 0.1;
 
     bool focused = false;
 
@@ -61,12 +63,15 @@ protected:
     std::shared_ptr<Button> increase_button, decrease_button;
     std::shared_ptr<Label> label;
 
-    std::vector<std::function<void()>> on_focused_callbacks;
+    std::vector<std::function<void()>> focused_callbacks;
+    std::vector<std::function<void()>> value_changed_callbacks;
 
     std::optional<StyleBox> theme_normal, theme_focused;
 
 protected:
-    void on_focused();
+    void when_focused();
+
+    void when_value_changed();
 };
 } // namespace Flint
 

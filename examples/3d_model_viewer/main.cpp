@@ -21,26 +21,24 @@ int main() {
         node_ui->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         app.tree->replace_scene(node_ui);
 
-        {
-            auto world3d = std::make_shared<World>(false);
-            node_ui->add_child(world3d);
+        auto world3d = std::make_shared<World>(false);
+        node_ui->add_child(world3d);
 
-            auto camera3d = std::make_shared<Camera3d>();
-            camera3d->position = {5, 5, 5};
-            camera3d->look_at({0, 0, 0});
-            world3d->add_child(camera3d);
-            world3d->add_camera3d(camera3d.get());
+        auto camera3d = std::make_shared<Camera3d>(Vec2I(WINDOW_WIDTH, WINDOW_HEIGHT));
+        camera3d->position = {5, 5, 5};
+        camera3d->look_at({0, 0, 0});
+        world3d->add_child(camera3d);
+        world3d->add_camera3d(camera3d.get());
 
-            auto node_3d = std::make_shared<Node3d>();
-            world3d->add_child(node_3d);
+        auto node_3d = std::make_shared<Node3d>();
+        world3d->add_child(node_3d);
 
-            auto model = std::make_shared<Model>();
-            model->set_mesh(ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj"));
-            node_3d->add_child(model);
+        auto model = std::make_shared<Model>();
+        model->set_mesh(ResourceManager::get_singleton()->load<Mesh3d>("../assets/viking_room/viking_room.obj"));
+        node_3d->add_child(model);
 
-            auto skybox = std::make_shared<Skybox>();
-            node_3d->add_child(skybox);
-        }
+        auto skybox = std::make_shared<Skybox>();
+        node_3d->add_child(skybox);
 
         // Inspector.
         // ------------------------------------------
@@ -64,6 +62,8 @@ int main() {
         vbox_container->add_child(file_dialog);
 
         auto text_edit = std::make_shared<TextEdit>();
+        text_edit->container_sizing.expand_h = true;
+        text_edit->set_editable(false);
         hbox_container->add_child(text_edit);
 
         auto button = std::make_shared<Button>();
@@ -87,6 +87,11 @@ int main() {
             auto spin_box_x = std::make_shared<SpinBox>();
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
+            auto callback1 = [spin_box_x, model] {
+                model->position.x = spin_box_x->get_value();
+            };
+            spin_box_x->connect_signal("value_changed", callback1);
+
             auto spin_box_y = std::make_shared<SpinBox>();
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
@@ -121,6 +126,7 @@ int main() {
             auto spin_box_x = std::make_shared<SpinBox>();
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;
+
             auto spin_box_y = std::make_shared<SpinBox>();
             spin_box_x->container_sizing.expand_h = true;
             spin_box_x->container_sizing.flag_h = ContainerSizingFlag::Fill;

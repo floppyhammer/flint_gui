@@ -10,8 +10,8 @@ namespace Flint {
 
 class Camera2d : public Node2d {
 public:
-    Camera2d() {
-        subview = std::make_shared<Subview>();
+    Camera2d(Vec2I view_size) {
+        subview = std::make_shared<Subview>(view_size);
     }
 
     /**

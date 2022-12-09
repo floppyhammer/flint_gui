@@ -22,7 +22,9 @@ void Label::set_text(const std::string &p_text) {
     auto ws_text = utf8_to_ws(p_text);
 
     // Only update glyphs when text has changed.
-    if (text == ws_text || font == nullptr) return;
+    if (text == ws_text || font == nullptr) {
+        return;
+    }
 
     text = ws_text;
 
@@ -192,7 +194,14 @@ void Label::draw() {
 
     auto translation = global_position + alignment_shift;
 
-    vector_server->draw_glyphs(glyphs, font_style, Transform2::from_translation(translation), RectF{{}, size});
+    RectF clip_box;
+    if (clip) {
+        clip_box = {{}, size};
+    } else {
+        clip_box = {{}, calc_minimum_size()};
+    }
+
+    vector_server->draw_glyphs(glyphs, font_style, Transform2::from_translation(translation), clip_box);
 
     NodeUi::draw();
 }
