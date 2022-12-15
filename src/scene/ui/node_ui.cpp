@@ -23,6 +23,10 @@ Vec2F NodeUi::calc_minimum_size() const {
 }
 
 void NodeUi::propagate_draw(VkCommandBuffer cmd_buffer) {
+    if (!visible) {
+        return;
+    }
+
     draw();
 
     for (auto &child : children) {

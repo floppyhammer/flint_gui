@@ -85,6 +85,8 @@ Panel::Panel() {
     };
     collapse_button->connect_signal("pressed", callback);
 
+    close_button->connect_signal("pressed", [this] { visible = false; });
+
     title_bar = true;
     // ---------------------------------------------------------
 }
@@ -163,6 +165,10 @@ void Panel::update(double dt) {
 }
 
 void Panel::propagate_draw(VkCommandBuffer cmd_buffer) {
+    if (!visible) {
+        return;
+    }
+
     draw();
 
     if (!collapsed) {

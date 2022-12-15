@@ -15,6 +15,7 @@ void VectorServer::submit() {
     canvas->draw();
     canvas->clear();
 
+    // TODO: clear the dst texture every frame even when there's nothing to draw on the canvas.
     // Get the dst texture.
     auto texture_vk = static_cast<Pathfinder::TextureVk *>(canvas->get_dst_texture().get());
 
