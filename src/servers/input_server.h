@@ -88,9 +88,11 @@ enum class CursorShape {
     // The hand shape.
     Hand,
     // The horizontal resize arrow shape.
-    HResize,
+    ResizeH,
     // The vertical resize arrow shape.
-    VResize,
+    ResizeV,
+    ResizeTlbr,
+    ResizeTrbl,
 };
 
 class InputServer {
@@ -123,6 +125,7 @@ public:
 
 private:
     GLFWcursor *arrow_cursor, *ibeam_cursor, *crosshair_cursor, *hand_cursor, *resize_cursor_h, *resize_cursor_v;
+    GLFWcursor *resize_tlbr_cursor, *resize_trbl_cursor;
 };
 
 } // namespace Flint

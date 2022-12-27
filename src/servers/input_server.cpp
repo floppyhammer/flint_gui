@@ -56,6 +56,8 @@ InputServer::InputServer() {
     hand_cursor = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
     resize_cursor_h = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
     resize_cursor_v = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
+    resize_tlbr_cursor = glfwCreateStandardCursor(GLFW_RESIZE_NWSE_CURSOR);
+    resize_trbl_cursor = glfwCreateStandardCursor(GLFW_RESIZE_NESW_CURSOR);
 }
 
 void InputServer::init(GLFWwindow *window) {
@@ -164,11 +166,17 @@ void InputServer::set_cursor(CursorShape shape) {
         case CursorShape::Hand: {
             current_cursor = hand_cursor;
         } break;
-        case CursorShape::HResize: {
+        case CursorShape::ResizeH: {
             current_cursor = resize_cursor_h;
         } break;
-        case CursorShape::VResize: {
+        case CursorShape::ResizeV: {
             current_cursor = resize_cursor_v;
+        } break;
+        case CursorShape::ResizeTlbr: {
+            current_cursor = resize_tlbr_cursor;
+        } break;
+        case CursorShape::ResizeTrbl: {
+            current_cursor = resize_trbl_cursor;
         } break;
     }
 

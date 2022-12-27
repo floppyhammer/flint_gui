@@ -125,6 +125,28 @@ void Panel::input(InputEvent &event) {
         if (active_rect.contains_point(args.position)) {
             consume_flag = true;
         }
+
+        bool h_resize = false;
+        if (abs(global_position.x - args.position.x) < 4.0 || abs(global_position.x + size.x - args.position.x) < 4.0) {
+            h_resize = true;
+            consume_flag = true;
+        }
+
+        bool v_resize = false;
+        if (abs(global_position.y - args.position.y) < 4.0 || abs(global_position.y + size.y + title_bar_height - args.position.y) < 4.0) {
+            v_resize = true;
+            consume_flag = true;
+        }
+
+        if (h_resize && v_resize) {
+            InputServer::get_singleton()->set_cursor(CursorShape::ResizeTlbr);
+        } else if (h_resize) {
+            InputServer::get_singleton()->set_cursor(CursorShape::ResizeH);
+        } else if (v_resize) {
+            InputServer::get_singleton()->set_cursor(CursorShape::ResizeV);
+        } else {
+            InputServer::get_singleton()->set_cursor(CursorShape::Arrow);
+        }
     }
 
     if (event.type == InputEventType::MouseButton) {
