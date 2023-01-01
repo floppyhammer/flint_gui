@@ -3,8 +3,10 @@
 
 #include "mesh.h"
 #include "surface.h"
+#include "theme.h"
 
 namespace Flint {
+
 class DefaultResource {
 public:
     DefaultResource() {
@@ -49,6 +51,8 @@ public:
             default_skybox_gpu_resources =
                 std::make_shared<VertexGpuResources<SkyboxVertex>>(skybox_vertices, skybox_indices);
         }
+
+        default_theme = std::make_shared<Theme>();
     }
 
     static DefaultResource *get_singleton() {
@@ -62,6 +66,10 @@ public:
 
     inline std::shared_ptr<VertexGpuResources<SkyboxVertex>> get_default_skybox_gpu_resources() {
         return default_skybox_gpu_resources;
+    }
+
+    inline std::shared_ptr<Theme> get_default_theme() {
+        return default_theme;
     }
 
     inline void cleanup() {
@@ -90,7 +98,10 @@ private:
     std::shared_ptr<VertexGpuResources<Vertex>> default_surface_2d_gpu_resources;
 
     std::shared_ptr<VertexGpuResources<SkyboxVertex>> default_skybox_gpu_resources;
+
+    std::shared_ptr<Theme> default_theme;
 };
+
 } // namespace Flint
 
 #endif // FLINT_DEFAULT_RESOURCE_H

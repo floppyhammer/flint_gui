@@ -4,7 +4,7 @@
 #include <iostream>
 #include <memory>
 
-#include "cubemap_texture.h"
+#include "cube_texture.h"
 #include "image_texture.h"
 
 namespace Flint {
@@ -74,7 +74,7 @@ public:
 
     void createDescriptorSet() override;
 
-    void updateDescriptorSet(CubemapTexture *p_texture);
+    void updateDescriptorSet(CubeTexture *texture);
 };
 
 /// Material Resources
@@ -124,14 +124,14 @@ public:
 
     static std::shared_ptr<MaterialSkybox> from_default();
 
-    void set_texture(std::shared_ptr<CubemapTexture> p_texture);
+    void set_texture(std::shared_ptr<CubeTexture> new_texture);
 
     std::shared_ptr<MaterialSkyboxDescSet> get_desc_set() {
         return desc_set;
     }
 
 private:
-    std::shared_ptr<CubemapTexture> texture;
+    std::shared_ptr<CubeTexture> texture;
 
     std::shared_ptr<MaterialSkyboxDescSet> desc_set;
 };

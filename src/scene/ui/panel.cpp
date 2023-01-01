@@ -40,8 +40,8 @@ Panel::Panel() {
         close_button->set_icon(close_tex);
         close_button->set_minimum_size(Vec2F(title_bar_height));
         close_button->set_expand_icon(true);
-        close_button->theme_normal.value().border_width = 0.0;
-        close_button->theme_normal.value().bg_color = ColorU::transparent_black();
+        close_button->theme_normal.border_width = 0.0;
+        close_button->theme_normal.bg_color = ColorU::transparent_black();
     }
 
     collapse_button = std::make_shared<Button>();
@@ -49,8 +49,8 @@ Panel::Panel() {
     collapse_button->set_icon(expanded_tex);
     collapse_button->set_minimum_size(Vec2F(title_bar_height));
     collapse_button->set_expand_icon(true);
-    collapse_button->theme_normal.value().border_width = 0.0;
-    collapse_button->theme_normal.value().bg_color = ColorU::transparent_black();
+    collapse_button->theme_normal.border_width = 0.0;
+    collapse_button->theme_normal.bg_color = ColorU::transparent_black();
 
     title_container = std::make_shared<HStackContainer>();
     title_container->set_parent(this);

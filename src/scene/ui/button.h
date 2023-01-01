@@ -47,9 +47,9 @@ public:
     void set_toggle_mode(bool enable);
 
     // Styles.
-    std::optional<StyleBox> theme_normal;
-    std::optional<StyleBox> theme_hovered;
-    std::optional<StyleBox> theme_pressed;
+    StyleBox theme_normal;
+    StyleBox theme_hovered;
+    StyleBox theme_pressed;
 
 protected:
     bool pressed_inside = false;
@@ -60,7 +60,7 @@ protected:
 
     /// Button[HStackContainer[TextureRect, Label]]
     std::shared_ptr<MarginContainer> margin_container;
-    std::shared_ptr<HStackContainer> hbox_container;
+    std::shared_ptr<HStackContainer> hstack_container;
     std::shared_ptr<TextureRect> icon_rect;
     std::shared_ptr<Label> label;
 

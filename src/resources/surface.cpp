@@ -1,8 +1,11 @@
 #include "surface.h"
 
+#include <utility>
+
 #include "default_resource.h"
 
 namespace Flint {
+
 std::shared_ptr<Material2d> Surface2d::get_material() const {
     return material;
 }
@@ -43,7 +46,8 @@ uint32_t Surface::get_index_count() {
     return gpu_resources->get_index_count();
 }
 
-void Surface::set_gpu_resources(std::shared_ptr<VertexGpuResources<Vertex>> p_gpu_resources) {
-    gpu_resources = p_gpu_resources;
+void Surface::set_gpu_resources(std::shared_ptr<VertexGpuResources<Vertex>> new_gpu_resources) {
+    gpu_resources = std::move(new_gpu_resources);
 }
+
 } // namespace Flint

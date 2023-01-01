@@ -1,5 +1,5 @@
-#ifndef FLINT_CUBEMAP_TEXTURE_H
-#define FLINT_CUBEMAP_TEXTURE_H
+#ifndef FLINT_CUBE_TEXTURE_H
+#define FLINT_CUBE_TEXTURE_H
 
 #define GLFW_INCLUDE_VULKAN
 
@@ -10,9 +10,9 @@
 #include "texture.h"
 
 namespace Flint {
-class CubemapTexture : public Texture {
+class CubeTexture : public Texture {
 public:
-    CubemapTexture(const std::string &path);
+    CubeTexture(const std::string &path);
 
     void load_from_file(const std::string &path);
 
@@ -32,4 +32,4 @@ public:
 };
 } // namespace Flint
 
-#endif // FLINT_CUBEMAP_TEXTURE_H
+#endif // FLINT_CUBE_TEXTURE_H

@@ -9,7 +9,7 @@ namespace Flint {
 enum class TextureType {
     IMAGE,
     VECTOR,
-    CUBEMAP,
+    CUBE,
     MAX,
 };
 

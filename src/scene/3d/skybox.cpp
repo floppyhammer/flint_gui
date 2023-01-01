@@ -14,7 +14,7 @@ Skybox::Skybox() {
     type = NodeType::Skybox;
 
     material = std::make_shared<MaterialSkybox>();
-    material->set_texture(std::make_shared<CubemapTexture>("../assets/skybox.jpg"));
+    material->set_texture(std::make_shared<CubeTexture>("../assets/skybox.jpg"));
 }
 
 void Skybox::update(double dt) {

@@ -8,6 +8,7 @@
 #include "resource.h"
 
 namespace Flint {
+
 class ResourceManager {
 public:
     static ResourceManager *get_singleton() {
@@ -36,6 +37,7 @@ public:
 private:
     std::unordered_map<std::string, std::weak_ptr<Resource>> resources;
 };
+
 } // namespace Flint
 
 #endif // FLINT_RESOURCE_MANAGER_H

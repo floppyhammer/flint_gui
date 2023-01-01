@@ -1,7 +1,7 @@
 #ifndef FLINT_SKYBOX_H
 #define FLINT_SKYBOX_H
 
-#include "../../resources/cubemap_texture.h"
+#include "../../resources/cube_texture.h"
 #include "../../resources/mesh.h"
 #include "glm/glm.hpp"
 #include "node3d.h"

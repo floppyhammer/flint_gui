@@ -259,7 +259,7 @@ void MaterialSkyboxDescSet::createDescriptorSet() {
     }
 }
 
-void MaterialSkyboxDescSet::updateDescriptorSet(CubemapTexture *p_texture) {
+void MaterialSkyboxDescSet::updateDescriptorSet(CubeTexture *texture) {
     auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
     auto &descriptorSetLayout = RenderServer::getSingleton()->skybox_descriptor_set_layout;
     auto device = Platform::getSingleton()->device;
@@ -267,8 +267,8 @@ void MaterialSkyboxDescSet::updateDescriptorSet(CubemapTexture *p_texture) {
     for (size_t i = 0; i < swapChainImages.size(); i++) {
         VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = p_texture->imageView;
-        imageInfo.sampler = p_texture->sampler;
+        imageInfo.imageView = texture->imageView;
+        imageInfo.sampler = texture->sampler;
 
         std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 
@@ -294,8 +294,8 @@ std::shared_ptr<MaterialSkybox> MaterialSkybox::from_default() {
     return std::shared_ptr<MaterialSkybox>();
 }
 
-void MaterialSkybox::set_texture(std::shared_ptr<CubemapTexture> p_texture) {
-    texture = p_texture;
+void MaterialSkybox::set_texture(std::shared_ptr<CubeTexture> new_texture) {
+    texture = new_texture;
     desc_set->updateDescriptorSet(texture.get());
 }
 } // namespace Flint

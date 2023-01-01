@@ -8,6 +8,7 @@
 /// A mesh consists of one or multiple surfaces and is managed by the resource manager.
 
 namespace Flint {
+
 class Mesh2d : public Resource {
 public:
     Mesh2d() = default;
@@ -23,6 +24,7 @@ public:
 
     std::vector<std::shared_ptr<Surface3d>> surfaces;
 };
+
 } // namespace Flint
 
 #endif // FLINT_MESH_H

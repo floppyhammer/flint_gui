@@ -1,22 +1,18 @@
-#include "cubemap_texture.h"
-
-#include "../common/logger.h"
-#include "../common/macros.h"
-
-// Already defined in Pathfinder.
-// #define STB_IMAGE_IMPLEMENTATION
+#include "cube_texture.h"
 
 #include <stdexcept>
 
+#include "../common/logger.h"
+#include "../common/macros.h"
 #include "stb_image.h"
 
 namespace Flint {
 
-CubemapTexture::CubemapTexture(const std::string &path) {
+CubeTexture::CubeTexture(const std::string &path) {
     load_from_file(path);
 }
 
-void CubemapTexture::load_from_file(const std::string &path) {
+void CubeTexture::load_from_file(const std::string &path) {
     auto device = Platform::getSingleton()->device;
 
     // TODO: Add mip levels.

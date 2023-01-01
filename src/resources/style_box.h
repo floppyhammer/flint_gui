@@ -17,10 +17,8 @@ struct StyleBox {
     float border_width = 0;
     float corner_radius = 4;
 
-    float margin = 0;
-
     ColorU shadow_color;
-    float shadow_size;
+    float shadow_size = 0;
     Vec2F shadow_offset;
 };
 

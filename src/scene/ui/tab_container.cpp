@@ -25,17 +25,17 @@ TabContainer::TabContainer() {
         button->connect_signal("pressed", callback);
         button->set_toggle_mode(true);
 
-        button->theme_normal.value().border_width = 0;
-        button->theme_normal.value().corner_radius = 0;
-        button->theme_normal.value().bg_color = ColorU(29, 29, 29);
+        button->theme_normal.border_width = 0;
+        button->theme_normal.corner_radius = 0;
+        button->theme_normal.bg_color = ColorU(29, 29, 29);
 
-        button->theme_hovered.value().border_width = 0;
-        button->theme_hovered.value().corner_radius = 0;
-        button->theme_hovered.value().bg_color = ColorU(35, 35, 35);
+        button->theme_hovered.border_width = 0;
+        button->theme_hovered.corner_radius = 0;
+        button->theme_hovered.bg_color = ColorU(35, 35, 35);
 
-        button->theme_pressed.value().border_width = 0;
-        button->theme_pressed.value().corner_radius = 0;
-        button->theme_pressed.value().bg_color = ColorU(48, 48, 48);
+        button->theme_pressed.border_width = 0;
+        button->theme_pressed.corner_radius = 0;
+        button->theme_pressed.bg_color = ColorU(48, 48, 48);
 
         button_container->add_child(button);
 

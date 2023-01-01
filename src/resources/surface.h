@@ -1,19 +1,19 @@
 #ifndef FLINT_SURFACE_H
 #define FLINT_SURFACE_H
 
-#include "../render/vertex.h"
-#include "material.h"
-
-#define GLFW_INCLUDE_VULKAN
-
 #include <array>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include "../render/vertex.h"
+#include "material.h"
+
+#define GLFW_INCLUDE_VULKAN
 #include "GLFW/glfw3.h"
 
 namespace Flint {
+
 class Surface {
 public:
     Surface() = default;
@@ -26,7 +26,7 @@ public:
 
     uint32_t get_index_count();
 
-    void set_gpu_resources(std::shared_ptr<VertexGpuResources<Vertex>> p_gpu_resources);
+    void set_gpu_resources(std::shared_ptr<VertexGpuResources<Vertex>> new_gpu_resources);
 
 private:
     std::shared_ptr<VertexGpuResources<Vertex>> gpu_resources;
@@ -72,6 +72,7 @@ public:
 private:
     std::shared_ptr<Material3d> material;
 };
+
 } // namespace Flint
 
 #endif // FLINT_SURFACE_H

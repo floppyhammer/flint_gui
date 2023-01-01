@@ -1,6 +1,7 @@
 #include "button.h"
 
 #include "../../common/geometry.h"
+#include "../../resources/default_resource.h"
 #include "../../resources/vector_texture.h"
 
 namespace Flint {
@@ -8,19 +9,11 @@ namespace Flint {
 Button::Button() {
     type = NodeType::Button;
 
-    theme_normal = std::optional(StyleBox());
-    theme_normal.value().bg_color = ColorU(27, 27, 27, 255);
-    theme_normal.value().border_color = ColorU(100, 100, 100, 255);
-    theme_normal.value().border_width = 2;
+    theme_normal = DefaultResource::get_singleton()->get_default_theme()->button.styles["normal"];
 
-    theme_hovered = std::optional(StyleBox());
-    theme_hovered.value().border_color = ColorU(163, 163, 163, 255);
-    theme_hovered.value().border_width = 2;
+    theme_hovered = DefaultResource::get_singleton()->get_default_theme()->button.styles["hovered"];
 
-    theme_pressed = std::optional(StyleBox());
-    theme_pressed.value().bg_color = ColorU(70, 70, 70, 255);
-    theme_pressed.value().border_color = ColorU(163, 163, 163, 255);
-    theme_pressed.value().border_width = 2;
+    theme_pressed = DefaultResource::get_singleton()->get_default_theme()->button.styles["pressed"];
 
     debug_size_box.border_color = ColorU::green();
 
@@ -36,14 +29,14 @@ Button::Button() {
     icon_rect->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
     icon_rect->set_texture(icon_tex);
 
-    hbox_container = std::make_shared<HStackContainer>();
-    hbox_container->add_child(icon_rect);
-    hbox_container->add_child(label);
-    hbox_container->set_separation(0);
+    hstack_container = std::make_shared<HStackContainer>();
+    hstack_container->add_child(icon_rect);
+    hstack_container->add_child(label);
+    hstack_container->set_separation(0);
 
     margin_container = std::make_shared<MarginContainer>();
     margin_container->set_margin_all(0);
-    margin_container->add_child(hbox_container);
+    margin_container->add_child(hstack_container);
     margin_container->set_parent(this);
     margin_container->set_size(size);
 }
