@@ -20,6 +20,8 @@ public:
 
     void update_mvp();
 
+    void when_window_size_changed(Vec2I new_size);
+
     std::shared_ptr<Mesh2d> mesh;
 
     Vec2I view_size;

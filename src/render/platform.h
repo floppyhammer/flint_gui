@@ -55,6 +55,9 @@ public:
     /// Logical device.
     VkDevice device{};
 
+    int32_t framebuffer_width;
+    int32_t framebuffer_height;
+
     /// Flag indicating the window size has changed.
     bool framebufferResized = false;
 
@@ -62,6 +65,8 @@ public:
         // We have attached a Platform pointer to this window previously. Now we retrieve it.
         auto platform = reinterpret_cast<Platform *>(glfwGetWindowUserPointer(window));
         platform->framebufferResized = true;
+        platform->framebuffer_width = width;
+        platform->framebuffer_height = height;
     }
 
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) const;

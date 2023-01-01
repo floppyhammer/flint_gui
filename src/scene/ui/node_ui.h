@@ -120,6 +120,8 @@ public:
 
     void get_anchor_flag();
 
+    void when_window_size_changed(Vec2I new_size);
+
 protected:
     Vec2F position{0};
     Vec2F size{128};

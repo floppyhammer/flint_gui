@@ -17,50 +17,48 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto node_ui = std::make_shared<NodeUi>();
-        app.tree->replace_scene(node_ui);
-
         auto panel = std::make_shared<Panel>();
         panel->enable_title_bar(false);
         panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
-        node_ui->add_child(panel);
+        panel->set_anchor_flag(AnchorFlag::FullRect);
+        app.tree->replace_scene(panel);
 
         auto margin_container = std::make_shared<MarginContainer>();
         margin_container->set_position({0, 0});
         margin_container->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         margin_container->set_margin_all(32);
+        margin_container->set_anchor_flag(AnchorFlag::FullRect);
         panel->add_child(margin_container);
 
-        auto vbox_container = std::make_shared<VStackContainer>();
-        vbox_container->set_separation(16);
-        margin_container->add_child(vbox_container);
+        auto vstack_container = std::make_shared<VStackContainer>();
+        vstack_container->set_separation(16);
+        margin_container->add_child(vstack_container);
 
         auto label = std::make_shared<Label>("File path:");
-        vbox_container->add_child(label);
+        vstack_container->add_child(label);
 
-        auto hbox_container = std::make_shared<HStackContainer>();
-        vbox_container->add_child(hbox_container);
+        auto hstack_container = std::make_shared<HStackContainer>();
+        vstack_container->add_child(hstack_container);
 
         auto text_edit = std::make_shared<TextEdit>();
         text_edit->container_sizing.expand_h = true;
         text_edit->container_sizing.flag_h = ContainerSizingFlag::Fill;
-        hbox_container->add_child(text_edit);
+        hstack_container->add_child(text_edit);
 
         auto file_dialog = std::make_shared<FileDialog>();
-        node_ui->add_child(file_dialog);
+        panel->add_child(file_dialog);
 
         auto select_button = std::make_shared<Button>();
         select_button->set_text("Select");
         // Callback to clean up staging resources.
         auto callback = [file_dialog, text_edit] { text_edit->set_text(file_dialog->show()); };
         select_button->connect_signal("pressed", callback);
-        hbox_container->add_child(select_button);
+        hstack_container->add_child(select_button);
 
         auto confirm_button = std::make_shared<Button>();
         confirm_button->set_text("Confirm");
         confirm_button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
-        vbox_container->add_child(confirm_button);
-        // ----------------------------------------------------
+        vstack_container->add_child(confirm_button);
     }
 
     app.main_loop();

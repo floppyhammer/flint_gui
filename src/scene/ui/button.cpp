@@ -23,11 +23,8 @@ Button::Button() {
     label->set_horizontal_alignment(Alignment::Center);
     label->set_vertical_alignment(Alignment::Center);
 
-    auto icon_tex = std::make_shared<VectorTexture>("../assets/icons/Node_Button.svg");
-
     icon_rect = std::make_shared<TextureRect>();
     icon_rect->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
-    icon_rect->set_texture(icon_tex);
 
     hstack_container = std::make_shared<HStackContainer>();
     hstack_container->add_child(icon_rect);

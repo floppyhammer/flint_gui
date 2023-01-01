@@ -50,6 +50,13 @@ void SceneTree::update(double dt) const {
         return;
     }
 
+    if (Platform::getSingleton()->framebufferResized) {
+        auto new_size =
+            Vec2I(Platform::getSingleton()->framebuffer_width, Platform::getSingleton()->framebuffer_height);
+        when_window_size_changed(new_size);
+        VectorServer::get_singleton()->get_canvas()->set_new_dst_texture(new_size);
+    }
+
     root->propagate_update(dt);
 }
 
@@ -59,6 +66,15 @@ void SceneTree::draw(VkCommandBuffer cmd_buffer) const {
     }
 
     root->propagate_draw(cmd_buffer);
+}
+
+void SceneTree::when_window_size_changed(Vec2I new_size) const {
+    for (auto& child : root->get_children()) {
+        if (child->get_node_type() == NodeType::UiLayer) {
+            auto cast_child = dynamic_cast<UiLayer*>(child.get());
+            cast_child->when_window_size_changed(new_size);
+        }
+    }
 }
 
 } // namespace Flint

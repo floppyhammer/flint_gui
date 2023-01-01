@@ -293,4 +293,54 @@ void NodeUi::get_anchor_flag() {
     anchor_mode;
 }
 
+void NodeUi::when_window_size_changed(Vec2I new_size) {
+    if (parent->get_node_type() != NodeType::UiLayer) {
+        return;
+    }
+
+    switch (anchor_mode) {
+        case AnchorFlag::FullRect: {
+            size = new_size.to_f32();
+        } break;
+        case AnchorFlag::TopRight: {
+            position.x = new_size.x - size.x;
+        } break;
+        case AnchorFlag::BottomLeft: {
+            position.y = new_size.y - size.y;
+        } break;
+        case AnchorFlag::BottomRight: {
+            position = new_size.to_f32() - size;
+        } break;
+        case AnchorFlag::CenterLeft: {
+            position.y = new_size.y * 0.5 - size.y * 0.5;
+        } break;
+        case AnchorFlag::CenterRight: {
+            position.x = new_size.x - size.x;
+            position.y = new_size.y * 0.5 - size.y * 0.5;
+        } break;
+        case AnchorFlag::CenterTop: {
+            position.x = new_size.x * 0.5 - size.x * 0.5;
+        } break;
+        case AnchorFlag::CenterBottom:
+            break;
+        case AnchorFlag::Center:
+            break;
+        case AnchorFlag::LeftWide:
+            break;
+        case AnchorFlag::RightWide:
+            break;
+        case AnchorFlag::TopWide:
+            break;
+        case AnchorFlag::BottomWide:
+            break;
+        case AnchorFlag::VCenterWide:
+            break;
+        case AnchorFlag::HCenterWide:
+            break;
+        case AnchorFlag::Max:
+        default:
+            break;
+    }
+}
+
 } // namespace Flint

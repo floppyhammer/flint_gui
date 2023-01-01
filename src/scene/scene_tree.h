@@ -38,6 +38,8 @@ public:
 
     void replace_scene(std::shared_ptr<Node> new_scene);
 
+    void when_window_size_changed(Vec2I new_size) const;
+
 private:
     std::shared_ptr<Node> root;
 };

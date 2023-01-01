@@ -5,6 +5,7 @@
 #include "glm/gtx/rotate_vector.hpp"
 #include "render/swap_chain.h"
 #include "resources/default_resource.h"
+#include "scene/ui/node_ui.h"
 #include "servers/vector_server.h"
 
 namespace Flint {
@@ -19,7 +20,7 @@ UiLayer::UiLayer() {
 
 void UiLayer::propagate_draw(VkCommandBuffer cmd_buffer) {
     // Record drawing commands.
-    for (auto &child : children) {
+    for (auto& child : children) {
         child->propagate_draw(cmd_buffer);
     }
 
@@ -64,6 +65,15 @@ void UiLayer::draw(VkCommandBuffer cmd_buffer) {
         cmd_buffer,
         pipeline,
         mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage));
+}
+
+void UiLayer::when_window_size_changed(Vec2I new_size) {
+    for (auto& child : children) {
+        if (child->is_ui_node()) {
+            auto cast_child = dynamic_cast<NodeUi*>(child.get());
+            cast_child->when_window_size_changed(new_size);
+        }
+    }
 }
 
 } // namespace Flint
