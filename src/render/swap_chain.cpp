@@ -8,6 +8,7 @@
 #include "render_server.h"
 
 namespace Flint {
+
 SwapChain::SwapChain() {
     // Swap chain related resources.
     initSwapChain();
@@ -417,4 +418,5 @@ void SwapChain::flush(uint32_t imageIndex) {
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
+
 } // namespace Flint

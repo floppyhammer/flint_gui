@@ -1,12 +1,11 @@
 #ifndef FLINT_PLATFORM_H
 #define FLINT_PLATFORM_H
 
-#define GLFW_INCLUDE_VULKAN
-
 #include <iostream>
 #include <optional>
 #include <vector>
 
+#define GLFW_INCLUDE_VULKAN
 #include "GLFW/glfw3.h"
 
 /// How many frames should be processed concurrently.
@@ -42,7 +41,7 @@ public:
         return &singleton;
     }
 
-    void init(uint32_t window_width, uint32_t window_height);
+    void init(int32_t window_width, int32_t window_height);
 
     GLFWwindow *window{};
 
@@ -55,11 +54,11 @@ public:
     /// Logical device.
     VkDevice device{};
 
-    int32_t framebuffer_width;
-    int32_t framebuffer_height;
-
     /// Flag indicating the window size has changed.
     bool framebufferResized = false;
+
+    int32_t framebuffer_width{};
+    int32_t framebuffer_height{};
 
     static void framebufferResizeCallback(GLFWwindow *window, int width, int height) {
         // We have attached a Platform pointer to this window previously. Now we retrieve it.
@@ -149,13 +148,16 @@ private:
     static const bool enableValidationLayers = true;
 
 private:
-    void initWindow(uint32_t window_width, uint32_t window_height);
+    void create_window(int32_t width, int32_t height);
 
     void setupDebugMessenger();
 
-    void createInstance();
+    /// Initialize the Vulkan library by creating an instance.
+    /// The instance is the connection between your application and the Vulkan library.
+    void create_instance();
 
-    void createSurface();
+    /// Create a Vulkan window surface.
+    void create_surface();
 
     bool checkDeviceExtensionSupport(VkPhysicalDevice pPhysicalDevice) const;
 
@@ -166,9 +168,9 @@ private:
      */
     bool isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const;
 
-    void pickPhysicalDevice();
+    void pick_physical_device();
 
-    void createLogicalDevice();
+    void create_logical_device();
 
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
 };

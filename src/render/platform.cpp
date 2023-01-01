@@ -24,103 +24,106 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
     }
 }
 
-void Platform::init(uint32_t window_width, uint32_t window_height) {
-    // Get a GLFW window.
-    initWindow(window_width, window_height);
+void Platform::init(int32_t window_width, int32_t window_height) {
+    // Create a window.
+    create_window(window_width, window_height);
 
     // Initialize the Vulkan library by creating an instance.
-    createInstance();
+    create_instance();
 
     setupDebugMessenger();
 
-    // Create a GLFW window surface.
-    createSurface();
+    // Create a Vulkan window surface.
+    create_surface();
 
     // Pick a suitable GPU.
-    pickPhysicalDevice();
+    pick_physical_device();
 
     // Create a logical device.
-    createLogicalDevice();
+    create_logical_device();
 }
 
-void Platform::initWindow(uint32_t window_width, uint32_t window_height) {
+void Platform::create_window(int32_t width, int32_t height) {
     // Initializes the GLFW library.
     glfwInit();
 
     // To not create an OpenGL context (as we're using Vulkan).
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-    // Enable window resizing. This needs us to recreate the swap chain.
+    // Enable window resizing. Resizing requires swap chain recreation.
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
     // Hide window upon creation as we need to center the window before showing it.
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
     // Get monitor position (used to correctly center the window in a multi-monitor scenario).
-    int monitors_count, monitor_x, monitor_y;
+    int monitors_count;
     GLFWmonitor **monitors = glfwGetMonitors(&monitors_count);
-    const GLFWvidmode *videoMode = glfwGetVideoMode(monitors[0]);
+
+    const GLFWvidmode *video_mode = glfwGetVideoMode(monitors[0]);
+
+    int monitor_x, monitor_y;
     glfwGetMonitorPos(monitors[0], &monitor_x, &monitor_y);
 
     // Get DPI scale.
     float dpi_scale_x, dpi_scale_y;
     glfwGetMonitorContentScale(monitors[0], &dpi_scale_x, &dpi_scale_y);
 
-    window = glfwCreateWindow(window_width, window_height, "Vulkan", nullptr, nullptr);
+    window = glfwCreateWindow(width, height, "Flint", nullptr, nullptr);
 
     // Center window.
     glfwSetWindowPos(
-        window, monitor_x + (videoMode->width - window_width) / 2, monitor_y + (videoMode->height - window_height) / 2);
+        window, monitor_x + (video_mode->width - width) / 2, monitor_y + (video_mode->height - height) / 2);
 
     // Show window.
     glfwShowWindow(window);
 
-    // Assign this to window user, so we can fetch it when window size changes.
+    // Assign this to window user, so we can fetch it when the window size changes.
     glfwSetWindowUserPointer(window, this);
     glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
-void Platform::createInstance() {
+void Platform::create_instance() {
     if (enableValidationLayers && !checkValidationLayerSupport()) {
         throw std::runtime_error("Validation layers requested, but not available!");
     }
 
-    // Structure specifying application information.
-    VkApplicationInfo appInfo;
-    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = "Simple Vulkan Renderer";
-    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.pEngineName = "No Engine"; // Name of the engine (if any) used to create the application.
-    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    appInfo.apiVersion = VK_API_VERSION_1_0;
-    appInfo.pNext = nullptr;
+    // Specifying application information.
+    VkApplicationInfo app_info;
+    app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    app_info.pApplicationName = "Flint";
+    app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    app_info.pEngineName = "No Engine"; // Name of the engine (if any) used to create the application.
+    app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    app_info.apiVersion = VK_API_VERSION_1_0;
+    app_info.pNext = nullptr;
 
-    // Structure specifying parameters of a newly created instance.
-    VkInstanceCreateInfo createInfo;
-    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.pApplicationInfo = &appInfo;
-    createInfo.flags = 0;
+    // Specifying parameters of a newly created instance.
+    VkInstanceCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+    create_info.pApplicationInfo = &app_info;
+    create_info.flags = 0;
 
     auto extensions = getRequiredExtensions();
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-    createInfo.ppEnabledExtensionNames = extensions.data();
+    create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+    create_info.ppEnabledExtensionNames = extensions.data();
 
-    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
+    VkDebugUtilsMessengerCreateInfoEXT debug_create_info;
     if (enableValidationLayers) {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-        createInfo.ppEnabledLayerNames = validationLayers.data();
+        create_info.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        create_info.ppEnabledLayerNames = validationLayers.data();
 
-        populateDebugMessengerCreateInfo(debugCreateInfo);
-        createInfo.pNext =
-            (VkDebugUtilsMessengerCreateInfoEXT *)&debugCreateInfo; // Pointer to a structure extending this structure.
+        populateDebugMessengerCreateInfo(debug_create_info);
+        // Pointer to a structure extending this structure.
+        create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debug_create_info;
     } else {
-        createInfo.enabledLayerCount = 0;
+        create_info.enabledLayerCount = 0;
 
-        createInfo.pNext = nullptr;
+        create_info.pNext = nullptr;
     }
 
     // Create a new Vulkan instance.
-    if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
+    if (vkCreateInstance(&create_info, nullptr, &instance) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create instance!");
     }
 }
@@ -156,7 +159,9 @@ void Platform::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoE
 }
 
 void Platform::setupDebugMessenger() {
-    if (!enableValidationLayers) return;
+    if (!enableValidationLayers) {
+        return;
+    }
 
     VkDebugUtilsMessengerCreateInfoEXT createInfo;
     populateDebugMessengerCreateInfo(createInfo);
@@ -166,9 +171,9 @@ void Platform::setupDebugMessenger() {
     }
 }
 
-void Platform::createSurface() {
+void Platform::create_surface() {
     if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create window surface!");
+        throw std::runtime_error("Failed to create a Vulkan window surface!");
     }
 }
 
@@ -230,18 +235,18 @@ bool Platform::isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const {
     return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
 }
 
-void Platform::pickPhysicalDevice() {
+void Platform::pick_physical_device() {
     // Enumerates the physical devices accessible to a Vulkan instance.
-    uint32_t deviceCount = 0;
-    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+    uint32_t device_count = 0;
+    vkEnumeratePhysicalDevices(instance, &device_count, nullptr);
 
-    if (deviceCount == 0) {
-        throw std::runtime_error("Failed to find GPUs with Vulkan support!");
+    if (device_count == 0) {
+        throw std::runtime_error("Failed to find a GPU with Vulkan support!");
     }
 
     // Call again to get the physical devices.
-    std::vector<VkPhysicalDevice> devices(deviceCount);
-    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+    std::vector<VkPhysicalDevice> devices(device_count);
+    vkEnumeratePhysicalDevices(instance, &device_count, devices.data());
 
     // Pick a suitable one among the physical devices.
     for (const auto &d : devices) {
@@ -314,58 +319,59 @@ QueueFamilyIndices Platform::findQueueFamilies(VkPhysicalDevice pPhysicalDevice)
     return qfIndices;
 }
 
-void Platform::createLogicalDevice() {
-    QueueFamilyIndices qfIndices = findQueueFamilies(physicalDevice);
+void Platform::create_logical_device() {
+    QueueFamilyIndices qf_indices = findQueueFamilies(physicalDevice);
 
-    // Structure specifying parameters of a newly created device queue.
-    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
 
-    std::set<uint32_t> uniqueQueueFamilies = {qfIndices.graphicsFamily.value(), qfIndices.presentFamily.value()};
+    std::set<uint32_t> unique_queue_families = {qf_indices.graphicsFamily.value(), qf_indices.presentFamily.value()};
 
-    float queuePriority = 1.0f;
-    for (uint32_t queueFamily : uniqueQueueFamilies) {
-        VkDeviceQueueCreateInfo queueCreateInfo{};
-        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        queueCreateInfo.queueFamilyIndex = queueFamily;
-        queueCreateInfo.queueCount = 1;
-        queueCreateInfo.pQueuePriorities = &queuePriority;
-        queueCreateInfos.push_back(queueCreateInfo);
+    float queue_priority = 1.0f;
+
+    for (uint32_t queue_family : unique_queue_families) {
+        VkDeviceQueueCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        create_info.queueFamilyIndex = queue_family;
+        create_info.queueCount = 1;
+        create_info.pQueuePriorities = &queue_priority;
+
+        queue_create_infos.push_back(create_info);
     }
 
-    // Structure describing the fine-grained features that can be supported by an implementation.
-    VkPhysicalDeviceFeatures deviceFeatures{};
+    // Describing the fine-grained features that can be supported by an implementation.
+    VkPhysicalDeviceFeatures device_features{};
     // Specifies whether anisotropic filtering is supported.
     // If this feature is not enabled, the anisotropyEnable member of the VkSamplerCreateInfo structure must be
     // VK_FALSE.
-    deviceFeatures.samplerAnisotropy = VK_TRUE;
+    device_features.samplerAnisotropy = VK_TRUE;
 
-    VkDeviceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    VkDeviceCreateInfo device_create_info{};
+    device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
-    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
-    createInfo.pQueueCreateInfos = queueCreateInfos.data();
+    device_create_info.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size());
+    device_create_info.pQueueCreateInfos = queue_create_infos.data();
 
-    createInfo.pEnabledFeatures = &deviceFeatures;
+    device_create_info.pEnabledFeatures = &device_features;
 
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
-    createInfo.ppEnabledExtensionNames = deviceExtensions.data();
+    device_create_info.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
+    device_create_info.ppEnabledExtensionNames = deviceExtensions.data();
 
     // enabledLayerCount and ppEnabledLayerNames are deprecated and ignored.
     if (enableValidationLayers) {
-        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-        createInfo.ppEnabledLayerNames = validationLayers.data();
+        device_create_info.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        device_create_info.ppEnabledLayerNames = validationLayers.data();
     } else {
-        createInfo.enabledLayerCount = 0;
+        device_create_info.enabledLayerCount = 0;
     }
 
     // A logical device is created as a connection to a physical device.
-    if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS) {
+    if (vkCreateDevice(physicalDevice, &device_create_info, nullptr, &device) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create logical device!");
     }
 
     // Get a queue handle from a device.
-    vkGetDeviceQueue(device, qfIndices.graphicsFamily.value(), 0, &graphicsQueue);
-    vkGetDeviceQueue(device, qfIndices.presentFamily.value(), 0, &presentQueue);
+    vkGetDeviceQueue(device, qf_indices.graphicsFamily.value(), 0, &graphicsQueue);
+    vkGetDeviceQueue(device, qf_indices.presentFamily.value(), 0, &presentQueue);
 }
 
 VkFormat Platform::findSupportedFormat(const std::vector<VkFormat> &candidates,

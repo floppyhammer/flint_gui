@@ -4,6 +4,7 @@
 #include "platform.h"
 
 namespace Flint {
+
 class SwapChain {
 public:
     SwapChain();
@@ -112,6 +113,7 @@ public:
 
     void cleanup();
 };
+
 } // namespace Flint
 
 #endif // FLINT_SWAP_CHAIN_H
