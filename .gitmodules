@@ -1,8 +1,8 @@
 # git pull --recurse-submodules | git submodule update --remote --recursive
 [submodule "external/glfw"]
 	path = external/glfw
-	url = https://github.com/glfw/glfw.git
-	branch = 3.3-stable
+	url = https://github.com/floppyhammer/glfw.git
+	branch = master
 [submodule "external/pathfinder-cpp"]
 	path = external/pathfinder-cpp
 	url = https://github.com/floppyhammer/pathfinder-cpp.git

@@ -5,8 +5,8 @@ bin/
 .idea/
 
 # CLion outputs
-cmake-build-debug
-cmake-build-release
+cmake-build-debug/
+cmake-build-release/
 
 # Prerequisites
 *.d
