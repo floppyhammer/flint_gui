@@ -53,7 +53,7 @@ void Material3dDescSet::createDescriptorPool() {
 void Material3dDescSet::createDescriptorSet() {
     auto device = Platform::getSingleton()->device;
     auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
-    auto &descriptorSetLayout = RenderServer::getSingleton()->meshDescriptorSetLayout;
+    auto &descriptorSetLayout = RenderServer::getSingleton()->mesh_descriptor_set_layout;
 
     std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
@@ -70,7 +70,7 @@ void Material3dDescSet::createDescriptorSet() {
 
 void Material3dDescSet::updateDescriptorSet(const std::shared_ptr<ImageTexture> &p_texture) {
     auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
-    auto &descriptorSetLayout = RenderServer::getSingleton()->meshDescriptorSetLayout;
+    auto &descriptorSetLayout = RenderServer::getSingleton()->mesh_descriptor_set_layout;
     auto device = Platform::getSingleton()->device;
 
     for (size_t i = 0; i < swapChainImages.size(); i++) {
@@ -131,7 +131,7 @@ void Material2dDescSet::createDescriptorPool() {
 void Material2dDescSet::createDescriptorSet() {
     auto device = Platform::getSingleton()->device;
     auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
-    auto &descriptorSetLayout = RenderServer::getSingleton()->blitDescriptorSetLayout;
+    auto &descriptorSetLayout = RenderServer::getSingleton()->blit_descriptor_set_layout;
 
     std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
@@ -148,7 +148,7 @@ void Material2dDescSet::createDescriptorSet() {
 
 void Material2dDescSet::updateDescriptorSet(ImageTexture *p_texture) {
     auto swapChainImages = SwapChain::getSingleton()->swapChainImages;
-    auto &descriptorSetLayout = RenderServer::getSingleton()->blitDescriptorSetLayout;
+    auto &descriptorSetLayout = RenderServer::getSingleton()->blit_descriptor_set_layout;
     auto device = Platform::getSingleton()->device;
 
     for (size_t i = 0; i < swapChainImages.size(); i++) {

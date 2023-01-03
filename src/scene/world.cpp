@@ -128,8 +128,8 @@ void World::draw(VkCommandBuffer cmd_buffer) {
 
     mesh->surface->get_material()->set_texture(image_texture.get());
 
-    VkPipeline pipeline = RenderServer::getSingleton()->blitPipeline;
-    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blitPipelineLayout;
+    VkPipeline pipeline = RenderServer::getSingleton()->blit_pipeline;
+    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blit_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
     vkCmdPushConstants(

@@ -13,16 +13,16 @@ RenderServer::RenderServer() {
     createCommandPool();
 
     // Create descriptor set layouts and pipeline layouts.
-    createMeshLayouts();
-    createBlitLayouts();
-    createSkeleton2dMeshLayouts();
+    create_mesh_layouts();
+    create_blit_layouts();
+    create_skeleton2d_mesh_layouts();
     create_skybox_layouts();
 }
 
 void RenderServer::createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
-    createMeshPipeline(renderPass, swapChainExtent, meshPipeline);
-    createBlitPipeline(renderPass, swapChainExtent, blitPipeline);
-    createSkeleton2dMeshPipeline(renderPass, swapChainExtent, skeleton2dMeshPipeline);
+    create_mesh_pipeline(renderPass, swapChainExtent, mesh_pipeline);
+    create_blit_pipeline(renderPass, swapChainExtent, blit_pipeline);
+    create_skeleton2d_mesh_pipeline(renderPass, swapChainExtent, skeleton2d_mesh_pipeline);
     create_skybox_pipeline(renderPass, swapChainExtent, skybox_pipeline);
 }
 
@@ -30,23 +30,23 @@ void RenderServer::cleanupSwapChainRelatedResources() const {
     auto device = Platform::getSingleton()->device;
 
     // Graphics pipeline resources.
-    vkDestroyPipeline(device, meshPipeline, nullptr);
-    vkDestroyPipeline(device, blitPipeline, nullptr);
-    vkDestroyPipeline(device, skeleton2dMeshPipeline, nullptr);
+    vkDestroyPipeline(device, mesh_pipeline, nullptr);
+    vkDestroyPipeline(device, blit_pipeline, nullptr);
+    vkDestroyPipeline(device, skeleton2d_mesh_pipeline, nullptr);
 }
 
 void RenderServer::cleanup() {
     auto device = Platform::getSingleton()->device;
 
     // Pipeline layouts.
-    vkDestroyPipelineLayout(device, meshPipelineLayout, nullptr);
-    vkDestroyPipelineLayout(device, blitPipelineLayout, nullptr);
-    vkDestroyPipelineLayout(device, skeleton2dMeshPipelineLayout, nullptr);
+    vkDestroyPipelineLayout(device, mesh_pipeline_layout, nullptr);
+    vkDestroyPipelineLayout(device, blit_pipeline_layout, nullptr);
+    vkDestroyPipelineLayout(device, skeleton2d_mesh_pipeline_layout, nullptr);
 
     // Descriptor set layouts.
-    vkDestroyDescriptorSetLayout(device, meshDescriptorSetLayout, nullptr);
-    vkDestroyDescriptorSetLayout(device, blitDescriptorSetLayout, nullptr);
-    vkDestroyDescriptorSetLayout(device, skeleton2dMeshDescriptorSetLayout, nullptr);
+    vkDestroyDescriptorSetLayout(device, mesh_descriptor_set_layout, nullptr);
+    vkDestroyDescriptorSetLayout(device, blit_descriptor_set_layout, nullptr);
+    vkDestroyDescriptorSetLayout(device, skeleton2d_mesh_descriptor_set_layout, nullptr);
 
     vkDestroyCommandPool(device, commandPool, nullptr);
 }
@@ -536,7 +536,7 @@ void RenderServer::draw_skeleton_2d(VkCommandBuffer command_buffer,
     // Bind uniform buffers and samplers.
     vkCmdBindDescriptorSets(command_buffer,
                             VK_PIPELINE_BIND_POINT_GRAPHICS,
-                            skeleton2dMeshPipelineLayout,
+                            skeleton2d_mesh_pipeline_layout,
                             0,
                             1,
                             &descriptor_set,
@@ -564,7 +564,7 @@ void RenderServer::draw_mesh_2d(VkCommandBuffer commandBuffer,
 
     // Bind uniform buffers and samplers.
     vkCmdBindDescriptorSets(
-        commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, blitPipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+        commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, blit_pipeline_layout, 0, 1, &descriptorSet, 0, nullptr);
 
     // Draw call.
     vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
@@ -587,7 +587,7 @@ void RenderServer::draw_mesh(VkCommandBuffer commandBuffer,
 
     // Bind uniform buffers and samplers.
     vkCmdBindDescriptorSets(
-        commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, meshPipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
+        commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mesh_pipeline_layout, 0, 1, &descriptorSet, 0, nullptr);
 
     // Draw call.
     vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
@@ -616,7 +616,7 @@ void RenderServer::draw_skybox(VkCommandBuffer commandBuffer,
     vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 }
 
-void RenderServer::createMeshLayouts() {
+void RenderServer::create_mesh_layouts() {
     // Descriptor set layout.
     {
         // MVP uniform binding.
@@ -639,22 +639,23 @@ void RenderServer::createMeshLayouts() {
 
         // Image sampler uniform binding.
         // ------------------------------
-        VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-        samplerLayoutBinding.binding = 0;
-        samplerLayoutBinding.descriptorCount = 1;
-        samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        samplerLayoutBinding.pImmutableSamplers = nullptr;
-        samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        VkDescriptorSetLayoutBinding sampler_layout_binding{};
+        sampler_layout_binding.binding = 0;
+        sampler_layout_binding.descriptorCount = 1;
+        sampler_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        sampler_layout_binding.pImmutableSamplers = nullptr;
+        sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         // ------------------------------
 
-        std::array<VkDescriptorSetLayoutBinding, 1> bindings = {samplerLayoutBinding};
-        VkDescriptorSetLayoutCreateInfo layoutInfo{};
-        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-        layoutInfo.pBindings = bindings.data();
+        std::array<VkDescriptorSetLayoutBinding, 1> bindings = {sampler_layout_binding};
+
+        VkDescriptorSetLayoutCreateInfo layout_info{};
+        layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
+        layout_info.pBindings = bindings.data();
 
         if (vkCreateDescriptorSetLayout(
-                Platform::getSingleton()->device, &layoutInfo, nullptr, &meshDescriptorSetLayout) != VK_SUCCESS) {
+                Platform::getSingleton()->device, &layout_info, nullptr, &mesh_descriptor_set_layout) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor set layout!");
         }
     }
@@ -662,29 +663,28 @@ void RenderServer::createMeshLayouts() {
     // Pipeline layout, which depends on a descriptor set layout.
     {
         // Push constant.
-        VkPushConstantRange pushConstant;
-        {
-            pushConstant.offset = 0;
-            pushConstant.size = sizeof(MvpPushConstant);
-            pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        }
+        VkPushConstantRange push_constant;
+        push_constant.offset = 0;
+        push_constant.size = sizeof(MvpPushConstant);
+        push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 1;
-        pipelineLayoutInfo.pSetLayouts = &meshDescriptorSetLayout;
-        pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
-        pipelineLayoutInfo.pushConstantRangeCount = 1;
+        VkPipelineLayoutCreateInfo pipeline_layout_info{};
+        pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipeline_layout_info.setLayoutCount = 1;
+        pipeline_layout_info.pSetLayouts = &mesh_descriptor_set_layout;
+        pipeline_layout_info.pPushConstantRanges = &push_constant;
+        pipeline_layout_info.pushConstantRangeCount = 1;
 
         // Create pipeline layout.
         if (vkCreatePipelineLayout(
-                Platform::getSingleton()->device, &pipelineLayoutInfo, nullptr, &meshPipelineLayout) != VK_SUCCESS) {
+                Platform::getSingleton()->device, &pipeline_layout_info, nullptr, &mesh_pipeline_layout) !=
+            VK_SUCCESS) {
             throw std::runtime_error("Failed to create pipeline layout!");
         }
     }
 }
 
-void RenderServer::createBlitLayouts() {
+void RenderServer::create_blit_layouts() {
     // Descriptor set layout.
     {
         // MVP uniform binding. (We use PushConstant instead.)
@@ -707,22 +707,23 @@ void RenderServer::createBlitLayouts() {
 
         // Image sampler uniform binding.
         // ------------------------------
-        VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-        samplerLayoutBinding.binding = 0;
-        samplerLayoutBinding.descriptorCount = 1;
-        samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        samplerLayoutBinding.pImmutableSamplers = nullptr;
-        samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        VkDescriptorSetLayoutBinding sampler_layout_binding{};
+        sampler_layout_binding.binding = 0;
+        sampler_layout_binding.descriptorCount = 1;
+        sampler_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        sampler_layout_binding.pImmutableSamplers = nullptr;
+        sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         // ------------------------------
 
-        std::array<VkDescriptorSetLayoutBinding, 1> bindings = {samplerLayoutBinding};
-        VkDescriptorSetLayoutCreateInfo layoutInfo{};
-        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-        layoutInfo.pBindings = bindings.data();
+        std::array<VkDescriptorSetLayoutBinding, 1> bindings = {sampler_layout_binding};
+
+        VkDescriptorSetLayoutCreateInfo layout_info{};
+        layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
+        layout_info.pBindings = bindings.data();
 
         if (vkCreateDescriptorSetLayout(
-                Platform::getSingleton()->device, &layoutInfo, nullptr, &blitDescriptorSetLayout) != VK_SUCCESS) {
+                Platform::getSingleton()->device, &layout_info, nullptr, &blit_descriptor_set_layout) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor set layout!");
         }
     }
@@ -730,29 +731,28 @@ void RenderServer::createBlitLayouts() {
     // Pipeline layout.
     {
         // Push constant.
-        VkPushConstantRange pushConstant;
-        {
-            pushConstant.offset = 0;
-            pushConstant.size = sizeof(MvpPushConstant);
-            pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        }
+        VkPushConstantRange push_constant;
+        push_constant.offset = 0;
+        push_constant.size = sizeof(MvpPushConstant);
+        push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 1;
-        pipelineLayoutInfo.pSetLayouts = &blitDescriptorSetLayout;
-        pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
-        pipelineLayoutInfo.pushConstantRangeCount = 1;
+        VkPipelineLayoutCreateInfo pipeline_layout_info{};
+        pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipeline_layout_info.setLayoutCount = 1;
+        pipeline_layout_info.pSetLayouts = &blit_descriptor_set_layout;
+        pipeline_layout_info.pPushConstantRanges = &push_constant;
+        pipeline_layout_info.pushConstantRangeCount = 1;
 
         // Create pipeline layout.
         if (vkCreatePipelineLayout(
-                Platform::getSingleton()->device, &pipelineLayoutInfo, nullptr, &blitPipelineLayout) != VK_SUCCESS) {
+                Platform::getSingleton()->device, &pipeline_layout_info, nullptr, &blit_pipeline_layout) !=
+            VK_SUCCESS) {
             throw std::runtime_error("Failed to create pipeline layout!");
         }
     }
 }
 
-void RenderServer::createSkeleton2dMeshLayouts() {
+void RenderServer::create_skeleton2d_mesh_layouts() {
     // Descriptor set layout.
     {
         // Image sampler uniform binding.
@@ -773,13 +773,14 @@ void RenderServer::createSkeleton2dMeshLayouts() {
         // ------------------------------
 
         std::array<VkDescriptorSetLayoutBinding, 2> bindings = {skeletonTextureLayoutBinding, meshTextureLayoutBinding};
-        VkDescriptorSetLayoutCreateInfo layoutInfo{};
-        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-        layoutInfo.pBindings = bindings.data();
+
+        VkDescriptorSetLayoutCreateInfo layout_info{};
+        layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
+        layout_info.pBindings = bindings.data();
 
         if (vkCreateDescriptorSetLayout(
-                Platform::getSingleton()->device, &layoutInfo, nullptr, &skeleton2dMeshDescriptorSetLayout) !=
+                Platform::getSingleton()->device, &layout_info, nullptr, &skeleton2d_mesh_descriptor_set_layout) !=
             VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor set layout!");
         }
@@ -788,23 +789,21 @@ void RenderServer::createSkeleton2dMeshLayouts() {
     // Pipeline layout.
     {
         // Push constant.
-        VkPushConstantRange pushConstant;
-        {
-            pushConstant.offset = 0;
-            pushConstant.size = sizeof(MvpPushConstant);
-            pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        }
+        VkPushConstantRange push_constant;
+        push_constant.offset = 0;
+        push_constant.size = sizeof(MvpPushConstant);
+        push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 1;
-        pipelineLayoutInfo.pSetLayouts = &skeleton2dMeshDescriptorSetLayout;
-        pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
-        pipelineLayoutInfo.pushConstantRangeCount = 1;
+        VkPipelineLayoutCreateInfo pipeline_layout_info{};
+        pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        pipeline_layout_info.setLayoutCount = 1;
+        pipeline_layout_info.pSetLayouts = &skeleton2d_mesh_descriptor_set_layout;
+        pipeline_layout_info.pPushConstantRanges = &push_constant;
+        pipeline_layout_info.pushConstantRangeCount = 1;
 
         // Create pipeline layout.
         if (vkCreatePipelineLayout(
-                Platform::getSingleton()->device, &pipelineLayoutInfo, nullptr, &skeleton2dMeshPipelineLayout) !=
+                Platform::getSingleton()->device, &pipeline_layout_info, nullptr, &skeleton2d_mesh_pipeline_layout) !=
             VK_SUCCESS) {
             throw std::runtime_error("Failed to create pipeline layout!");
         }
@@ -862,7 +861,7 @@ void RenderServer::create_skybox_layouts() {
     }
 }
 
-void RenderServer::createMeshPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) {
+void RenderServer::create_mesh_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) {
     auto vertShaderCode = load_file_as_bytes("../src/shaders/mesh_instance_vert.spv");
     auto fragShaderCode = load_file_as_bytes("../src/shaders/mesh_instance_frag.spv");
 
@@ -975,7 +974,7 @@ void RenderServer::createMeshPipeline(VkRenderPass renderPass, VkExtent2D viewpo
     pipelineInfo.pRasterizationState = &rasterizer;
     pipelineInfo.pMultisampleState = &multisampling;
     pipelineInfo.pColorBlendState = &colorBlending;
-    pipelineInfo.layout = meshPipelineLayout;
+    pipelineInfo.layout = mesh_pipeline_layout;
     pipelineInfo.renderPass = renderPass;
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
@@ -993,7 +992,7 @@ void RenderServer::createMeshPipeline(VkRenderPass renderPass, VkExtent2D viewpo
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
-void RenderServer::createBlitPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) {
+void RenderServer::create_blit_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) {
     auto vertShaderCode = load_file_as_bytes("../src/shaders/blit_vert.spv");
     auto fragShaderCode = load_file_as_bytes("../src/shaders/blit_frag.spv");
 
@@ -1116,7 +1115,7 @@ void RenderServer::createBlitPipeline(VkRenderPass renderPass, VkExtent2D viewpo
     pipelineInfo.pRasterizationState = &rasterizer;
     pipelineInfo.pMultisampleState = &multisampling;
     pipelineInfo.pColorBlendState = &colorBlending;
-    pipelineInfo.layout = blitPipelineLayout;
+    pipelineInfo.layout = blit_pipeline_layout;
     pipelineInfo.renderPass = renderPass;
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
@@ -1134,9 +1133,9 @@ void RenderServer::createBlitPipeline(VkRenderPass renderPass, VkExtent2D viewpo
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
-void RenderServer::createSkeleton2dMeshPipeline(VkRenderPass renderPass,
-                                                VkExtent2D viewportExtent,
-                                                VkPipeline &pipeline) {
+void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass,
+                                                   VkExtent2D viewportExtent,
+                                                   VkPipeline &pipeline) {
     auto vertShaderCode = load_file_as_bytes("../src/shaders/skeleton_2d_vert.spv");
     auto fragShaderCode = load_file_as_bytes("../src/shaders/skeleton_2d_frag.spv");
 
@@ -1259,7 +1258,7 @@ void RenderServer::createSkeleton2dMeshPipeline(VkRenderPass renderPass,
     pipelineInfo.pRasterizationState = &rasterizer;
     pipelineInfo.pMultisampleState = &multisampling;
     pipelineInfo.pColorBlendState = &colorBlending;
-    pipelineInfo.layout = skeleton2dMeshPipelineLayout;
+    pipelineInfo.layout = skeleton2d_mesh_pipeline_layout;
     pipelineInfo.renderPass = renderPass;
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
@@ -1277,7 +1276,9 @@ void RenderServer::createSkeleton2dMeshPipeline(VkRenderPass renderPass,
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
-void RenderServer::create_skybox_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) {
+void RenderServer::create_skybox_pipeline(VkRenderPass renderPass,
+                                          VkExtent2D viewportExtent,
+                                          VkPipeline &pipeline) const {
     auto vertShaderCode = load_file_as_bytes("../src/shaders/skybox_vert.spv");
     auto fragShaderCode = load_file_as_bytes("../src/shaders/skybox_frag.spv");
 

@@ -178,10 +178,10 @@ VkRenderPassBeginInfo Subview::get_render_pass_info() {
 
 void Subview::create_pipelines() {
     // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
-    RenderServer::getSingleton()->createMeshPipeline(
+    RenderServer::getSingleton()->create_mesh_pipeline(
         render_pass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, mesh_pipeline);
 
-    RenderServer::getSingleton()->createBlitPipeline(
+    RenderServer::getSingleton()->create_blit_pipeline(
         render_pass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, blit_pipeline);
 
     RenderServer::getSingleton()->create_skybox_pipeline(

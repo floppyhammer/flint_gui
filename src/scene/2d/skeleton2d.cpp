@@ -349,7 +349,7 @@ Skeleton2d::Skeleton2d() {
     }
 
     auto device = Platform::getSingleton()->device;
-    auto &descriptorSetLayout = RenderServer::getSingleton()->skeleton2dMeshDescriptorSetLayout;
+    auto &descriptorSetLayout = RenderServer::getSingleton()->skeleton2d_mesh_descriptor_set_layout;
 
     std::vector<VkDescriptorSetLayout> layouts(1, descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
@@ -432,21 +432,17 @@ void Skeleton2d::update(double delta) {
     upload_bone_transforms();
 }
 
-void Skeleton2d::draw(VkCommandBuffer p_command_buffer) {
+void Skeleton2d::draw(VkCommandBuffer cmd_buffer) {
     // Draw all triangles with a single draw call.
-    VkPipeline pipeline = RenderServer::getSingleton()->skeleton2dMeshPipeline;
-    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->skeleton2dMeshPipelineLayout;
+    VkPipeline pipeline = RenderServer::getSingleton()->skeleton2d_mesh_pipeline;
+    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->skeleton2d_mesh_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
-    vkCmdPushConstants(p_command_buffer,
-                       pipeline_layout,
-                       VK_SHADER_STAGE_VERTEX_BIT,
-                       0,
-                       sizeof(MvpPushConstant),
-                       &pc_skeleton_transform);
+    vkCmdPushConstants(
+        cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &pc_skeleton_transform);
 
     VkBuffer vertexBuffers[] = {mesh->gpu_resources->get_vertex_buffer()};
-    RenderServer::getSingleton()->draw_skeleton_2d(p_command_buffer,
+    RenderServer::getSingleton()->draw_skeleton_2d(cmd_buffer,
                                                    pipeline,
                                                    descriptor_set,
                                                    vertexBuffers,
@@ -457,7 +453,7 @@ void Skeleton2d::draw(VkCommandBuffer p_command_buffer) {
         root_bone->draw();
     }
 
-    Node2d::draw(p_command_buffer);
+    Node2d::draw(cmd_buffer);
 }
 
 void Skeleton2d::update_bone_rest() {

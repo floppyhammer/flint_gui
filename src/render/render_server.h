@@ -138,17 +138,17 @@ public:
 public:
     // Various pipelines.
     // --------------------------------------------------
-    VkDescriptorSetLayout meshDescriptorSetLayout{};
-    VkPipelineLayout meshPipelineLayout{};
-    VkPipeline meshPipeline{};
+    VkDescriptorSetLayout mesh_descriptor_set_layout{};
+    VkPipelineLayout mesh_pipeline_layout{};
+    VkPipeline mesh_pipeline{};
 
-    VkDescriptorSetLayout blitDescriptorSetLayout{};
-    VkPipelineLayout blitPipelineLayout{};
-    VkPipeline blitPipeline{};
+    VkDescriptorSetLayout blit_descriptor_set_layout{};
+    VkPipelineLayout blit_pipeline_layout{};
+    VkPipeline blit_pipeline{};
 
-    VkDescriptorSetLayout skeleton2dMeshDescriptorSetLayout{};
-    VkPipelineLayout skeleton2dMeshPipelineLayout{};
-    VkPipeline skeleton2dMeshPipeline{};
+    VkDescriptorSetLayout skeleton2d_mesh_descriptor_set_layout{};
+    VkPipelineLayout skeleton2d_mesh_pipeline_layout{};
+    VkPipeline skeleton2d_mesh_pipeline{};
 
     VkDescriptorSetLayout skybox_descriptor_set_layout{};
     VkPipelineLayout skybox_pipeline_layout{};
@@ -163,9 +163,9 @@ public:
      * chains.
      * @dependency Descriptor set layout, render pass, viewport extent.
      */
-    void createMeshPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
+    void create_mesh_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
 
-    void create_skybox_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
+    void create_skybox_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) const;
 
     /**
      * Draw a single mesh.
@@ -213,24 +213,24 @@ public:
 
     VkCommandPool commandPool{};
 
-    void createBlitPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
+    void create_blit_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
 
-    void createSkeleton2dMeshPipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
+    void create_skeleton2d_mesh_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
 
 private:
     /**
      * Create descriptor set layout and pipeline layout for mesh drawing.
      * @dependency None.
      */
-    void createMeshLayouts();
+    void create_mesh_layouts();
 
     /**
      * Create descriptor set layout and pipeline layout for blit drawing.
      * @dependency None.
      */
-    void createBlitLayouts();
+    void create_blit_layouts();
 
-    void createSkeleton2dMeshLayouts();
+    void create_skeleton2d_mesh_layouts();
 
     void create_skybox_layouts();
 };
