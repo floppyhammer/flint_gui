@@ -1,14 +1,13 @@
 #include "font.h"
 
-#include "../common/load_file.h"
-#include "../common/logger.h"
-
-#define STB_TRUETYPE_IMPLEMENTATION
-
 #include <vector>
 
+#include "../common/load_file.h"
+#include "../common/logger.h"
 #include "pathfinder.h"
-#include "stb_truetype.h"
+
+#define STB_TRUETYPE_IMPLEMENTATION
+#include <stb_truetype.h>
 
 namespace Flint {
 
@@ -26,6 +25,8 @@ Font::Font(const std::string &path) : Resource(path) {
     }
 
     get_metrics();
+
+    harfbuzz_res = std::make_shared<HarfBuzzRes>(path);
 }
 
 Font::Font(std::vector<char> &bytes) {
@@ -101,6 +102,67 @@ Pathfinder::Path2d Font::get_glyph_path(int glyph_index) const {
     stbtt_FreeShape(&info, vertices);
 
     return path;
+}
+
+void Font::get_glyphs_harfbuzz(const std::string &text, Language lang, std::vector<Glyph> &glyphs) const {
+    hb_buffer_t *buf;
+
+    // Buffers are sequences of Unicode characters that use the same font and have the same text direction, script, and
+    // language.
+    buf = hb_buffer_create();
+
+    // TODO: should have a loop handling split text runs.
+    {
+        // Item offset and length should represent a specific run.
+        hb_buffer_add_utf8(buf, text.c_str(), -1, 0, -1);
+
+        // TODO: should set these based on a specific run.
+        switch (lang) {
+            case Language::Chinese:
+            case Language::English: {
+                hb_buffer_set_direction(buf, HB_DIRECTION_LTR);
+                hb_buffer_set_script(buf, HB_SCRIPT_LATIN);
+                hb_buffer_set_language(buf, hb_language_from_string("en", -1));
+            } break;
+            case Language::Arabic: {
+                hb_buffer_set_direction(buf, HB_DIRECTION_RTL);
+                hb_buffer_set_script(buf, HB_SCRIPT_ARABIC);
+                hb_buffer_set_language(buf, hb_language_from_string("ar", -1));
+            } break;
+        }
+
+        hb_shape(harfbuzz_res->font, buf, nullptr, 0);
+
+        unsigned int glyph_count;
+        hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(buf, &glyph_count);
+        hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(buf, &glyph_count);
+
+        glyphs.clear();
+
+        float cursor_x = 0;
+        float cursor_y = 0;
+        for (unsigned int i = 0; i < glyph_count; i++) {
+            Glyph glyph;
+
+            // codepoint property is replaced with glyph ID after shaping.
+            glyph.index = glyph_info[i].codepoint;
+
+            glyph.x_offset = glyph_pos[i].x_offset / 64.0 * (64.0 / font_size);
+            glyph.y_offset = glyph_pos[i].y_offset / 64.0;
+
+            glyph.x_advance = glyph_pos[i].x_advance / 64.0 * (64.0 / font_size);
+            glyph.y_advance = glyph_pos[i].y_advance / 64.0 * (64.0 / font_size);
+
+            glyph.position = {(float)cursor_x, (float)cursor_y};
+
+            cursor_x += glyph.x_advance;
+            cursor_y += glyph.y_advance;
+
+            glyphs.push_back(glyph);
+        }
+    }
+
+    hb_buffer_destroy(buf);
 }
 
 int32_t Font::find_index(int codepoint) {

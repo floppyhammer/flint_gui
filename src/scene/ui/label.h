@@ -22,18 +22,18 @@ enum class Alignment {
 
 class Label : public NodeUi {
 public:
-    Label(const std::string &p_text);
+    Label(const std::string &_text);
 
     /**
      * Set text context.
      * @note See https://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html for glyph conventions.
      * @param p_text Text string.
      */
-    void set_text(const std::string &p_text);
+    void set_text(const std::string &new_text);
 
     std::string get_text() const;
 
-    void insert_text(uint32_t position, const std::string &p_text);
+    void insert_text(uint32_t position, const std::string &new_text);
 
     void remove_text(uint32_t position, uint32_t count);
 
@@ -57,6 +57,8 @@ public:
 
     float get_font_size() const;
 
+    void set_language(Language new_lang);
+
 private:
     void measure();
 
@@ -65,7 +67,11 @@ private:
     Vec2F get_text_size() const;
 
 private:
-    std::wstring text;
+    std::string text;
+
+    std::wstring text_debug;
+
+    Language language = Language::English;
 
     std::shared_ptr<Font> font;
 

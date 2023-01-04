@@ -108,6 +108,8 @@ public:
 
     bool get_visibility() const;
 
+    bool get_global_visibility() const;
+
     /**
      * Called when the sub-tree structure of this node changed.
      */

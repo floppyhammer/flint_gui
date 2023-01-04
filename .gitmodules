@@ -8,3 +8,7 @@
 	path = external/pathfinder-cpp
 	url = https://github.com/floppyhammer/pathfinder-cpp.git
     branch = master
+[submodule "external/harfbuzz"]
+	path = external/harfbuzz
+	url = https://github.com/harfbuzz/harfbuzz.git
+    branch = main

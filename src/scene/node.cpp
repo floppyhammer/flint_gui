@@ -134,6 +134,14 @@ bool Node::get_visibility() const {
     return visible;
 }
 
+bool Node::get_global_visibility() const {
+    if (parent) {
+        return parent->get_global_visibility() && get_visibility();
+    } else {
+        return get_visibility();
+    }
+}
+
 NodeType Node::extended_from_which_base_node() const {
     if (type < NodeType::NodeUi)
         return NodeType::Node;

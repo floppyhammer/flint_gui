@@ -38,6 +38,9 @@ add_subdirectory(external/glfw)
 include_directories(external/pathfinder-cpp/src)
 add_subdirectory(external/pathfinder-cpp)
 
+include_directories(external/harfbuzz/src)
+add_subdirectory(external/harfbuzz)
+
 add_subdirectory(third_party/poly2tri)
 
 add_library(flint ${SOURCE_FILES})
@@ -51,3 +54,4 @@ add_subdirectory(examples/texture_rect)
 add_subdirectory(examples/scrolling)
 add_subdirectory(examples/tabs)
 add_subdirectory(examples/progress_bars)
+add_subdirectory(examples/i18n)
