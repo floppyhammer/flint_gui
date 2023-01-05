@@ -6,8 +6,8 @@
 #include "../common/geometry.h"
 #include "../resources/font.h"
 #include "../resources/image_texture.h"
-#include "../resources/vector_texture.h"
 #include "../resources/style_box.h"
+#include "../resources/vector_texture.h"
 
 using Pathfinder::ColorU;
 using Pathfinder::RectF;
@@ -29,7 +29,7 @@ public:
 
     VectorServer() = default;
 
-    void init(const std::shared_ptr<Pathfinder::Driver> &driver, int p_canvas_width, int p_canvas_height);
+    void init(const std::shared_ptr<Pathfinder::Driver> &driver, int32_t canvas_width, int32_t canvas_height);
 
     void cleanup();
 

@@ -344,12 +344,12 @@ Skeleton2d::Skeleton2d() {
     poolInfo.pPoolSizes = poolSizes.data();
     poolInfo.maxSets = 1;
 
-    if (vkCreateDescriptorPool(Platform::getSingleton()->device, &poolInfo, nullptr, &descriptor_pool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(Window::get_singleton()->device, &poolInfo, nullptr, &descriptor_pool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor pool!");
     }
 
-    auto device = Platform::getSingleton()->device;
-    auto &descriptorSetLayout = RenderServer::getSingleton()->skeleton2d_mesh_descriptor_set_layout;
+    auto device = Window::get_singleton()->device;
+    auto &descriptorSetLayout = RenderServer::get_singleton()->skeleton2d_mesh_descriptor_set_layout;
 
     std::vector<VkDescriptorSetLayout> layouts(1, descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
@@ -374,7 +374,7 @@ Skeleton2d::Skeleton2d() {
 }
 
 Skeleton2d::~Skeleton2d() {
-    vkDestroyDescriptorPool(Platform::getSingleton()->device, descriptor_pool, nullptr);
+    vkDestroyDescriptorPool(Window::get_singleton()->device, descriptor_pool, nullptr);
 }
 
 template <class C>
@@ -434,20 +434,20 @@ void Skeleton2d::update(double delta) {
 
 void Skeleton2d::draw(VkCommandBuffer cmd_buffer) {
     // Draw all triangles with a single draw call.
-    VkPipeline pipeline = RenderServer::getSingleton()->skeleton2d_mesh_pipeline;
-    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->skeleton2d_mesh_pipeline_layout;
+    VkPipeline pipeline = RenderServer::get_singleton()->skeleton2d_mesh_pipeline;
+    VkPipelineLayout pipeline_layout = RenderServer::get_singleton()->skeleton2d_mesh_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
     vkCmdPushConstants(
         cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &pc_skeleton_transform);
 
     VkBuffer vertexBuffers[] = {mesh->gpu_resources->get_vertex_buffer()};
-    RenderServer::getSingleton()->draw_skeleton_2d(cmd_buffer,
-                                                   pipeline,
-                                                   descriptor_set,
-                                                   vertexBuffers,
-                                                   mesh->gpu_resources->get_index_buffer(),
-                                                   mesh->gpu_resources->get_index_count());
+    RenderServer::get_singleton()->draw_skeleton_2d(cmd_buffer,
+                                                    pipeline,
+                                                    descriptor_set,
+                                                    vertexBuffers,
+                                                    mesh->gpu_resources->get_index_buffer(),
+                                                    mesh->gpu_resources->get_index_count());
 
     if (root_bone) {
         root_bone->draw();
@@ -702,7 +702,7 @@ void Skeleton2d::allocate_bone_transforms(uint32_t new_bone_count) {
     descriptorWrites[1].pImageInfo = &imageInfo2;
 
     // Update the contents of a descriptor set object.
-    vkUpdateDescriptorSets(Platform::getSingleton()->device,
+    vkUpdateDescriptorSets(Window::get_singleton()->device,
                            static_cast<uint32_t>(descriptorWrites.size()),
                            descriptorWrites.data(),
                            0,
@@ -726,7 +726,7 @@ void Skeleton2d::upload_bone_transforms() {
         VkBuffer staging_buffer;
         VkDeviceMemory staging_buffer_memory;
 
-        RenderServer::getSingleton()->createBuffer(
+        RenderServer::get_singleton()->createBuffer(
             imageSize,
             VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -734,41 +734,41 @@ void Skeleton2d::upload_bone_transforms() {
             staging_buffer_memory);
 
         // Copy the pixel values that we got from the image loading library to the buffer.
-        RenderServer::getSingleton()->copyDataToMemory(bone_transforms.data(), staging_buffer_memory, imageSize);
+        RenderServer::get_singleton()->copyDataToMemory(bone_transforms.data(), staging_buffer_memory, imageSize);
 
-        auto cmd_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
+        auto cmd_buffer = RenderServer::get_singleton()->beginSingleTimeCommands();
 
         // Transition the texture image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL.
-        RenderServer::getSingleton()->transitionImageLayout(cmd_buffer,
-                                                            bone_transforms_texture->image,
-                                                            VK_FORMAT_R32G32B32A32_SFLOAT,
-                                                            VK_IMAGE_LAYOUT_UNDEFINED,
-                                                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        RenderServer::transitionImageLayout(cmd_buffer,
+                                            bone_transforms_texture->image,
+                                            VK_FORMAT_R32G32B32A32_SFLOAT,
+                                            VK_IMAGE_LAYOUT_UNDEFINED,
+                                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
         // Execute the buffer to image copy operation.
-        RenderServer::getSingleton()->copyBufferToImage(cmd_buffer,
-                                                        staging_buffer,
-                                                        bone_transforms_texture->image,
-                                                        0,
-                                                        0,
-                                                        static_cast<uint32_t>(tex_width),
-                                                        static_cast<uint32_t>(tex_height));
+        RenderServer::get_singleton()->copyBufferToImage(cmd_buffer,
+                                                         staging_buffer,
+                                                         bone_transforms_texture->image,
+                                                         0,
+                                                         0,
+                                                         static_cast<uint32_t>(tex_width),
+                                                         static_cast<uint32_t>(tex_height));
 
         // To be able to start sampling from the texture image in the shader, we need one last transition to prepare it
         // for shader access.
-        RenderServer::getSingleton()->transitionImageLayout(cmd_buffer,
-                                                            bone_transforms_texture->image,
-                                                            VK_FORMAT_R32G32B32A32_SFLOAT,
-                                                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                                                            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        RenderServer::transitionImageLayout(cmd_buffer,
+                                            bone_transforms_texture->image,
+                                            VK_FORMAT_R32G32B32A32_SFLOAT,
+                                            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-        RenderServer::getSingleton()->endSingleTimeCommands(cmd_buffer);
+        RenderServer::get_singleton()->endSingleTimeCommands(cmd_buffer);
 
         bone_transforms_texture->layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         // Clean up staging objects.
-        vkDestroyBuffer(Platform::getSingleton()->device, staging_buffer, nullptr);
-        vkFreeMemory(Platform::getSingleton()->device, staging_buffer_memory, nullptr);
+        vkDestroyBuffer(Window::get_singleton()->device, staging_buffer, nullptr);
+        vkFreeMemory(Window::get_singleton()->device, staging_buffer_memory, nullptr);
     }
 }
 

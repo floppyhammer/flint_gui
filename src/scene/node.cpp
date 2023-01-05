@@ -67,12 +67,12 @@ World *Node::get_world() {
     return parent->type == NodeType::World ? (World *)parent : parent->get_world();
 }
 
-Window *Node::get_window() {
+WindowNode *Node::get_window() {
     if (parent == nullptr) {
         return nullptr;
     }
 
-    return parent->type == NodeType::Window ? (Window *)parent : parent->get_window();
+    return parent->type == NodeType::Window ? (WindowNode *)parent : parent->get_window();
 }
 
 void Node::set_parent(Node *node) {

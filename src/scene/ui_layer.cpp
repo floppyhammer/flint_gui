@@ -53,18 +53,19 @@ void UiLayer::draw(VkCommandBuffer cmd_buffer) {
     auto image_texture = VectorServer::get_singleton()->get_texture();
     mesh->surface->get_material()->set_texture(image_texture.get());
 
-    VkPipeline pipeline = RenderServer::getSingleton()->blit_pipeline;
-    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blit_pipeline_layout;
+    auto rs = RenderServer::get_singleton();
+
+    VkPipeline pipeline = rs->blit_pipeline;
+    VkPipelineLayout pipeline_layout = rs->blit_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
     vkCmdPushConstants(
         cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
 
     // Unlike Sprite 2D, Texture Rect should not support custom mesh.
-    RenderServer::getSingleton()->blit(
-        cmd_buffer,
-        pipeline,
-        mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage));
+    rs->blit(cmd_buffer,
+             pipeline,
+             mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::get_singleton()->currentImage));
 }
 
 void UiLayer::when_window_size_changed(Vec2I new_size) {

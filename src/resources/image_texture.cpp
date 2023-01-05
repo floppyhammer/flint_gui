@@ -19,7 +19,7 @@ ImageTexture::ImageTexture() {
 ImageTexture::~ImageTexture() {
     if (!resource_ownership) return;
 
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     vkDestroySampler(device, sampler, nullptr);
 
@@ -54,14 +54,14 @@ void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uin
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
 
-    RenderServer::getSingleton()->createBuffer(
+    RenderServer::get_singleton()->createBuffer(
         imageSize,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         stagingBuffer,
         stagingBufferMemory);
 
-    RenderServer::getSingleton()->createImage(
+    RenderServer::get_singleton()->createImage(
         size.x,
         size.y,
         tex_format,
@@ -72,29 +72,29 @@ void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uin
         imageMemory);
 
     // Copy the pixel values that we got from the image loading library to the buffer.
-    RenderServer::getSingleton()->copyDataToMemory(pixels, stagingBufferMemory, imageSize);
+    RenderServer::get_singleton()->copyDataToMemory(pixels, stagingBufferMemory, imageSize);
 
-    VkCommandBuffer cmd_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
+    VkCommandBuffer cmd_buffer = RenderServer::get_singleton()->beginSingleTimeCommands();
 
     // Transition the texture image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL.
-    RenderServer::getSingleton()->transitionImageLayout(
+    RenderServer::transitionImageLayout(
         cmd_buffer, image, tex_format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     // Execute the buffer to image copy operation.
-    RenderServer::getSingleton()->copyBufferToImage(cmd_buffer, stagingBuffer, image, 0, 0, size.x, size.y);
+    RenderServer::get_singleton()->copyBufferToImage(cmd_buffer, stagingBuffer, image, 0, 0, size.x, size.y);
 
     // To be able to start sampling from the texture image in the shader, we need one last transition to prepare it for
     // shader access.
-    RenderServer::getSingleton()->transitionImageLayout(
+    RenderServer::transitionImageLayout(
         cmd_buffer, image, tex_format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-    RenderServer::getSingleton()->endSingleTimeCommands(cmd_buffer);
+    RenderServer::get_singleton()->endSingleTimeCommands(cmd_buffer);
 
     layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     // Clean up staging stuff.
-    vkDestroyBuffer(Platform::getSingleton()->device, stagingBuffer, nullptr);
-    vkFreeMemory(Platform::getSingleton()->device, stagingBufferMemory, nullptr);
+    vkDestroyBuffer(Window::get_singleton()->device, stagingBuffer, nullptr);
+    vkFreeMemory(Window::get_singleton()->device, stagingBufferMemory, nullptr);
 }
 
 std::shared_ptr<ImageTexture> ImageTexture::from_empty(Vec2I size, VkFormat format) {
@@ -121,21 +121,21 @@ std::shared_ptr<ImageTexture> ImageTexture::from_empty(Vec2I size, VkFormat form
 
     // Create image view.
     texture->imageView =
-        RenderServer::getSingleton()->createImageView(texture->image, format, VK_IMAGE_ASPECT_COLOR_BIT);
+        RenderServer::get_singleton()->createImageView(texture->image, format, VK_IMAGE_ASPECT_COLOR_BIT);
 
     // Create sampler.
-    RenderServer::getSingleton()->createTextureSampler(texture->sampler, VK_FILTER_LINEAR);
+    RenderServer::get_singleton()->createTextureSampler(texture->sampler, VK_FILTER_LINEAR);
 
     return texture;
 }
 
 void ImageTexture::set_filter(VkFilter filter) {
     // Destroy the old sampler.
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
     vkDestroySampler(device, sampler, nullptr);
 
     // Create a new sampler.
-    RenderServer::getSingleton()->createTextureSampler(sampler, filter);
+    RenderServer::get_singleton()->createTextureSampler(sampler, filter);
 }
 
 ImageTexture::ImageTexture(const std::string &path) : Texture(path) {
@@ -159,10 +159,10 @@ ImageTexture::ImageTexture(const std::string &path) : Texture(path) {
 
     // Create image view.
     imageView =
-        RenderServer::getSingleton()->createImageView(image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT);
+        RenderServer::get_singleton()->createImageView(image, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT);
 
     // Create sampler.
-    RenderServer::getSingleton()->createTextureSampler(sampler, VK_FILTER_LINEAR);
+    RenderServer::get_singleton()->createTextureSampler(sampler, VK_FILTER_LINEAR);
 }
 
 std::shared_ptr<ImageTexture> ImageTexture::from_wrapper(VkImageView image_view, VkSampler sampler, Vec2I size) {

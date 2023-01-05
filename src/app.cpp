@@ -34,12 +34,12 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
     {
         VkRenderPassBeginInfo render_pass_info{};
         render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        render_pass_info.renderPass = SwapChain::getSingleton()->renderPass;
+        render_pass_info.renderPass = SwapChain::get_singleton()->renderPass;
         render_pass_info.framebuffer =
-            SwapChain::getSingleton()->swapChainFramebuffers[image_index]; // Set target framebuffer.
+            SwapChain::get_singleton()->swapChainFramebuffers[image_index]; // Set target framebuffer.
         render_pass_info.renderArea.offset = {0, 0};
         render_pass_info.renderArea.extent =
-            SwapChain::getSingleton()->swapChainExtent; // Has to be larger than the area we're going to draw.
+            SwapChain::get_singleton()->swapChainExtent; // Has to be larger than the area we're going to draw.
 
         // Clear color.
         std::array<VkClearValue, 2> clear_values{};
@@ -64,27 +64,27 @@ void App::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_
     }
 }
 
-App::App(uint32_t window_width, uint32_t window_height) {
+App::App(int32_t window_width, int32_t window_height) {
     // Set logger level.
     Logger::set_level(Logger::VERBOSE);
 
     // 1. Initialize hardware.
-    auto platform = Platform::getSingleton();
-    platform->init(window_width, window_height);
+    auto window = Window::get_singleton();
+    window->init(window_width, window_height);
 
     // 2. Initialize render server.
-    auto render_server = RenderServer::getSingleton();
+    auto render_server = RenderServer::get_singleton();
 
     // 3. Initialize swap chain.
-    auto swap_chain = SwapChain::getSingleton();
+    auto swap_chain = SwapChain::get_singleton();
 
     // 4. Initialize input server.
     auto input_server = InputServer::get_singleton();
-    input_server->init(platform->window);
+    input_server->init(window->glfw_window);
 
     // 5. Initialize vector server.
     std::shared_ptr<Pathfinder::Driver> driver = std::make_shared<Pathfinder::DriverVk>(
-        platform->device, platform->physicalDevice, platform->graphicsQueue, render_server->commandPool);
+        window->device, window->physicalDevice, window->graphicsQueue, render_server->command_pool);
     auto vector_server = VectorServer::get_singleton();
     vector_server->init(driver, window_width, window_height);
 
@@ -92,7 +92,7 @@ App::App(uint32_t window_width, uint32_t window_height) {
 }
 
 void App::main_loop() {
-    while (!glfwWindowShouldClose(Platform::getSingleton()->window)) {
+    while (!Window::get_singleton()->should_close()) {
         // Collect input and window events.
         InputServer::get_singleton()->collect_events();
 
@@ -106,7 +106,7 @@ void App::main_loop() {
         // We should do this before updating the scenes as we need to modify different
         // buffers according to the current image index.
         uint32_t image_index;
-        if (!SwapChain::getSingleton()->acquireSwapChainImage(image_index)) {
+        if (!SwapChain::get_singleton()->acquireSwapChainImage(image_index)) {
             Logger::error("Invalid swap chain image index!", "Swap Chain");
             return;
         }
@@ -118,14 +118,14 @@ void App::main_loop() {
         tree->update(dt);
 
         // Record draw calls.
-        record_commands(SwapChain::getSingleton()->commandBuffers, image_index);
+        record_commands(SwapChain::get_singleton()->commandBuffers, image_index);
 
         // Submit commands for drawing.
-        SwapChain::getSingleton()->flush(image_index);
+        SwapChain::get_singleton()->flush(image_index);
     }
 
     // Wait on the host for the completion of outstanding queue operations for all queues on a given logical device.
-    vkDeviceWaitIdle(Platform::getSingleton()->device);
+    vkDeviceWaitIdle(Window::get_singleton()->device);
 }
 
 void App::cleanup() {
@@ -138,12 +138,12 @@ void App::cleanup() {
     DefaultResource::get_singleton()->cleanup();
     Logger::verbose("Cleaned up DefaultResource.", "App");
 
-    SwapChain::getSingleton()->cleanup();
+    SwapChain::get_singleton()->cleanup();
     Logger::verbose("Cleaned up SwapChain.", "App");
 
-    RenderServer::getSingleton()->cleanup();
+    RenderServer::get_singleton()->cleanup();
     Logger::verbose("Cleaned up RenderServer.", "App");
 
-    Platform::getSingleton()->cleanup();
-    Logger::verbose("Cleaned up Platform.", "App");
+    Window::get_singleton()->cleanup();
+    Logger::verbose("Cleaned up Window.", "App");
 }

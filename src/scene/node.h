@@ -51,7 +51,7 @@ enum class NodeType {
 };
 
 class World;
-class Window;
+class WindowNode;
 
 class Node {
 public:
@@ -86,7 +86,7 @@ public:
      */
     World *get_world();
 
-    Window *get_window();
+    WindowNode *get_window();
 
     void set_parent(Node *node);
 

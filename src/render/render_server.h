@@ -18,7 +18,7 @@ namespace Flint {
 
 class RenderServer {
 public:
-    static RenderServer *getSingleton() {
+    static RenderServer *get_singleton() {
         static RenderServer singleton;
         return &singleton;
     }
@@ -26,13 +26,12 @@ public:
     RenderServer();
 
     /**
-     * Once swap chain extent changes, render pass also changes. We need recreate pipelines due to that.
-     * @param renderPass
-     * @param swapChainExtent
+     * As long as the swap chain extent changes, render pass also changes.
+     * As a result, we need to recreate the pipelines.
+     * @param render_pass
+     * @param swapchain_extent
      */
-    void createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent);
-
-    [[nodiscard]] uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
+    void create_swapchain_related_resources(VkRenderPass render_pass, VkExtent2D swapchain_extent);
 
 public:
     void cleanup();
@@ -54,13 +53,13 @@ public:
      */
     void endSingleTimeCommands(VkCommandBuffer commandBuffer) const;
 
-    void transitionImageLayout(VkCommandBuffer cmd_buffer,
-                               VkImage image,
-                               VkFormat format,
-                               VkImageLayout oldLayout,
-                               VkImageLayout newLayout,
-                               uint32_t levelCount = 1,
-                               uint32_t layerCount = 1) const;
+    static void transitionImageLayout(VkCommandBuffer cmd_buffer,
+                                      VkImage image,
+                                      VkFormat format,
+                                      VkImageLayout oldLayout,
+                                      VkImageLayout newLayout,
+                                      uint32_t levelCount = 1,
+                                      uint32_t layerCount = 1);
 
     /**
      * Copy data from VkBuffer to VkImage.
@@ -135,25 +134,6 @@ public:
 
     void createTextureSampler(VkSampler &textureSampler, VkFilter filter) const;
 
-public:
-    // Various pipelines.
-    // --------------------------------------------------
-    VkDescriptorSetLayout mesh_descriptor_set_layout{};
-    VkPipelineLayout mesh_pipeline_layout{};
-    VkPipeline mesh_pipeline{};
-
-    VkDescriptorSetLayout blit_descriptor_set_layout{};
-    VkPipelineLayout blit_pipeline_layout{};
-    VkPipeline blit_pipeline{};
-
-    VkDescriptorSetLayout skeleton2d_mesh_descriptor_set_layout{};
-    VkPipelineLayout skeleton2d_mesh_pipeline_layout{};
-    VkPipeline skeleton2d_mesh_pipeline{};
-
-    VkDescriptorSetLayout skybox_descriptor_set_layout{};
-    VkPipelineLayout skybox_pipeline_layout{};
-    VkPipeline skybox_pipeline{};
-
     /**
      * Set up shaders, viewport, blend state, etc.
      * @param renderPass Target render pass.
@@ -190,7 +170,7 @@ public:
                       VkBuffer indexBuffer,
                       uint32_t indexCount) const;
 
-    void blit(VkCommandBuffer commandBuffer, VkPipeline graphicsPipeline, VkDescriptorSet const &descriptorSet) const;
+    void blit(VkCommandBuffer commandBuffer, VkPipeline graphicsPipeline, const VkDescriptorSet &descriptorSet) const;
 
     void draw_skeleton_2d(VkCommandBuffer command_buffer,
                           VkPipeline pipeline,
@@ -207,15 +187,34 @@ public:
                      uint32_t indexCount) const;
     // --------------------------------------------------
 
-    void cleanupSwapChainRelatedResources() const;
+    void cleanup_swapchain_related_resources() const;
 
-    void createCommandPool();
-
-    VkCommandPool commandPool{};
+    void create_command_pool();
 
     void create_blit_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
 
     void create_skeleton2d_mesh_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
+
+public:
+    // Various pipelines.
+    // --------------------------------------------------
+    VkDescriptorSetLayout mesh_descriptor_set_layout{};
+    VkPipelineLayout mesh_pipeline_layout{};
+    VkPipeline mesh_pipeline{};
+
+    VkDescriptorSetLayout blit_descriptor_set_layout{};
+    VkPipelineLayout blit_pipeline_layout{};
+    VkPipeline blit_pipeline{};
+
+    VkDescriptorSetLayout skeleton2d_mesh_descriptor_set_layout{};
+    VkPipelineLayout skeleton2d_mesh_pipeline_layout{};
+    VkPipeline skeleton2d_mesh_pipeline{};
+
+    VkDescriptorSetLayout skybox_descriptor_set_layout{};
+    VkPipelineLayout skybox_pipeline_layout{};
+    VkPipeline skybox_pipeline{};
+
+    VkCommandPool command_pool{};
 
 private:
     /**

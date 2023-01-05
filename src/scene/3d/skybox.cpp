@@ -33,7 +33,7 @@ void Skybox::draw(VkCommandBuffer cmd_buffer) {
     }
 
     VkPipeline pipeline = camera->subview->skybox_pipeline;
-    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->skybox_pipeline_layout;
+    VkPipelineLayout pipeline_layout = RenderServer::get_singleton()->skybox_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
     vkCmdPushConstants(
@@ -44,9 +44,9 @@ void Skybox::draw(VkCommandBuffer cmd_buffer) {
     auto skybox_gpu_resource = DefaultResource::get_singleton()->get_default_skybox_gpu_resources();
 
     VkBuffer vertexBuffers[] = {skybox_gpu_resource->get_vertex_buffer()};
-    RenderServer::getSingleton()->draw_skybox(cmd_buffer,
+    RenderServer::get_singleton()->draw_skybox(cmd_buffer,
                                               pipeline,
-                                              desc_set->getDescriptorSet(SwapChain::getSingleton()->currentImage),
+                                              desc_set->getDescriptorSet(SwapChain::get_singleton()->currentImage),
                                               vertexBuffers,
                                               skybox_gpu_resource->get_index_buffer(),
                                               skybox_gpu_resource->get_index_count());

@@ -9,7 +9,7 @@ class SwapChain {
 public:
     SwapChain();
 
-    static SwapChain *getSingleton() {
+    static SwapChain *get_singleton() {
         static SwapChain singleton;
         return &singleton;
     }

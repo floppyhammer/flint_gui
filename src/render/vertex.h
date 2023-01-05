@@ -102,7 +102,7 @@ struct VertexGpuResources {
     }
 
     ~VertexGpuResources() {
-        auto device = Platform::getSingleton()->device;
+        auto device = Window::get_singleton()->device;
 
         // Clean up index buffer.
         vkDestroyBuffer(device, index_buffer, nullptr);
@@ -142,7 +142,7 @@ private:
         VkBuffer staging_buffer;              // In GPU
         VkDeviceMemory staging_buffer_memory; // In CPU
 
-        auto rs = RenderServer::getSingleton();
+        auto rs = RenderServer::get_singleton();
 
         // Create the GPU buffer and link it with the GPU memory.
         rs->createBuffer(buffer_size,
@@ -165,8 +165,8 @@ private:
         rs->copyBuffer(staging_buffer, vertex_buffer, buffer_size);
 
         // Clean up staging buffer and memory.
-        vkDestroyBuffer(Platform::getSingleton()->device, staging_buffer, nullptr);
-        vkFreeMemory(Platform::getSingleton()->device, staging_buffer_memory, nullptr);
+        vkDestroyBuffer(Window::get_singleton()->device, staging_buffer, nullptr);
+        vkFreeMemory(Window::get_singleton()->device, staging_buffer_memory, nullptr);
     }
 
     void create_index_buffer(const std::vector<uint32_t> &indices) {
@@ -178,7 +178,7 @@ private:
         VkBuffer staging_buffer;
         VkDeviceMemory staging_buffer_memory;
 
-        auto rs = RenderServer::getSingleton();
+        auto rs = RenderServer::get_singleton();
 
         rs->createBuffer(buffer_size,
                          VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -197,8 +197,8 @@ private:
         // Copy data from staging buffer to index buffer.
         rs->copyBuffer(staging_buffer, index_buffer, buffer_size);
 
-        vkDestroyBuffer(Platform::getSingleton()->device, staging_buffer, nullptr);
-        vkFreeMemory(Platform::getSingleton()->device, staging_buffer_memory, nullptr);
+        vkDestroyBuffer(Window::get_singleton()->device, staging_buffer, nullptr);
+        vkFreeMemory(Window::get_singleton()->device, staging_buffer_memory, nullptr);
     }
 };
 

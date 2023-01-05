@@ -1,5 +1,5 @@
-#ifndef FLINT_PLATFORM_H
-#define FLINT_PLATFORM_H
+#ifndef FLINT_WINDOW_H
+#define FLINT_WINDOW_H
 
 #include <iostream>
 #include <optional>
@@ -32,18 +32,20 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-class Platform {
+class Window {
 public:
-    Platform() = default;
+    Window() = default;
 
-    static Platform *getSingleton() {
-        static Platform singleton;
+    static Window *get_singleton() {
+        static Window singleton;
         return &singleton;
     }
 
     void init(int32_t window_width, int32_t window_height);
 
-    GLFWwindow *window{};
+    bool should_close() const;
+
+    GLFWwindow *glfw_window{};
 
     /// Native platform surface or window objects are abstracted by surface objects.
     VkSurfaceKHR surface{};
@@ -60,12 +62,12 @@ public:
     int32_t framebuffer_width{};
     int32_t framebuffer_height{};
 
-    static void framebufferResizeCallback(GLFWwindow *window, int width, int height) {
-        // We have attached a Platform pointer to this window previously. Now we retrieve it.
-        auto platform = reinterpret_cast<Platform *>(glfwGetWindowUserPointer(window));
-        platform->framebufferResized = true;
-        platform->framebuffer_width = width;
-        platform->framebuffer_height = height;
+    static void framebufferResizeCallback(GLFWwindow *glfw_window, int width, int height) {
+        // We have attached a Window pointer to this window previously. Now we retrieve it.
+        auto window = reinterpret_cast<Window *>(glfwGetWindowUserPointer(glfw_window));
+        window->framebufferResized = true;
+        window->framebuffer_width = width;
+        window->framebuffer_height = height;
     }
 
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) const;
@@ -135,6 +137,8 @@ public:
                                                VkImageTiling tiling,
                                                VkFormatFeatureFlags features) const;
 
+    [[nodiscard]] uint32_t findMemoryType(uint32_t type_filter, VkMemoryPropertyFlags properties) const;
+
     void cleanup();
 
 private:
@@ -175,4 +179,4 @@ private:
     void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
 };
 
-#endif // FLINT_PLATFORM_H
+#endif // FLINT_WINDOW_H

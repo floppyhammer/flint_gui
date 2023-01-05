@@ -24,7 +24,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
     }
 }
 
-void Platform::init(int32_t window_width, int32_t window_height) {
+void Window::init(int32_t window_width, int32_t window_height) {
     // Create a window.
     create_window(window_width, window_height);
 
@@ -43,7 +43,11 @@ void Platform::init(int32_t window_width, int32_t window_height) {
     create_logical_device();
 }
 
-void Platform::create_window(int32_t width, int32_t height) {
+bool Window::should_close() const {
+    return glfwWindowShouldClose(glfw_window);
+}
+
+void Window::create_window(int32_t width, int32_t height) {
     // Initializes the GLFW library.
     glfwInit();
 
@@ -69,21 +73,21 @@ void Platform::create_window(int32_t width, int32_t height) {
     float dpi_scale_x, dpi_scale_y;
     glfwGetMonitorContentScale(monitors[0], &dpi_scale_x, &dpi_scale_y);
 
-    window = glfwCreateWindow(width, height, "Flint", nullptr, nullptr);
+    glfw_window = glfwCreateWindow(width, height, "Flint", nullptr, nullptr);
 
     // Center window.
     glfwSetWindowPos(
-        window, monitor_x + (video_mode->width - width) / 2, monitor_y + (video_mode->height - height) / 2);
+        glfw_window, monitor_x + (video_mode->width - width) / 2, monitor_y + (video_mode->height - height) / 2);
 
     // Show window.
-    glfwShowWindow(window);
+    glfwShowWindow(glfw_window);
 
     // Assign this to window user, so we can fetch it when the window size changes.
-    glfwSetWindowUserPointer(window, this);
-    glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+    glfwSetWindowUserPointer(glfw_window, this);
+    glfwSetFramebufferSizeCallback(glfw_window, framebufferResizeCallback);
 }
 
-void Platform::create_instance() {
+void Window::create_instance() {
     if (enableValidationLayers && !checkValidationLayerSupport()) {
         throw std::runtime_error("Validation layers requested, but not available!");
     }
@@ -128,12 +132,12 @@ void Platform::create_instance() {
     }
 }
 
-VkExtent2D Platform::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) const {
+VkExtent2D Window::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities) const {
     if (capabilities.currentExtent.width != UINT32_MAX) {
         return capabilities.currentExtent;
     } else {
         int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
+        glfwGetFramebufferSize(glfw_window, &width, &height);
 
         VkExtent2D actualExtent = {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
 
@@ -146,7 +150,7 @@ VkExtent2D Platform::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabiliti
     }
 }
 
-void Platform::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
+void Window::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo) {
     createInfo = {};
     createInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     createInfo.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
@@ -158,7 +162,21 @@ void Platform::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoE
     createInfo.pfnUserCallback = debugCallback;
 }
 
-void Platform::setupDebugMessenger() {
+uint32_t Window::findMemoryType(uint32_t type_filter, VkMemoryPropertyFlags properties) const {
+    VkPhysicalDeviceMemoryProperties mem_properties;
+    // Reports memory information for the specified physical device.
+    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &mem_properties);
+
+    for (uint32_t i = 0; i < mem_properties.memoryTypeCount; i++) {
+        if ((type_filter & (1 << i)) && (mem_properties.memoryTypes[i].propertyFlags & properties) == properties) {
+            return i;
+        }
+    }
+
+    throw std::runtime_error("Failed to find suitable memory type!");
+}
+
+void Window::setupDebugMessenger() {
     if (!enableValidationLayers) {
         return;
     }
@@ -171,13 +189,13 @@ void Platform::setupDebugMessenger() {
     }
 }
 
-void Platform::create_surface() {
-    if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
+void Window::create_surface() {
+    if (glfwCreateWindowSurface(instance, glfw_window, nullptr, &surface) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create a Vulkan window surface!");
     }
 }
 
-bool Platform::checkDeviceExtensionSupport(VkPhysicalDevice pPhysicalDevice) const {
+bool Window::checkDeviceExtensionSupport(VkPhysicalDevice pPhysicalDevice) const {
     uint32_t extensionCount;
     vkEnumerateDeviceExtensionProperties(pPhysicalDevice, nullptr, &extensionCount, nullptr);
 
@@ -193,7 +211,7 @@ bool Platform::checkDeviceExtensionSupport(VkPhysicalDevice pPhysicalDevice) con
     return requiredExtensions.empty();
 }
 
-SwapChainSupportDetails Platform::querySwapChainSupport(VkPhysicalDevice pPhysicalDevice) const {
+SwapChainSupportDetails Window::querySwapChainSupport(VkPhysicalDevice pPhysicalDevice) const {
     SwapChainSupportDetails details;
 
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(pPhysicalDevice, surface, &details.capabilities);
@@ -218,7 +236,7 @@ SwapChainSupportDetails Platform::querySwapChainSupport(VkPhysicalDevice pPhysic
     return details;
 }
 
-bool Platform::isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const {
+bool Window::isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const {
     QueueFamilyIndices indices = findQueueFamilies(pPhysicalDevice);
 
     bool extensionsSupported = checkDeviceExtensionSupport(pPhysicalDevice);
@@ -235,7 +253,7 @@ bool Platform::isDeviceSuitable(VkPhysicalDevice pPhysicalDevice) const {
     return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
 }
 
-void Platform::pick_physical_device() {
+void Window::pick_physical_device() {
     // Enumerates the physical devices accessible to a Vulkan instance.
     uint32_t device_count = 0;
     vkEnumeratePhysicalDevices(instance, &device_count, nullptr);
@@ -261,7 +279,7 @@ void Platform::pick_physical_device() {
     }
 }
 
-VkSurfaceFormatKHR Platform::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats) {
+VkSurfaceFormatKHR Window::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats) {
     for (const auto &availableFormat : availableFormats) {
         if (availableFormat.format == VK_FORMAT_R8G8B8A8_UNORM &&
             availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -272,7 +290,7 @@ VkSurfaceFormatKHR Platform::chooseSwapSurfaceFormat(const std::vector<VkSurface
     return availableFormats[0];
 }
 
-VkPresentModeKHR Platform::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
+VkPresentModeKHR Window::chooseSwapPresentMode(const std::vector<VkPresentModeKHR> &availablePresentModes) {
     for (const auto &availablePresentMode : availablePresentModes) {
         if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
             return availablePresentMode;
@@ -282,7 +300,7 @@ VkPresentModeKHR Platform::chooseSwapPresentMode(const std::vector<VkPresentMode
     return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-QueueFamilyIndices Platform::findQueueFamilies(VkPhysicalDevice pPhysicalDevice) const {
+QueueFamilyIndices Window::findQueueFamilies(VkPhysicalDevice pPhysicalDevice) const {
     QueueFamilyIndices qfIndices;
 
     // Reports properties of the queues of the specified physical device.
@@ -319,7 +337,7 @@ QueueFamilyIndices Platform::findQueueFamilies(VkPhysicalDevice pPhysicalDevice)
     return qfIndices;
 }
 
-void Platform::create_logical_device() {
+void Window::create_logical_device() {
     QueueFamilyIndices qf_indices = findQueueFamilies(physicalDevice);
 
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
@@ -374,12 +392,12 @@ void Platform::create_logical_device() {
     vkGetDeviceQueue(device, qf_indices.presentFamily.value(), 0, &presentQueue);
 }
 
-VkFormat Platform::findSupportedFormat(const std::vector<VkFormat> &candidates,
-                                       VkImageTiling tiling,
-                                       VkFormatFeatureFlags features) const {
+VkFormat Window::findSupportedFormat(const std::vector<VkFormat> &candidates,
+                                     VkImageTiling tiling,
+                                     VkFormatFeatureFlags features) const {
     for (VkFormat format : candidates) {
         VkFormatProperties props;
-        vkGetPhysicalDeviceFormatProperties(Platform::getSingleton()->physicalDevice, format, &props);
+        vkGetPhysicalDeviceFormatProperties(Window::get_singleton()->physicalDevice, format, &props);
 
         if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
             return format;
@@ -391,13 +409,13 @@ VkFormat Platform::findSupportedFormat(const std::vector<VkFormat> &candidates,
     throw std::runtime_error("Failed to find supported format!");
 }
 
-VkFormat Platform::findDepthFormat() const {
+VkFormat Window::findDepthFormat() const {
     return findSupportedFormat({VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
                                VK_IMAGE_TILING_OPTIMAL,
                                VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT);
 }
 
-void Platform::cleanup() {
+void Window::cleanup() {
     vkDestroyDevice(device, nullptr);
 
     if (enableValidationLayers) {
@@ -407,7 +425,7 @@ void Platform::cleanup() {
     vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyInstance(instance, nullptr);
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(glfw_window);
 
     glfwTerminate();
 }

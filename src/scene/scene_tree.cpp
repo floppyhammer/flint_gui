@@ -7,12 +7,12 @@
 namespace Flint {
 
 SceneTree::SceneTree() {
-    root = std::make_shared<Window>(
-        Vec2I(SwapChain::getSingleton()->swapChainExtent.width, SwapChain::getSingleton()->swapChainExtent.height));
+    root = std::make_shared<WindowNode>(
+        Vec2I(SwapChain::get_singleton()->swapChainExtent.width, SwapChain::get_singleton()->swapChainExtent.height));
     root->name = "Main Window";
 }
 
-void SceneTree::replace_scene(std::shared_ptr<Node> new_scene) {
+void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
     switch (new_scene->extended_from_which_base_node()) {
         case NodeType::Node:
         case NodeType::Node3d: {
@@ -50,9 +50,8 @@ void SceneTree::update(double dt) const {
         return;
     }
 
-    if (Platform::getSingleton()->framebufferResized) {
-        auto new_size =
-            Vec2I(Platform::getSingleton()->framebuffer_width, Platform::getSingleton()->framebuffer_height);
+    if (Window::get_singleton()->framebufferResized) {
+        auto new_size = Vec2I(Window::get_singleton()->framebuffer_width, Window::get_singleton()->framebuffer_height);
         when_window_size_changed(new_size);
         VectorServer::get_singleton()->get_canvas()->set_new_dst_texture(new_size);
     }

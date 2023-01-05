@@ -46,8 +46,8 @@ void TextureRect::draw() {
         if (texture->get_type() == TextureType::IMAGE) {
             //            Node *viewport_node = get_viewport();
             //
-            //            VkPipeline pipeline = RenderServer::getSingleton()->blitGraphicsPipeline;
-            //            VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blitPipelineLayout;
+            //            VkPipeline pipeline = RenderServer::get_singleton()->blitGraphicsPipeline;
+            //            VkPipelineLayout pipeline_layout = RenderServer::get_singleton()->blitPipelineLayout;
             //
             //            if (viewport_node) {
             //                auto viewport = dynamic_cast<SubViewport *>(viewport_node);
@@ -63,10 +63,10 @@ void TextureRect::draw() {
             //                               &push_constant);
             //
             //            // Unlike Sprite 2D, Texture Rect should not support custom mesh.
-            //            RenderServer::getSingleton()->blit(p_command_buffer,
+            //            RenderServer::get_singleton()->blit(p_command_buffer,
             //                                               pipeline,
             //                                               mesh->surface->get_material()->get_desc_set()->getDescriptorSet(
-            //                                                   SwapChain::getSingleton()->currentImage));
+            //                                                   SwapChain::get_singleton()->currentImage));
 
         } else { // Vector texture.
             auto vector_server = VectorServer::get_singleton();

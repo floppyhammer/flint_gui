@@ -2,13 +2,13 @@
 
 namespace Flint {
 
-Window::Window(Vec2I _size) {
+WindowNode::WindowNode(Vec2I _size) {
     type = NodeType::Window;
 
     size = _size;
 }
 
-Vec2I Window::get_size() const {
+Vec2I WindowNode::get_size() const {
     return size;
 }
 

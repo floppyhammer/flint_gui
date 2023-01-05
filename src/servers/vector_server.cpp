@@ -2,7 +2,9 @@
 
 namespace Flint {
 
-void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver, int canvas_width, int canvas_height) {
+void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver,
+                        int32_t canvas_width,
+                        int32_t canvas_height) {
     canvas = std::make_shared<Pathfinder::Canvas>(driver);
     canvas->set_new_dst_texture({canvas_width, canvas_height});
 }
@@ -19,20 +21,20 @@ void VectorServer::submit() {
     // Get the dst texture.
     auto texture_vk = static_cast<Pathfinder::TextureVk *>(canvas->get_dst_texture().get());
 
-    auto cmd_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
+    auto cmd_buffer = RenderServer::get_singleton()->beginSingleTimeCommands();
 
     // Transition the dst texture to ShaderReadOnly layout, so we can use it as a sampler.
     // Its layout may be Undefined or ColorAttachment.
-    RenderServer::getSingleton()->transitionImageLayout(cmd_buffer,
-                                                        texture_vk->get_image(),
-                                                        Pathfinder::to_vk_texture_format(texture_vk->get_format()),
-                                                        Pathfinder::to_vk_layout(texture_vk->get_layout()),
-                                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                                                        1,
-                                                        1);
+    RenderServer::transitionImageLayout(cmd_buffer,
+                                        texture_vk->get_image(),
+                                        Pathfinder::to_vk_texture_format(texture_vk->get_format()),
+                                        Pathfinder::to_vk_layout(texture_vk->get_layout()),
+                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                        1,
+                                        1);
     texture_vk->set_layout(Pathfinder::TextureLayout::ShaderReadOnly);
 
-    RenderServer::getSingleton()->endSingleTimeCommands(cmd_buffer);
+    RenderServer::get_singleton()->endSingleTimeCommands(cmd_buffer);
 }
 
 void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) {

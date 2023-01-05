@@ -13,7 +13,7 @@ CubeTexture::CubeTexture(const std::string &path) {
 }
 
 void CubeTexture::load_from_file(const std::string &path) {
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     // TODO: Add mip levels.
     uint32_t mipLevels = 1;
@@ -22,7 +22,7 @@ void CubeTexture::load_from_file(const std::string &path) {
     stbi_uc *pixels = stbi_load(path.c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
 
     if (!pixels) {
-        Flint::Logger::warn("Failed to load image file: " + path, "Texture");
+        Logger::warn("Failed to load image file: " + path, "CubeTexture");
         throw std::runtime_error("Failed to load texture image!");
     }
 
@@ -38,7 +38,7 @@ void CubeTexture::load_from_file(const std::string &path) {
     VkBuffer staging_buffer;
     VkDeviceMemory staging_buffer_memory;
 
-    auto rs = RenderServer::getSingleton();
+    auto rs = RenderServer::get_singleton();
 
     rs->createBuffer(layer_data_size * 6,
                      VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -92,7 +92,7 @@ void CubeTexture::load_from_file(const std::string &path) {
 
     // Image barrier for optimal image (target).
     // Set initial layout for all array layers (faces) of the optimal (target) tiled texture.
-    rs->transitionImageLayout(
+    RenderServer::transitionImageLayout(
         cmd_buffer, image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, 6);
 
     vkCmdCopyBufferToImage(cmd_buffer,
@@ -103,13 +103,13 @@ void CubeTexture::load_from_file(const std::string &path) {
                            buffer_copy_regions.data());
 
     // Change texture image layout to shader read after all faces have been copied.
-    rs->transitionImageLayout(cmd_buffer,
-                              image,
-                              format,
-                              VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                              VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                              1,
-                              6);
+    RenderServer::transitionImageLayout(cmd_buffer,
+                                        image,
+                                        format,
+                                        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                        1,
+                                        6);
 
     rs->endSingleTimeCommands(cmd_buffer);
 

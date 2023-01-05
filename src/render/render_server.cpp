@@ -10,7 +10,7 @@
 namespace Flint {
 
 RenderServer::RenderServer() {
-    createCommandPool();
+    create_command_pool();
 
     // Create descriptor set layouts and pipeline layouts.
     create_mesh_layouts();
@@ -19,15 +19,15 @@ RenderServer::RenderServer() {
     create_skybox_layouts();
 }
 
-void RenderServer::createSwapChainRelatedResources(VkRenderPass renderPass, VkExtent2D swapChainExtent) {
-    create_mesh_pipeline(renderPass, swapChainExtent, mesh_pipeline);
-    create_blit_pipeline(renderPass, swapChainExtent, blit_pipeline);
-    create_skeleton2d_mesh_pipeline(renderPass, swapChainExtent, skeleton2d_mesh_pipeline);
-    create_skybox_pipeline(renderPass, swapChainExtent, skybox_pipeline);
+void RenderServer::create_swapchain_related_resources(VkRenderPass render_pass, VkExtent2D swapchain_extent) {
+    create_mesh_pipeline(render_pass, swapchain_extent, mesh_pipeline);
+    create_blit_pipeline(render_pass, swapchain_extent, blit_pipeline);
+    create_skeleton2d_mesh_pipeline(render_pass, swapchain_extent, skeleton2d_mesh_pipeline);
+    create_skybox_pipeline(render_pass, swapchain_extent, skybox_pipeline);
 }
 
-void RenderServer::cleanupSwapChainRelatedResources() const {
-    auto device = Platform::getSingleton()->device;
+void RenderServer::cleanup_swapchain_related_resources() const {
+    auto device = Window::get_singleton()->device;
 
     // Graphics pipeline resources.
     vkDestroyPipeline(device, mesh_pipeline, nullptr);
@@ -36,7 +36,7 @@ void RenderServer::cleanupSwapChainRelatedResources() const {
 }
 
 void RenderServer::cleanup() {
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     // Pipeline layouts.
     vkDestroyPipelineLayout(device, mesh_pipeline_layout, nullptr);
@@ -48,95 +48,80 @@ void RenderServer::cleanup() {
     vkDestroyDescriptorSetLayout(device, blit_descriptor_set_layout, nullptr);
     vkDestroyDescriptorSetLayout(device, skeleton2d_mesh_descriptor_set_layout, nullptr);
 
-    vkDestroyCommandPool(device, commandPool, nullptr);
-}
-
-uint32_t RenderServer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const {
-    VkPhysicalDeviceMemoryProperties memProperties;
-    // Reports memory information for the specified physical device.
-    vkGetPhysicalDeviceMemoryProperties(Platform::getSingleton()->physicalDevice, &memProperties);
-
-    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
-            return i;
-        }
-    }
-
-    throw std::runtime_error("Failed to find suitable memory type!");
+    vkDestroyCommandPool(device, command_pool, nullptr);
 }
 
 VkShaderModule RenderServer::createShaderModule(const std::vector<char> &code) {
-    VkShaderModuleCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    createInfo.codeSize = code.size();
-    createInfo.pCode = reinterpret_cast<const uint32_t *>(code.data());
+    VkShaderModuleCreateInfo create_info{};
+    create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    create_info.codeSize = code.size();
+    create_info.pCode = reinterpret_cast<const uint32_t *>(code.data());
 
-    VkShaderModule shaderModule;
-    if (vkCreateShaderModule(Platform::getSingleton()->device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+    VkShaderModule shader_module;
+    if (vkCreateShaderModule(Window::get_singleton()->device, &create_info, nullptr, &shader_module) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create shader module!");
     }
 
-    return shaderModule;
+    return shader_module;
 }
 
-void RenderServer::createCommandPool() {
-    QueueFamilyIndices qfIndices =
-        Platform::getSingleton()->findQueueFamilies(Platform::getSingleton()->physicalDevice);
+void RenderServer::create_command_pool() {
+    QueueFamilyIndices qf_indices = Window::get_singleton()->findQueueFamilies(Window::get_singleton()->physicalDevice);
 
-    VkCommandPoolCreateInfo poolInfo{};
-    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    poolInfo.queueFamilyIndex = qfIndices.graphicsFamily.value();
-    poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // So we can reset command buffers.
+    VkCommandPoolCreateInfo pool_info{};
+    pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    pool_info.queueFamilyIndex = qf_indices.graphicsFamily.value();
+    pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // So we can reset command buffers.
 
-    if (vkCreateCommandPool(Platform::getSingleton()->device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
+    if (vkCreateCommandPool(Window::get_singleton()->device, &pool_info, nullptr, &command_pool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create command pool!");
     }
 }
 
 VkCommandBuffer RenderServer::beginSingleTimeCommands() const {
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     // Allocate a command buffer.
     // ----------------------------------------
-    VkCommandBufferAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocInfo.commandPool = commandPool;
-    allocInfo.commandBufferCount = 1;
+    VkCommandBufferAllocateInfo alloc_info{};
+    alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    alloc_info.commandPool = command_pool;
+    alloc_info.commandBufferCount = 1;
 
-    VkCommandBuffer commandBuffer;
-    vkAllocateCommandBuffers(device, &allocInfo, &commandBuffer);
+    VkCommandBuffer cmd_buffer;
+    vkAllocateCommandBuffers(device, &alloc_info, &cmd_buffer);
     // ----------------------------------------
 
     // Start recording the command buffer.
     // ----------------------------------------
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    VkCommandBufferBeginInfo begin_info{};
+    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+    vkBeginCommandBuffer(cmd_buffer, &begin_info);
     // ----------------------------------------
 
-    return commandBuffer;
+    return cmd_buffer;
 }
 
-void RenderServer::endSingleTimeCommands(VkCommandBuffer commandBuffer) const {
+void RenderServer::endSingleTimeCommands(VkCommandBuffer cmd_buffer) const {
     // End recording the command buffer.
-    vkEndCommandBuffer(commandBuffer);
+    vkEndCommandBuffer(cmd_buffer);
 
     // Submit the command buffer to the graphics queue.
     // ----------------------------------------
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffer;
+    VkSubmitInfo submit_info{};
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.commandBufferCount = 1;
+    submit_info.pCommandBuffers = &cmd_buffer;
 
-    vkQueueSubmit(Platform::getSingleton()->graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-    vkQueueWaitIdle(Platform::getSingleton()->graphicsQueue);
+    vkQueueSubmit(Window::get_singleton()->graphicsQueue, 1, &submit_info, VK_NULL_HANDLE);
+    vkQueueWaitIdle(Window::get_singleton()->graphicsQueue);
     // ----------------------------------------
 
     // Free the command buffer.
-    vkFreeCommandBuffers(Platform::getSingleton()->device, commandPool, 1, &commandBuffer);
+    vkFreeCommandBuffers(Window::get_singleton()->device, command_pool, 1, &cmd_buffer);
 }
 
 void RenderServer::transitionImageLayout(VkCommandBuffer cmd_buffer,
@@ -145,7 +130,7 @@ void RenderServer::transitionImageLayout(VkCommandBuffer cmd_buffer,
                                          VkImageLayout old_layout,
                                          VkImageLayout new_layout,
                                          uint32_t level_count,
-                                         uint32_t layer_count) const {
+                                         uint32_t layer_count) {
     if (old_layout == new_layout) {
         return;
     }
@@ -352,7 +337,7 @@ void RenderServer::createImage(uint32_t width,
                                VkDeviceMemory &imageMemory,
                                uint32_t arrayLayers,
                                VkImageCreateFlags flags) const {
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -383,7 +368,7 @@ void RenderServer::createImage(uint32_t width,
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+    allocInfo.memoryTypeIndex = Window::get_singleton()->findMemoryType(memRequirements.memoryTypeBits, properties);
 
     if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate image memory!");
@@ -394,7 +379,7 @@ void RenderServer::createImage(uint32_t width,
 }
 
 VkImageView RenderServer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) const {
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     VkImageViewCreateInfo viewInfo{};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -420,7 +405,7 @@ void RenderServer::createBuffer(VkDeviceSize size,
                                 VkMemoryPropertyFlags properties,
                                 VkBuffer &buffer,
                                 VkDeviceMemory &bufferMemory) const {
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     // Structure specifying the parameters of a newly created buffer object.
     VkBufferCreateInfo bufferInfo{};
@@ -442,8 +427,8 @@ void RenderServer::createBuffer(VkDeviceSize size,
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits,
-                                               properties); // Index identifying a memory type.
+    // Index identifying a memory type.
+    allocInfo.memoryTypeIndex = Window::get_singleton()->findMemoryType(memRequirements.memoryTypeBits, properties);
 
     // Allocate CPU buffer memory.
     if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
@@ -458,7 +443,7 @@ void RenderServer::copyDataToMemory(const void *src,
                                     VkDeviceMemory bufferMemory,
                                     size_t dataSize,
                                     size_t memoryOffset) const {
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     void *data;
     vkMapMemory(device, bufferMemory, memoryOffset, dataSize, 0, &data);
@@ -477,7 +462,7 @@ void RenderServer::createTextureSampler(VkSampler &textureSampler, VkFilter filt
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
     VkPhysicalDeviceProperties properties{};
-    vkGetPhysicalDeviceProperties(Platform::getSingleton()->physicalDevice, &properties);
+    vkGetPhysicalDeviceProperties(Window::get_singleton()->physicalDevice, &properties);
 
     samplerInfo.anisotropyEnable = VK_TRUE;
     samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
@@ -497,7 +482,7 @@ void RenderServer::createTextureSampler(VkSampler &textureSampler, VkFilter filt
     samplerInfo.minLod = 0.0f;
     samplerInfo.maxLod = 0.0f;
 
-    if (vkCreateSampler(Platform::getSingleton()->device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
+    if (vkCreateSampler(Window::get_singleton()->device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create texture sampler!");
     }
 }
@@ -655,7 +640,7 @@ void RenderServer::create_mesh_layouts() {
         layout_info.pBindings = bindings.data();
 
         if (vkCreateDescriptorSetLayout(
-                Platform::getSingleton()->device, &layout_info, nullptr, &mesh_descriptor_set_layout) != VK_SUCCESS) {
+                Window::get_singleton()->device, &layout_info, nullptr, &mesh_descriptor_set_layout) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor set layout!");
         }
     }
@@ -677,8 +662,7 @@ void RenderServer::create_mesh_layouts() {
 
         // Create pipeline layout.
         if (vkCreatePipelineLayout(
-                Platform::getSingleton()->device, &pipeline_layout_info, nullptr, &mesh_pipeline_layout) !=
-            VK_SUCCESS) {
+                Window::get_singleton()->device, &pipeline_layout_info, nullptr, &mesh_pipeline_layout) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create pipeline layout!");
         }
     }
@@ -723,7 +707,7 @@ void RenderServer::create_blit_layouts() {
         layout_info.pBindings = bindings.data();
 
         if (vkCreateDescriptorSetLayout(
-                Platform::getSingleton()->device, &layout_info, nullptr, &blit_descriptor_set_layout) != VK_SUCCESS) {
+                Window::get_singleton()->device, &layout_info, nullptr, &blit_descriptor_set_layout) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor set layout!");
         }
     }
@@ -745,8 +729,7 @@ void RenderServer::create_blit_layouts() {
 
         // Create pipeline layout.
         if (vkCreatePipelineLayout(
-                Platform::getSingleton()->device, &pipeline_layout_info, nullptr, &blit_pipeline_layout) !=
-            VK_SUCCESS) {
+                Window::get_singleton()->device, &pipeline_layout_info, nullptr, &blit_pipeline_layout) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create pipeline layout!");
         }
     }
@@ -780,7 +763,7 @@ void RenderServer::create_skeleton2d_mesh_layouts() {
         layout_info.pBindings = bindings.data();
 
         if (vkCreateDescriptorSetLayout(
-                Platform::getSingleton()->device, &layout_info, nullptr, &skeleton2d_mesh_descriptor_set_layout) !=
+                Window::get_singleton()->device, &layout_info, nullptr, &skeleton2d_mesh_descriptor_set_layout) !=
             VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor set layout!");
         }
@@ -803,7 +786,7 @@ void RenderServer::create_skeleton2d_mesh_layouts() {
 
         // Create pipeline layout.
         if (vkCreatePipelineLayout(
-                Platform::getSingleton()->device, &pipeline_layout_info, nullptr, &skeleton2d_mesh_pipeline_layout) !=
+                Window::get_singleton()->device, &pipeline_layout_info, nullptr, &skeleton2d_mesh_pipeline_layout) !=
             VK_SUCCESS) {
             throw std::runtime_error("Failed to create pipeline layout!");
         }
@@ -830,7 +813,7 @@ void RenderServer::create_skybox_layouts() {
         layoutInfo.pBindings = bindings.data();
 
         if (vkCreateDescriptorSetLayout(
-                Platform::getSingleton()->device, &layoutInfo, nullptr, &skybox_descriptor_set_layout) != VK_SUCCESS) {
+                Window::get_singleton()->device, &layoutInfo, nullptr, &skybox_descriptor_set_layout) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor set layout!");
         }
     }
@@ -854,8 +837,7 @@ void RenderServer::create_skybox_layouts() {
 
         // Create pipeline layout.
         if (vkCreatePipelineLayout(
-                Platform::getSingleton()->device, &pipelineLayoutInfo, nullptr, &skybox_pipeline_layout) !=
-            VK_SUCCESS) {
+                Window::get_singleton()->device, &pipelineLayoutInfo, nullptr, &skybox_pipeline_layout) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create pipeline layout!");
         }
     }
@@ -980,7 +962,7 @@ void RenderServer::create_mesh_pipeline(VkRenderPass renderPass, VkExtent2D view
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
 
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
@@ -1121,7 +1103,7 @@ void RenderServer::create_blit_pipeline(VkRenderPass renderPass, VkExtent2D view
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
 
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
@@ -1264,7 +1246,7 @@ void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass,
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
 
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
@@ -1398,7 +1380,7 @@ void RenderServer::create_skybox_pipeline(VkRenderPass renderPass,
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
 
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {

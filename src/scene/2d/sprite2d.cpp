@@ -76,8 +76,8 @@ void Sprite2d::draw(VkCommandBuffer p_command_buffer) {
 //
 //    Node *viewport_node = get_viewport();
 //
-//    VkPipeline pipeline = RenderServer::getSingleton()->blitGraphicsPipeline;
-//    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blitPipelineLayout;
+//    VkPipeline pipeline = RenderServer::get_singleton()->blitGraphicsPipeline;
+//    VkPipelineLayout pipeline_layout = RenderServer::get_singleton()->blitPipelineLayout;
 //
 //    if (viewport_node) {
 //        auto viewport = dynamic_cast<SubViewport *>(viewport_node);
@@ -91,10 +91,10 @@ void Sprite2d::draw(VkCommandBuffer p_command_buffer) {
 //    VkBuffer vertexBuffers[] = {mesh->surface->get_vertex_buffer()};
 //
 //    // Unlike Texture Rect, Sprite 2D should support custom mesh.
-//    RenderServer::getSingleton()->draw_mesh_2d(
+//    RenderServer::get_singleton()->draw_mesh_2d(
 //        p_command_buffer,
 //        pipeline,
-//        mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage),
+//        mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::get_singleton()->currentImage),
 //        vertexBuffers,
 //        mesh->surface->get_index_buffer(),
 //        mesh->surface->get_index_count());

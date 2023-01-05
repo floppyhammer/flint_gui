@@ -47,7 +47,7 @@ void World::propagate_draw(VkCommandBuffer cmd_buffer) {
 }
 
 void World::draw_subtree(Subview* subview, ColorF clear_color, ImageTexture* image_texture) {
-    auto cmd_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
+    auto cmd_buffer = RenderServer::get_singleton()->beginSingleTimeCommands();
 
     // Begin render pass.
     // It seems not feasible to wrap begin info into rendering Viewport.
@@ -76,7 +76,7 @@ void World::draw_subtree(Subview* subview, ColorF clear_color, ImageTexture* ima
     // End render pass.
     vkCmdEndRenderPass(cmd_buffer);
 
-    RenderServer::getSingleton()->endSingleTimeCommands(cmd_buffer);
+    RenderServer::get_singleton()->endSingleTimeCommands(cmd_buffer);
 
     image_texture->layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 }
@@ -128,17 +128,17 @@ void World::draw(VkCommandBuffer cmd_buffer) {
 
     mesh->surface->get_material()->set_texture(image_texture.get());
 
-    VkPipeline pipeline = RenderServer::getSingleton()->blit_pipeline;
-    VkPipelineLayout pipeline_layout = RenderServer::getSingleton()->blit_pipeline_layout;
+    VkPipeline pipeline = RenderServer::get_singleton()->blit_pipeline;
+    VkPipelineLayout pipeline_layout = RenderServer::get_singleton()->blit_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
     vkCmdPushConstants(
         cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
 
-    RenderServer::getSingleton()->blit(
+    RenderServer::get_singleton()->blit(
         cmd_buffer,
         pipeline,
-        mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::getSingleton()->currentImage));
+        mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::get_singleton()->currentImage));
 }
 
 } // namespace Flint

@@ -14,7 +14,7 @@ Subview::Subview(Vec2I view_size) {
 }
 
 Subview::~Subview() {
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     extent_dependent_cleanup();
 
@@ -25,29 +25,30 @@ void Subview::create_images() {
     // Color.
     texture = ImageTexture::from_empty(extent, VK_FORMAT_R8G8B8A8_UNORM);
 
+    auto rs = RenderServer::get_singleton();
+
     // A render target image's layout will always be SHADER_READ_ONLY.
-    auto cmd_buffer = RenderServer::getSingleton()->beginSingleTimeCommands();
-    RenderServer::getSingleton()->transitionImageLayout(cmd_buffer,
-                                                        texture->image,
-                                                        texture->format,
-                                                        VK_IMAGE_LAYOUT_UNDEFINED,
-                                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                                                        1,
-                                                        1);
-    RenderServer::getSingleton()->endSingleTimeCommands(cmd_buffer);
+    auto cmd_buffer = rs->beginSingleTimeCommands();
+    RenderServer::transitionImageLayout(cmd_buffer,
+                                        texture->image,
+                                        texture->format,
+                                        VK_IMAGE_LAYOUT_UNDEFINED,
+                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                        1,
+                                        1);
+    rs->endSingleTimeCommands(cmd_buffer);
 
     // Depth.
-    VkFormat depthFormat = Platform::getSingleton()->findDepthFormat();
-    RenderServer::getSingleton()->createImage(extent.x,
-                                              extent.y,
-                                              depthFormat,
-                                              VK_IMAGE_TILING_OPTIMAL,
-                                              VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-                                              VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                                              depth_image,
-                                              depth_image_memory);
-    depth_image_view =
-        RenderServer::getSingleton()->createImageView(depth_image, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+    VkFormat depthFormat = Window::get_singleton()->findDepthFormat();
+    rs->createImage(extent.x,
+                    extent.y,
+                    depthFormat,
+                    VK_IMAGE_TILING_OPTIMAL,
+                    VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
+                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+                    depth_image,
+                    depth_image_memory);
+    depth_image_view = rs->createImageView(depth_image, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
 void Subview::create_render_pass() {
@@ -81,7 +82,7 @@ void Subview::create_render_pass() {
     // Depth attachment.
     // ----------------------------------------
     VkAttachmentDescription depthAttachment{};
-    depthAttachment.format = Platform::getSingleton()->findDepthFormat();
+    depthAttachment.format = Window::get_singleton()->findDepthFormat();
     depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -134,7 +135,7 @@ void Subview::create_render_pass() {
     renderPassInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
     renderPassInfo.pDependencies = dependencies.data();
 
-    if (vkCreateRenderPass(Platform::getSingleton()->device, &renderPassInfo, nullptr, &render_pass) != VK_SUCCESS) {
+    if (vkCreateRenderPass(Window::get_singleton()->device, &renderPassInfo, nullptr, &render_pass) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create render pass!");
     }
 }
@@ -153,7 +154,7 @@ void Subview::create_framebuffer() {
         framebufferInfo.height = extent.y;
         framebufferInfo.layers = 1;
 
-        if (vkCreateFramebuffer(Platform::getSingleton()->device, &framebufferInfo, nullptr, &framebuffer) !=
+        if (vkCreateFramebuffer(Window::get_singleton()->device, &framebufferInfo, nullptr, &framebuffer) !=
             VK_SUCCESS) {
             throw std::runtime_error("Failed to create framebuffer!");
         }
@@ -177,15 +178,14 @@ VkRenderPassBeginInfo Subview::get_render_pass_info() {
 }
 
 void Subview::create_pipelines() {
+    auto rs = RenderServer::get_singleton();
+
     // We need to create pipelines exclusively for this sub-viewport as pipelines contain render pass info.
-    RenderServer::getSingleton()->create_mesh_pipeline(
-        render_pass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, mesh_pipeline);
+    rs->create_mesh_pipeline(render_pass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, mesh_pipeline);
 
-    RenderServer::getSingleton()->create_blit_pipeline(
-        render_pass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, blit_pipeline);
+    rs->create_blit_pipeline(render_pass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, blit_pipeline);
 
-    RenderServer::getSingleton()->create_skybox_pipeline(
-        render_pass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, skybox_pipeline);
+    rs->create_skybox_pipeline(render_pass, VkExtent2D{(uint32_t)extent.x, (uint32_t)extent.y}, skybox_pipeline);
 }
 
 void Subview::set_extent(Vec2I new_extent) {
@@ -210,7 +210,7 @@ void Subview::extent_dependent_init() {
 }
 
 void Subview::extent_dependent_cleanup() const {
-    auto device = Platform::getSingleton()->device;
+    auto device = Window::get_singleton()->device;
 
     vkDestroyPipeline(device, mesh_pipeline, nullptr);
     vkDestroyPipeline(device, blit_pipeline, nullptr);
