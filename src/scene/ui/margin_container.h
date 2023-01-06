@@ -13,8 +13,6 @@ public:
         type = NodeType::MarginContainer;
     }
 
-    void update(double dt) override;
-
     void adjust_layout() override;
 
     Vec2F calc_minimum_size() const override;

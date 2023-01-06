@@ -48,8 +48,6 @@ void Container::set_size(Vec2F new_size) {
     auto min_size = calc_minimum_size();
 
     size = new_size.max(min_size);
-
-    adjust_layout();
 }
 
 void Container::update(double dt) {

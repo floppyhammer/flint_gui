@@ -38,12 +38,6 @@ Vec2F MarginContainer::calc_minimum_size() const {
     return minimum_size.max(max_child_min_size);
 }
 
-void MarginContainer::update(double dt) {
-    adjust_layout();
-
-    NodeUi::update(dt);
-}
-
 void MarginContainer::set_margin_all(float new_margin) {
     margin = {new_margin, new_margin, new_margin, new_margin};
 }

@@ -39,6 +39,9 @@ int main() {
 
         vstack_container->add_child(std::make_shared<Label>("Hello"));
 
+        std::string emojis = "😀😁😂🤣";
+        vstack_container->add_child(std::make_shared<Label>(emojis));
+
         auto label = std::make_shared<Label>("مرحبا");
         label->set_language(Language::Arabic);
         vstack_container->add_child(label);

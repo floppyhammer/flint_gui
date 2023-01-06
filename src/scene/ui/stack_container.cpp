@@ -1,6 +1,7 @@
 #include "stack_container.h"
 
 namespace Flint {
+
 void StackContainer::adjust_layout() {
     if (children.empty()) {
         return;
@@ -217,6 +218,6 @@ void StackContainer::set_separation(float new_separation) {
     }
 
     separation = new_separation;
-    adjust_layout();
 }
+
 } // namespace Flint
