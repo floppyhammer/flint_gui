@@ -139,12 +139,11 @@ void Font::get_glyphs_harfbuzz(const std::string &text, Language lang, std::vect
 
         glyphs.clear();
 
-        float cursor_x = 0;
-        float cursor_y = 0;
+        // Output position will always be in one line (regardless of line breaks).
         for (unsigned int i = 0; i < glyph_count; i++) {
             Glyph glyph;
 
-            // codepoint property is replaced with glyph ID after shaping.
+            // Codepoint property is replaced with glyph ID after shaping.
             glyph.index = glyph_info[i].codepoint;
 
             glyph.x_offset = glyph_pos[i].x_offset / 64.0 * (64.0 / font_size);
@@ -152,11 +151,6 @@ void Font::get_glyphs_harfbuzz(const std::string &text, Language lang, std::vect
 
             glyph.x_advance = glyph_pos[i].x_advance / 64.0 * (64.0 / font_size);
             glyph.y_advance = glyph_pos[i].y_advance / 64.0 * (64.0 / font_size);
-
-            glyph.position = {(float)cursor_x, (float)cursor_y};
-
-            cursor_x += glyph.x_advance;
-            cursor_y += glyph.y_advance;
 
             glyphs.push_back(glyph);
         }

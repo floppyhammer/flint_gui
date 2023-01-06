@@ -21,6 +21,7 @@ int main() {
         panel->enable_title_bar(false);
         panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         panel->set_anchor_flag(AnchorFlag::FullRect);
+        panel->apply_fullscreen_style();
         app.tree->replace_scene(panel);
 
         auto margin_container = std::make_shared<MarginContainer>();

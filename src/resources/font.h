@@ -68,8 +68,6 @@ struct Glyph {
     float x_advance = 0; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
     float y_advance = 0;
 
-    Vec2F position;
-
     int32_t font_size = 0; // Font size;
     char32_t text{};
 
@@ -77,7 +75,8 @@ struct Glyph {
     // A particular glyph ID within the font does not necessarily correlate to a predictable Unicode codepoint.
     int32_t index = 0;
 
-    Pathfinder::Path2d path; // Glyph path.
+    // Glyph path. The points are in the glyph's baseline coordinates.
+    Pathfinder::Path2d path;
 
     /// Glyph box in the baseline coordinates.
     RectF box;
@@ -85,7 +84,7 @@ struct Glyph {
     /// Glyph path's bounding box in the baseline coordinates.
     RectF bbox;
 
-    /// Layout box in the text.
+    /// Layout box in the whole text. Coordinate origin is the top-left corner.
     RectF layout_box;
 };
 

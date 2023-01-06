@@ -16,6 +16,7 @@ Label::Label(const std::string &_text) {
     type = NodeType::Label;
 
     debug_size_box.border_color = ColorU::red();
+    visual_debug = true;
 
     font = ResourceManager::get_singleton()->load<Font>("../assets/unifont-14.0.03.ttf");
 
@@ -76,6 +77,9 @@ void Label::measure() {
     // Reset text's layout box.
     layout_box = RectF();
 
+    float cursor_x = 0;
+    float cursor_y = 0;
+
     for (auto &g : glyphs) {
         // Set UTF-32 codepoint.
         //        g.text = u_codepoint;
@@ -89,14 +93,14 @@ void Label::measure() {
 
         // Line break.
         //        if (u_codepoint == '\n') {
-        //            x = 0;
-        //            y += font_size;
+        //            cursor_x = 0;
+        //            cursor_y += font_size;
         //            glyphs.push_back(g);
         //            continue;
         //        }
 
         // Glyph width.
-        //        g.advance = font->get_advance(g.index);
+        //        g.x_advance = font->get_advance(g.index);
 
         // Get the glyph path's bounding box. The Y axis points down.
         RectI bounding_box = font->get_bounds(g.index);
@@ -118,22 +122,22 @@ void Label::measure() {
         g.bbox = bounding_box.to_f32();
 
         // The glyph's layout box in the text's local coordinates. The origin is the top-left corner of the text box.
-        g.layout_box = RectF(g.x_offset, g.y_offset, g.x_offset + g.x_advance, g.y_offset + font_size);
+        g.layout_box = RectF(cursor_x, cursor_y, cursor_x + g.x_advance, cursor_y + font_size);
 
         // The whole text's layout box.
         layout_box = layout_box.union_rect(g.layout_box);
 
         // Advance x.
-        // x += roundf(g.advance);
+        cursor_x += g.x_advance;
     }
 }
 
-void Label::set_font(std::shared_ptr<Font> p_font) {
-    if (p_font == nullptr) {
+void Label::set_font(std::shared_ptr<Font> new_font) {
+    if (new_font == nullptr) {
         return;
     }
 
-    font = std::move(p_font);
+    font = std::move(new_font);
 
     if (text.empty()) {
         return;
@@ -169,6 +173,9 @@ void Label::consider_alignment() {
 }
 
 void Label::update(double dt) {
+    NodeUi::update(dt);
+
+    consider_alignment();
 }
 
 void Label::set_text_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color) {
@@ -193,7 +200,9 @@ void Label::draw() {
         vector_server->draw_style_box(theme_background.value(), global_position, size);
     }
 
-    auto translation = global_position + alignment_shift + Vec2F(0, 1) * font->get_ascent();
+    auto baseline_position = Vec2F(0, font->get_ascent());
+
+    auto translation = Transform2::from_translation(global_position + alignment_shift + baseline_position);
 
     RectF clip_box;
     //    if (clip) {
@@ -202,13 +211,15 @@ void Label::draw() {
     //        clip_box = {{}, calc_minimum_size()};
     //    }
 
-    vector_server->draw_glyphs(glyphs, font_style, Transform2::from_translation(translation), clip_box);
+    vector_server->draw_glyphs(glyphs, font_style, translation, clip_box);
 
     NodeUi::draw();
 }
 
 void Label::set_horizontal_alignment(Alignment alignment) {
-    if (horizontal_alignment == alignment) return;
+    if (horizontal_alignment == alignment) {
+        return;
+    }
 
     horizontal_alignment = alignment;
 
@@ -216,7 +227,9 @@ void Label::set_horizontal_alignment(Alignment alignment) {
 }
 
 void Label::set_vertical_alignment(Alignment alignment) {
-    if (vertical_alignment == alignment) return;
+    if (vertical_alignment == alignment) {
+        return;
+    }
 
     vertical_alignment = alignment;
 

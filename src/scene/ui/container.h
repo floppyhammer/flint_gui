@@ -4,6 +4,7 @@
 #include "node_ui.h"
 
 namespace Flint {
+
 /**
  * Containers adjust their container children's layouts automatically.
  * This base class is not meant for direct use as a node.
@@ -12,7 +13,7 @@ class Container : public NodeUi {
 public:
     Container();
 
-    void set_size(Vec2F p_size) override;
+    void set_size(Vec2F new_size) override;
 
     void update(double dt) override;
 
@@ -29,6 +30,7 @@ protected:
      */
     virtual void adjust_layout();
 };
+
 } // namespace Flint
 
 #endif // FLINT_CONTAINER_H

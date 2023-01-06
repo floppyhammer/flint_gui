@@ -1,5 +1,7 @@
 #include "vector_server.h"
 
+using namespace Pathfinder;
+
 namespace Flint {
 
 void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver,
@@ -162,44 +164,44 @@ void VectorServer::draw_glyphs(const std::vector<Glyph> &glyphs,
 
     // Text clip.
     if (clip_box.is_valid()) {
-        auto clip_path = Pathfinder::Path2d();
+        auto clip_path = Path2d();
         clip_path.add_rect(clip_box, 0);
         canvas->set_transform(global_transform_offset * transform);
-        canvas->clip_path(clip_path, Pathfinder::FillRule::Winding);
+        canvas->clip_path(clip_path, FillRule::Winding);
     }
 
     // Draw glyphs.
     for (Glyph g : glyphs) {
-        canvas->set_transform(global_transform_offset * Pathfinder::Transform2::from_translation(g.position) *
+        canvas->set_transform(global_transform_offset * Transform2::from_translation(g.layout_box.origin()) *
                               transform);
 
         // Add fill.
-        canvas->set_fill_paint(Pathfinder::Paint::from_color(font_style.color));
-        canvas->fill_path(g.path, Pathfinder::FillRule::Winding);
+        canvas->set_fill_paint(Paint::from_color(font_style.color));
+        canvas->fill_path(g.path, FillRule::Winding);
 
         // Add stroke if needed.
-        canvas->set_stroke_paint(Pathfinder::Paint::from_color(font_style.stroke_color));
+        canvas->set_stroke_paint(Paint::from_color(font_style.stroke_color));
         canvas->set_line_width(font_style.stroke_width);
         canvas->stroke_path(g.path);
 
         if (font_style.debug) {
             canvas->set_line_width(1);
 
-            // Add layout box.
+            // Add box.
             // --------------------------------
-            Pathfinder::Path2d layout_path;
-            layout_path.add_rect(g.layout_box);
+            Path2d layout_path;
+            layout_path.add_rect(g.box);
 
-            canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::green()));
+            canvas->set_stroke_paint(Paint::from_color(ColorU::green()));
             canvas->stroke_path(layout_path);
             // --------------------------------
 
             // Add bbox.
             // --------------------------------
-            Pathfinder::Path2d bbox_path;
+            Path2d bbox_path;
             bbox_path.add_rect(g.bbox);
 
-            canvas->set_stroke_paint(Pathfinder::Paint::from_color(Pathfinder::ColorU::red()));
+            canvas->set_stroke_paint(Paint::from_color(ColorU::red()));
             canvas->stroke_path(bbox_path);
             // --------------------------------
         }

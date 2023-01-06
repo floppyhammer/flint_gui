@@ -1,6 +1,7 @@
 #include "container.h"
 
 namespace Flint {
+
 Container::Container() {
     // This class is not meant for direct use as a node.
     type = NodeType::Max;
@@ -39,16 +40,22 @@ Vec2F Container::calc_minimum_size() const {
     return minimum_size.max(min_size);
 }
 
-void Container::set_size(Vec2F p_size) {
-    if (size == p_size) {
+void Container::set_size(Vec2F new_size) {
+    if (size == new_size) {
         return;
     }
 
-    size = p_size;
+    auto min_size = calc_minimum_size();
+
+    size = new_size.max(min_size);
 
     adjust_layout();
 }
 
 void Container::update(double dt) {
+    NodeUi::update(dt);
+
+    adjust_layout();
 }
+
 } // namespace Flint

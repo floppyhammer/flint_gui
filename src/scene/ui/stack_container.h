@@ -8,8 +8,6 @@ namespace Flint {
 /// Instead, use HStackContainer/VStackContainer.
 class StackContainer : public Container {
 public:
-    void update(double dt) override;
-
     void adjust_layout() override;
 
     Vec2F calc_minimum_size() const override;

@@ -133,7 +133,8 @@ void Panel::input(InputEvent &event) {
         }
 
         bool v_resize = false;
-        if (abs(global_position.y - args.position.y) < 4.0 || abs(global_position.y + size.y + title_bar_height - args.position.y) < 4.0) {
+        if (abs(global_position.y - args.position.y) < 4.0 ||
+            abs(global_position.y + size.y + title_bar_height - args.position.y) < 4.0) {
             v_resize = true;
             consume_flag = true;
         }
@@ -247,5 +248,10 @@ void Panel::set_size(Vec2<float> p_size) {
 void Panel::set_title(const std::string &title) {
     title_label->set_text(title);
 }
+
+void Panel::apply_fullscreen_style() {
+    theme_panel->border_width = 0;
+    theme_panel->corner_radius = 0;
+};
 
 } // namespace Flint

@@ -39,6 +39,10 @@ public:
     /// Set title text.
     void set_title(const std::string &title);
 
+    /// Hide border and disable corner radius,
+    /// which achieves better visual effect when the panel occupies the whole window.
+    void apply_fullscreen_style();
+
 private:
     bool title_bar = false;
     bool closable = false;

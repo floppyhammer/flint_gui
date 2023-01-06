@@ -43,7 +43,7 @@ void NodeUi::draw() {
 
 void NodeUi::update(double dt) {
     if (visual_debug) {
-        debug_size_box.border_width = 2;
+        debug_size_box.border_width = 1;
     } else {
         debug_size_box.border_width = 0;
     }
@@ -118,16 +118,16 @@ void NodeUi::set_mouse_filter(MouseFilter filter) {
     mouse_filter = filter;
 }
 
-void NodeUi::set_position(Vec2F p_position) {
-    position = p_position;
+void NodeUi::set_position(Vec2F new_position) {
+    position = new_position;
 }
 
-void NodeUi::set_size(Vec2F p_size) {
-    if (size == p_size) {
+void NodeUi::set_size(Vec2F new_size) {
+    if (size == new_size) {
         return;
     }
 
-    size = p_size.max(calc_minimum_size());
+    size = new_size.max(calc_minimum_size());
 }
 
 Vec2F NodeUi::get_position() const {
@@ -138,8 +138,8 @@ Vec2F NodeUi::get_size() const {
     return size;
 }
 
-void NodeUi::set_minimum_size(Vec2F p_minimum_size) {
-    minimum_size = p_minimum_size;
+void NodeUi::set_minimum_size(Vec2F new_minimum_size) {
+    minimum_size = new_minimum_size;
 }
 
 Vec2F NodeUi::get_minimum_size() const {
@@ -285,7 +285,6 @@ void NodeUi::set_anchor_flag(AnchorFlag anchor_flag) {
     }
 
     anchor_mode = anchor_flag;
-    apply_anchor();
 }
 
 void NodeUi::get_anchor_flag() {

@@ -174,10 +174,6 @@ void StackContainer::adjust_layout() {
     }
 }
 
-void StackContainer::update(double dt) {
-    NodeUi::update(dt);
-}
-
 Vec2F StackContainer::calc_minimum_size() const {
     Vec2F min_size;
 
