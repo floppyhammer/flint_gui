@@ -9,19 +9,30 @@ public:
     Theme() {
         button.colors["text"] = ColorU(27, 27, 27, 255);
 
-        button.styles["normal"] = StyleBox();
-        button.styles["normal"].bg_color = ColorU(27, 27, 27, 255);
-        button.styles["normal"].border_color = ColorU(100, 100, 100, 255);
-        button.styles["normal"].border_width = 2;
+        {
+            auto style_box = StyleBox();
+            style_box.bg_color = ColorU(27, 27, 27, 255);
+            style_box.border_color = ColorU(100, 100, 100, 255);
+            style_box.border_width = 2;
+            button.styles["normal"] = style_box;
+        }
 
-        button.styles["hovered"] = StyleBox();
-        button.styles["hovered"].border_color = ColorU(163, 163, 163, 255);
-        button.styles["hovered"].border_width = 2;
+        {
+            auto style_box = StyleBox();
+            style_box.border_color = ColorU(163, 163, 163, 255);
+            style_box.border_width = 2;
+            button.styles["hovered"] = style_box;
+        }
 
-        button.styles["pressed"] = StyleBox();
-        button.styles["pressed"].bg_color = ColorU(70, 70, 70, 255);
-        button.styles["pressed"].border_color = ColorU(163, 163, 163, 255);
-        button.styles["pressed"].border_width = 2;
+        {
+            auto style_box = StyleBox();
+            style_box.bg_color = ColorU(70, 70, 70, 255);
+            style_box.border_color = ColorU(163, 163, 163, 255);
+            style_box.border_width = 2;
+            button.styles["pressed"] = style_box;
+        }
+
+        label.styles["background"] = StyleBox::from_empty();
     }
 
     struct {

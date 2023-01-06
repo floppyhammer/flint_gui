@@ -59,6 +59,8 @@ public:
 
     void set_language(Language new_lang);
 
+    StyleBox theme_background;
+
 private:
     void measure();
 
@@ -95,9 +97,8 @@ private:
     Alignment horizontal_alignment = Alignment::Begin;
     Alignment vertical_alignment = Alignment::Begin;
     Vec2F alignment_shift{0};
-
-    std::optional<StyleBox> theme_background;
 };
+
 } // namespace Flint
 
 #endif // FLINT_LABEL_H

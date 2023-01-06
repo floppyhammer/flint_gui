@@ -32,18 +32,21 @@ int main() {
         {
             auto label = std::make_shared<Label>("Hello");
             label->set_horizontal_alignment(Alignment::Begin);
+            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
         {
             auto label = std::make_shared<Label>("Hello");
             label->set_horizontal_alignment(Alignment::Center);
+            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
         {
             auto label = std::make_shared<Label>("Hello");
             label->set_horizontal_alignment(Alignment::End);
+            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
@@ -51,6 +54,7 @@ int main() {
             auto label = std::make_shared<Label>("Hello");
             label->set_vertical_alignment(Alignment::Begin);
             label->set_minimum_size(Vec2F(0, 64));
+            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
@@ -58,6 +62,7 @@ int main() {
             auto label = std::make_shared<Label>("Hello");
             label->set_vertical_alignment(Alignment::Center);
             label->set_minimum_size(Vec2F(0, 64));
+            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
@@ -65,6 +70,7 @@ int main() {
             auto label = std::make_shared<Label>("Hello");
             label->set_vertical_alignment(Alignment::End);
             label->set_minimum_size(Vec2F(0, 64));
+            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
     }

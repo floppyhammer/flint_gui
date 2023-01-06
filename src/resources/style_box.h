@@ -20,6 +20,21 @@ struct StyleBox {
     ColorU shadow_color;
     float shadow_size = 0;
     Vec2F shadow_offset;
+
+    static StyleBox from_empty() {
+        StyleBox box;
+        box.bg_color = ColorU::transparent_black();
+
+        box.border_color = ColorU::transparent_black();
+        box.border_width = 0;
+        box.corner_radius = 0;
+
+        box.shadow_color = ColorU::transparent_black();
+        box.shadow_size = 0;
+        box.shadow_offset = Vec2F();
+
+        return box;
+    }
 };
 
 struct StyleLine {

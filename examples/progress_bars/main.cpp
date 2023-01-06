@@ -27,7 +27,7 @@ int main() {
         app.tree->replace_scene(node_ui);
 
         auto vstack_container = std::make_shared<VStackContainer>();
-        vstack_container->set_debug_mode(true);
+        vstack_container->enable_visual_debug(true);
         node_ui->add_child(vstack_container);
 
         for (int i = 0; i < 5; i++) {

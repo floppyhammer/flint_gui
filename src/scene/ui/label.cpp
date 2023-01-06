@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "../../resources/default_resource.h"
+
 using Pathfinder::Transform2;
 
 namespace Flint {
@@ -16,13 +18,14 @@ Label::Label(const std::string &_text) {
     type = NodeType::Label;
 
     debug_size_box.border_color = ColorU::red();
-    visual_debug = true;
 
     font = ResourceManager::get_singleton()->load<Font>("../assets/unifont-14.0.03.ttf");
 
     set_text(_text);
 
     font_style.color = {163, 163, 163, 255};
+
+    theme_background = DefaultResource::get_singleton()->get_default_theme()->label.styles["background"];
 }
 
 void Label::set_text(const std::string &new_text) {
@@ -196,9 +199,7 @@ void Label::draw() {
 
     auto vector_server = VectorServer::get_singleton();
 
-    if (theme_background.has_value()) {
-        vector_server->draw_style_box(theme_background.value(), global_position, size);
-    }
+    vector_server->draw_style_box(theme_background, global_position, size);
 
     auto baseline_position = Vec2F(0, font->get_ascent());
 

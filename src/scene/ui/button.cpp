@@ -22,6 +22,7 @@ Button::Button() {
     label->set_mouse_filter(MouseFilter::Ignore);
     label->set_horizontal_alignment(Alignment::Center);
     label->set_vertical_alignment(Alignment::Center);
+    label->theme_background = StyleBox::from_empty();
 
     icon_rect = std::make_shared<TextureRect>();
     icon_rect->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
