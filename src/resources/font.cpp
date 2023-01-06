@@ -146,11 +146,11 @@ void Font::get_glyphs_harfbuzz(const std::string &text, Language lang, std::vect
             // Codepoint property is replaced with glyph ID after shaping.
             glyph.index = glyph_info[i].codepoint;
 
-            glyph.x_offset = glyph_pos[i].x_offset / 64.0 * (64.0 / font_size);
-            glyph.y_offset = glyph_pos[i].y_offset / 64.0;
+            glyph.x_offset = glyph_pos[i].x_offset / font_size;
+            glyph.y_offset = glyph_pos[i].y_offset / font_size;
 
-            glyph.x_advance = glyph_pos[i].x_advance / 64.0 * (64.0 / font_size);
-            glyph.y_advance = glyph_pos[i].y_advance / 64.0 * (64.0 / font_size);
+            glyph.x_advance = glyph_pos[i].x_advance / font_size;
+            glyph.y_advance = glyph_pos[i].y_advance / font_size;
 
             glyphs.push_back(glyph);
         }
