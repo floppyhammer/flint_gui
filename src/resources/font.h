@@ -62,8 +62,8 @@ struct Glyph {
     // A particular glyph ID within the font does not necessarily correlate to a predictable Unicode codepoint.
     uint16_t index = 0;
 
-    float x_offset = 0; // Offset from the origin of the glyph on baseline.
-    float y_offset = 0;
+    int32_t x_offset = 0; // Offset from the origin of the glyph on baseline.
+    int32_t y_offset = 0;
     float x_advance = 0; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
     float y_advance = 0;
 
@@ -114,16 +114,16 @@ public:
 
 private:
     /// Stores font data, should not be freed until font is deleted.
-    unsigned char *buffer;
+    unsigned char *stbtt_buffer;
 
-    stbtt_fontinfo info{};
+    stbtt_fontinfo stbtt_info{};
 
-    uint32_t font_size = 32;
+    uint32_t size = 32;
 
     float scale;
 
-    int ascent;
-    int descent;
+    int32_t ascent;
+    int32_t descent;
 
     std::shared_ptr<HarfBuzzRes> harfbuzz_res;
 

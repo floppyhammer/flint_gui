@@ -24,7 +24,7 @@ Label::Label(const std::string &_text) {
     set_text(_text);
 
     font_style.color = {163, 163, 163, 255};
-    font_style.debug = true;
+//    font_style.debug = true;
 
     theme_background = DefaultResource::get_singleton()->get_default_theme()->label.styles["background"];
 }

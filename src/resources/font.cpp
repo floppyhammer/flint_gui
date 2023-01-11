@@ -16,11 +16,11 @@ Font::Font(const std::string &path) : Resource(path) {
 
     auto byte_size = bytes.size() * sizeof(unsigned char);
 
-    buffer = static_cast<unsigned char *>(malloc(byte_size));
-    memcpy(buffer, bytes.data(), byte_size);
+    stbtt_buffer = static_cast<unsigned char *>(malloc(byte_size));
+    memcpy(stbtt_buffer, bytes.data(), byte_size);
 
     // Prepare font info.
-    if (!stbtt_InitFont(&info, buffer, 0)) {
+    if (!stbtt_InitFont(&stbtt_info, stbtt_buffer, 0)) {
         Logger::error("Failed to prepare font info!", "Font");
     }
 
@@ -32,11 +32,11 @@ Font::Font(const std::string &path) : Resource(path) {
 Font::Font(std::vector<char> &bytes) {
     auto byte_size = bytes.size() * sizeof(unsigned char);
 
-    buffer = static_cast<unsigned char *>(malloc(byte_size));
-    memcpy(buffer, bytes.data(), byte_size);
+    stbtt_buffer = static_cast<unsigned char *>(malloc(byte_size));
+    memcpy(stbtt_buffer, bytes.data(), byte_size);
 
     // Prepare font info.
-    if (!stbtt_InitFont(&info, buffer, 0)) {
+    if (!stbtt_InitFont(&stbtt_info, stbtt_buffer, 0)) {
         Logger::error("Failed to prepare font info!", "Font");
     }
 
@@ -44,19 +44,19 @@ Font::Font(std::vector<char> &bytes) {
 }
 
 Font::~Font() {
-    free(buffer);
+    free(stbtt_buffer);
 }
 
 void Font::get_metrics() {
     // Calculate font scaling.
-    scale = stbtt_ScaleForPixelHeight(&info, font_size);
+    scale = stbtt_ScaleForPixelHeight(&stbtt_info, size);
 
     // The origin is baseline and the Y axis points u.
     // So, ascent is usually positive, and descent negative.
     int unscaled_ascent;
     int unscaled_descent;
     int unscaled_line_gap;
-    stbtt_GetFontVMetrics(&info, &unscaled_ascent, &unscaled_descent, &unscaled_line_gap);
+    stbtt_GetFontVMetrics(&stbtt_info, &unscaled_ascent, &unscaled_descent, &unscaled_line_gap);
 
     // Take scale into account.
     ascent = roundf(float(unscaled_ascent) * scale);
@@ -68,7 +68,7 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
 
     stbtt_vertex *vertices = nullptr;
 
-    int num_vertices = stbtt_GetGlyphShape(&info, glyph_index, &vertices);
+    int num_vertices = stbtt_GetGlyphShape(&stbtt_info, glyph_index, &vertices);
 
     // Glyph has no shape (e.g. Space).
     if (vertices == nullptr) {
@@ -99,17 +99,15 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
     // Close the last contour in the outline.
     path.close_path();
 
-    stbtt_FreeShape(&info, vertices);
+    stbtt_FreeShape(&stbtt_info, vertices);
 
     return path;
 }
 
 std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
-    hb_buffer_t *buf;
-
     // Buffers are sequences of Unicode characters that use the same font
     // and have the same text direction, script, and language.
-    buf = hb_buffer_create();
+    hb_buffer_t *hb_buffer = hb_buffer_create();
 
     uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
 
@@ -118,57 +116,57 @@ std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
     // TODO: should have a loop handling split text runs.
     {
         // Item offset and length should represent a specific run.
-        hb_buffer_add_utf8(buf, text.c_str(), -1, 0, -1);
+        hb_buffer_add_utf8(hb_buffer, text.c_str(), -1, 0, -1);
 
         // TODO: should set these based on a specific run.
         switch (lang) {
             case Language::Chinese:
             case Language::English: {
-                hb_buffer_set_direction(buf, HB_DIRECTION_LTR);
-                hb_buffer_set_script(buf, HB_SCRIPT_LATIN);
-                hb_buffer_set_language(buf, hb_language_from_string("en", -1));
+                hb_buffer_set_direction(hb_buffer, HB_DIRECTION_LTR);
+                hb_buffer_set_script(hb_buffer, HB_SCRIPT_LATIN);
+                hb_buffer_set_language(hb_buffer, hb_language_from_string("en", -1));
             } break;
             case Language::Arabic: {
-                hb_buffer_set_direction(buf, HB_DIRECTION_RTL);
-                hb_buffer_set_script(buf, HB_SCRIPT_ARABIC);
-                hb_buffer_set_language(buf, hb_language_from_string("ar", -1));
+                hb_buffer_set_direction(hb_buffer, HB_DIRECTION_RTL);
+                hb_buffer_set_script(hb_buffer, HB_SCRIPT_ARABIC);
+                hb_buffer_set_language(hb_buffer, hb_language_from_string("ar", -1));
             } break;
         }
 
-        hb_shape(harfbuzz_res->font, buf, nullptr, 0);
+        hb_shape(harfbuzz_res->font, hb_buffer, nullptr, 0);
 
         unsigned int glyph_count;
-        hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(buf, &glyph_count);
-        hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(buf, &glyph_count);
+        hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(hb_buffer, &glyph_count);
+        hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(hb_buffer, &glyph_count);
 
-        // Output position will always be in one line (regardless of line breaks).
-        for (unsigned int i = 0; i < glyph_count; i++) {
+        // Shaped glyph positions will always be in one line (regardless of line breaks).
+        for (int i = 0; i < glyph_count; i++) {
             Glyph glyph;
 
+            auto &info = glyph_info[i];
             auto &pos = glyph_pos[i];
 
             // Codepoint property is replaced with glyph ID after shaping.
-            glyph.index = glyph_info[i].codepoint;
+            glyph.index = info.codepoint;
 
+            // Check if the glyph has already been cached.
             if (glyph_cache.find(glyph.index) != glyph_cache.end()) {
                 glyphs.push_back(glyph_cache[glyph.index]);
+                continue;
             }
 
             glyph.x_offset = pos.x_offset;
             glyph.y_offset = pos.y_offset;
-            glyph.x_advance = pos.x_advance * font_size / units_per_em;
+
+            // Don't why harfbuzz returns incorrect advance.
+            //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
+            glyph.x_advance = get_advance(glyph.index);
 
             // Get glyph path.
             glyph.path = get_glyph_path(glyph.index);
 
-            // The position of the left point of the glyph's baseline in the whole text.
-            // g.position = Vec2F(g.x_off, g.y_off);
-
-            // Move the center to the top-left corner of the glyph's layout box.
-            // g.position.y += ascent;
-
-            // The glyph's layout box in the glyph's local coordinates. The origin is the baseline.
-            // The Y axis is downward.
+            // The glyph's layout box in the glyph's local coordinates.
+            // The origin is the baseline. The Y axis is downward.
             glyph.box = RectF(0, -ascent, glyph.x_advance, -descent);
 
             // Get the glyph path's bounding box. The Y axis points down.
@@ -181,19 +179,19 @@ std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
         }
     }
 
-    hb_buffer_destroy(buf);
+    hb_buffer_destroy(hb_buffer);
 
     return glyphs;
 }
 
 int32_t Font::find_index(int codepoint) {
-    return stbtt_FindGlyphIndex(&info, codepoint);
+    return stbtt_FindGlyphIndex(&stbtt_info, codepoint);
 }
 
 RectI Font::get_bounds(uint16_t glyph_index) const {
     RectI bounding_box;
 
-    stbtt_GetGlyphBitmapBox(&info,
+    stbtt_GetGlyphBitmapBox(&stbtt_info,
                             glyph_index,
                             scale,
                             scale,
@@ -215,17 +213,17 @@ float Font::get_advance(uint16_t glyph_index) const {
     // It is positive for horizontal layouts, and in most cases negative for vertical ones.
     int left_side_bearing;
 
-    stbtt_GetGlyphHMetrics(&info, glyph_index, &advance_width, &left_side_bearing);
+    stbtt_GetGlyphHMetrics(&stbtt_info, glyph_index, &advance_width, &left_side_bearing);
 
     return (float)advance_width * scale;
 }
 
-void Font::set_size(uint32_t new_font_size) {
-    if (new_font_size == font_size) {
+void Font::set_size(uint32_t new_size) {
+    if (new_size == size) {
         return;
     }
 
-    font_size = new_font_size;
+    size = new_size;
 
     get_metrics();
 }
