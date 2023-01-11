@@ -61,6 +61,8 @@ public:
 
     StyleBox theme_background;
 
+    float get_glyph_position(uint32_t glyph_index);
+
 private:
     void measure();
 
@@ -81,7 +83,11 @@ private:
 
     float font_size = 32;
 
+    // Layout-independent.
     std::vector<Glyph> glyphs;
+
+    // Layout-dependent.
+    std::vector<Vec2F> glyph_positions;
 
     mutable RectF layout_box;
 

@@ -58,22 +58,14 @@ enum class Language {
 };
 
 struct Glyph {
-    int start = -1; // Start offset in the source string.
-    int end = -1;   // End offset in the source string.
-
-    uint8_t repeat = 0; // Draw multiple times in the row.
+    // Glyph index (font specific) or UTF-32 codepoint (for the invalid glyphs).
+    // A particular glyph ID within the font does not necessarily correlate to a predictable Unicode codepoint.
+    uint16_t index = 0;
 
     float x_offset = 0; // Offset from the origin of the glyph on baseline.
     float y_offset = 0;
     float x_advance = 0; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
     float y_advance = 0;
-
-    int32_t font_size = 0; // Font size;
-    char32_t text{};
-
-    // Glyph index (font specific) or UTF-32 codepoint (for the invalid glyphs).
-    // A particular glyph ID within the font does not necessarily correlate to a predictable Unicode codepoint.
-    int32_t index = 0;
 
     // Glyph path. The points are in the glyph's baseline coordinates.
     Pathfinder::Path2d path;
@@ -83,9 +75,6 @@ struct Glyph {
 
     /// Glyph path's bounding box in the baseline coordinates.
     RectF bbox;
-
-    /// Layout box in the whole text. Coordinate origin is the top-left corner.
-    RectF layout_box;
 };
 
 /// Static font properties.
@@ -109,15 +98,15 @@ public:
 
     void set_size(uint32_t new_font_size);
 
-    Pathfinder::Path2d get_glyph_path(int glyph_index) const;
+    Pathfinder::Path2d get_glyph_path(uint16_t glyph_index) const;
 
-    void get_glyphs_harfbuzz(const std::string &text, Language lang, std::vector<Glyph> &glyphs) const;
+    std::vector<Glyph> get_glyphs(const std::string &text, Language lang);
 
     int32_t find_index(int codepoint);
 
-    float get_advance(int32_t glyph_index);
+    float get_advance(uint16_t glyph_index) const;
 
-    RectI get_bounds(int32_t glyph_index);
+    RectI get_bounds(uint16_t glyph_index) const;
 
     int get_ascent() const;
 
@@ -138,6 +127,9 @@ private:
 
     std::shared_ptr<HarfBuzzRes> harfbuzz_res;
 
+    std::unordered_map<uint16_t, Glyph> glyph_cache;
+
+private:
     void get_metrics();
 };
 

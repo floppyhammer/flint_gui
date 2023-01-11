@@ -191,14 +191,12 @@ void TextEdit::draw() {
     if (focused && editable) {
         theme_caret.color.a = 255.0f * std::ceil(std::sin(caret_blink_timer * 5.0f));
 
-        auto current_glyph_box = RectF({0, 0}, {0, label->get_font_size()});
+        float current_glyph_right_edge = 0;
         if (current_caret_index > -1 && current_caret_index < label->get_glyphs().size()) {
-            current_glyph_box = label->get_glyphs()[current_caret_index].layout_box;
+            current_glyph_right_edge = label->get_glyph_position(current_caret_index);
         }
 
-        auto caret_offset = current_glyph_box.max_x();
-
-        auto start = label->get_global_position() + Vec2F(caret_offset, 3);
+        auto start = label->get_global_position() + Vec2F(current_glyph_right_edge, 3);
         auto end = start + Vec2F(0, label->get_font_size() - 6);
         vector_server->draw_style_line(theme_caret, start, end);
     }
@@ -216,10 +214,10 @@ int32_t TextEdit::calculate_caret_index(Vec2F local_cursor_position) {
     auto &glyphs = label->get_glyphs();
 
     for (int i = 0; i < glyphs.size(); i++) {
-        auto glyph_box = glyphs[i].layout_box;
+        float glyph_right_edge = label->get_glyph_position(i);
 
         // Mouse position to the right boundary of the glyph.
-        auto distance = abs(local_cursor_position.x - glyph_box.max_x());
+        auto distance = abs(local_cursor_position.x - glyph_right_edge);
 
         if (distance < closest_distance) {
             closest_distance = distance;
@@ -238,10 +236,9 @@ int32_t TextEdit::calculate_caret_index(Vec2F local_cursor_position) {
 Vec2F TextEdit::calculate_caret_position(int32_t target_caret_index) {
     auto closest_glyph_index = -1;
     auto closest_distance = std::numeric_limits<float>::max();
-    auto &glyphs = label->get_glyphs();
 
     if (target_caret_index > -1) {
-        return glyphs[target_caret_index].layout_box.upper_right();
+        return {label->get_glyph_position(target_caret_index), 0};
     } else {
         return {0, 0};
     }

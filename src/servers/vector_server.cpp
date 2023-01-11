@@ -156,10 +156,16 @@ void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2F &sta
     canvas->restore_state();
 }
 
-void VectorServer::draw_glyphs(const std::vector<Glyph> &glyphs,
+void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
+                               std::vector<Vec2F> &glyph_positions,
                                FontStyle font_style,
                                const Transform2 &transform,
                                const RectF &clip_box) {
+    if (glyphs.size() != glyph_positions.size()) {
+        Logger::error("Glyph count mismatches glyph position count!", "VectorServer");
+        return;
+    }
+
     canvas->save_state();
 
     // Text clip.
@@ -171,9 +177,11 @@ void VectorServer::draw_glyphs(const std::vector<Glyph> &glyphs,
     }
 
     // Draw glyphs.
-    for (Glyph g : glyphs) {
-        canvas->set_transform(global_transform_offset * Transform2::from_translation(g.layout_box.origin()) *
-                              transform);
+    for (int i = 0; i < glyphs.size(); i++) {
+        auto &g = glyphs[i];
+        auto &p = glyph_positions[i];
+
+        canvas->set_transform(global_transform_offset * Transform2::from_translation(p) * transform);
 
         // Add fill.
         canvas->set_fill_paint(Paint::from_color(font_style.color));

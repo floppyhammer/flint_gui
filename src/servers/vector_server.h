@@ -60,7 +60,8 @@ public:
      * We shouldn't use clip path to achieve general content clip (like scrolling)
      * since it's quite performance heavy and easily produces nested clipping.
      */
-    void draw_glyphs(const std::vector<Glyph> &glyphs,
+    void draw_glyphs(std::vector<Glyph> &glyphs,
+                     std::vector<Vec2F> &glyph_positions,
                      FontStyle font_style,
                      const Transform2 &transform,
                      const RectF &clip_box);

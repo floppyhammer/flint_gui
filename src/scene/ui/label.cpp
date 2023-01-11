@@ -19,11 +19,12 @@ Label::Label(const std::string &_text) {
 
     debug_size_box.border_color = ColorU::red();
 
-    font = ResourceManager::get_singleton()->load<Font>("../assets/unifont-15.0.01.ttf");
+    font = ResourceManager::get_singleton()->load<Font>("../assets/Arial Unicode MS Font.ttf");
 
     set_text(_text);
 
     font_style.color = {163, 163, 163, 255};
+    font_style.debug = true;
 
     theme_background = DefaultResource::get_singleton()->get_default_theme()->label.styles["background"];
 }
@@ -52,7 +53,9 @@ void Label::insert_text(uint32_t position, const std::string &new_text) {
 }
 
 void Label::remove_text(uint32_t position, uint32_t count) {
-    if (position == -1) return;
+    if (position == -1) {
+        return;
+    }
 
     text.erase(position, count);
 
@@ -75,60 +78,26 @@ void Label::measure() {
     int ascent = font->get_ascent();
     int descent = font->get_descent();
 
-    font->get_glyphs_harfbuzz(text, language, glyphs);
+    glyphs = font->get_glyphs(text, language);
 
     // Reset text's layout box.
     layout_box = RectF();
 
+    glyph_positions.clear();
+
     float cursor_x = 0;
     float cursor_y = 0;
 
+    // Build layout.
     for (auto &g : glyphs) {
-        // Set UTF-32 codepoint.
-        //        g.text = u_codepoint;
-
-        // Set glyph index.
-        //        g.index = font->find_index(u_codepoint);
-
-        // Baseline offset.
-        //        g.x_off = x;
-        //        g.y_off = y;
-
-        // Line break.
-        //        if (u_codepoint == '\n') {
-        //            cursor_x = 0;
-        //            cursor_y += font_size;
-        //            glyphs.push_back(g);
-        //            continue;
-        //        }
-
-        // Glyph width.
-        //        g.x_advance = font->get_advance(g.index);
-
-        // Get the glyph path's bounding box. The Y axis points down.
-        RectI bounding_box = font->get_bounds(g.index);
-
-        // Set glyph path.
-        g.path = font->get_glyph_path(g.index);
-
-        // The position of the left point of the glyph's baseline in the whole text.
-        // g.position = Vec2F(g.x_off, g.y_off);
-
-        // Move the center to the top-left corner of the glyph's layout box.
-        // g.position.y += ascent;
-
-        // The glyph's layout box in the glyph's local coordinates. The origin is the baseline.
-        // The Y axis is downward.
-        g.box = RectF(0, -ascent, g.x_advance, -descent);
-
-        // BBox in the glyph's local coordinates.
-        g.bbox = bounding_box.to_f32();
-
         // The glyph's layout box in the text's local coordinates. The origin is the top-left corner of the text box.
-        g.layout_box = RectF(cursor_x, cursor_y, cursor_x + g.x_advance, cursor_y + font_size);
+        RectF glyph_layout_box =
+            RectF(cursor_x + g.x_offset, cursor_y + g.y_offset, cursor_x + g.x_advance, cursor_y + font_size);
+
+        glyph_positions.emplace_back(cursor_x + g.x_offset, cursor_y + g.y_offset);
 
         // The whole text's layout box.
-        layout_box = layout_box.union_rect(g.layout_box);
+        layout_box = layout_box.union_rect(glyph_layout_box);
 
         // Advance x.
         cursor_x += g.x_advance;
@@ -212,7 +181,7 @@ void Label::draw() {
     //        clip_box = {{}, calc_minimum_size()};
     //    }
 
-    vector_server->draw_glyphs(glyphs, font_style, translation, clip_box);
+    vector_server->draw_glyphs(glyphs, glyph_positions, font_style, translation, clip_box);
 
     NodeUi::draw();
 }
@@ -264,6 +233,16 @@ void Label::set_language(Language new_lang) {
     language = new_lang;
 
     measure();
+}
+
+float Label::get_glyph_position(uint32_t glyph_index) {
+    float pos = 0;
+
+    for (int i = 0; i < glyph_index; i++) {
+        pos += glyphs[i].x_advance;
+    }
+
+    return pos;
 }
 
 } // namespace Flint
