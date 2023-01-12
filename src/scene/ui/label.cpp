@@ -19,7 +19,7 @@ Label::Label(const std::string &_text) {
 
     debug_size_box.border_color = ColorU::red();
 
-    font = ResourceManager::get_singleton()->load<Font>("../assets/Arial Unicode MS Font.ttf");
+    font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/Arial Unicode MS Font.ttf");
 
     set_text(_text);
 

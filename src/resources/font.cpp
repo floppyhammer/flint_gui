@@ -9,6 +9,14 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
 
+#include "unicode/localpointer.h"
+#include "unicode/ubidi.h"
+#include "unicode/uchar.h"
+#include "unicode/unistr.h"
+#include "unicode/utypes.h"
+
+using icu::UnicodeString;
+
 namespace Flint {
 
 Font::Font(const std::string &path) : Resource(path) {
@@ -112,6 +120,44 @@ std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
     uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
 
     std::vector<Glyph> glyphs;
+
+    UnicodeString us(text.c_str());
+
+    UBiDi *bidi = ubidi_open();
+
+    UErrorCode error_code = U_ZERO_ERROR;
+
+    UBiDiLevel paraLevel = UBIDI_DEFAULT_LTR;
+
+    ubidi_setPara(bidi, us.getBuffer(), us.length(), paraLevel, nullptr, &error_code);
+
+    if (U_SUCCESS(error_code)) {
+        UnicodeString u_string(ubidi_getText(bidi));
+
+        std::string Ustr;
+        u_string.toUTF8String(Ustr);
+
+        int32_t count = ubidi_countRuns(bidi, &error_code);
+        int32_t logical_start, length;
+
+        for (int32_t i = 0; i < count; i++) {
+            UBiDiDirection dir = ubidi_getVisualRun(bidi, i, &logical_start, &length);
+            std::string dir_str = "UBIDI_LTR";
+            if (dir == UBIDI_RTL) {
+                dir_str = "UBIDI_RTL";
+            }
+
+            std::string str55;
+            UnicodeString temp = u_string.tempSubString(logical_start, length);
+
+            temp.toUTF8String(str55);
+
+            std::cout << "VisualRun \t" << dir_str << "\t" << logical_start << '\t' << length << '\t' << str55
+                      << std::endl;
+        }
+    } else {
+        std::cout << "Failed" << std::endl;
+    }
 
     // TODO: should have a loop handling split text runs.
     {
