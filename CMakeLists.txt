@@ -42,6 +42,8 @@ add_subdirectory(external/harfbuzz)
 
 add_subdirectory(third_party/poly2tri)
 
+add_subdirectory(external/icu-cmake)
+
 add_library(flint ${SOURCE_FILES})
 
 # Add examples.
