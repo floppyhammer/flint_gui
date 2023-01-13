@@ -6,7 +6,7 @@ add_executable(i18n ${SOURCE_FILES} main.cpp)
 
 # Link libs.
 if (WIN32) # Windows
-    target_link_libraries(i18n glfw Vulkan::Vulkan pathfinder poly2tri harfbuzz icu)
+    target_link_libraries(i18n glfw Vulkan::Vulkan pathfinder poly2tri harfbuzz icuuc)
 else () # Linux
-    target_link_libraries(i18n -lglfw -lvulkan -lpathfinder -lpoly2tri -lharfbuzz -licu)
+    target_link_libraries(i18n -lglfw -lvulkan -lpathfinder -lpoly2tri -lharfbuzz)
 endif ()

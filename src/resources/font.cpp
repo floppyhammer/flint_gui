@@ -11,7 +11,6 @@
 
 #include "unicode/localpointer.h"
 #include "unicode/ubidi.h"
-#include "unicode/uchar.h"
 #include "unicode/unistr.h"
 #include "unicode/utypes.h"
 
@@ -113,10 +112,6 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
 }
 
 std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
-    // Buffers are sequences of Unicode characters that use the same font
-    // and have the same text direction, script, and language.
-    hb_buffer_t *hb_buffer = hb_buffer_create();
-
     uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
 
     std::vector<Glyph> glyphs;
@@ -127,105 +122,100 @@ std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
 
     UErrorCode error_code = U_ZERO_ERROR;
 
-    UBiDiLevel paraLevel = UBIDI_DEFAULT_LTR;
-
-    ubidi_setPara(bidi, us.getBuffer(), us.length(), paraLevel, nullptr, &error_code);
+    // FIXME: need to set ICU data for BiDi to work?
+    UBiDiDirection direction = ubidi_getBaseDirection(us.getBuffer(), us.length());
+    ubidi_setPara(bidi, us.getBuffer(), us.length(), direction, nullptr, &error_code);
 
     if (U_SUCCESS(error_code)) {
-        UnicodeString u_string(ubidi_getText(bidi));
+        int32_t run_count = ubidi_countRuns(bidi, &error_code);
 
-        std::string Ustr;
-        u_string.toUTF8String(Ustr);
+        for (int32_t run_index = 0; run_index < run_count; run_index++) {
+            int32_t logical_start, length;
+            UBiDiDirection dir = ubidi_getVisualRun(bidi, run_index, &logical_start, &length);
 
-        int32_t count = ubidi_countRuns(bidi, &error_code);
-        int32_t logical_start, length;
+            bool is_rtl = dir == UBIDI_RTL;
 
-        for (int32_t i = 0; i < count; i++) {
-            UBiDiDirection dir = ubidi_getVisualRun(bidi, i, &logical_start, &length);
-            std::string dir_str = "UBIDI_LTR";
-            if (dir == UBIDI_RTL) {
-                dir_str = "UBIDI_RTL";
+            std::string run_text = text.substr(logical_start, length);
+
+            std::cout << "VisualRun: \t" << run_index << "\t" << is_rtl << "\t" << logical_start << '\t' << length
+                      << '\t' << run_text << std::endl;
+
+            // Buffers are sequences of Unicode characters that use the same font
+            // and have the same text direction, script, and language.
+            hb_buffer_t *hb_buffer = hb_buffer_create();
+
+            // Item offset and length should represent a specific run.
+            hb_buffer_add_utf8(hb_buffer, text.c_str(), -1, logical_start, length);
+
+            if (is_rtl) {
+                hb_buffer_set_direction(hb_buffer, HB_DIRECTION_RTL);
+            } else {
+                hb_buffer_set_direction(hb_buffer, HB_DIRECTION_LTR);
             }
 
-            std::string str55;
-            UnicodeString temp = u_string.tempSubString(logical_start, length);
+            switch (lang) {
+                case Language::Arabic: {
+                    hb_buffer_set_script(hb_buffer, HB_SCRIPT_ARABIC);
+                    hb_buffer_set_language(hb_buffer, hb_language_from_string("ar", -1));
+                } break;
+                default: {
+                    hb_buffer_set_script(hb_buffer, HB_SCRIPT_LATIN);
+                    hb_buffer_set_language(hb_buffer, hb_language_from_string("en", -1));
+                } break;
+            }
 
-            temp.toUTF8String(str55);
+            hb_shape(harfbuzz_res->font, hb_buffer, nullptr, 0);
 
-            std::cout << "VisualRun \t" << dir_str << "\t" << logical_start << '\t' << length << '\t' << str55
-                      << std::endl;
+            unsigned int glyph_count;
+            hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(hb_buffer, &glyph_count);
+            hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(hb_buffer, &glyph_count);
+
+            // Shaped glyph positions will always be in one line (regardless of line breaks).
+            for (int i = 0; i < glyph_count; i++) {
+                Glyph glyph;
+
+                auto &info = glyph_info[i];
+                auto &pos = glyph_pos[i];
+
+                // Codepoint property is replaced with glyph ID after shaping.
+                glyph.index = info.codepoint;
+
+                // Check if the glyph has already been cached.
+                if (glyph_cache.find(glyph.index) != glyph_cache.end()) {
+                    glyphs.push_back(glyph_cache[glyph.index]);
+                    continue;
+                }
+
+                glyph.x_offset = pos.x_offset;
+                glyph.y_offset = pos.y_offset;
+
+                // Don't why harfbuzz returns incorrect advance.
+                //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
+                glyph.x_advance = get_advance(glyph.index);
+
+                // Get glyph path.
+                glyph.path = get_glyph_path(glyph.index);
+
+                // The glyph's layout box in the glyph's local coordinates.
+                // The origin is the baseline. The Y axis is downward.
+                glyph.box = RectF(0, -ascent, glyph.x_advance, -descent);
+
+                // Get the glyph path's bounding box. The Y axis points down.
+                RectI bounding_box = get_bounds(glyph.index);
+
+                // BBox in the glyph's local coordinates.
+                glyph.bbox = bounding_box.to_f32();
+
+                glyphs.push_back(glyph);
+            }
+
+            hb_buffer_destroy(hb_buffer);
         }
     } else {
         std::cout << "Failed" << std::endl;
     }
 
-    // TODO: should have a loop handling split text runs.
-    {
-        // Item offset and length should represent a specific run.
-        hb_buffer_add_utf8(hb_buffer, text.c_str(), -1, 0, -1);
-
-        // TODO: should set these based on a specific run.
-        switch (lang) {
-            case Language::Chinese:
-            case Language::English: {
-                hb_buffer_set_direction(hb_buffer, HB_DIRECTION_LTR);
-                hb_buffer_set_script(hb_buffer, HB_SCRIPT_LATIN);
-                hb_buffer_set_language(hb_buffer, hb_language_from_string("en", -1));
-            } break;
-            case Language::Arabic: {
-                hb_buffer_set_direction(hb_buffer, HB_DIRECTION_RTL);
-                hb_buffer_set_script(hb_buffer, HB_SCRIPT_ARABIC);
-                hb_buffer_set_language(hb_buffer, hb_language_from_string("ar", -1));
-            } break;
-        }
-
-        hb_shape(harfbuzz_res->font, hb_buffer, nullptr, 0);
-
-        unsigned int glyph_count;
-        hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(hb_buffer, &glyph_count);
-        hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(hb_buffer, &glyph_count);
-
-        // Shaped glyph positions will always be in one line (regardless of line breaks).
-        for (int i = 0; i < glyph_count; i++) {
-            Glyph glyph;
-
-            auto &info = glyph_info[i];
-            auto &pos = glyph_pos[i];
-
-            // Codepoint property is replaced with glyph ID after shaping.
-            glyph.index = info.codepoint;
-
-            // Check if the glyph has already been cached.
-            if (glyph_cache.find(glyph.index) != glyph_cache.end()) {
-                glyphs.push_back(glyph_cache[glyph.index]);
-                continue;
-            }
-
-            glyph.x_offset = pos.x_offset;
-            glyph.y_offset = pos.y_offset;
-
-            // Don't why harfbuzz returns incorrect advance.
-            //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
-            glyph.x_advance = get_advance(glyph.index);
-
-            // Get glyph path.
-            glyph.path = get_glyph_path(glyph.index);
-
-            // The glyph's layout box in the glyph's local coordinates.
-            // The origin is the baseline. The Y axis is downward.
-            glyph.box = RectF(0, -ascent, glyph.x_advance, -descent);
-
-            // Get the glyph path's bounding box. The Y axis points down.
-            RectI bounding_box = get_bounds(glyph.index);
-
-            // BBox in the glyph's local coordinates.
-            glyph.bbox = bounding_box.to_f32();
-
-            glyphs.push_back(glyph);
-        }
-    }
-
-    hb_buffer_destroy(hb_buffer);
+    ubidi_close(bidi);
 
     return glyphs;
 }

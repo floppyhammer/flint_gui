@@ -17,19 +17,12 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto panel = std::make_shared<Panel>();
-        panel->enable_title_bar(false);
-        panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
-        panel->set_anchor_flag(AnchorFlag::FullRect);
-        panel->apply_fullscreen_style();
-        app.tree->replace_scene(panel);
-
         auto margin_container = std::make_shared<MarginContainer>();
         margin_container->set_position({0, 0});
         margin_container->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         margin_container->set_margin_all(32);
         margin_container->set_anchor_flag(AnchorFlag::FullRect);
-        panel->add_child(margin_container);
+        app.tree->replace_scene(margin_container);
 
         auto vstack_container = std::make_shared<VStackContainer>();
         vstack_container->set_separation(16);
@@ -38,9 +31,6 @@ int main() {
         vstack_container->add_child(std::make_shared<Label>("你好"));
 
         vstack_container->add_child(std::make_shared<Label>("Hello"));
-
-        std::string emojis = "😀😁😂🤣";
-        vstack_container->add_child(std::make_shared<Label>(emojis));
 
         auto label = std::make_shared<Label>("مرحبا");
         label->set_language(Language::Arabic);

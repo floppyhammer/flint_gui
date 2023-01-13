@@ -42,10 +42,9 @@ add_subdirectory(external/harfbuzz)
 
 add_subdirectory(third_party/poly2tri)
 
-# ICU
-set(BUILD_ICU ON)
-set(ICU_BUILD_VERSION 72.1)
-add_subdirectory(external/icu-cmake)
+# ICU.
+include_directories(third_party/icu4c/include)
+link_directories(third_party/icu4c/lib64)
 
 add_library(flint ${SOURCE_FILES})
 
