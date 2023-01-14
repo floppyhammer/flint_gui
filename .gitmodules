@@ -12,7 +12,3 @@
 	path = external/harfbuzz
 	url = https://github.com/harfbuzz/harfbuzz.git
     branch = main
-[submodule "external/icu-cmake"]
-	path = external/icu-cmake
-	url = https://github.com/viaduck/icu-cmake.git
-    branch = master

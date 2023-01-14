@@ -9,10 +9,24 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
 
-#include "unicode/localpointer.h"
-#include "unicode/ubidi.h"
-#include "unicode/unistr.h"
-#include "unicode/utypes.h"
+// Built-in ICU data.
+#ifdef ICU_STATIC_DATA
+    #include "icu4c/icudata.gen.h"
+#endif
+
+
+
+#include <unicode/ubidi.h>
+#include <unicode/ubrk.h>
+#include <unicode/uchar.h>
+#include <unicode/uclean.h>
+#include <unicode/udata.h>
+#include <unicode/uiter.h>
+#include <unicode/uloc.h>
+#include <unicode/unorm2.h>
+#include <unicode/uscript.h>
+#include <unicode/ustring.h>
+#include <unicode/utypes.h>
 
 using icu::UnicodeString;
 
@@ -112,6 +126,17 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
 }
 
 std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
+#ifdef ICU_STATIC_DATA
+    static bool icu_data_loaded = false;
+    if (!icu_data_loaded) {
+        UErrorCode err = U_ZERO_ERROR;
+        u_init(&err); // Do not check for errors, since we only load part of the data.
+        icu_data_loaded = true;
+    }
+#else
+// Load data manually.
+#endif
+
     uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
 
     std::vector<Glyph> glyphs;

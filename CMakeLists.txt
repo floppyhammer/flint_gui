@@ -9,6 +9,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 # Enable Flint's debug mode, which includes visual indicators.
 add_compile_definitions(FLINT_DEBUG)
 
+# > 0x0502 for dark title bar.
+# > 0x0601 for ICU.
+add_compile_definitions(_WIN32_WINNT=0x0601)
+
 # More generally, you are using find_package and then later you're using add_subdirectory
 # to try to incorporate these external projects. That's not how it works. find_package will
 # look for a pre-existing binary of the package, while add_subdirectory isn't designed to
@@ -21,7 +25,8 @@ include_directories(${Vulkan_INCLUDE_DIRS})
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
         src/*.cpp
-        third_party/tinyfiledialogs/*.c)
+        third_party/tinyfiledialogs/*.c
+        third_party/icu4c/common/*.cpp)
 
 add_compile_definitions(PATHFINDER_USE_VULKAN)
 
@@ -30,7 +35,6 @@ include_directories(external/eigen third_party)
 
 # GLFW library.
 include_directories(external/glfw/include)
-add_compile_definitions(_WIN32_WINNT=0x0502)
 add_subdirectory(external/glfw)
 
 # Pathfinder library.
@@ -42,9 +46,11 @@ add_subdirectory(external/harfbuzz)
 
 add_subdirectory(third_party/poly2tri)
 
-# ICU.
-include_directories(third_party/icu4c/include)
-link_directories(third_party/icu4c/lib64)
+# icu4c.
+add_compile_definitions(U_STATIC_IMPLEMENTATION)
+add_compile_definitions(U_COMMON_IMPLEMENTATION)
+add_compile_definitions(ICU_STATIC_DATA)
+include_directories(third_party/icu4c/common)
 
 add_library(flint ${SOURCE_FILES})
 
