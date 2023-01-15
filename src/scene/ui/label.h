@@ -41,7 +41,7 @@ public:
 
     void set_font(std::shared_ptr<Font> p_font);
 
-    void set_text_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color);
+    void set_text_style(ColorU _color, float _stroke_width, ColorU _stroke_color);
 
     void update(double dt) override;
 
@@ -90,6 +90,9 @@ private:
     std::vector<Vec2F> glyph_positions;
 
     mutable RectF layout_box;
+
+    bool need_to_remeasure = true;
+    bool need_to_update_layout = true;
 
     FontStyle font_style;
     // Fill

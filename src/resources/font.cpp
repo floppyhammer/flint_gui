@@ -1,5 +1,8 @@
 #include "font.h"
 
+#include <codecvt>
+#include <locale>
+#include <string>
 #include <vector>
 
 #include "../common/load_file.h"
@@ -14,21 +17,12 @@
     #include "icu4c/icudata.gen.h"
 #endif
 
-
-
 #include <unicode/ubidi.h>
 #include <unicode/ubrk.h>
-#include <unicode/uchar.h>
 #include <unicode/uclean.h>
 #include <unicode/udata.h>
-#include <unicode/uiter.h>
-#include <unicode/uloc.h>
-#include <unicode/unorm2.h>
 #include <unicode/uscript.h>
-#include <unicode/ustring.h>
 #include <unicode/utypes.h>
-
-using icu::UnicodeString;
 
 namespace Flint {
 
@@ -141,15 +135,19 @@ std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
 
     std::vector<Glyph> glyphs;
 
-    UnicodeString us(text.c_str());
+    // Note: don't use icu::UnicodeString, it doesn't work.
+
+    std::wstring_convert<std::codecvt<char16_t, char, std::mbstate_t>, char16_t> convert;
+    std::u16string utf16_string = convert.from_bytes(text);
+
+    const UChar *uchar_data = utf16_string.c_str();
+    const int32_t uchar_count = utf16_string.length();
 
     UBiDi *bidi = ubidi_open();
 
     UErrorCode error_code = U_ZERO_ERROR;
 
-    // FIXME: need to set ICU data for BiDi to work?
-    UBiDiDirection direction = ubidi_getBaseDirection(us.getBuffer(), us.length());
-    ubidi_setPara(bidi, us.getBuffer(), us.length(), direction, nullptr, &error_code);
+    ubidi_setPara(bidi, uchar_data, uchar_count, UBIDI_DEFAULT_LTR, nullptr, &error_code);
 
     if (U_SUCCESS(error_code)) {
         int32_t run_count = ubidi_countRuns(bidi, &error_code);
@@ -160,7 +158,7 @@ std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
 
             bool is_rtl = dir == UBIDI_RTL;
 
-            std::string run_text = text.substr(logical_start, length);
+            std::string run_text = convert.to_bytes(utf16_string.substr(logical_start, length));
 
             std::cout << "VisualRun: \t" << run_index << "\t" << is_rtl << "\t" << logical_start << '\t' << length
                       << '\t' << run_text << std::endl;
@@ -170,7 +168,7 @@ std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
             hb_buffer_t *hb_buffer = hb_buffer_create();
 
             // Item offset and length should represent a specific run.
-            hb_buffer_add_utf8(hb_buffer, text.c_str(), -1, logical_start, length);
+            hb_buffer_add_utf16(hb_buffer, reinterpret_cast<const uint16_t *>(uchar_data), -1, logical_start, length);
 
             if (is_rtl) {
                 hb_buffer_set_direction(hb_buffer, HB_DIRECTION_RTL);

@@ -24,7 +24,7 @@ Label::Label(const std::string &_text) {
     set_text(_text);
 
     font_style.color = {163, 163, 163, 255};
-//    font_style.debug = true;
+    //    font_style.debug = true;
 
     theme_background = DefaultResource::get_singleton()->get_default_theme()->label.styles["background"];
 }
@@ -39,7 +39,7 @@ void Label::set_text(const std::string &new_text) {
 
     text_debug = utf8_to_ws(new_text);
 
-    measure();
+    need_to_remeasure = true;
 }
 
 void Label::insert_text(uint32_t position, const std::string &new_text) {
@@ -49,7 +49,7 @@ void Label::insert_text(uint32_t position, const std::string &new_text) {
 
     text.insert(position, new_text);
 
-    measure();
+    need_to_remeasure = true;
 }
 
 void Label::remove_text(uint32_t position, uint32_t count) {
@@ -59,7 +59,7 @@ void Label::remove_text(uint32_t position, uint32_t count) {
 
     text.erase(position, count);
 
-    measure();
+    need_to_remeasure = true;
 }
 
 std::string Label::get_text() const {
@@ -67,7 +67,9 @@ std::string Label::get_text() const {
 }
 
 void Label::set_size(Vec2F p_size) {
-    if (size == p_size) return;
+    if (size == p_size) {
+        return;
+    }
 
     size = p_size;
     consider_alignment();
@@ -115,7 +117,7 @@ void Label::set_font(std::shared_ptr<Font> new_font) {
         return;
     }
 
-    measure();
+    need_to_remeasure = true;
 }
 
 void Label::consider_alignment() {
@@ -147,16 +149,18 @@ void Label::consider_alignment() {
 void Label::update(double dt) {
     NodeUi::update(dt);
 
+    if (need_to_remeasure) {
+        need_to_remeasure = false;
+        measure();
+    }
+
     consider_alignment();
 }
 
-void Label::set_text_style(float p_size, ColorU p_color, float p_stroke_width, ColorU p_stroke_color) {
-    font_size = p_size;
-    color = p_color;
-    stroke_width = p_stroke_width;
-    stroke_color = p_stroke_color;
-
-    measure();
+void Label::set_text_style(ColorU _color, float _stroke_width, ColorU _stroke_color) {
+    color = _color;
+    stroke_width = _stroke_width;
+    stroke_color = _stroke_color;
 }
 
 void Label::draw() {
@@ -232,7 +236,7 @@ void Label::set_language(Language new_lang) {
 
     language = new_lang;
 
-    measure();
+    need_to_remeasure = true;
 }
 
 float Label::get_glyph_position(uint32_t glyph_index) {
