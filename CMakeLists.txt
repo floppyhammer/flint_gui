@@ -13,6 +13,9 @@ add_compile_definitions(FLINT_DEBUG)
 # > 0x0601 for ICU.
 add_compile_definitions(_WIN32_WINNT=0x0601)
 
+# Fix "too many characters in constant" error when using CMake with MSVC.
+string(APPEND CMAKE_CXX_FLAGS " /utf-8")
+
 # More generally, you are using find_package and then later you're using add_subdirectory
 # to try to incorporate these external projects. That's not how it works. find_package will
 # look for a pre-existing binary of the package, while add_subdirectory isn't designed to
