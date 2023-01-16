@@ -80,7 +80,7 @@ void Label::measure() {
     int ascent = font->get_ascent();
     int descent = font->get_descent();
 
-    glyphs = font->get_glyphs(text, language);
+    font->get_glyphs(text, language, glyphs, line_ranges);
 
     // Reset text's layout box.
     layout_box = RectF();
@@ -91,18 +91,26 @@ void Label::measure() {
     float cursor_y = 0;
 
     // Build layout.
-    for (auto &g : glyphs) {
-        // The glyph's layout box in the text's local coordinates. The origin is the top-left corner of the text box.
-        RectF glyph_layout_box =
-            RectF(cursor_x + g.x_offset, cursor_y + g.y_offset, cursor_x + g.x_advance, cursor_y + font_size);
+    for (auto &line : line_ranges) {
+        for (int i = line.start; i < line.end; i++) {
+            auto &g = glyphs[i];
 
-        glyph_positions.emplace_back(cursor_x + g.x_offset, cursor_y + g.y_offset);
+            // The glyph's layout box in the text's local coordinates.
+            // The origin is the top-left corner of the text box.
+            RectF glyph_layout_box =
+                RectF(cursor_x + g.x_offset, cursor_y + g.y_offset, cursor_x + g.x_advance, cursor_y + font_size);
 
-        // The whole text's layout box.
-        layout_box = layout_box.union_rect(glyph_layout_box);
+            glyph_positions.emplace_back(cursor_x + g.x_offset, cursor_y + g.y_offset);
 
-        // Advance x.
-        cursor_x += g.x_advance;
+            // The whole text's layout box.
+            layout_box = layout_box.union_rect(glyph_layout_box);
+
+            // Advance x.
+            cursor_x += g.x_advance;
+        }
+
+        cursor_x = 0;
+        cursor_y += font_size;
     }
 }
 
@@ -212,7 +220,9 @@ void Label::set_vertical_alignment(Alignment alignment) {
 
 Vec2<float> Label::calc_minimum_size() const {
     auto min_size = get_text_size();
-    min_size.y = font_size;
+
+    // Label has a minimal height even when the text is empty.
+    min_size.y = std::max(min_size.y, font_size);
 
     return min_size.max(minimum_size);
 }

@@ -83,8 +83,11 @@ private:
 
     float font_size = 32;
 
-    // Layout-independent.
+    // Layout independent.
     std::vector<Glyph> glyphs;
+
+    // Layout dependent.
+    std::vector<Pathfinder::Range> line_ranges;
 
     // Layout-dependent.
     std::vector<Vec2F> glyph_positions;

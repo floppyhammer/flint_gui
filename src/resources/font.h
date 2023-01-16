@@ -100,7 +100,10 @@ public:
 
     Pathfinder::Path2d get_glyph_path(uint16_t glyph_index) const;
 
-    std::vector<Glyph> get_glyphs(const std::string &text, Language lang);
+    void get_glyphs(const std::string &text,
+                    const Language lang,
+                    std::vector<Glyph> &glyphs,
+                    std::vector<Pathfinder::Range> &line_ranges);
 
     int32_t find_index(int codepoint);
 

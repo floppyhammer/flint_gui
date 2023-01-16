@@ -28,9 +28,9 @@ int main() {
         vstack_container->set_separation(16);
         margin_container->add_child(vstack_container);
 
-        vstack_container->add_child(std::make_shared<Label>("你好"));
-
-        vstack_container->add_child(std::make_shared<Label>("Hello"));
+        auto ll = std::make_shared<Label>("Hello\n你好");
+        ll->enable_visual_debug(true);
+        vstack_container->add_child(ll);
 
         auto label = std::make_shared<Label>("مرحبا");
         label->set_language(Language::Arabic);

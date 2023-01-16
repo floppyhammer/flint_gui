@@ -123,7 +123,13 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
     return path;
 }
 
-std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
+void Font::get_glyphs(const std::string &text,
+                      const Language lang,
+                      std::vector<Glyph> &glyphs,
+                      std::vector<Pathfinder::Range> &line_ranges) {
+    glyphs.clear();
+    line_ranges.clear();
+
 #ifdef ICU_STATIC_DATA
     static bool icu_data_loaded = false;
     if (!icu_data_loaded) {
@@ -137,8 +143,6 @@ std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
 
     uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
 
-    std::vector<Glyph> glyphs;
-
     // Note: don't use icu::UnicodeString, it doesn't work.
 
     std::wstring_convert<std::codecvt<char16_t, char, std::mbstate_t>, char16_t> convert;
@@ -147,104 +151,146 @@ std::vector<Glyph> Font::get_glyphs(const std::string &text, Language lang) {
     const UChar *uchar_data = utf16_string.c_str();
     const int32_t uchar_count = utf16_string.length();
 
-    UBiDi *bidi = ubidi_open();
+    UBiDi *para_bidi = ubidi_open();
+    UBiDi *line_bidi = ubidi_open();
 
     UErrorCode error_code = U_ZERO_ERROR;
 
-    ubidi_setPara(bidi, uchar_data, uchar_count, UBIDI_DEFAULT_LTR, nullptr, &error_code);
+    do {
+        std::cout << "Paragraphs: " << text << std::endl;
 
-    if (U_SUCCESS(error_code)) {
-        int32_t run_count = ubidi_countRuns(bidi, &error_code);
+        ubidi_setPara(para_bidi, uchar_data, uchar_count, UBIDI_DEFAULT_LTR, nullptr, &error_code);
+        if (!U_SUCCESS(error_code)) {
+            Logger::error("ICU failed!", "TextServer");
+            break;
+        }
 
-        for (int32_t run_index = 0; run_index < run_count; run_index++) {
-            int32_t logical_start, length;
-            UBiDiDirection dir = ubidi_getVisualRun(bidi, run_index, &logical_start, &length);
+        int32_t para_count = ubidi_countParagraphs(para_bidi);
 
-            bool is_rtl = dir == UBIDI_RTL;
+        for (int32_t para_index = 0; para_index < para_count; para_index++) {
+            int32_t para_start, para_end;
+            UBiDiLevel para_level;
+            ubidi_getParagraphByIndex(para_bidi, para_index, &para_start, &para_end, &para_level, &error_code);
 
-            std::string run_text = convert.to_bytes(utf16_string.substr(logical_start, length));
-
-            std::cout << "VisualRun: \t" << run_index << "\t" << is_rtl << "\t" << logical_start << '\t' << length
-                      << '\t' << run_text << std::endl;
-
-            // Buffers are sequences of Unicode characters that use the same font
-            // and have the same text direction, script, and language.
-            hb_buffer_t *hb_buffer = hb_buffer_create();
-
-            // Item offset and length should represent a specific run.
-            hb_buffer_add_utf16(hb_buffer, reinterpret_cast<const uint16_t *>(uchar_data), -1, logical_start, length);
-
-            if (is_rtl) {
-                hb_buffer_set_direction(hb_buffer, HB_DIRECTION_RTL);
-            } else {
-                hb_buffer_set_direction(hb_buffer, HB_DIRECTION_LTR);
+            if (!U_SUCCESS(error_code)) {
+                Logger::error("ICU failed!", "TextServer");
+                break;
             }
 
-            switch (lang) {
-                case Language::Arabic: {
-                    hb_buffer_set_script(hb_buffer, HB_SCRIPT_ARABIC);
-                    hb_buffer_set_language(hb_buffer, hb_language_from_string("ar", -1));
-                } break;
-                default: {
-                    hb_buffer_set_script(hb_buffer, HB_SCRIPT_LATIN);
-                    hb_buffer_set_language(hb_buffer, hb_language_from_string("en", -1));
-                } break;
+            std::string line_text = convert.to_bytes(utf16_string.substr(para_start, para_end));
+            if (!U_SUCCESS(error_code)) {
+                Logger::error("ICU failed!", "TextServer");
+                break;
             }
 
-            hb_shape(harfbuzz_res->font, hb_buffer, nullptr, 0);
+            std::cout << "Line text: " << line_text << std::endl;
+            std::cout << "Line range: \t" << para_start << "\t" << para_end << std::endl;
 
-            unsigned int glyph_count;
-            hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(hb_buffer, &glyph_count);
-            hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(hb_buffer, &glyph_count);
+            size_t line_start = glyphs.size();
 
-            // Shaped glyph positions will always be in one line (regardless of line breaks).
-            for (int i = 0; i < glyph_count; i++) {
-                Glyph glyph;
+            ubidi_setLine(para_bidi, para_start, para_end, line_bidi, &error_code);
+            if (!U_SUCCESS(error_code)) {
+                Logger::error("ICU failed!", "TextServer");
+                break;
+            }
 
-                auto &info = glyph_info[i];
-                auto &pos = glyph_pos[i];
+            int32_t run_count = ubidi_countRuns(line_bidi, &error_code);
 
-                // Codepoint property is replaced with glyph ID after shaping.
-                glyph.index = info.codepoint;
+            for (int32_t run_index = 0; run_index < run_count; run_index++) {
+                int32_t logical_start, length;
+                UBiDiDirection dir = ubidi_getVisualRun(line_bidi, run_index, &logical_start, &length);
 
-                // Check if the glyph has already been cached.
-                if (glyph_cache.find(glyph.index) != glyph_cache.end()) {
-                    glyphs.push_back(glyph_cache[glyph.index]);
-                    continue;
+                bool is_rtl = dir == UBIDI_RTL;
+
+                std::string run_text = convert.to_bytes(utf16_string.substr(para_start + logical_start, length));
+
+                std::cout << "Visual run in line: \t" << run_index << "\t" << is_rtl << "\t" << logical_start << '\t'
+                          << length << '\t' << run_text << std::endl;
+
+                // Buffers are sequences of Unicode characters that use the same font
+                // and have the same text direction, script, and language.
+                hb_buffer_t *hb_buffer = hb_buffer_create();
+
+                // Item offset and length should represent a specific run.
+                hb_buffer_add_utf16(
+                    hb_buffer, reinterpret_cast<const uint16_t *>(uchar_data), -1, para_start + logical_start, length);
+
+                if (is_rtl) {
+                    hb_buffer_set_direction(hb_buffer, HB_DIRECTION_RTL);
+                } else {
+                    hb_buffer_set_direction(hb_buffer, HB_DIRECTION_LTR);
                 }
 
-                glyph.x_offset = pos.x_offset;
-                glyph.y_offset = pos.y_offset;
+                switch (lang) {
+                    case Language::Arabic: {
+                        hb_buffer_set_script(hb_buffer, HB_SCRIPT_ARABIC);
+                        hb_buffer_set_language(hb_buffer, hb_language_from_string("ar", -1));
+                    } break;
+                    default: {
+                        hb_buffer_set_script(hb_buffer, HB_SCRIPT_LATIN);
+                        hb_buffer_set_language(hb_buffer, hb_language_from_string("en", -1));
+                    } break;
+                }
 
-                // Don't why harfbuzz returns incorrect advance.
-                //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
-                glyph.x_advance = get_advance(glyph.index);
+                hb_shape(harfbuzz_res->font, hb_buffer, nullptr, 0);
 
-                // Get glyph path.
-                glyph.path = get_glyph_path(glyph.index);
+                unsigned int glyph_count;
+                hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(hb_buffer, &glyph_count);
+                hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(hb_buffer, &glyph_count);
 
-                // The glyph's layout box in the glyph's local coordinates.
-                // The origin is the baseline. The Y axis is downward.
-                glyph.box = RectF(0, -ascent, glyph.x_advance, -descent);
+                // Shaped glyph positions will always be in one line (regardless of line breaks).
+                for (int i = 0; i < glyph_count; i++) {
+                    // Skip line break;
+                    if (line_ranges.size() < para_count - 1 && i == glyph_count - 1) {
+                        continue;
+                    }
 
-                // Get the glyph path's bounding box. The Y axis points down.
-                RectI bounding_box = get_bounds(glyph.index);
+                    Glyph glyph;
 
-                // BBox in the glyph's local coordinates.
-                glyph.bbox = bounding_box.to_f32();
+                    auto &info = glyph_info[i];
+                    auto &pos = glyph_pos[i];
 
-                glyphs.push_back(glyph);
+                    // Codepoint property is replaced with glyph ID after shaping.
+                    glyph.index = info.codepoint;
+
+                    // Check if the glyph has already been cached.
+                    if (glyph_cache.find(glyph.index) != glyph_cache.end()) {
+                        glyphs.push_back(glyph_cache[glyph.index]);
+                        continue;
+                    }
+
+                    glyph.x_offset = pos.x_offset;
+                    glyph.y_offset = pos.y_offset;
+
+                    // Don't why harfbuzz returns incorrect advance.
+                    //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
+                    glyph.x_advance = get_advance(glyph.index);
+
+                    // Get glyph path.
+                    glyph.path = get_glyph_path(glyph.index);
+
+                    // The glyph's layout box in the glyph's local coordinates.
+                    // The origin is the baseline. The Y axis is downward.
+                    glyph.box = RectF(0, -ascent, glyph.x_advance, -descent);
+
+                    // Get the glyph path's bounding box. The Y axis points down.
+                    RectI bounding_box = get_bounds(glyph.index);
+
+                    // BBox in the glyph's local coordinates.
+                    glyph.bbox = bounding_box.to_f32();
+
+                    glyphs.push_back(glyph);
+                }
+
+                hb_buffer_destroy(hb_buffer);
             }
 
-            hb_buffer_destroy(hb_buffer);
+            line_ranges.emplace_back(line_start, glyphs.size());
         }
-    } else {
-        std::cout << "Failed" << std::endl;
-    }
+    } while (false);
 
-    ubidi_close(bidi);
-
-    return glyphs;
+    ubidi_close(line_bidi);
+    ubidi_close(para_bidi);
 }
 
 int32_t Font::find_index(int codepoint) {
