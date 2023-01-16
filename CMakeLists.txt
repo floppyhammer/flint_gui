@@ -34,7 +34,7 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
 add_compile_definitions(PATHFINDER_USE_VULKAN)
 
 # Include external and third party headers.
-include_directories(external/eigen third_party)
+include_directories(third_party)
 
 # GLFW library.
 include_directories(external/glfw/include)
