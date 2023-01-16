@@ -5,10 +5,9 @@
 
 // Already defined in Pathfinder.
 // #define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
 
 #include <stdexcept>
-
-#include "stb_image.h"
 
 namespace Flint {
 

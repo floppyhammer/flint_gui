@@ -28,13 +28,12 @@ include_directories(${Vulkan_INCLUDE_DIRS})
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
         src/*.cpp
-        third_party/tinyfiledialogs/*.c
-        third_party/icu4c/common/*.cpp)
+        third_party/tinyfiledialogs/*.c)
 
 add_compile_definitions(PATHFINDER_USE_VULKAN)
 
-# Include external and third party headers.
-include_directories(third_party)
+# Include external and third-party headers.
+include_directories(external third_party)
 
 # GLFW library.
 include_directories(external/glfw/include)
@@ -47,13 +46,20 @@ add_subdirectory(external/pathfinder-cpp)
 include_directories(external/harfbuzz/src)
 add_subdirectory(external/harfbuzz)
 
+include_directories(third_party/poly2tri)
 add_subdirectory(third_party/poly2tri)
 
 # icu4c.
-add_compile_definitions(U_STATIC_IMPLEMENTATION)
-add_compile_definitions(U_COMMON_IMPLEMENTATION)
-add_compile_definitions(ICU_STATIC_DATA)
-include_directories(third_party/icu4c/common)
+if (NOT WIN32)
+    # For non-Windows platforms, we need to compile ICU from source.
+    file(APPEND GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
+            third_party/icu4c/common/*.cpp)
+
+    add_compile_definitions(U_STATIC_IMPLEMENTATION)
+    add_compile_definitions(U_COMMON_IMPLEMENTATION)
+    add_compile_definitions(ICU_STATIC_DATA)
+    include_directories(third_party/icu4c/common)
+endif ()
 
 add_library(flint ${SOURCE_FILES})
 

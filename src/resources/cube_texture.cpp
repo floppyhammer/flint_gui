@@ -1,10 +1,11 @@
 #include "cube_texture.h"
 
+#include <stb/stb_image.h>
+
 #include <stdexcept>
 
 #include "../common/logger.h"
 #include "../common/macros.h"
-#include "stb_image.h"
 
 namespace Flint {
 

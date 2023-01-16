@@ -8,10 +8,10 @@
 #include "../world.h"
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "poly2tri/poly2tri.h"
+#include <poly2tri.h>
 
 namespace Flint {
 void Bone2d::add_child(const std::shared_ptr<Bone2d> &child) {

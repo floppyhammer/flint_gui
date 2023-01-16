@@ -6,7 +6,7 @@ add_executable(scrolling ${SOURCE_FILES} main.cpp)
 
 # Link libs.
 if (WIN32) # Windows
-    target_link_libraries(scrolling glfw Vulkan::Vulkan pathfinder poly2tri harfbuzz)
+    target_link_libraries(scrolling glfw Vulkan::Vulkan pathfinder poly2tri harfbuzz icu)
 else () # Linux
-    target_link_libraries(scrolling -lglfw -lvulkan -lpathfinder -lpoly2tri -lharfbuzz)
+    target_link_libraries(scrolling -lglfw -lvulkan -lpathfinder -lpoly2tri -lharfbuzz -licuut)
 endif ()

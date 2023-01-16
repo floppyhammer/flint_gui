@@ -1,15 +1,19 @@
 # Run `git submodule sync --recursive` after editing this file.
 # First time: git submodule update --init --recursive
 # Update: git pull --recurse-submodules | git submodule update --remote --recursive
-[submodule "external/glfw"]
+[submodule "glfw"]
 	path = external/glfw
 	url = https://github.com/floppyhammer/glfw.git
 	branch = master
-[submodule "external/pathfinder-cpp"]
+[submodule "pathfinder-cpp"]
 	path = external/pathfinder-cpp
 	url = https://github.com/floppyhammer/pathfinder-cpp.git
     branch = master
-[submodule "external/harfbuzz"]
+[submodule "harfbuzz"]
 	path = external/harfbuzz
 	url = https://github.com/harfbuzz/harfbuzz.git
     branch = main
+[submodule "glm"]
+	path = external/glm
+	url = https://github.com/g-truc/glm.git
+    branch = master

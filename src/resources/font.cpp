@@ -10,19 +10,23 @@
 #include "pathfinder.h"
 
 #define STB_TRUETYPE_IMPLEMENTATION
-#include <stb_truetype.h>
+#include <stb/stb_truetype.h>
 
-// Built-in ICU data.
-#ifdef ICU_STATIC_DATA
-    #include "icu4c/icudata.gen.h"
+#ifdef _WIN32
+    #include <icu.h>
+#else
+    // Built-in ICU data.
+    #ifdef ICU_STATIC_DATA
+        #include "icu4c/icudata.gen.h"
+    #endif
+
+    #include <unicode/ubidi.h>
+    #include <unicode/ubrk.h>
+    #include <unicode/uclean.h>
+    #include <unicode/udata.h>
+    #include <unicode/uscript.h>
+    #include <unicode/utypes.h>
 #endif
-
-#include <unicode/ubidi.h>
-#include <unicode/ubrk.h>
-#include <unicode/uclean.h>
-#include <unicode/udata.h>
-#include <unicode/uscript.h>
-#include <unicode/utypes.h>
 
 namespace Flint {
 

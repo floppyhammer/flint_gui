@@ -3,7 +3,7 @@
 
 #include <hb.h>
 #include <pathfinder.h>
-#include <stb_truetype.h>
+#include <stb/stb_truetype.h>
 
 #include <cstdio>
 #include <cstdlib>
