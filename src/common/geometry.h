@@ -3,8 +3,8 @@
 
 #include <pathfinder-cpp/include/pathfinder.h>
 
-using Pathfinder::ColorU;
 using Pathfinder::ColorF;
+using Pathfinder::ColorU;
 using Pathfinder::Transform2;
 using Pathfinder::Vec2F;
 using Pathfinder::Vec2I;

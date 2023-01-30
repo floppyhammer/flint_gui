@@ -5,14 +5,12 @@
 #include "platform.h"
 
 #define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
 #include <array>
 #include <iostream>
 #include <optional>
 #include <vector>
-
-#include "GLFW/glfw3.h"
-#include "glm/glm.hpp"
 
 namespace Flint {
 

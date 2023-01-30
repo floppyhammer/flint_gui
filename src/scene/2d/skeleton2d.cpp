@@ -1,5 +1,12 @@
 #include "skeleton2d.h"
 
+#include <poly2tri.h>
+
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "../../common/geometry.h"
 #include "../../common/logger.h"
 #include "../../render/mvp.h"
 #include "../../render/render_server.h"
@@ -7,13 +14,8 @@
 #include "../../resources/resource_manager.h"
 #include "../world.h"
 
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <poly2tri.h>
-
 namespace Flint {
+
 void Bone2d::add_child(const std::shared_ptr<Bone2d> &child) {
     children.push_back(child);
     child->parent = this;

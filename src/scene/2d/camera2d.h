@@ -1,8 +1,7 @@
-#ifndef FLINT_CAMERA3D_H
-    #define FLINT_CAMERA_3D_H
+#ifndef FLINT_CAMERA2D_H
+#define FLINT_CAMERA2D_H
 
 #include "../../common/geometry.h"
-#include "glm/glm.hpp"
 #include "node2d.h"
 #include "render/subview.h"
 
@@ -10,7 +9,7 @@ namespace Flint {
 
 class Camera2d : public Node2d {
 public:
-    Camera2d(Vec2I view_size) {
+    explicit Camera2d(Vec2I view_size) {
         subview = std::make_shared<Subview>(view_size);
     }
 
@@ -35,4 +34,4 @@ protected:
 
 } // namespace Flint
 
-#endif // FLINT_CAMERA3D_H
+#endif // FLINT_CAMERA2D_H

@@ -10,8 +10,8 @@
 #include <vector>
 
 #define GLFW_INCLUDE_VULKAN
-#include "GLFW/glfw3.h"
-#include "glm/glm.hpp"
+#include <GLFW/glfw3.h>
+
 #include "resources/image_texture.h"
 #include "resources/surface.h"
 #include "scene/scene_tree.h"

@@ -46,6 +46,9 @@ add_subdirectory(external/pathfinder-cpp)
 include_directories(external/harfbuzz/src)
 add_subdirectory(external/harfbuzz)
 
+include_directories(external/glm)
+add_subdirectory(external/glm)
+
 include_directories(third_party/poly2tri)
 add_subdirectory(third_party/poly2tri)
 
