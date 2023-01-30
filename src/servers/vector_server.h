@@ -1,7 +1,7 @@
 #ifndef FLINT_VECTOR_SERVER_H
 #define FLINT_VECTOR_SERVER_H
 
-#include <pathfinder.h>
+#include <pathfinder-cpp/include/pathfinder.h>
 
 #include "../common/geometry.h"
 #include "../resources/font.h"

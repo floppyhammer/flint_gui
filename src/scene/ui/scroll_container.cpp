@@ -1,7 +1,5 @@
 #include "scroll_container.h"
 
-#include "pathfinder.h"
-
 using Pathfinder::clamp;
 
 namespace Flint {

@@ -7,7 +7,6 @@
 
 #include "../common/load_file.h"
 #include "../common/logger.h"
-#include "pathfinder.h"
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb/stb_truetype.h>

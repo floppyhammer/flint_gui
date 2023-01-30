@@ -2,13 +2,12 @@
 #define FLINT_FONT_H
 
 #include <hb.h>
-#include <pathfinder.h>
+#include <pathfinder-cpp/include/pathfinder.h>
 #include <stb/stb_truetype.h>
 
 #include <cstdio>
 #include <cstdlib>
 
-#include "pathfinder.h"
 #include "resource.h"
 
 using Pathfinder::ColorU;
