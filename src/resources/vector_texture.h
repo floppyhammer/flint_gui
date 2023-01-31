@@ -1,7 +1,7 @@
 #ifndef FLINT_VECTOR_TEXTURE_H
 #define FLINT_VECTOR_TEXTURE_H
 
-#include <pathfinder-cpp/include/pathfinder.h>
+#include <pathfinder.h>
 
 #include <memory>
 

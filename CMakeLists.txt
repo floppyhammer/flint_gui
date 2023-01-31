@@ -40,7 +40,7 @@ include_directories(external/glfw/include)
 add_subdirectory(external/glfw)
 
 # Pathfinder library.
-include_directories(external/pathfinder-cpp/src)
+include_directories(external/pathfinder-cpp/include)
 add_subdirectory(external/pathfinder-cpp)
 
 include_directories(external/harfbuzz/src)

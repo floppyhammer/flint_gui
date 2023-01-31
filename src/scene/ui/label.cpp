@@ -23,8 +23,8 @@ Label::Label(const std::string &_text) {
 
     set_text(_text);
 
-    font_style.color = {163, 163, 163, 255};
-    //    font_style.debug = true;
+    text_style.color = {163, 163, 163, 255};
+    //    text_style.debug = true;
 
     theme_background = DefaultResource::get_singleton()->get_default_theme()->label.styles["background"];
 }
@@ -36,8 +36,6 @@ void Label::set_text(const std::string &new_text) {
     }
 
     text = new_text;
-
-    text_debug = utf8_to_ws(new_text);
 
     need_to_remeasure = true;
 }
@@ -87,6 +85,9 @@ void Label::measure() {
 
     glyph_positions.clear();
 
+    glyph_boxes.clear();
+    character_boxes.clear();
+
     float cursor_x = 0;
     float cursor_y = 0;
 
@@ -97,8 +98,8 @@ void Label::measure() {
 
             // The glyph's layout box in the text's local coordinates.
             // The origin is the top-left corner of the text box.
-            RectF glyph_layout_box =
-                RectF(cursor_x + g.x_offset, cursor_y + g.y_offset, cursor_x + g.x_advance, cursor_y + font_size);
+            RectF glyph_layout_box = RectF(
+                cursor_x + g.x_offset, cursor_y + g.y_offset, cursor_x + g.x_advance, cursor_y + font->get_size());
 
             glyph_positions.emplace_back(cursor_x + g.x_offset, cursor_y + g.y_offset);
 
@@ -110,7 +111,7 @@ void Label::measure() {
         }
 
         cursor_x = 0;
-        cursor_y += font_size;
+        cursor_y += font->get_size();
     }
 }
 
@@ -120,10 +121,6 @@ void Label::set_font(std::shared_ptr<Font> new_font) {
     }
 
     font = std::move(new_font);
-
-    if (text.empty()) {
-        return;
-    }
 
     need_to_remeasure = true;
 }
@@ -165,10 +162,8 @@ void Label::update(double dt) {
     consider_alignment();
 }
 
-void Label::set_text_style(ColorU _color, float _stroke_width, ColorU _stroke_color) {
-    color = _color;
-    stroke_width = _stroke_width;
-    stroke_color = _stroke_color;
+void Label::set_text_style(TextStyle _text_style) {
+    text_style = _text_style;
 }
 
 void Label::draw() {
@@ -193,7 +188,7 @@ void Label::draw() {
     //        clip_box = {{}, calc_minimum_size()};
     //    }
 
-    vector_server->draw_glyphs(glyphs, glyph_positions, font_style, translation, clip_box);
+    vector_server->draw_glyphs(glyphs, glyph_positions, text_style, translation, clip_box);
 
     NodeUi::draw();
 }
@@ -222,7 +217,7 @@ Vec2<float> Label::calc_minimum_size() const {
     auto min_size = get_text_size();
 
     // Label has a minimal height even when the text is empty.
-    min_size.y = std::max(min_size.y, font_size);
+    min_size.y = std::max(min_size.y, (float)font->get_size());
 
     return min_size.max(minimum_size);
 }
@@ -236,7 +231,7 @@ std::vector<Glyph> &Label::get_glyphs() {
 }
 
 float Label::get_font_size() const {
-    return font_size;
+    return font->get_size();
 }
 
 void Label::set_language(Language new_lang) {

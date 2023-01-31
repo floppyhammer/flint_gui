@@ -2,7 +2,7 @@
 #define FLINT_FONT_H
 
 #include <hb.h>
-#include <pathfinder-cpp/include/pathfinder.h>
+#include <pathfinder.h>
 #include <stb/stb_truetype.h>
 
 #include <cstdio>
@@ -24,16 +24,10 @@ struct HarfBuzzRes {
 
     HarfBuzzRes() = default;
 
-    HarfBuzzRes(const std::string &filename) {
+    explicit HarfBuzzRes(const std::string &filename) {
         blob = hb_blob_create_from_file(filename.c_str()); /* or hb_blob_create_from_file_or_fail() */
         face = hb_face_create(blob, 0);
         font = hb_font_create(face);
-        hb_font_set_ptem(font, 32);
-
-        int x_scale;
-        int y_scale;
-        hb_font_get_scale(font, &x_scale, &y_scale);
-        //        hb_font_set_scale(font, x_scale / 3.0, y_scale / 3.0);
     }
 
     ~HarfBuzzRes() {
@@ -56,6 +50,13 @@ enum class Language {
     Arabic,
 };
 
+struct TextStyle {
+    ColorU color = ColorU::white();
+    ColorU stroke_color;
+    float stroke_width = 0;
+    bool debug = false;
+};
+
 struct Glyph {
     // Glyph index (font specific) or UTF-32 codepoint (for the invalid glyphs).
     // A particular glyph ID within the font does not necessarily correlate to a predictable Unicode codepoint.
@@ -63,6 +64,7 @@ struct Glyph {
 
     int32_t x_offset = 0; // Offset from the origin of the glyph on baseline.
     int32_t y_offset = 0;
+
     float x_advance = 0; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
     float y_advance = 0;
 
@@ -76,7 +78,6 @@ struct Glyph {
     RectF bbox;
 };
 
-/// Static font properties.
 class Font : public Resource {
 public:
     explicit Font(const std::string &path);
@@ -96,6 +97,8 @@ public:
     }
 
     void set_size(uint32_t new_font_size);
+
+    uint32_t get_size() const;
 
     Pathfinder::Path2d get_glyph_path(uint16_t glyph_index) const;
 
@@ -133,14 +136,6 @@ private:
 
 private:
     void get_metrics();
-};
-
-/// Dynamic font properties.
-struct FontStyle {
-    ColorU color = ColorU::white();
-    ColorU stroke_color;
-    float stroke_width = 0;
-    bool debug = false;
 };
 
 } // namespace Flint

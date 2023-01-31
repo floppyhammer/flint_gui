@@ -1,7 +1,7 @@
 #ifndef FLINT_GEOMETRY_H
 #define FLINT_GEOMETRY_H
 
-#include <pathfinder-cpp/include/pathfinder.h>
+#include <pathfinder.h>
 
 using Pathfinder::ColorF;
 using Pathfinder::ColorU;

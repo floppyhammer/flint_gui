@@ -1,7 +1,7 @@
 #ifndef FLINT_VECTOR_SERVER_H
 #define FLINT_VECTOR_SERVER_H
 
-#include <pathfinder-cpp/include/pathfinder.h>
+#include <pathfinder.h>
 
 #include "../common/geometry.h"
 #include "../resources/font.h"
@@ -62,7 +62,7 @@ public:
      */
     void draw_glyphs(std::vector<Glyph> &glyphs,
                      std::vector<Vec2F> &glyph_positions,
-                     FontStyle font_style,
+                     TextStyle text_style,
                      const Transform2 &transform,
                      const RectF &clip_box);
 

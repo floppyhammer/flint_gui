@@ -41,7 +41,7 @@ public:
 
     void set_font(std::shared_ptr<Font> p_font);
 
-    void set_text_style(ColorU _color, float _stroke_width, ColorU _stroke_color);
+    void set_text_style(TextStyle _text_style);
 
     void update(double dt) override;
 
@@ -73,15 +73,13 @@ private:
 private:
     std::string text;
 
-    std::wstring text_debug;
-
     Language language = Language::English;
 
     std::shared_ptr<Font> font;
 
     bool clip = false;
 
-    float font_size = 32;
+    bool autowrap = false;
 
     // Layout independent.
     std::vector<Glyph> glyphs;
@@ -94,16 +92,13 @@ private:
 
     mutable RectF layout_box;
 
+    std::vector<RectF> glyph_boxes;
+    std::vector<RectF> character_boxes;
+
     bool need_to_remeasure = true;
     bool need_to_update_layout = true;
 
-    FontStyle font_style;
-    // Fill
-    ColorU color{163, 163, 163, 255};
-
-    // Stroke
-    float stroke_width = 0;
-    ColorU stroke_color;
+    TextStyle text_style;
 
     // Layout
     Alignment horizontal_alignment = Alignment::Begin;

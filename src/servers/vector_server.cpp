@@ -158,7 +158,7 @@ void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2F &sta
 
 void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
                                std::vector<Vec2F> &glyph_positions,
-                               FontStyle font_style,
+                               TextStyle text_style,
                                const Transform2 &transform,
                                const RectF &clip_box) {
     if (glyphs.size() != glyph_positions.size()) {
@@ -184,15 +184,15 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         canvas->set_transform(global_transform_offset * Transform2::from_translation(p) * transform);
 
         // Add fill.
-        canvas->set_fill_paint(Paint::from_color(font_style.color));
+        canvas->set_fill_paint(Paint::from_color(text_style.color));
         canvas->fill_path(g.path, FillRule::Winding);
 
         // Add stroke if needed.
-        canvas->set_stroke_paint(Paint::from_color(font_style.stroke_color));
-        canvas->set_line_width(font_style.stroke_width);
+        canvas->set_stroke_paint(Paint::from_color(text_style.stroke_color));
+        canvas->set_line_width(text_style.stroke_width);
         canvas->stroke_path(g.path);
 
-        if (font_style.debug) {
+        if (text_style.debug) {
             canvas->set_line_width(1);
 
             // Add box.

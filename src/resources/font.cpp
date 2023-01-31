@@ -241,7 +241,7 @@ void Font::get_glyphs(const std::string &text,
                 for (int i = 0; i < glyph_count; i++) {
                     // Skip line break;
                     if (line_ranges.size() < para_count - 1 && i == glyph_count - 1) {
-                        continue;
+//                        continue;
                     }
 
                     Glyph glyph;
@@ -334,6 +334,10 @@ void Font::set_size(uint32_t new_size) {
     size = new_size;
 
     get_metrics();
+}
+
+uint32_t Font::get_size() const {
+    return size;
 }
 
 int Font::get_ascent() const {

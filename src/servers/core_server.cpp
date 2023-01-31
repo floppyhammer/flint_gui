@@ -22,7 +22,7 @@ void CoreServer::tick() {
 
     // Print FPS.
     std::chrono::duration<double> duration = current_time - last_time_updated_fps;
-    if (duration.count() > 1) {
+    if (duration.count() > 5) {
         last_time_updated_fps = current_time;
 
         fps = (float)(1.0 / delta);
