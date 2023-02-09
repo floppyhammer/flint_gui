@@ -57,8 +57,6 @@ public:
 
     float get_font_size() const;
 
-    void set_language(Language new_lang);
-
     StyleBox theme_background;
 
     float get_glyph_position(uint32_t glyph_index);
@@ -72,8 +70,6 @@ private:
 
 private:
     std::string text;
-
-    Language language = Language::English;
 
     std::shared_ptr<Font> font;
 

@@ -33,7 +33,6 @@ int main() {
         vstack_container->add_child(ll);
 
         auto label = std::make_shared<Label>("مرحبا");
-        label->set_language(Language::Arabic);
         vstack_container->add_child(label);
     }
 

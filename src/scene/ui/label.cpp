@@ -78,7 +78,7 @@ void Label::measure() {
     int ascent = font->get_ascent();
     int descent = font->get_descent();
 
-    font->get_glyphs(text, language, glyphs, line_ranges);
+    font->get_glyphs(text, glyphs, line_ranges);
 
     // Reset text's layout box.
     layout_box = RectF();
@@ -232,16 +232,6 @@ std::vector<Glyph> &Label::get_glyphs() {
 
 float Label::get_font_size() const {
     return font->get_size();
-}
-
-void Label::set_language(Language new_lang) {
-    if (language == new_lang) {
-        return;
-    }
-
-    language = new_lang;
-
-    need_to_remeasure = true;
 }
 
 float Label::get_glyph_position(uint32_t glyph_index) {

@@ -43,13 +43,6 @@ struct HarfBuzzRes {
     }
 };
 
-// TODO: languages should be auto-detected.
-enum class Language {
-    Chinese,
-    English,
-    Arabic,
-};
-
 struct TextStyle {
     ColorU color = ColorU::white();
     ColorU stroke_color;
@@ -103,7 +96,6 @@ public:
     Pathfinder::Path2d get_glyph_path(uint16_t glyph_index) const;
 
     void get_glyphs(const std::string &text,
-                    const Language lang,
                     std::vector<Glyph> &glyphs,
                     std::vector<Pathfinder::Range> &line_ranges);
 

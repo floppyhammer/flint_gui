@@ -29,6 +29,36 @@
 
 namespace Flint {
 
+enum class Script {
+    Common,
+    Arabic,
+    Bengali,
+    Devanagari,
+    Hebrew,
+};
+
+Script get_text_script(const std::string &text) {
+    std::wstring_convert<std::codecvt<char16_t, char, std::mbstate_t>, char16_t> convert;
+    std::u16string utf16_string = convert.from_bytes(text);
+
+    for (auto& codepoint : utf16_string) {
+        if (codepoint >= 0x0600 && codepoint <= 0x06FF) {
+            return Script::Arabic;
+        }
+        if (codepoint >= 0x0981 && codepoint <= 0x09FB) {
+            return Script::Bengali;
+        }
+        if (codepoint >= 0x0901 && codepoint <= 0x097F) {
+            return Script::Devanagari;
+        }
+        if (codepoint >= 0x0590 && codepoint <= 0x05FF) {
+            return Script::Hebrew;
+        }
+    }
+
+    return Script::Common;
+}
+
 Font::Font(const std::string &path) : Resource(path) {
     auto bytes = load_file_as_bytes(path.c_str());
 
@@ -123,7 +153,6 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
 }
 
 void Font::get_glyphs(const std::string &text,
-                      const Language lang,
                       std::vector<Glyph> &glyphs,
                       std::vector<Pathfinder::Range> &line_ranges) {
     glyphs.clear();
@@ -206,6 +235,8 @@ void Font::get_glyphs(const std::string &text,
                 std::cout << "Visual run in line: \t" << run_index << "\t" << is_rtl << "\t" << logical_start << '\t'
                           << length << '\t' << run_text << std::endl;
 
+                auto run_script = get_text_script(run_text);
+
                 // Buffers are sequences of Unicode characters that use the same font
                 // and have the same text direction, script, and language.
                 hb_buffer_t *hb_buffer = hb_buffer_create();
@@ -220,8 +251,8 @@ void Font::get_glyphs(const std::string &text,
                     hb_buffer_set_direction(hb_buffer, HB_DIRECTION_LTR);
                 }
 
-                switch (lang) {
-                    case Language::Arabic: {
+                switch (run_script) {
+                    case Script::Arabic: {
                         hb_buffer_set_script(hb_buffer, HB_SCRIPT_ARABIC);
                         hb_buffer_set_language(hb_buffer, hb_language_from_string("ar", -1));
                     } break;
@@ -241,7 +272,7 @@ void Font::get_glyphs(const std::string &text,
                 for (int i = 0; i < glyph_count; i++) {
                     // Skip line break;
                     if (line_ranges.size() < para_count - 1 && i == glyph_count - 1) {
-//                        continue;
+                        //                        continue;
                     }
 
                     Glyph glyph;
