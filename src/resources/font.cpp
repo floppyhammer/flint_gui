@@ -270,15 +270,16 @@ void Font::get_glyphs(const std::string &text,
 
                 // Shaped glyph positions will always be in one line (regardless of line breaks).
                 for (int i = 0; i < glyph_count; i++) {
-                    // Skip line break;
-                    if (line_ranges.size() < para_count - 1 && i == glyph_count - 1) {
-                        //                        continue;
+                    auto &info = glyph_info[i];
+                    auto &pos = glyph_pos[i];
+
+                    // Skip line break.
+                    // In text U+0000 behaves as Combining Mark regarding line breaks.
+                    if (info.codepoint == 0x0000) {
+                        continue;
                     }
 
                     Glyph glyph;
-
-                    auto &info = glyph_info[i];
-                    auto &pos = glyph_pos[i];
 
                     // Codepoint property is replaced with glyph ID after shaping.
                     glyph.index = info.codepoint;
