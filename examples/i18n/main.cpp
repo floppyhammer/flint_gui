@@ -30,15 +30,15 @@ int main() {
 
         std::string text = "";
         text += "🌤你好世界！\n"; // Chinese
-        text += "こんにちは世界！\n\n"; // Japanese
+        text += "こんにちは世界！\n"; // Japanese
         text += "مرحبا بالعالم!\n"; // Arabic
         text += "ওহে বিশ্ব!\n"; // Bengali
         text += "สวัสดีชาวโลก!\n"; // Thai
         text += "سلام دنیا!\n"; // Persian
         text += "नमस्ते दुनिया!\n"; // Hindi
         text += "Chào thế giới!\n"; // Vietnamese
-        text += "שלום עולם!\n"; // Hebrew
-        text += "ABCDEFG Hello!٠١٢مرحبا!你好\n"; // Mixed languages.
+        text += "שלום עולם!\n\n\n"; // Hebrew
+        text += "Hello123!مرحبا٠١٢!你好123！\n"; // Mixed languages.
 
         auto label = std::make_shared<Label>(text);
         label->enable_visual_debug(true);

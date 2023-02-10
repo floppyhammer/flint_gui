@@ -41,19 +41,19 @@ hb_script_t to_harfbuzz_script(Script script) {
     switch (script) {
         case Script::Arabic: {
             return HB_SCRIPT_ARABIC;
-        } break;
+        }
         case Script::Hebrew: {
             return HB_SCRIPT_HEBREW;
-        } break;
+        }
         case Script::Bengali: {
             return HB_SCRIPT_BENGALI;
-        } break;
+        }
         case Script::Devanagari: {
             return HB_SCRIPT_DEVANAGARI;
-        } break;
+        }
         default: {
-            return HB_SCRIPT_LATIN;
-        } break;
+            return HB_SCRIPT_COMMON;
+        }
     }
 }
 
@@ -248,12 +248,13 @@ void Font::get_glyphs(const std::string &text,
                 int32_t logical_start, length;
                 UBiDiDirection dir = ubidi_getVisualRun(line_bidi, run_index, &logical_start, &length);
 
-                bool is_rtl = dir == UBIDI_RTL;
+                bool run_is_rtl = dir == UBIDI_RTL;
 
-                std::string run_text = convert.to_bytes(utf16_string.substr(para_start + logical_start, length));
+                std::u16string run_text_u16 = utf16_string.substr(para_start + logical_start, length);
+                std::string run_text = convert.to_bytes(run_text_u16);
 
-                std::cout << "Visual run in line: \t" << run_index << "\t" << is_rtl << "\t" << logical_start << '\t'
-                          << length << '\t' << run_text << std::endl;
+                std::cout << "Visual run in line: \t" << run_index << "\t" << run_is_rtl << "\t" << logical_start
+                          << '\t' << length << '\t' << run_text << std::endl;
 
                 auto run_script = get_text_script(run_text);
 
@@ -265,7 +266,7 @@ void Font::get_glyphs(const std::string &text,
                 hb_buffer_add_utf16(
                     hb_buffer, reinterpret_cast<const uint16_t *>(uchar_data), -1, para_start + logical_start, length);
 
-                if (is_rtl) {
+                if (run_is_rtl) {
                     hb_buffer_set_direction(hb_buffer, HB_DIRECTION_RTL);
                 } else {
                     hb_buffer_set_direction(hb_buffer, HB_DIRECTION_LTR);
@@ -284,9 +285,28 @@ void Font::get_glyphs(const std::string &text,
                     auto &info = glyph_info[i];
                     auto &pos = glyph_pos[i];
 
-                    // Skip line breaks, so they're nor drawn.
-                    // In text U+0000 behaves as Combining Mark regarding line breaks.
-                    if (info.codepoint == 0x0000) {
+                    // Cluster unit is u16, so it cannot be directly used with std::string.
+                    Pathfinder::Range current_cluster;
+                    if (!run_is_rtl) {
+                        if (i < glyph_count - 1) {
+                            current_cluster = {info.cluster, glyph_info[i + 1].cluster};
+                        } else {
+                            current_cluster = {info.cluster, (unsigned long long)(para_start + logical_start + length)};
+                        }
+                    } else {
+                        if (i == 0) {
+                            current_cluster = {info.cluster, (unsigned long long)(para_start + logical_start + length)};
+                        } else {
+                            current_cluster = {info.cluster, glyph_info[i - 1].cluster};
+                        }
+                    }
+
+                    std::string glyph_text =
+                        convert.to_bytes(utf16_string.substr(current_cluster.start, current_cluster.length()));
+//                    std::cout << "Glyph text: " << glyph_text << std::endl;
+
+                    // Skip line breaks, so they're not drawn.
+                    if (glyph_text == "\n") {
                         continue;
                     }
 
