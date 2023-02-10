@@ -37,11 +37,31 @@ enum class Script {
     Hebrew,
 };
 
+hb_script_t to_harfbuzz_script(Script script) {
+    switch (script) {
+        case Script::Arabic: {
+            return HB_SCRIPT_ARABIC;
+        } break;
+        case Script::Hebrew: {
+            return HB_SCRIPT_HEBREW;
+        } break;
+        case Script::Bengali: {
+            return HB_SCRIPT_BENGALI;
+        } break;
+        case Script::Devanagari: {
+            return HB_SCRIPT_DEVANAGARI;
+        } break;
+        default: {
+            return HB_SCRIPT_LATIN;
+        } break;
+    }
+}
+
 Script get_text_script(const std::string &text) {
     std::wstring_convert<std::codecvt<char16_t, char, std::mbstate_t>, char16_t> convert;
     std::u16string utf16_string = convert.from_bytes(text);
 
-    for (auto& codepoint : utf16_string) {
+    for (auto &codepoint : utf16_string) {
         if (codepoint >= 0x0600 && codepoint <= 0x06FF) {
             return Script::Arabic;
         }
@@ -251,16 +271,7 @@ void Font::get_glyphs(const std::string &text,
                     hb_buffer_set_direction(hb_buffer, HB_DIRECTION_LTR);
                 }
 
-                switch (run_script) {
-                    case Script::Arabic: {
-                        hb_buffer_set_script(hb_buffer, HB_SCRIPT_ARABIC);
-                        hb_buffer_set_language(hb_buffer, hb_language_from_string("ar", -1));
-                    } break;
-                    default: {
-                        hb_buffer_set_script(hb_buffer, HB_SCRIPT_LATIN);
-                        hb_buffer_set_language(hb_buffer, hb_language_from_string("en", -1));
-                    } break;
-                }
+                hb_buffer_set_script(hb_buffer, to_harfbuzz_script(run_script));
 
                 hb_shape(harfbuzz_res->font, hb_buffer, nullptr, 0);
 
@@ -273,7 +284,7 @@ void Font::get_glyphs(const std::string &text,
                     auto &info = glyph_info[i];
                     auto &pos = glyph_pos[i];
 
-                    // Skip line break.
+                    // Skip line breaks, so they're nor drawn.
                     // In text U+0000 behaves as Combining Mark regarding line breaks.
                     if (info.codepoint == 0x0000) {
                         continue;
