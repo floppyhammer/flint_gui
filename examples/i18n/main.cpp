@@ -9,8 +9,8 @@ using namespace Flint;
 using Pathfinder::Vec2;
 using Pathfinder::Vec3;
 
-const uint32_t WINDOW_WIDTH = 640;
-const uint32_t WINDOW_HEIGHT = 480;
+const uint32_t WINDOW_WIDTH = 1280;
+const uint32_t WINDOW_HEIGHT = 720;
 
 int main() {
     App app(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -29,18 +29,25 @@ int main() {
         margin_container->add_child(vstack_container);
 
         std::string text = "";
-        text += "🌤你好世界！\n"; // Chinese
-        text += "こんにちは世界！\n"; // Japanese
-        text += "مرحبا بالعالم!\n"; // Arabic
-        text += "ওহে বিশ্ব!\n"; // Bengali
-        text += "สวัสดีชาวโลก!\n"; // Thai
-        text += "سلام دنیا!\n"; // Persian
-        text += "नमस्ते दुनिया!\n"; // Hindi
-        text += "Chào thế giới!\n"; // Vietnamese
-        text += "שלום עולם!\n\n\n"; // Hebrew
+        text += "🌤你好世界！\n";                 // Chinese
+        text += "こんにちは世界！\n";            // Japanese
+        text += "مرحبا بالعالم!\n";              // Arabic
+        text += "ওহে বিশ্ব!\n";                   // Bengali
+        text += "สวัสดีชาวโลก!\n";                 // Thai
+        text += "سلام دنیا!\n";                  // Persian
+        text += "नमस्ते दुनिया!\n";                 // Hindi
+        text += "Chào thế giới!\n";              // Vietnamese
+        text += "שלום עולם!\n\n\n";              // Hebrew
         text += "Hello123!مرحبا٠١٢!你好123！\n"; // Mixed languages.
 
         auto label = std::make_shared<Label>(text);
+        label->set_text_style(TextStyle{
+            ColorU::white(),
+            ColorU::red(),
+            8,
+            false,
+        });
+        label->get_font()->set_size(64);
         label->enable_visual_debug(true);
         vstack_container->add_child(label);
     }

@@ -230,8 +230,8 @@ std::vector<Glyph> &Label::get_glyphs() {
     return glyphs;
 }
 
-float Label::get_font_size() const {
-    return font->get_size();
+std::shared_ptr<Font> Label::get_font() const {
+    return font;
 }
 
 float Label::get_glyph_position(uint32_t glyph_index) {

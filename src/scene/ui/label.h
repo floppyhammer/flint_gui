@@ -37,11 +37,11 @@ public:
 
     void remove_text(uint32_t position, uint32_t count);
 
-    void set_size(Vec2F p_size) override;
+    void set_size(Vec2F new_size) override;
 
-    void set_font(std::shared_ptr<Font> p_font);
+    void set_font(std::shared_ptr<Font> new_font);
 
-    void set_text_style(TextStyle _text_style);
+    void set_text_style(TextStyle new_text_style);
 
     void update(double dt) override;
 
@@ -55,7 +55,7 @@ public:
 
     std::vector<Glyph> &get_glyphs();
 
-    float get_font_size() const;
+    std::shared_ptr<Font> get_font() const;
 
     StyleBox theme_background;
 

@@ -177,7 +177,7 @@ void TextEdit::draw() {
             auto start = calculate_caret_position(std::min(current_caret_index, selected_caret_index));
             auto end = calculate_caret_position(std::max(current_caret_index, selected_caret_index));
             auto box_position = label->get_global_position() + start;
-            auto box_size = Vec2F(0, label->get_font_size()) + (end - start);
+            auto box_size = Vec2F(0, label->get_font()->get_size()) + (end - start);
             vector_server->draw_style_box(theme_selection_box, box_position, box_size);
         }
     }
@@ -197,7 +197,7 @@ void TextEdit::draw() {
         }
 
         auto start = label->get_global_position() + Vec2F(current_glyph_right_edge, 3);
-        auto end = start + Vec2F(0, label->get_font_size() - 6);
+        auto end = start + Vec2F(0, label->get_font()->get_size() - 6);
         vector_server->draw_style_line(theme_caret, start, end);
     }
 

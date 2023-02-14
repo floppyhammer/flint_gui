@@ -176,7 +176,21 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         canvas->clip_path(clip_path, FillRule::Winding);
     }
 
-    // Draw glyphs.
+    // Draw glyph strokes. The strokes go below the fills.
+    for (int i = 0; i < glyphs.size(); i++) {
+        auto &g = glyphs[i];
+        auto &p = glyph_positions[i];
+
+        canvas->set_transform(global_transform_offset * Transform2::from_translation(p) * transform);
+
+        // Add stroke if needed.
+        canvas->set_stroke_paint(Paint::from_color(text_style.stroke_color));
+        canvas->set_line_width(text_style.stroke_width);
+        canvas->set_line_join(LineJoin::Bevel);
+        canvas->stroke_path(g.path);
+    }
+
+    // Draw glyph fills.
     for (int i = 0; i < glyphs.size(); i++) {
         auto &g = glyphs[i];
         auto &p = glyph_positions[i];
@@ -186,11 +200,6 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         // Add fill.
         canvas->set_fill_paint(Paint::from_color(text_style.color));
         canvas->fill_path(g.path, FillRule::Winding);
-
-        // Add stroke if needed.
-        canvas->set_stroke_paint(Paint::from_color(text_style.stroke_color));
-        canvas->set_line_width(text_style.stroke_width);
-        canvas->stroke_path(g.path);
 
         if (text_style.debug) {
             canvas->set_line_width(1);

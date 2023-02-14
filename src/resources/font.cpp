@@ -52,7 +52,7 @@ hb_script_t to_harfbuzz_script(Script script) {
         }
         case Script::Devanagari: {
             // It doesn't seem correct to set script as DEVANAGARI for Devanagari.
-//            return HB_SCRIPT_DEVANAGARI;
+            //            return HB_SCRIPT_DEVANAGARI;
             return HB_SCRIPT_LATIN;
         }
         default: {
@@ -238,7 +238,7 @@ void Font::get_glyphs(const std::string &text,
 
             std::string para_text = convert.to_bytes(text_u16.substr(para_start, para_end));
             std::cout << "Paragraph text: " << para_text << std::endl;
-            std::cout << "Paragraph range: \t" << para_start << "\t" << para_end << std::endl;
+            std::cout << "Paragraph range: " << para_start << " -> " << para_end << std::endl;
 
             // Set a paragraph (lines).
             ubidi_setLine(para_bidi, para_start, para_end, line_bidi, &error_code);
@@ -265,7 +265,7 @@ void Font::get_glyphs(const std::string &text,
                 std::u16string run_text_u16 = text_u16.substr(para_start + logical_start, length);
                 std::string run_text = convert.to_bytes(run_text_u16);
 
-                std::cout << "Visual run in line: \t" << run_index << "\t" << run_is_rtl << "\t" << logical_start
+                std::cout << "Visual run in paragraph: \t" << run_index << "\t" << run_is_rtl << "\t" << logical_start
                           << '\t' << length << '\t' << run_text << std::endl;
 
                 auto run_script = get_text_script(run_text);
