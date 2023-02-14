@@ -12,6 +12,8 @@
 #include <stb/stb_truetype.h>
 
 #ifdef _WIN32
+    // With Windows 10 Fall Creators Update and later, you can just include the single header <icu.h>.
+    // See https://learn.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-
     #include <icu.h>
 #else
     // Built-in ICU data.
@@ -303,7 +305,7 @@ void Font::get_glyphs(const std::string &text,
 
                     std::string glyph_text =
                         convert.to_bytes(utf16_string.substr(current_cluster.start, current_cluster.length()));
-//                    std::cout << "Glyph text: " << glyph_text << std::endl;
+                    //                    std::cout << "Glyph text: " << glyph_text << std::endl;
 
                     // Skip line breaks, so they're not drawn.
                     if (glyph_text == "\n") {

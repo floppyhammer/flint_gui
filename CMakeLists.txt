@@ -9,10 +9,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 # Enable Flint's debug mode, which includes visual indicators.
 add_compile_definitions(FLINT_DEBUG)
 
-# > 0x0502 for dark title bar.
-# > 0x0601 for ICU.
-add_compile_definitions(_WIN32_WINNT=0x0601)
-
 # Fix "too many characters in constant" error when using CMake with MSVC.
 string(APPEND CMAKE_CXX_FLAGS " /utf-8")
 
@@ -28,7 +24,8 @@ include_directories(${Vulkan_INCLUDE_DIRS})
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
         src/*.cpp
-        third_party/tinyfiledialogs/*.c)
+        third_party/tinyfiledialogs/*.c
+        third_party/fribidi/*.c)
 
 add_compile_definitions(PATHFINDER_USE_VULKAN)
 
@@ -63,6 +60,15 @@ if (NOT WIN32)
     add_compile_definitions(ICU_STATIC_DATA)
     include_directories(third_party/icu4c/common)
 endif ()
+
+# Alternative to icu4c. If the target platform comes with ICU, we just use it.
+# Else, we build fribidi. It's too cumbersome to build ICU ourselves.
+include_directories(third_party/fribidi)
+include_directories(third_party/fribidi/generated)
+#add_compile_definitions(DONT_HAVE_FRIBIDI_CONFIG_H)
+#add_compile_definitions(DONT_HAVE_FRIBIDI_UNICODE_VERSION_H)
+add_compile_definitions(HAVE_STRINGIZE=1)
+add_compile_definitions(FRIBIDI_BUILD)
 
 add_library(flint ${SOURCE_FILES})
 
