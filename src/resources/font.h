@@ -95,9 +95,10 @@ public:
 
     Pathfinder::Path2d get_glyph_path(uint16_t glyph_index) const;
 
-    void get_glyphs(const std::string &text,
-                    std::vector<Glyph> &glyphs,
-                    std::vector<Pathfinder::Range> &line_ranges);
+    /// Paragraphs and lines are different concepts.
+    /// Paragraphs are seperated by line breaks, while lines are results of automatic layout.
+    /// A paragraph may contain one or more lines.
+    void get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Pathfinder::Range> &para_ranges);
 
     int32_t find_index(int codepoint);
 

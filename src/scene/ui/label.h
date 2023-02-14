@@ -81,7 +81,7 @@ private:
     std::vector<Glyph> glyphs;
 
     // Layout dependent.
-    std::vector<Pathfinder::Range> line_ranges;
+    std::vector<Pathfinder::Range> para_ranges;
 
     // Layout-dependent.
     std::vector<Vec2F> glyph_positions;

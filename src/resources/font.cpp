@@ -176,9 +176,9 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
 
 void Font::get_glyphs(const std::string &text,
                       std::vector<Glyph> &glyphs,
-                      std::vector<Pathfinder::Range> &line_ranges) {
+                      std::vector<Pathfinder::Range> &para_ranges) {
     glyphs.clear();
-    line_ranges.clear();
+    para_ranges.clear();
 
 #ifdef ICU_STATIC_DATA
     static bool icu_data_loaded = false;
@@ -193,66 +193,74 @@ void Font::get_glyphs(const std::string &text,
 
     uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
 
-    // Note: don't use icu::UnicodeString, it doesn't work.
+    // Note: don't use icu::UnicodeString, it doesn't work. Use plain UChar* instead.
 
     std::wstring_convert<std::codecvt<char16_t, char, std::mbstate_t>, char16_t> convert;
-    std::u16string utf16_string = convert.from_bytes(text);
+    std::u16string text_u16 = convert.from_bytes(text);
 
-    const UChar *uchar_data = utf16_string.c_str();
-    const int32_t uchar_count = utf16_string.length();
+    const UChar *uchar_data = text_u16.c_str();
+    const int32_t uchar_count = text_u16.length();
 
+    // Bidi for the whole text (paragraphs).
     UBiDi *para_bidi = ubidi_open();
+    // Bidi for a paragraph (lines).
+    // This would a child bidi of para_bidi. The order to destroy them matters.
     UBiDi *line_bidi = ubidi_open();
 
     UErrorCode error_code = U_ZERO_ERROR;
 
     do {
+        // Paragraphs are seperated by line breaks.
         std::cout << "Paragraphs: " << text << std::endl;
 
+        // Set paragraphs.
         ubidi_setPara(para_bidi, uchar_data, uchar_count, UBIDI_DEFAULT_LTR, nullptr, &error_code);
         if (!U_SUCCESS(error_code)) {
-            Logger::error("ICU failed!", "TextServer");
+            Logger::error("ubidi_setPara() failed!", "TextServer");
             break;
         }
 
         int32_t para_count = ubidi_countParagraphs(para_bidi);
 
+        // Go through paragraphs.
         for (int32_t para_index = 0; para_index < para_count; para_index++) {
+            // Paragraph start and end in the whole text. Unit: u16char.
             int32_t para_start, para_end;
             UBiDiLevel para_level;
             ubidi_getParagraphByIndex(para_bidi, para_index, &para_start, &para_end, &para_level, &error_code);
 
             if (!U_SUCCESS(error_code)) {
-                Logger::error("ICU failed!", "TextServer");
+                Logger::error("ubidi_getParagraphByIndex() failed!", "TextServer");
                 break;
             }
 
-            std::string line_text = convert.to_bytes(utf16_string.substr(para_start, para_end));
-            if (!U_SUCCESS(error_code)) {
-                Logger::error("ICU failed!", "TextServer");
-                break;
-            }
+            std::string para_text = convert.to_bytes(text_u16.substr(para_start, para_end));
+            std::cout << "Paragraph text: " << para_text << std::endl;
+            std::cout << "Paragraph range: \t" << para_start << "\t" << para_end << std::endl;
 
-            std::cout << "Line text: " << line_text << std::endl;
-            std::cout << "Line range: \t" << para_start << "\t" << para_end << std::endl;
-
-            size_t line_start = glyphs.size();
-
+            // Set a paragraph (lines).
             ubidi_setLine(para_bidi, para_start, para_end, line_bidi, &error_code);
             if (!U_SUCCESS(error_code)) {
-                Logger::error("ICU failed!", "TextServer");
+                Logger::error("ubidi_setLine failed!", "TextServer");
                 break;
             }
 
+            // The first glyph in the new paragraph.
+            size_t para_glyph_start = glyphs.size();
+
+            // Get run count in the current paragraph.
             int32_t run_count = ubidi_countRuns(line_bidi, &error_code);
 
+            // Go through runs.
             for (int32_t run_index = 0; run_index < run_count; run_index++) {
+                // Run start and end in the paragraph. Unit: u16char.
                 int32_t logical_start, length;
                 UBiDiDirection dir = ubidi_getVisualRun(line_bidi, run_index, &logical_start, &length);
 
                 bool run_is_rtl = dir == UBIDI_RTL;
 
-                std::u16string run_text_u16 = utf16_string.substr(para_start + logical_start, length);
+                // Get run text from the whole text.
+                std::u16string run_text_u16 = text_u16.substr(para_start + logical_start, length);
                 std::string run_text = convert.to_bytes(run_text_u16);
 
                 std::cout << "Visual run in line: \t" << run_index << "\t" << run_is_rtl << "\t" << logical_start
@@ -268,12 +276,7 @@ void Font::get_glyphs(const std::string &text,
                 hb_buffer_add_utf16(
                     hb_buffer, reinterpret_cast<const uint16_t *>(uchar_data), -1, para_start + logical_start, length);
 
-                if (run_is_rtl) {
-                    hb_buffer_set_direction(hb_buffer, HB_DIRECTION_RTL);
-                } else {
-                    hb_buffer_set_direction(hb_buffer, HB_DIRECTION_LTR);
-                }
-
+                hb_buffer_set_direction(hb_buffer, run_is_rtl ? HB_DIRECTION_RTL : HB_DIRECTION_LTR);
                 hb_buffer_set_script(hb_buffer, to_harfbuzz_script(run_script));
 
                 hb_shape(harfbuzz_res->font, hb_buffer, nullptr, 0);
@@ -287,7 +290,7 @@ void Font::get_glyphs(const std::string &text,
                     auto &info = glyph_info[i];
                     auto &pos = glyph_pos[i];
 
-                    // Cluster unit is u16, so it cannot be directly used with std::string.
+                    // Cluster unit is u16char, so it should be worked with std::u16string instead of std::string.
                     Pathfinder::Range current_cluster;
                     if (!run_is_rtl) {
                         if (i < glyph_count - 1) {
@@ -304,7 +307,7 @@ void Font::get_glyphs(const std::string &text,
                     }
 
                     std::string glyph_text =
-                        convert.to_bytes(utf16_string.substr(current_cluster.start, current_cluster.length()));
+                        convert.to_bytes(text_u16.substr(current_cluster.start, current_cluster.length()));
                     //                    std::cout << "Glyph text: " << glyph_text << std::endl;
 
                     // Skip line breaks, so they're not drawn.
@@ -326,7 +329,8 @@ void Font::get_glyphs(const std::string &text,
                     glyph.x_offset = pos.x_offset;
                     glyph.y_offset = pos.y_offset;
 
-                    // Don't why harfbuzz returns incorrect advance.
+                    // Don't know why harfbuzz returns incorrect advance.
+                    // So, we use the info provided by freetype.
                     //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
                     glyph.x_advance = get_advance(glyph.index);
 
@@ -335,7 +339,7 @@ void Font::get_glyphs(const std::string &text,
 
                     // The glyph's layout box in the glyph's local coordinates.
                     // The origin is the baseline. The Y axis is downward.
-                    glyph.box = RectF(0, -ascent, glyph.x_advance, -descent);
+                    glyph.box = RectF(0, (float)-ascent, glyph.x_advance, (float)-descent);
 
                     // Get the glyph path's bounding box. The Y axis points down.
                     RectI bounding_box = get_bounds(glyph.index);
@@ -349,7 +353,8 @@ void Font::get_glyphs(const std::string &text,
                 hb_buffer_destroy(hb_buffer);
             }
 
-            line_ranges.emplace_back(line_start, glyphs.size());
+            // Record glyph start and end in the new paragraph.
+            para_ranges.emplace_back(para_glyph_start, glyphs.size());
         }
     } while (false);
 

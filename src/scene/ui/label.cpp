@@ -78,7 +78,7 @@ void Label::measure() {
     int ascent = font->get_ascent();
     int descent = font->get_descent();
 
-    font->get_glyphs(text, glyphs, line_ranges);
+    font->get_glyphs(text, glyphs, para_ranges);
 
     // Reset text's layout box.
     layout_box = RectF();
@@ -92,8 +92,8 @@ void Label::measure() {
     float cursor_y = 0;
 
     // Build layout.
-    for (auto &line : line_ranges) {
-        for (int i = line.start; i < line.end; i++) {
+    for (auto &para : para_ranges) {
+        for (int i = para.start; i < para.end; i++) {
             auto &g = glyphs[i];
 
             // The glyph's layout box in the text's local coordinates.
