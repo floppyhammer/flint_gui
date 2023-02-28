@@ -10,7 +10,7 @@ namespace Flint {
 /// Subview is a texture to which you can draw things.
 class Subview {
 public:
-    Subview(Vec2I view_size);
+    explicit Subview(Vec2I view_size);
 
     ~Subview();
 

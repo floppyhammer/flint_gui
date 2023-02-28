@@ -76,4 +76,12 @@ void SceneTree::when_window_size_changed(Vec2I new_size) const {
     }
 }
 
+void SceneTree::quit() {
+    quited = true;
+}
+
+bool SceneTree::has_quited() const {
+    return quited;
+}
+
 } // namespace Flint

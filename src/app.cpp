@@ -95,7 +95,7 @@ App::App(int32_t window_width, int32_t window_height) {
 }
 
 void App::main_loop() {
-    while (!Window::get_singleton()->should_close()) {
+    while (!tree->has_quited()) {
         // Collect input and window events.
         InputServer::get_singleton()->collect_events();
 
@@ -127,8 +127,7 @@ void App::main_loop() {
         SwapChain::get_singleton()->flush(image_index);
     }
 
-    // Wait on the host for the completion of outstanding queue operations for all queues on a given logical device.
-    vkDeviceWaitIdle(Window::get_singleton()->device);
+    cleanup();
 }
 
 void App::cleanup() {

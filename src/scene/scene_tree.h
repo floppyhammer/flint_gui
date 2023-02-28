@@ -40,8 +40,14 @@ public:
 
     void when_window_size_changed(Vec2I new_size) const;
 
+    void quit();
+
+    bool has_quited() const;
+
 private:
     std::shared_ptr<Node> root;
+
+    bool quited = false;
 };
 
 } // namespace Flint

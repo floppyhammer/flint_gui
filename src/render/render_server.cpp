@@ -400,12 +400,13 @@ VkImageView RenderServer::createImageView(VkImage image, VkFormat format, VkImag
     return imageView;
 }
 
-void RenderServer::createBuffer(VkDeviceSize size,
+void RenderServer::createBuffer(const std::shared_ptr<Window> &window,
+                                VkDeviceSize size,
                                 VkBufferUsageFlags usage,
                                 VkMemoryPropertyFlags properties,
                                 VkBuffer &buffer,
                                 VkDeviceMemory &bufferMemory) const {
-    auto device = Window::get_singleton()->device;
+    auto device = window->device;
 
     // Structure specifying the parameters of a newly created buffer object.
     VkBufferCreateInfo bufferInfo{};
@@ -428,7 +429,7 @@ void RenderServer::createBuffer(VkDeviceSize size,
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
     // Index identifying a memory type.
-    allocInfo.memoryTypeIndex = Window::get_singleton()->findMemoryType(memRequirements.memoryTypeBits, properties);
+    allocInfo.memoryTypeIndex = window->findMemoryType(memRequirements.memoryTypeBits, properties);
 
     // Allocate CPU buffer memory.
     if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
@@ -439,11 +440,12 @@ void RenderServer::createBuffer(VkDeviceSize size,
     vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
-void RenderServer::copyDataToMemory(const void *src,
+void RenderServer::copyDataToMemory(const std::shared_ptr<Window> &window,
+                                    const void *src,
                                     VkDeviceMemory bufferMemory,
                                     size_t dataSize,
                                     size_t memoryOffset) const {
-    auto device = Window::get_singleton()->device;
+    auto device = window->device;
 
     void *data;
     vkMapMemory(device, bufferMemory, memoryOffset, dataSize, 0, &data);
@@ -451,7 +453,9 @@ void RenderServer::copyDataToMemory(const void *src,
     vkUnmapMemory(device, bufferMemory);
 }
 
-void RenderServer::createTextureSampler(VkSampler &textureSampler, VkFilter filter) const {
+void RenderServer::createTextureSampler(const std::shared_ptr<Window> &window,
+                                        VkSampler &textureSampler,
+                                        VkFilter filter) const {
     VkSamplerCreateInfo samplerInfo{};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
     samplerInfo.magFilter = filter;
@@ -462,7 +466,7 @@ void RenderServer::createTextureSampler(VkSampler &textureSampler, VkFilter filt
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
     VkPhysicalDeviceProperties properties{};
-    vkGetPhysicalDeviceProperties(Window::get_singleton()->physicalDevice, &properties);
+    vkGetPhysicalDeviceProperties(window->physicalDevice, &properties);
 
     samplerInfo.anisotropyEnable = VK_TRUE;
     samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
@@ -482,7 +486,7 @@ void RenderServer::createTextureSampler(VkSampler &textureSampler, VkFilter filt
     samplerInfo.minLod = 0.0f;
     samplerInfo.maxLod = 0.0f;
 
-    if (vkCreateSampler(Window::get_singleton()->device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
+    if (vkCreateSampler(window->device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create texture sampler!");
     }
 }
@@ -494,12 +498,12 @@ void RenderServer::blit(VkCommandBuffer commandBuffer,
 
     VkBuffer vertexBuffers[] = {default_resources->get_vertex_buffer()};
 
-    draw_mesh_2d(commandBuffer,
-                 graphicsPipeline,
-                 descriptorSet,
-                 vertexBuffers,
-                 default_resources->get_index_buffer(),
-                 default_resources->get_index_count());
+    draw_mesh2d(commandBuffer,
+                graphicsPipeline,
+                descriptorSet,
+                vertexBuffers,
+                default_resources->get_index_buffer(),
+                default_resources->get_index_count());
 }
 
 void RenderServer::draw_skeleton_2d(VkCommandBuffer command_buffer,
@@ -532,12 +536,12 @@ void RenderServer::draw_skeleton_2d(VkCommandBuffer command_buffer,
     vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
 }
 
-void RenderServer::draw_mesh_2d(VkCommandBuffer commandBuffer,
-                                VkPipeline graphicsPipeline,
-                                const VkDescriptorSet &descriptorSet,
-                                VkBuffer vertexBuffers[],
-                                VkBuffer indexBuffer,
-                                uint32_t indexCount) const {
+void RenderServer::draw_mesh2d(VkCommandBuffer commandBuffer,
+                               VkPipeline graphicsPipeline,
+                               const VkDescriptorSet &descriptorSet,
+                               VkBuffer vertexBuffers[],
+                               VkBuffer indexBuffer,
+                               uint32_t indexCount) const {
     // Bind pipeline.
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
@@ -555,12 +559,12 @@ void RenderServer::draw_mesh_2d(VkCommandBuffer commandBuffer,
     vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 }
 
-void RenderServer::draw_mesh(VkCommandBuffer commandBuffer,
-                             VkPipeline graphicsPipeline,
-                             const VkDescriptorSet &descriptorSet,
-                             VkBuffer vertexBuffers[],
-                             VkBuffer indexBuffer,
-                             uint32_t indexCount) const {
+void RenderServer::draw_mesh3d(VkCommandBuffer commandBuffer,
+                               VkPipeline graphicsPipeline,
+                               const VkDescriptorSet &descriptorSet,
+                               VkBuffer vertexBuffers[],
+                               VkBuffer indexBuffer,
+                               uint32_t indexCount) const {
     // Bind pipeline.
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
@@ -601,251 +605,153 @@ void RenderServer::draw_skybox(VkCommandBuffer commandBuffer,
     vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 }
 
-void RenderServer::create_mesh_layouts() {
-    // Descriptor set layout.
+void RenderServer::create_dsl_and_pl(VkDevice device,
+                                     std::vector<VkDescriptorSetLayoutBinding> dsl_bindings,
+                                     std::vector<VkPushConstantRange> pc_ranges,
+                                     VkDescriptorSetLayout &dsl,
+                                     VkPipelineLayout &pl) {
     {
-        // MVP uniform binding.
-        //    // ------------------------------
-        //    VkDescriptorSetLayoutBinding uboLayoutBinding{};
-        //    uboLayoutBinding.binding = 0;
-        //    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        //
-        //    // It is possible for the shader variable to represent an array of uniform buffer objects,
-        //    // and descriptorCount specifies the number of values in the array.
-        //    // This could be used to specify a transformation for each of the bones
-        //    // in a skeleton for skeletal animation, for example.
-        //    uboLayoutBinding.descriptorCount = 1;
-        //
-        //    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        //
-        //    // The pImmutableSamplers field is only relevant for image sampling related descriptors.
-        //    uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
-        //    // ------------------------------
+        VkDescriptorSetLayoutCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        create_info.bindingCount = static_cast<uint32_t>(dsl_bindings.size());
+        create_info.pBindings = dsl_bindings.data();
 
-        // Image sampler uniform binding.
-        // ------------------------------
-        VkDescriptorSetLayoutBinding sampler_layout_binding{};
-        sampler_layout_binding.binding = 0;
-        sampler_layout_binding.descriptorCount = 1;
-        sampler_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        sampler_layout_binding.pImmutableSamplers = nullptr;
-        sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        // ------------------------------
-
-        std::array<VkDescriptorSetLayoutBinding, 1> bindings = {sampler_layout_binding};
-
-        VkDescriptorSetLayoutCreateInfo layout_info{};
-        layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
-        layout_info.pBindings = bindings.data();
-
-        if (vkCreateDescriptorSetLayout(
-                Window::get_singleton()->device, &layout_info, nullptr, &mesh_descriptor_set_layout) != VK_SUCCESS) {
+        if (vkCreateDescriptorSetLayout(device, &create_info, nullptr, &dsl) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create descriptor set layout!");
         }
     }
 
-    // Pipeline layout, which depends on a descriptor set layout.
     {
-        // Push constant.
-        VkPushConstantRange push_constant;
-        push_constant.offset = 0;
-        push_constant.size = sizeof(MvpPushConstant);
-        push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        VkPipelineLayoutCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        create_info.setLayoutCount = 1;
+        create_info.pSetLayouts = &dsl;
+        if (!pc_ranges.empty()) {
+            create_info.pPushConstantRanges = pc_ranges.data();
+            create_info.pushConstantRangeCount = pc_ranges.size();
+        }
 
-        VkPipelineLayoutCreateInfo pipeline_layout_info{};
-        pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipeline_layout_info.setLayoutCount = 1;
-        pipeline_layout_info.pSetLayouts = &mesh_descriptor_set_layout;
-        pipeline_layout_info.pPushConstantRanges = &push_constant;
-        pipeline_layout_info.pushConstantRangeCount = 1;
-
-        // Create pipeline layout.
-        if (vkCreatePipelineLayout(
-                Window::get_singleton()->device, &pipeline_layout_info, nullptr, &mesh_pipeline_layout) != VK_SUCCESS) {
+        if (vkCreatePipelineLayout(device, &create_info, nullptr, &pl) != VK_SUCCESS) {
             throw std::runtime_error("Failed to create pipeline layout!");
         }
     }
+}
+
+void RenderServer::create_mesh_layouts() {
+    auto device = Window::get_singleton()->device;
+
+    // MVP uniform binding.
+    //    // ------------------------------
+    //    VkDescriptorSetLayoutBinding uboLayoutBinding{};
+    //    uboLayoutBinding.binding = 0;
+    //    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    //
+    //    // It is possible for the shader variable to represent an array of uniform buffer objects,
+    //    // and descriptorCount specifies the number of values in the array.
+    //    // This could be used to specify a transformation for each of the bones
+    //    // in a skeleton for skeletal animation, for example.
+    //    uboLayoutBinding.descriptorCount = 1;
+    //
+    //    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    //
+    //    // The pImmutableSamplers field is only relevant for image sampling related descriptors.
+    //    uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
+    //    // ------------------------------
+
+    // Image sampler uniform binding.
+    VkDescriptorSetLayoutBinding sampler_binding{};
+    sampler_binding.binding = 0;
+    sampler_binding.descriptorCount = 1;
+    sampler_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    sampler_binding.pImmutableSamplers = nullptr;
+    sampler_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+    VkPushConstantRange push_constant;
+    push_constant.offset = 0;
+    push_constant.size = sizeof(MvpPushConstant);
+    push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+    create_dsl_and_pl(device, {sampler_binding}, {push_constant}, mesh_descriptor_set_layout, mesh_pipeline_layout);
 }
 
 void RenderServer::create_blit_layouts() {
-    // Descriptor set layout.
-    {
-        // MVP uniform binding. (We use PushConstant instead.)
-        // ------------------------------
-        //    VkDescriptorSetLayoutBinding uboLayoutBinding{};
-        //    uboLayoutBinding.binding = 0;
-        //    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        //
-        //    // It is possible for the shader variable to represent an array of uniform buffer objects,
-        //    // and descriptorCount specifies the number of values in the array.
-        //    // This could be used to specify a transformation for each of the bones
-        //    // in a skeleton for skeletal animation, for example.
-        //    uboLayoutBinding.descriptorCount = 1;
-        //
-        //    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        //
-        //    // The pImmutableSamplers field is only relevant for image sampling related descriptors.
-        //    uboLayoutBinding.pImmutableSamplers = nullptr; // Optional
-        // ------------------------------
+    auto device = Window::get_singleton()->device;
 
-        // Image sampler uniform binding.
-        // ------------------------------
-        VkDescriptorSetLayoutBinding sampler_layout_binding{};
-        sampler_layout_binding.binding = 0;
-        sampler_layout_binding.descriptorCount = 1;
-        sampler_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        sampler_layout_binding.pImmutableSamplers = nullptr;
-        sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        // ------------------------------
+    // Image sampler uniform binding.
+    VkDescriptorSetLayoutBinding sampler_binding{};
+    sampler_binding.binding = 0;
+    sampler_binding.descriptorCount = 1;
+    sampler_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    sampler_binding.pImmutableSamplers = nullptr;
+    sampler_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-        std::array<VkDescriptorSetLayoutBinding, 1> bindings = {sampler_layout_binding};
+    // Push constant.
+    VkPushConstantRange push_constant;
+    push_constant.offset = 0;
+    push_constant.size = sizeof(MvpPushConstant);
+    push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-        VkDescriptorSetLayoutCreateInfo layout_info{};
-        layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
-        layout_info.pBindings = bindings.data();
-
-        if (vkCreateDescriptorSetLayout(
-                Window::get_singleton()->device, &layout_info, nullptr, &blit_descriptor_set_layout) != VK_SUCCESS) {
-            throw std::runtime_error("Failed to create descriptor set layout!");
-        }
-    }
-
-    // Pipeline layout.
-    {
-        // Push constant.
-        VkPushConstantRange push_constant;
-        push_constant.offset = 0;
-        push_constant.size = sizeof(MvpPushConstant);
-        push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-        VkPipelineLayoutCreateInfo pipeline_layout_info{};
-        pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipeline_layout_info.setLayoutCount = 1;
-        pipeline_layout_info.pSetLayouts = &blit_descriptor_set_layout;
-        pipeline_layout_info.pPushConstantRanges = &push_constant;
-        pipeline_layout_info.pushConstantRangeCount = 1;
-
-        // Create pipeline layout.
-        if (vkCreatePipelineLayout(
-                Window::get_singleton()->device, &pipeline_layout_info, nullptr, &blit_pipeline_layout) != VK_SUCCESS) {
-            throw std::runtime_error("Failed to create pipeline layout!");
-        }
-    }
+    create_dsl_and_pl(device, {sampler_binding}, {push_constant}, blit_descriptor_set_layout, blit_pipeline_layout);
 }
 
 void RenderServer::create_skeleton2d_mesh_layouts() {
-    // Descriptor set layout.
-    {
-        // Image sampler uniform binding.
-        // ------------------------------
-        VkDescriptorSetLayoutBinding skeletonTextureLayoutBinding{};
-        skeletonTextureLayoutBinding.binding = 0;
-        skeletonTextureLayoutBinding.descriptorCount = 1;
-        skeletonTextureLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        skeletonTextureLayoutBinding.pImmutableSamplers = nullptr;
-        skeletonTextureLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    auto device = Window::get_singleton()->device;
 
-        VkDescriptorSetLayoutBinding meshTextureLayoutBinding{};
-        meshTextureLayoutBinding.binding = 1;
-        meshTextureLayoutBinding.descriptorCount = 1;
-        meshTextureLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        meshTextureLayoutBinding.pImmutableSamplers = nullptr;
-        meshTextureLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        // ------------------------------
+    // Image sampler uniform binding.
+    // ------------------------------
+    VkDescriptorSetLayoutBinding skeleton_texture_binding{};
+    skeleton_texture_binding.binding = 0;
+    skeleton_texture_binding.descriptorCount = 1;
+    skeleton_texture_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    skeleton_texture_binding.pImmutableSamplers = nullptr;
+    skeleton_texture_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-        std::array<VkDescriptorSetLayoutBinding, 2> bindings = {skeletonTextureLayoutBinding, meshTextureLayoutBinding};
+    VkDescriptorSetLayoutBinding mesh_texture_binding{};
+    mesh_texture_binding.binding = 1;
+    mesh_texture_binding.descriptorCount = 1;
+    mesh_texture_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    mesh_texture_binding.pImmutableSamplers = nullptr;
+    mesh_texture_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    // ------------------------------
 
-        VkDescriptorSetLayoutCreateInfo layout_info{};
-        layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layout_info.bindingCount = static_cast<uint32_t>(bindings.size());
-        layout_info.pBindings = bindings.data();
+    // Push constant.
+    VkPushConstantRange push_constant;
+    push_constant.offset = 0;
+    push_constant.size = sizeof(MvpPushConstant);
+    push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-        if (vkCreateDescriptorSetLayout(
-                Window::get_singleton()->device, &layout_info, nullptr, &skeleton2d_mesh_descriptor_set_layout) !=
-            VK_SUCCESS) {
-            throw std::runtime_error("Failed to create descriptor set layout!");
-        }
-    }
-
-    // Pipeline layout.
-    {
-        // Push constant.
-        VkPushConstantRange push_constant;
-        push_constant.offset = 0;
-        push_constant.size = sizeof(MvpPushConstant);
-        push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-        VkPipelineLayoutCreateInfo pipeline_layout_info{};
-        pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipeline_layout_info.setLayoutCount = 1;
-        pipeline_layout_info.pSetLayouts = &skeleton2d_mesh_descriptor_set_layout;
-        pipeline_layout_info.pPushConstantRanges = &push_constant;
-        pipeline_layout_info.pushConstantRangeCount = 1;
-
-        // Create pipeline layout.
-        if (vkCreatePipelineLayout(
-                Window::get_singleton()->device, &pipeline_layout_info, nullptr, &skeleton2d_mesh_pipeline_layout) !=
-            VK_SUCCESS) {
-            throw std::runtime_error("Failed to create pipeline layout!");
-        }
-    }
+    create_dsl_and_pl(device,
+                      {skeleton_texture_binding, mesh_texture_binding},
+                      {push_constant},
+                      skeleton2d_mesh_descriptor_set_layout,
+                      skeleton2d_mesh_pipeline_layout);
 }
 
 void RenderServer::create_skybox_layouts() {
-    // Descriptor set layout.
-    {
-        // Image sampler uniform binding.
-        // ------------------------------
-        VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-        samplerLayoutBinding.binding = 0;
-        samplerLayoutBinding.descriptorCount = 1;
-        samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        samplerLayoutBinding.pImmutableSamplers = nullptr;
-        samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        // ------------------------------
+    auto device = Window::get_singleton()->device;
 
-        std::array<VkDescriptorSetLayoutBinding, 1> bindings = {samplerLayoutBinding};
-        VkDescriptorSetLayoutCreateInfo layoutInfo{};
-        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-        layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-        layoutInfo.pBindings = bindings.data();
+    // Image sampler uniform binding.
+    VkDescriptorSetLayoutBinding sampler_binding{};
+    sampler_binding.binding = 0;
+    sampler_binding.descriptorCount = 1;
+    sampler_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    sampler_binding.pImmutableSamplers = nullptr;
+    sampler_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-        if (vkCreateDescriptorSetLayout(
-                Window::get_singleton()->device, &layoutInfo, nullptr, &skybox_descriptor_set_layout) != VK_SUCCESS) {
-            throw std::runtime_error("Failed to create descriptor set layout!");
-        }
-    }
+    // Push constant.
+    VkPushConstantRange push_constant;
+    push_constant.offset = 0;
+    push_constant.size = sizeof(MvpPushConstant);
+    push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-    // Pipeline layout, which depends on a descriptor set layout.
-    {
-        // Push constant.
-        VkPushConstantRange pushConstant;
-        {
-            pushConstant.offset = 0;
-            pushConstant.size = sizeof(MvpPushConstant);
-            pushConstant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-        }
-
-        VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-        pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 1;
-        pipelineLayoutInfo.pSetLayouts = &skybox_descriptor_set_layout;
-        pipelineLayoutInfo.pPushConstantRanges = &pushConstant;
-        pipelineLayoutInfo.pushConstantRangeCount = 1;
-
-        // Create pipeline layout.
-        if (vkCreatePipelineLayout(
-                Window::get_singleton()->device, &pipelineLayoutInfo, nullptr, &skybox_pipeline_layout) != VK_SUCCESS) {
-            throw std::runtime_error("Failed to create pipeline layout!");
-        }
-    }
+    create_dsl_and_pl(device, {sampler_binding}, {push_constant}, skybox_descriptor_set_layout, skybox_pipeline_layout);
 }
 
-void RenderServer::create_mesh_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) {
-    auto vertShaderCode = load_file_as_bytes("../src/shaders/mesh_instance_vert.spv");
-    auto fragShaderCode = load_file_as_bytes("../src/shaders/mesh_instance_frag.spv");
+void RenderServer::create_mesh3d_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) {
+    auto device = Window::get_singleton()->device;
+
+    auto vertShaderCode = load_file_as_bytes("../src/shaders/mesh3d_vert.spv");
+    auto fragShaderCode = load_file_as_bytes("../src/shaders/mesh3d_frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -962,8 +868,6 @@ void RenderServer::create_mesh_pipeline(VkRenderPass renderPass, VkExtent2D view
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
 
-    auto device = Window::get_singleton()->device;
-
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create graphics pipeline!");
@@ -974,9 +878,11 @@ void RenderServer::create_mesh_pipeline(VkRenderPass renderPass, VkExtent2D view
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
-void RenderServer::create_blit_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) {
-    auto vertShaderCode = load_file_as_bytes("../src/shaders/blit_vert.spv");
-    auto fragShaderCode = load_file_as_bytes("../src/shaders/blit_frag.spv");
+void RenderServer::create_mesh2d_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) {
+    auto device = Window::get_singleton()->device;
+
+    auto vertShaderCode = load_file_as_bytes("../src/shaders/mesh2d_vert.spv");
+    auto fragShaderCode = load_file_as_bytes("../src/shaders/mesh2d_frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -1103,8 +1009,6 @@ void RenderServer::create_blit_pipeline(VkRenderPass renderPass, VkExtent2D view
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
 
-    auto device = Window::get_singleton()->device;
-
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create graphics pipeline!");
@@ -1118,6 +1022,8 @@ void RenderServer::create_blit_pipeline(VkRenderPass renderPass, VkExtent2D view
 void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass,
                                                    VkExtent2D viewportExtent,
                                                    VkPipeline &pipeline) {
+    auto device = Window::get_singleton()->device;
+
     auto vertShaderCode = load_file_as_bytes("../src/shaders/skeleton_2d_vert.spv");
     auto fragShaderCode = load_file_as_bytes("../src/shaders/skeleton_2d_frag.spv");
 
@@ -1246,8 +1152,6 @@ void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass,
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
 
-    auto device = Window::get_singleton()->device;
-
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create graphics pipeline!");
@@ -1261,6 +1165,8 @@ void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass,
 void RenderServer::create_skybox_pipeline(VkRenderPass renderPass,
                                           VkExtent2D viewportExtent,
                                           VkPipeline &pipeline) const {
+    auto device = Window::get_singleton()->device;
+
     auto vertShaderCode = load_file_as_bytes("../src/shaders/skybox_vert.spv");
     auto fragShaderCode = load_file_as_bytes("../src/shaders/skybox_frag.spv");
 
@@ -1379,8 +1285,6 @@ void RenderServer::create_skybox_pipeline(VkRenderPass renderPass,
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
-
-    auto device = Window::get_singleton()->device;
 
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {

@@ -116,7 +116,8 @@ public:
      * @param buffer
      * @param bufferMemory
      */
-    void createBuffer(VkDeviceSize size,
+    void createBuffer(const std::shared_ptr<Window> &window,
+                      VkDeviceSize size,
                       VkBufferUsageFlags usage,
                       VkMemoryPropertyFlags properties,
                       VkBuffer &buffer,
@@ -128,9 +129,20 @@ public:
      * @param bufferMemory Device memory.
      * @param dataSize Data size in bytes.
      */
-    void copyDataToMemory(const void *src, VkDeviceMemory bufferMemory, size_t dataSize, size_t memoryOffset = 0) const;
+    void copyDataToMemory(const std::shared_ptr<Window> &window,
+                          const void *src,
+                          VkDeviceMemory bufferMemory,
+                          size_t dataSize,
+                          size_t memoryOffset = 0) const;
 
-    void createTextureSampler(VkSampler &textureSampler, VkFilter filter) const;
+    void createTextureSampler(const std::shared_ptr<Window> &window, VkSampler &textureSampler, VkFilter filter) const;
+
+    /// Create descriptor set layout and pipeline layout.
+    static void create_dsl_and_pl(VkDevice device,
+                                  std::vector<VkDescriptorSetLayoutBinding> dsl_bindings,
+                                  std::vector<VkPushConstantRange> pc_ranges,
+                                  VkDescriptorSetLayout &dsl,
+                                  VkPipelineLayout &pl);
 
     /**
      * Set up shaders, viewport, blend state, etc.
@@ -141,7 +153,11 @@ public:
      * chains.
      * @dependency Descriptor set layout, render pass, viewport extent.
      */
-    void create_mesh_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
+    void create_mesh3d_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
+
+    void create_mesh2d_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
+
+    void create_skeleton2d_mesh_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
 
     void create_skybox_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) const;
 
@@ -154,19 +170,19 @@ public:
      * @param indexBuffer
      * @param indexCount
      */
-    void draw_mesh(VkCommandBuffer commandBuffer,
-                   VkPipeline meshGraphicsPipeline,
-                   VkDescriptorSet const &descriptorSet,
-                   VkBuffer *vertexBuffers,
-                   VkBuffer indexBuffer,
-                   uint32_t indexCount) const;
+    void draw_mesh3d(VkCommandBuffer commandBuffer,
+                     VkPipeline meshGraphicsPipeline,
+                     VkDescriptorSet const &descriptorSet,
+                     VkBuffer *vertexBuffers,
+                     VkBuffer indexBuffer,
+                     uint32_t indexCount) const;
 
-    void draw_mesh_2d(VkCommandBuffer commandBuffer,
-                      VkPipeline graphicsPipeline,
-                      const VkDescriptorSet &descriptorSet,
-                      VkBuffer vertexBuffers[],
-                      VkBuffer indexBuffer,
-                      uint32_t indexCount) const;
+    void draw_mesh2d(VkCommandBuffer commandBuffer,
+                     VkPipeline graphicsPipeline,
+                     const VkDescriptorSet &descriptorSet,
+                     VkBuffer vertexBuffers[],
+                     VkBuffer indexBuffer,
+                     uint32_t indexCount) const;
 
     void blit(VkCommandBuffer commandBuffer, VkPipeline graphicsPipeline, const VkDescriptorSet &descriptorSet) const;
 
@@ -188,10 +204,6 @@ public:
     void cleanup_swapchain_related_resources() const;
 
     void create_command_pool();
-
-    void create_blit_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
-
-    void create_skeleton2d_mesh_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
 
 public:
     // Various pipelines.
