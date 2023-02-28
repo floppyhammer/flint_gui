@@ -26,6 +26,7 @@ enum class NodeType {
     VStackContainer,
     ScrollContainer,
     Window,
+    Popup,
     TabContainer,
     Button,
     Label,

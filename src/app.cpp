@@ -13,6 +13,7 @@
 #include "resources/mesh.h"
 #include "resources/resource_manager.h"
 #include "servers/core_server.h"
+#include "servers/display_server.h"
 #include "servers/input_server.h"
 #include "servers/vector_server.h"
 
@@ -71,6 +72,8 @@ App::App(int32_t window_width, int32_t window_height) {
     // 1. Initialize hardware.
     auto window = Window::get_singleton();
     window->init(window_width, window_height);
+
+    auto display_server = DisplayServer::get_singleton();
 
     // 2. Initialize render server.
     auto render_server = RenderServer::get_singleton();

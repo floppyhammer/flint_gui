@@ -43,6 +43,8 @@ public:
 
     void init(int32_t window_width, int32_t window_height);
 
+    bool process();
+
     bool should_close() const;
 
     GLFWwindow *glfw_window{};
@@ -152,8 +154,6 @@ private:
     static const bool enableValidationLayers = true;
 
 private:
-    void create_window(int32_t width, int32_t height);
-
     void setupDebugMessenger();
 
     /// Initialize the Vulkan library by creating an instance.

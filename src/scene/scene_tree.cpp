@@ -8,7 +8,7 @@ namespace Flint {
 
 SceneTree::SceneTree() {
     root = std::make_shared<WindowNode>(
-        Vec2I(SwapChain::get_singleton()->swapChainExtent.width, SwapChain::get_singleton()->swapChainExtent.height));
+        Vec2I(SwapChain::get_singleton()->swapChainExtent.width, SwapChain::get_singleton()->swapChainExtent.height), false);
     root->name = "Main Window";
 }
 

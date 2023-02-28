@@ -3,6 +3,8 @@
 #include <set>
 #include <stdexcept>
 
+#include "../servers/display_server.h"
+
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
                                       const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo,
                                       const VkAllocationCallbacks *pAllocator,
@@ -25,8 +27,10 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance,
 }
 
 void Window::init(int32_t window_width, int32_t window_height) {
-    // Create a window.
-    create_window(window_width, window_height);
+    auto display_server = Flint::DisplayServer::get_singleton();
+
+    // Create a GLFW window.
+    glfw_window = display_server->create_window({window_width, window_height}, "Flint");
 
     // Initialize the Vulkan library by creating an instance.
     create_instance();
@@ -45,46 +49,6 @@ void Window::init(int32_t window_width, int32_t window_height) {
 
 bool Window::should_close() const {
     return glfwWindowShouldClose(glfw_window);
-}
-
-void Window::create_window(int32_t width, int32_t height) {
-    // Initializes the GLFW library.
-    glfwInit();
-
-    // To not create an OpenGL context (as we're using Vulkan).
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
-    // Enable window resizing. Resizing requires swap chain recreation.
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-
-    // Hide window upon creation as we need to center the window before showing it.
-    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-
-    // Get monitor position (used to correctly center the window in a multi-monitor scenario).
-    int monitors_count;
-    GLFWmonitor **monitors = glfwGetMonitors(&monitors_count);
-
-    const GLFWvidmode *video_mode = glfwGetVideoMode(monitors[0]);
-
-    int monitor_x, monitor_y;
-    glfwGetMonitorPos(monitors[0], &monitor_x, &monitor_y);
-
-    // Get DPI scale.
-    float dpi_scale_x, dpi_scale_y;
-    glfwGetMonitorContentScale(monitors[0], &dpi_scale_x, &dpi_scale_y);
-
-    glfw_window = glfwCreateWindow(width, height, "Flint", nullptr, nullptr);
-
-    // Center window.
-    glfwSetWindowPos(
-        glfw_window, monitor_x + (video_mode->width - width) / 2, monitor_y + (video_mode->height - height) / 2);
-
-    // Show window.
-    glfwShowWindow(glfw_window);
-
-    // Assign this to window user, so we can fetch it when the window size changes.
-    glfwSetWindowUserPointer(glfw_window, this);
-    glfwSetFramebufferSizeCallback(glfw_window, framebufferResizeCallback);
 }
 
 void Window::create_instance() {
@@ -426,6 +390,44 @@ void Window::cleanup() {
     vkDestroyInstance(instance, nullptr);
 
     glfwDestroyWindow(glfw_window);
+}
 
-    glfwTerminate();
+bool Window::process() {
+    if (should_close()) {
+        // Wait on the host for the completion of outstanding queue operations for all queues on a given logical device.
+        vkDeviceWaitIdle(Window::get_singleton()->device);
+        return false;
+    }
+
+    // Collect input and window events.
+    InputServer::get_singleton()->collect_events();
+
+    // Engine processing.
+    CoreServer::get_singleton()->tick();
+
+    // Get frame time.
+    auto dt = CoreServer::get_singleton()->get_delta();
+
+    // Acquire next image.
+    // We should do this before updating the scenes as we need to modify different
+    // buffers according to the current image index.
+    uint32_t image_index;
+    if (!SwapChain::get_singleton()->acquireSwapChainImage(image_index)) {
+        Logger::error("Invalid swap chain image index!", "Swap Chain");
+        return;
+    }
+
+    // Propagate input events.
+    tree->input(InputServer::get_singleton()->input_queue);
+
+    // Update the scene tree.
+    tree->update(dt);
+
+    // Record draw calls.
+    record_commands(SwapChain::get_singleton()->commandBuffers, image_index);
+
+    // Submit commands for drawing.
+    SwapChain::get_singleton()->flush(image_index);
+
+    return true;
 }
