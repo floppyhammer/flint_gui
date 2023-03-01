@@ -18,7 +18,7 @@ protected:
 
     void update(double dt) override;
 
-    void draw(VkCommandBuffer cmd_buffer) override;
+    void draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 };
 
 } // namespace Flint

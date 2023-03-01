@@ -42,7 +42,7 @@ protected:
     StyleBox theme_scroll_grabber;
 
 private:
-    void propagate_draw(VkCommandBuffer p_command_buffer) override;
+    void propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     void propagate_input(InputEvent &event) override;
 };

@@ -14,9 +14,9 @@ class UiLayer : public Node {
 public:
     UiLayer();
 
-    void draw(VkCommandBuffer cmd_buffer) override;
+    void draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
-    void propagate_draw(VkCommandBuffer cmd_buffer) override;
+    void propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     void update_mvp();
 

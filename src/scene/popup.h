@@ -3,11 +3,11 @@
 
 #include <functional>
 
-#include "window.h"
+#include "window_proxy.h"
 
 namespace Flint {
 
-class Popup : public WindowNode {
+class Popup : public WindowProxy {
 public:
     Popup(Vec2I size);
 };

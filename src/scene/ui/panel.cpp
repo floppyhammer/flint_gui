@@ -187,7 +187,7 @@ void Panel::update(double dt) {
     NodeUi::update(dt);
 }
 
-void Panel::propagate_draw(VkCommandBuffer cmd_buffer) {
+void Panel::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     if (!visible) {
         return;
     }
@@ -195,7 +195,7 @@ void Panel::propagate_draw(VkCommandBuffer cmd_buffer) {
     draw();
 
     if (!collapsed) {
-        Node::propagate_draw(cmd_buffer);
+        Node::propagate_draw(render_pass, cmd_buffer);
     }
 }
 
@@ -220,7 +220,7 @@ void Panel::draw() {
                                                {global_position.x + size.x, global_position.y + title_bar_height});
             }
 
-            title_container->propagate_draw(VK_NULL_HANDLE);
+            title_container->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
         } else {
             if (!collapsed) {
                 vector_server->draw_style_box(theme_panel.value(), get_global_position(), size);
@@ -229,7 +229,7 @@ void Panel::draw() {
     }
 
     if (title_bar) {
-        title_container->propagate_draw(VK_NULL_HANDLE);
+        title_container->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
     }
 }
 

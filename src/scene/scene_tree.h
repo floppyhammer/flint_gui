@@ -30,11 +30,7 @@ class SceneTree {
 public:
     SceneTree();
 
-    void input(std::vector<InputEvent>& input_queue) const;
-
-    void update(double dt) const;
-
-    void draw(VkCommandBuffer cmd_buffer) const;
+    void process(double dt) const;
 
     void replace_scene(const std::shared_ptr<Node>& new_scene);
 

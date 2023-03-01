@@ -195,7 +195,7 @@ void TreeItem::propagate_draw(float folding_width, uint32_t depth, float &offset
     container->set_position(Vec2F(offset_x, offset_y) + global_position);
     container->set_size({item_height, item_height});
     container->propagate_update(0);
-    container->propagate_draw(VK_NULL_HANDLE);
+    container->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
 
     offset_y += item_height;
 

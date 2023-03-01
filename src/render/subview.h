@@ -3,7 +3,7 @@
 
 #include "../common/geometry.h"
 #include "../resources/image_texture.h"
-#include "render_server.h"
+#include "servers/render_server.h"
 
 namespace Flint {
 
@@ -20,13 +20,6 @@ public:
 
     /// For later use of the image as a sampler target.
     VkDescriptorImageInfo descriptor;
-
-    // Pipelines bound with the render pass of this sub viewport.
-    // ------------------------------------
-    VkPipeline mesh_pipeline;
-    VkPipeline blit_pipeline;
-    VkPipeline skybox_pipeline;
-    // ------------------------------------
 
     VkImage depth_image;
     VkDeviceMemory depth_image_memory;
@@ -56,8 +49,6 @@ private:
     // The color attachment of this framebuffer will then be used
     // to sample from in the fragment shader of the final pass.
     void create_framebuffer();
-
-    void create_pipelines();
 };
 
 } // namespace Flint

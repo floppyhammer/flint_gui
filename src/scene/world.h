@@ -2,11 +2,11 @@
 #define FLINT_WORLD_H
 
 #include "../common/geometry.h"
-#include "../render/render_server.h"
 #include "../render/subview.h"
 #include "../resources/image_texture.h"
 #include "node.h"
 #include "resources/mesh.h"
+#include "servers/render_server.h"
 
 using Pathfinder::ColorF;
 using Pathfinder::Vec2I;
@@ -25,7 +25,7 @@ class World : public Node {
 public:
     World(bool _is_2d);
 
-    void propagate_draw(VkCommandBuffer cmd_buffer) override;
+    void propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     void add_camera2d(Camera2d* new_camera);
 
@@ -34,7 +34,7 @@ public:
     Camera3d* current_camera3d{};
     Camera2d* current_camera2d{};
 
-    void draw(VkCommandBuffer cmd_buffer) override;
+    void draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     void update_mvp();
 

@@ -1,18 +1,15 @@
 #ifndef FLINT_SWAP_CHAIN_H
 #define FLINT_SWAP_CHAIN_H
 
-#include "platform.h"
+#include "window.h"
 
 namespace Flint {
 
 class SwapChain {
 public:
-    SwapChain();
+    SwapChain(Window* _window);
 
-    static SwapChain *get_singleton() {
-        static SwapChain singleton;
-        return &singleton;
-    }
+    ~SwapChain();
 
     VkSwapchainKHR swapChain;
 
@@ -112,6 +109,9 @@ public:
     void flush(uint32_t imageIndex);
 
     void cleanup();
+
+private:
+    Window* window;
 };
 
 } // namespace Flint

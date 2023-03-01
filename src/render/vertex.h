@@ -1,7 +1,7 @@
 #ifndef FLINT_VERTEX_H
 #define FLINT_VERTEX_H
 
-#include "render_server.h"
+#include "servers/render_server.h"
 
 namespace Flint {
 
@@ -102,7 +102,7 @@ struct VertexGpuResources {
     }
 
     ~VertexGpuResources() {
-        auto device = Window::get_singleton()->device;
+        auto device = DisplayServer::get_singleton()->get_device();
 
         // Clean up index buffer.
         vkDestroyBuffer(device, index_buffer, nullptr);
@@ -165,8 +165,8 @@ private:
         rs->copyBuffer(staging_buffer, vertex_buffer, buffer_size);
 
         // Clean up staging buffer and memory.
-        vkDestroyBuffer(Window::get_singleton()->device, staging_buffer, nullptr);
-        vkFreeMemory(Window::get_singleton()->device, staging_buffer_memory, nullptr);
+        vkDestroyBuffer(DisplayServer::get_singleton()->get_device(), staging_buffer, nullptr);
+        vkFreeMemory(DisplayServer::get_singleton()->get_device(), staging_buffer_memory, nullptr);
     }
 
     void create_index_buffer(const std::vector<uint32_t> &indices) {
@@ -197,8 +197,8 @@ private:
         // Copy data from staging buffer to index buffer.
         rs->copyBuffer(staging_buffer, index_buffer, buffer_size);
 
-        vkDestroyBuffer(Window::get_singleton()->device, staging_buffer, nullptr);
-        vkFreeMemory(Window::get_singleton()->device, staging_buffer_memory, nullptr);
+        vkDestroyBuffer(DisplayServer::get_singleton()->get_device(), staging_buffer, nullptr);
+        vkFreeMemory(DisplayServer::get_singleton()->get_device(), staging_buffer_memory, nullptr);
     }
 };
 

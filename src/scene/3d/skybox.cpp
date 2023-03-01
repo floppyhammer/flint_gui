@@ -21,7 +21,7 @@ void Skybox::update(double dt) {
     update_mvp();
 }
 
-void Skybox::draw(VkCommandBuffer cmd_buffer) {
+void Skybox::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     auto world = get_world();
     if (!world) {
         return;
@@ -32,7 +32,7 @@ void Skybox::draw(VkCommandBuffer cmd_buffer) {
         return;
     }
 
-    VkPipeline pipeline = camera->subview->skybox_pipeline;
+    VkPipeline pipeline = RenderServer::get_singleton()->get_pipeline(render_pass, "skybox");
     VkPipelineLayout pipeline_layout = RenderServer::get_singleton()->skybox_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
@@ -45,11 +45,11 @@ void Skybox::draw(VkCommandBuffer cmd_buffer) {
 
     VkBuffer vertexBuffers[] = {skybox_gpu_resource->get_vertex_buffer()};
     RenderServer::get_singleton()->draw_skybox(cmd_buffer,
-                                              pipeline,
-                                              desc_set->getDescriptorSet(SwapChain::get_singleton()->currentImage),
-                                              vertexBuffers,
-                                              skybox_gpu_resource->get_index_buffer(),
-                                              skybox_gpu_resource->get_index_count());
+                                               pipeline,
+                                               desc_set->getDescriptorSet(get_current_image()),
+                                               vertexBuffers,
+                                               skybox_gpu_resource->get_index_buffer(),
+                                               skybox_gpu_resource->get_index_count());
 }
 
 } // namespace Flint

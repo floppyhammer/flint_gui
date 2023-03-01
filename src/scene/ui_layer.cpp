@@ -18,10 +18,10 @@ UiLayer::UiLayer() {
     mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
 }
 
-void UiLayer::propagate_draw(VkCommandBuffer cmd_buffer) {
+void UiLayer::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     // Record drawing commands.
     for (auto& child : children) {
-        child->propagate_draw(cmd_buffer);
+        child->propagate_draw(render_pass, cmd_buffer);
     }
 
     // Draw UI nodes.
@@ -29,7 +29,7 @@ void UiLayer::propagate_draw(VkCommandBuffer cmd_buffer) {
 
     // TODO: let the scene tree manage UI layer drawing, so we can properly order UI and 2D/3D worlds.
     // Draw resulted UI texture.
-    draw(cmd_buffer);
+    draw(render_pass, cmd_buffer);
 }
 
 void UiLayer::update_mvp() {
@@ -49,13 +49,13 @@ void UiLayer::update_mvp() {
     push_constant.mvp = mvp.model;
 }
 
-void UiLayer::draw(VkCommandBuffer cmd_buffer) {
+void UiLayer::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     auto image_texture = VectorServer::get_singleton()->get_texture();
     mesh->surface->get_material()->set_texture(image_texture.get());
 
     auto rs = RenderServer::get_singleton();
 
-    VkPipeline pipeline = rs->blit_pipeline;
+    VkPipeline pipeline = rs->get_pipeline(render_pass, "mesh2d");
     VkPipelineLayout pipeline_layout = rs->blit_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
@@ -65,7 +65,7 @@ void UiLayer::draw(VkCommandBuffer cmd_buffer) {
     // Unlike Sprite 2D, Texture Rect should not support custom mesh.
     rs->blit(cmd_buffer,
              pipeline,
-             mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::get_singleton()->currentImage));
+             mesh->surface->get_material()->get_desc_set()->getDescriptorSet(get_current_image()));
 }
 
 void UiLayer::when_window_size_changed(Vec2I new_size) {

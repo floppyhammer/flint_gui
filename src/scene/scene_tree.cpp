@@ -2,14 +2,15 @@
 
 #include "render/swap_chain.h"
 #include "ui_layer.h"
-#include "window.h"
+#include "window_proxy.h"
 
 namespace Flint {
 
 SceneTree::SceneTree() {
-    root = std::make_shared<WindowNode>(
-        Vec2I(SwapChain::get_singleton()->swapChainExtent.width, SwapChain::get_singleton()->swapChainExtent.height), false);
+    root = std::make_shared<WindowProxy>(Vec2I{400, 300}, false);
     root->name = "Main Window";
+
+    auto render_server = RenderServer::get_singleton();
 }
 
 void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
@@ -35,36 +36,22 @@ void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
     }
 }
 
-void SceneTree::input(std::vector<InputEvent>& input_queue) const {
-    if (root == nullptr || input_queue.empty()) {
-        return;
-    }
-
-    for (auto& event : input_queue) {
-        root->propagate_input(event);
-    }
-}
-
-void SceneTree::update(double dt) const {
+void SceneTree::process(double dt) const {
     if (root == nullptr) {
         return;
     }
 
-    if (Window::get_singleton()->framebufferResized) {
-        auto new_size = Vec2I(Window::get_singleton()->framebuffer_width, Window::get_singleton()->framebuffer_height);
-        when_window_size_changed(new_size);
-        VectorServer::get_singleton()->get_canvas()->set_new_dst_texture(new_size);
-    }
+    //    if (Window::get_singleton()->framebufferResized) {
+    //        auto new_size = Vec2I(Window::get_singleton()->framebuffer_width,
+    //        Window::get_singleton()->framebuffer_height); when_window_size_changed(new_size);
+    //        VectorServer::get_singleton()->get_canvas()->set_new_dst_texture(new_size);
+    //    }
+
+//    root->propagate_input(dt);
 
     root->propagate_update(dt);
-}
 
-void SceneTree::draw(VkCommandBuffer cmd_buffer) const {
-    if (root == nullptr) {
-        return;
-    }
-
-    root->propagate_draw(cmd_buffer);
+    root->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
 }
 
 void SceneTree::when_window_size_changed(Vec2I new_size) const {

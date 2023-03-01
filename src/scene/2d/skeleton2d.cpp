@@ -9,10 +9,10 @@
 #include "../../common/geometry.h"
 #include "../../common/logger.h"
 #include "../../render/mvp.h"
-#include "../../render/render_server.h"
 #include "../../render/swap_chain.h"
 #include "../../resources/resource_manager.h"
 #include "../world.h"
+#include "servers/render_server.h"
 
 namespace Flint {
 
@@ -346,11 +346,11 @@ Skeleton2d::Skeleton2d() {
     poolInfo.pPoolSizes = poolSizes.data();
     poolInfo.maxSets = 1;
 
-    if (vkCreateDescriptorPool(Window::get_singleton()->device, &poolInfo, nullptr, &descriptor_pool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptor_pool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor pool!");
     }
 
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
     auto &descriptorSetLayout = RenderServer::get_singleton()->skeleton2d_mesh_descriptor_set_layout;
 
     std::vector<VkDescriptorSetLayout> layouts(1, descriptorSetLayout);
@@ -376,7 +376,7 @@ Skeleton2d::Skeleton2d() {
 }
 
 Skeleton2d::~Skeleton2d() {
-    vkDestroyDescriptorPool(Window::get_singleton()->device, descriptor_pool, nullptr);
+    vkDestroyDescriptorPool(DisplayServer::get_singleton()->get_device(), descriptor_pool, nullptr);
 }
 
 template <class C>
@@ -434,9 +434,9 @@ void Skeleton2d::update(double delta) {
     upload_bone_transforms();
 }
 
-void Skeleton2d::draw(VkCommandBuffer cmd_buffer) {
+void Skeleton2d::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     // Draw all triangles with a single draw call.
-    VkPipeline pipeline = RenderServer::get_singleton()->skeleton2d_mesh_pipeline;
+    VkPipeline pipeline = RenderServer::get_singleton()->get_pipeline(render_pass, "skeleton2d_mesh");
     VkPipelineLayout pipeline_layout = RenderServer::get_singleton()->skeleton2d_mesh_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
@@ -455,7 +455,7 @@ void Skeleton2d::draw(VkCommandBuffer cmd_buffer) {
         root_bone->draw();
     }
 
-    Node2d::draw(cmd_buffer);
+    Node2d::draw(render_pass, cmd_buffer);
 }
 
 void Skeleton2d::update_bone_rest() {
@@ -704,7 +704,7 @@ void Skeleton2d::allocate_bone_transforms(uint32_t new_bone_count) {
     descriptorWrites[1].pImageInfo = &imageInfo2;
 
     // Update the contents of a descriptor set object.
-    vkUpdateDescriptorSets(Window::get_singleton()->device,
+    vkUpdateDescriptorSets(DisplayServer::get_singleton()->get_device(),
                            static_cast<uint32_t>(descriptorWrites.size()),
                            descriptorWrites.data(),
                            0,
@@ -769,8 +769,8 @@ void Skeleton2d::upload_bone_transforms() {
         bone_transforms_texture->layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
         // Clean up staging objects.
-        vkDestroyBuffer(Window::get_singleton()->device, staging_buffer, nullptr);
-        vkFreeMemory(Window::get_singleton()->device, staging_buffer_memory, nullptr);
+        vkDestroyBuffer(DisplayServer::get_singleton()->get_device(), staging_buffer, nullptr);
+        vkFreeMemory(DisplayServer::get_singleton()->get_device(), staging_buffer_memory, nullptr);
     }
 }
 

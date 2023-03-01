@@ -3,6 +3,7 @@
 #include <string>
 
 #include "../render/swap_chain.h"
+#include "window_proxy.h"
 #include "world.h"
 
 namespace Flint {
@@ -15,11 +16,11 @@ void Node::propagate_update(double dt) {
     }
 }
 
-void Node::propagate_draw(VkCommandBuffer p_command_buffer) {
-    draw(p_command_buffer);
+void Node::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
+    draw(render_pass, cmd_buffer);
 
     for (auto &child : children) {
-        child->propagate_draw(p_command_buffer);
+        child->propagate_draw(render_pass, cmd_buffer);
     }
 }
 
@@ -56,7 +57,7 @@ void Node::update(double delta) {
 void Node::notify(Signal signal) {
 }
 
-void Node::draw(VkCommandBuffer p_command_buffer) {
+void Node::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
 }
 
 World *Node::get_world() {
@@ -67,12 +68,12 @@ World *Node::get_world() {
     return parent->type == NodeType::World ? (World *)parent : parent->get_world();
 }
 
-WindowNode *Node::get_window() {
+WindowProxy *Node::get_window() {
     if (parent == nullptr) {
         return nullptr;
     }
 
-    return parent->type == NodeType::Window ? (WindowNode *)parent : parent->get_window();
+    return parent->type == NodeType::Window ? (WindowProxy *)parent : parent->get_window();
 }
 
 void Node::set_parent(Node *node) {
@@ -188,6 +189,17 @@ void Node::enable_visual_debug(bool enabled) {
 
 NodeType Node::get_node_type() const {
     return type;
+}
+
+uint32_t Node::get_current_image() {
+    WindowProxy *window = get_window();
+    if (!window) {
+        abort();
+    }
+
+    uint32_t current_image = window->swapchain->currentImage;
+
+    return current_image;
 }
 
 } // namespace Flint

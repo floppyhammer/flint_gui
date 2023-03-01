@@ -24,56 +24,53 @@ VkDescriptorSet MaterialDescSet::getDescriptorSet(uint32_t index) const {
 }
 
 MaterialDescSet::~MaterialDescSet() {
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
     // When we destroy the pool, the sets inside are destroyed as well.
     vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 }
 
 void Material3dDescSet::createDescriptorPool() {
-    auto swapChainImages = SwapChain::get_singleton()->swapChainImages;
-
     std::array<VkDescriptorPoolSize, 1> poolSizes{};
     //    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    //    poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+    //    poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
     poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+    poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
     poolInfo.pPoolSizes = poolSizes.data();
-    poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
+    poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
-    if (vkCreateDescriptorPool(Window::get_singleton()->device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor pool!");
     }
 }
 
 void Material3dDescSet::createDescriptorSet() {
-    auto device = Window::get_singleton()->device;
-    auto swapChainImages = SwapChain::get_singleton()->swapChainImages;
+    auto device = DisplayServer::get_singleton()->get_device();
+
     auto &descriptorSetLayout = RenderServer::get_singleton()->mesh_descriptor_set_layout;
 
-    std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
+    std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = descriptorPool;
-    allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
     allocInfo.pSetLayouts = layouts.data();
 
-    descriptorSets.resize(swapChainImages.size());
+    descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
     if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate descriptor sets!");
     }
 }
 
 void Material3dDescSet::updateDescriptorSet(const std::shared_ptr<ImageTexture> &p_texture) {
-    auto swapChainImages = SwapChain::get_singleton()->swapChainImages;
     auto &descriptorSetLayout = RenderServer::get_singleton()->mesh_descriptor_set_layout;
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
-    for (size_t i = 0; i < swapChainImages.size(); i++) {
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         //        VkDescriptorBufferInfo bufferInfo{};
         //        bufferInfo.buffer = uniformBuffers[i];
         //        bufferInfo.offset = 0;
@@ -109,49 +106,46 @@ void Material3dDescSet::updateDescriptorSet(const std::shared_ptr<ImageTexture> 
 }
 
 void Material2dDescSet::createDescriptorPool() {
-    auto swapChainImages = SwapChain::get_singleton()->swapChainImages;
-
     std::array<VkDescriptorPoolSize, 1> poolSizes{};
     //    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    //    poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+    //    poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
     poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+    poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
     poolInfo.pPoolSizes = poolSizes.data();
-    poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
+    poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
-    if (vkCreateDescriptorPool(Window::get_singleton()->device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor pool!");
     }
 }
 
 void Material2dDescSet::createDescriptorSet() {
-    auto device = Window::get_singleton()->device;
-    auto swapChainImages = SwapChain::get_singleton()->swapChainImages;
+    auto device = DisplayServer::get_singleton()->get_device();
+
     auto &descriptorSetLayout = RenderServer::get_singleton()->blit_descriptor_set_layout;
 
-    std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
+    std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = descriptorPool;
-    allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
     allocInfo.pSetLayouts = layouts.data();
 
-    descriptorSets.resize(swapChainImages.size());
+    descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
     if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate descriptor sets!");
     }
 }
 
 void Material2dDescSet::updateDescriptorSet(ImageTexture *p_texture) {
-    auto swapChainImages = SwapChain::get_singleton()->swapChainImages;
     auto &descriptorSetLayout = RenderServer::get_singleton()->blit_descriptor_set_layout;
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
-    for (size_t i = 0; i < swapChainImages.size(); i++) {
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         //        VkDescriptorBufferInfo bufferInfo{};
         //        bufferInfo.buffer = uniformBuffers[i];
         //        bufferInfo.offset = 0;
@@ -224,47 +218,44 @@ MaterialSkyboxDescSet::MaterialSkyboxDescSet() {
 }
 
 void MaterialSkyboxDescSet::createDescriptorPool() {
-    auto swapChainImages = SwapChain::get_singleton()->swapChainImages;
-
     std::array<VkDescriptorPoolSize, 1> poolSizes{};
     poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[0].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+    poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
     poolInfo.pPoolSizes = poolSizes.data();
-    poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size());
+    poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
-    if (vkCreateDescriptorPool(Window::get_singleton()->device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor pool!");
     }
 }
 
 void MaterialSkyboxDescSet::createDescriptorSet() {
-    auto device = Window::get_singleton()->device;
-    auto swapChainImages = SwapChain::get_singleton()->swapChainImages;
+    auto device = DisplayServer::get_singleton()->get_device();
+
     auto &descriptorSetLayout = RenderServer::get_singleton()->skybox_descriptor_set_layout;
 
-    std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
+    std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = descriptorPool;
-    allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
     allocInfo.pSetLayouts = layouts.data();
 
-    descriptorSets.resize(swapChainImages.size());
+    descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
     if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate descriptor sets!");
     }
 }
 
 void MaterialSkyboxDescSet::updateDescriptorSet(CubeTexture *texture) {
-    auto swapChainImages = SwapChain::get_singleton()->swapChainImages;
     auto &descriptorSetLayout = RenderServer::get_singleton()->skybox_descriptor_set_layout;
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
-    for (size_t i = 0; i < swapChainImages.size(); i++) {
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
         VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         imageInfo.imageView = texture->imageView;

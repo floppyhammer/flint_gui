@@ -138,7 +138,7 @@ void SpinBox::draw() {
         vector_server->draw_style_box(active_style_box.value(), global_position, size);
     }
 
-    container_h->propagate_draw(VK_NULL_HANDLE);
+    container_h->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
 
     NodeUi::draw();
 }

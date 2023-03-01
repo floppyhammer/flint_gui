@@ -3,40 +3,45 @@
 #include <set>
 #include <stdexcept>
 
-#include "../common/load_file.h"
-#include "../resources/default_resource.h"
-#include "../resources/surface.h"
+#include "common/load_file.h"
+#include "display_server.h"
+#include "resources/default_resource.h"
 
 namespace Flint {
 
 RenderServer::RenderServer() {
-    create_command_pool();
-
-    // Create descriptor set layouts and pipeline layouts.
     create_mesh_layouts();
     create_blit_layouts();
     create_skeleton2d_mesh_layouts();
     create_skybox_layouts();
 }
 
-void RenderServer::create_swapchain_related_resources(VkRenderPass render_pass, VkExtent2D swapchain_extent) {
-    create_mesh_pipeline(render_pass, swapchain_extent, mesh_pipeline);
-    create_blit_pipeline(render_pass, swapchain_extent, blit_pipeline);
-    create_skeleton2d_mesh_pipeline(render_pass, swapchain_extent, skeleton2d_mesh_pipeline);
-    create_skybox_pipeline(render_pass, swapchain_extent, skybox_pipeline);
+VkPipeline RenderServer::get_pipeline(VkRenderPass render_pass, std::string name) {
+    if (name == "mesh3d") {
+        if (!mesh_pipeline) {
+            create_mesh3d_pipeline(render_pass, mesh_pipeline);
+        }
+        return mesh_pipeline;
+    } else if (name == "mesh2d") {
+        if (!blit_pipeline) {
+            create_mesh2d_pipeline(render_pass, blit_pipeline);
+        }
+        return blit_pipeline;
+    } else if (name == "skeleton2d_mesh") {
+        if (!skeleton2d_mesh_pipeline) {
+            create_skeleton2d_mesh_pipeline(render_pass, skeleton2d_mesh_pipeline);
+        }
+        return skeleton2d_mesh_pipeline;
+    } else if (name == "skybox") {
+        if (!skybox_pipeline) {
+            create_skybox_pipeline(render_pass, skybox_pipeline);
+        }
+        return skybox_pipeline;
+    }
 }
 
-void RenderServer::cleanup_swapchain_related_resources() const {
-    auto device = Window::get_singleton()->device;
-
-    // Graphics pipeline resources.
-    vkDestroyPipeline(device, mesh_pipeline, nullptr);
-    vkDestroyPipeline(device, blit_pipeline, nullptr);
-    vkDestroyPipeline(device, skeleton2d_mesh_pipeline, nullptr);
-}
-
-void RenderServer::cleanup() {
-    auto device = Window::get_singleton()->device;
+RenderServer::~RenderServer() {
+    auto device = DisplayServer::get_singleton()->get_device();
 
     // Pipeline layouts.
     vkDestroyPipelineLayout(device, mesh_pipeline_layout, nullptr);
@@ -47,50 +52,33 @@ void RenderServer::cleanup() {
     vkDestroyDescriptorSetLayout(device, mesh_descriptor_set_layout, nullptr);
     vkDestroyDescriptorSetLayout(device, blit_descriptor_set_layout, nullptr);
     vkDestroyDescriptorSetLayout(device, skeleton2d_mesh_descriptor_set_layout, nullptr);
-
-    vkDestroyCommandPool(device, command_pool, nullptr);
 }
 
-VkShaderModule RenderServer::createShaderModule(const std::vector<char> &code) {
+VkShaderModule RenderServer::createShaderModule(VkDevice device, const std::vector<char> &code) const {
     VkShaderModuleCreateInfo create_info{};
     create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     create_info.codeSize = code.size();
     create_info.pCode = reinterpret_cast<const uint32_t *>(code.data());
 
     VkShaderModule shader_module;
-    if (vkCreateShaderModule(Window::get_singleton()->device, &create_info, nullptr, &shader_module) != VK_SUCCESS) {
+    if (vkCreateShaderModule(device, &create_info, nullptr, &shader_module) != VK_SUCCESS) {
         throw std::runtime_error("Failed to create shader module!");
     }
 
     return shader_module;
 }
 
-void RenderServer::create_command_pool() {
-    QueueFamilyIndices qf_indices = Window::get_singleton()->findQueueFamilies(Window::get_singleton()->physicalDevice);
-
-    VkCommandPoolCreateInfo pool_info{};
-    pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    pool_info.queueFamilyIndex = qf_indices.graphicsFamily.value();
-    pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT; // So we can reset command buffers.
-
-    if (vkCreateCommandPool(Window::get_singleton()->device, &pool_info, nullptr, &command_pool) != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create command pool!");
-    }
-}
-
 VkCommandBuffer RenderServer::beginSingleTimeCommands() const {
-    auto device = Window::get_singleton()->device;
-
     // Allocate a command buffer.
     // ----------------------------------------
     VkCommandBufferAllocateInfo alloc_info{};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    alloc_info.commandPool = command_pool;
+    alloc_info.commandPool = DisplayServer::get_singleton()->command_pool;
     alloc_info.commandBufferCount = 1;
 
     VkCommandBuffer cmd_buffer;
-    vkAllocateCommandBuffers(device, &alloc_info, &cmd_buffer);
+    vkAllocateCommandBuffers(DisplayServer::get_singleton()->get_device(), &alloc_info, &cmd_buffer);
     // ----------------------------------------
 
     // Start recording the command buffer.
@@ -106,6 +94,8 @@ VkCommandBuffer RenderServer::beginSingleTimeCommands() const {
 }
 
 void RenderServer::endSingleTimeCommands(VkCommandBuffer cmd_buffer) const {
+    auto queue = DisplayServer::get_singleton()->get_graphics_queue();
+
     // End recording the command buffer.
     vkEndCommandBuffer(cmd_buffer);
 
@@ -116,12 +106,13 @@ void RenderServer::endSingleTimeCommands(VkCommandBuffer cmd_buffer) const {
     submit_info.commandBufferCount = 1;
     submit_info.pCommandBuffers = &cmd_buffer;
 
-    vkQueueSubmit(Window::get_singleton()->graphicsQueue, 1, &submit_info, VK_NULL_HANDLE);
-    vkQueueWaitIdle(Window::get_singleton()->graphicsQueue);
+    vkQueueSubmit(queue, 1, &submit_info, VK_NULL_HANDLE);
+    vkQueueWaitIdle(queue);
     // ----------------------------------------
 
     // Free the command buffer.
-    vkFreeCommandBuffers(Window::get_singleton()->device, command_pool, 1, &cmd_buffer);
+    vkFreeCommandBuffers(
+        DisplayServer::get_singleton()->get_device(), DisplayServer::get_singleton()->command_pool, 1, &cmd_buffer);
 }
 
 void RenderServer::transitionImageLayout(VkCommandBuffer cmd_buffer,
@@ -337,7 +328,7 @@ void RenderServer::createImage(uint32_t width,
                                VkDeviceMemory &imageMemory,
                                uint32_t arrayLayers,
                                VkImageCreateFlags flags) const {
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -368,7 +359,8 @@ void RenderServer::createImage(uint32_t width,
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = Window::get_singleton()->findMemoryType(memRequirements.memoryTypeBits, properties);
+    allocInfo.memoryTypeIndex =
+        DisplayServer::get_singleton()->findMemoryType(memRequirements.memoryTypeBits, properties);
 
     if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
         throw std::runtime_error("Failed to allocate image memory!");
@@ -379,7 +371,7 @@ void RenderServer::createImage(uint32_t width,
 }
 
 VkImageView RenderServer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) const {
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
     VkImageViewCreateInfo viewInfo{};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -400,13 +392,12 @@ VkImageView RenderServer::createImageView(VkImage image, VkFormat format, VkImag
     return imageView;
 }
 
-void RenderServer::createBuffer(const std::shared_ptr<Window> &window,
-                                VkDeviceSize size,
+void RenderServer::createBuffer(VkDeviceSize size,
                                 VkBufferUsageFlags usage,
                                 VkMemoryPropertyFlags properties,
                                 VkBuffer &buffer,
                                 VkDeviceMemory &bufferMemory) const {
-    auto device = window->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
     // Structure specifying the parameters of a newly created buffer object.
     VkBufferCreateInfo bufferInfo{};
@@ -429,7 +420,8 @@ void RenderServer::createBuffer(const std::shared_ptr<Window> &window,
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
     // Index identifying a memory type.
-    allocInfo.memoryTypeIndex = window->findMemoryType(memRequirements.memoryTypeBits, properties);
+    allocInfo.memoryTypeIndex =
+        DisplayServer::get_singleton()->findMemoryType(memRequirements.memoryTypeBits, properties);
 
     // Allocate CPU buffer memory.
     if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
@@ -440,12 +432,11 @@ void RenderServer::createBuffer(const std::shared_ptr<Window> &window,
     vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
-void RenderServer::copyDataToMemory(const std::shared_ptr<Window> &window,
-                                    const void *src,
+void RenderServer::copyDataToMemory(const void *src,
                                     VkDeviceMemory bufferMemory,
                                     size_t dataSize,
                                     size_t memoryOffset) const {
-    auto device = window->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
     void *data;
     vkMapMemory(device, bufferMemory, memoryOffset, dataSize, 0, &data);
@@ -453,9 +444,7 @@ void RenderServer::copyDataToMemory(const std::shared_ptr<Window> &window,
     vkUnmapMemory(device, bufferMemory);
 }
 
-void RenderServer::createTextureSampler(const std::shared_ptr<Window> &window,
-                                        VkSampler &textureSampler,
-                                        VkFilter filter) const {
+void RenderServer::createTextureSampler(VkSampler &textureSampler, VkFilter filter) const {
     VkSamplerCreateInfo samplerInfo{};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
     samplerInfo.magFilter = filter;
@@ -466,7 +455,7 @@ void RenderServer::createTextureSampler(const std::shared_ptr<Window> &window,
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
     VkPhysicalDeviceProperties properties{};
-    vkGetPhysicalDeviceProperties(window->physicalDevice, &properties);
+    vkGetPhysicalDeviceProperties(DisplayServer::get_singleton()->physicalDevice, &properties);
 
     samplerInfo.anisotropyEnable = VK_TRUE;
     samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
@@ -486,7 +475,8 @@ void RenderServer::createTextureSampler(const std::shared_ptr<Window> &window,
     samplerInfo.minLod = 0.0f;
     samplerInfo.maxLod = 0.0f;
 
-    if (vkCreateSampler(window->device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
+    if (vkCreateSampler(DisplayServer::get_singleton()->get_device(), &samplerInfo, nullptr, &textureSampler) !=
+        VK_SUCCESS) {
         throw std::runtime_error("Failed to create texture sampler!");
     }
 }
@@ -536,73 +526,73 @@ void RenderServer::draw_skeleton_2d(VkCommandBuffer command_buffer,
     vkCmdDrawIndexed(command_buffer, index_count, 1, 0, 0, 0);
 }
 
-void RenderServer::draw_mesh2d(VkCommandBuffer commandBuffer,
-                               VkPipeline graphicsPipeline,
+void RenderServer::draw_mesh2d(VkCommandBuffer cmd_buffer,
+                               VkPipeline pipeline,
                                const VkDescriptorSet &descriptorSet,
                                VkBuffer vertexBuffers[],
                                VkBuffer indexBuffer,
                                uint32_t indexCount) const {
     // Bind pipeline.
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+    vkCmdBindPipeline(cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
     // Bind vertex and index buffers.
     VkDeviceSize offsets[] = {0};
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+    vkCmdBindVertexBuffers(cmd_buffer, 0, 1, vertexBuffers, offsets);
 
-    vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+    vkCmdBindIndexBuffer(cmd_buffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
     // Bind uniform buffers and samplers.
     vkCmdBindDescriptorSets(
-        commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, blit_pipeline_layout, 0, 1, &descriptorSet, 0, nullptr);
+        cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, blit_pipeline_layout, 0, 1, &descriptorSet, 0, nullptr);
 
     // Draw call.
-    vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
+    vkCmdDrawIndexed(cmd_buffer, indexCount, 1, 0, 0, 0);
 }
 
-void RenderServer::draw_mesh3d(VkCommandBuffer commandBuffer,
-                               VkPipeline graphicsPipeline,
+void RenderServer::draw_mesh3d(VkCommandBuffer cmd_buffer,
+                               VkPipeline pipeline,
                                const VkDescriptorSet &descriptorSet,
                                VkBuffer vertexBuffers[],
                                VkBuffer indexBuffer,
                                uint32_t indexCount) const {
     // Bind pipeline.
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+    vkCmdBindPipeline(cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
     // Bind vertex and index buffers.
     VkDeviceSize offsets[] = {0};
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+    vkCmdBindVertexBuffers(cmd_buffer, 0, 1, vertexBuffers, offsets);
 
-    vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+    vkCmdBindIndexBuffer(cmd_buffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
     // Bind uniform buffers and samplers.
     vkCmdBindDescriptorSets(
-        commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mesh_pipeline_layout, 0, 1, &descriptorSet, 0, nullptr);
+        cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mesh_pipeline_layout, 0, 1, &descriptorSet, 0, nullptr);
 
     // Draw call.
-    vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
+    vkCmdDrawIndexed(cmd_buffer, indexCount, 1, 0, 0, 0);
 }
 
-void RenderServer::draw_skybox(VkCommandBuffer commandBuffer,
-                               VkPipeline graphicsPipeline,
+void RenderServer::draw_skybox(VkCommandBuffer cmd_buffer,
+                               VkPipeline pipeline,
                                const VkDescriptorSet &descriptorSet,
                                VkBuffer vertexBuffers[],
                                VkBuffer indexBuffer,
                                uint32_t indexCount) const {
     // Bind pipeline.
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+    vkCmdBindPipeline(cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
 
     // Bind vertex and index buffers.
     VkDeviceSize offsets[] = {0};
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+    vkCmdBindVertexBuffers(cmd_buffer, 0, 1, vertexBuffers, offsets);
 
-    vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+    vkCmdBindIndexBuffer(cmd_buffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
     // Bind uniform buffers and samplers.
     vkCmdBindDescriptorSets(
-        commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skybox_pipeline_layout, 0, 1, &descriptorSet, 0, nullptr);
+        cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skybox_pipeline_layout, 0, 1, &descriptorSet, 0, nullptr);
 
     // Draw call.
-    vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
+    vkCmdDrawIndexed(cmd_buffer, indexCount, 1, 0, 0, 0);
 }
 
 void RenderServer::create_dsl_and_pl(VkDevice device,
@@ -638,7 +628,7 @@ void RenderServer::create_dsl_and_pl(VkDevice device,
 }
 
 void RenderServer::create_mesh_layouts() {
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
     // MVP uniform binding.
     //    // ------------------------------
@@ -675,7 +665,7 @@ void RenderServer::create_mesh_layouts() {
 }
 
 void RenderServer::create_blit_layouts() {
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
     // Image sampler uniform binding.
     VkDescriptorSetLayoutBinding sampler_binding{};
@@ -695,7 +685,7 @@ void RenderServer::create_blit_layouts() {
 }
 
 void RenderServer::create_skeleton2d_mesh_layouts() {
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
     // Image sampler uniform binding.
     // ------------------------------
@@ -728,7 +718,7 @@ void RenderServer::create_skeleton2d_mesh_layouts() {
 }
 
 void RenderServer::create_skybox_layouts() {
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
     // Image sampler uniform binding.
     VkDescriptorSetLayoutBinding sampler_binding{};
@@ -747,14 +737,14 @@ void RenderServer::create_skybox_layouts() {
     create_dsl_and_pl(device, {sampler_binding}, {push_constant}, skybox_descriptor_set_layout, skybox_pipeline_layout);
 }
 
-void RenderServer::create_mesh3d_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) {
-    auto device = Window::get_singleton()->device;
+void RenderServer::create_mesh3d_pipeline(VkRenderPass renderPass, VkPipeline &pipeline) {
+    auto device = DisplayServer::get_singleton()->get_device();
 
     auto vertShaderCode = load_file_as_bytes("../src/shaders/mesh3d_vert.spv");
     auto fragShaderCode = load_file_as_bytes("../src/shaders/mesh3d_frag.spv");
 
-    VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
-    VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
+    VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
+    VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
 
     // Specify shader stages.
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -790,24 +780,17 @@ void RenderServer::create_mesh3d_pipeline(VkRenderPass renderPass, VkExtent2D vi
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float)viewportExtent.width;
-    viewport.height = (float)viewportExtent.height;
-    viewport.minDepth = 0.0f; // The depth range for the viewport.
-    viewport.maxDepth = 1.0f;
+    // Specify that these states will be dynamic, i.e. not part of pipeline state object.
+    std::array<VkDynamicState, 2> dynamics{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 
-    VkRect2D scissor{};
-    scissor.offset = {0, 0};
-    scissor.extent = viewportExtent;
+    VkPipelineDynamicStateCreateInfo dynamic{VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
+    dynamic.pDynamicStates = dynamics.data();
+    dynamic.dynamicStateCount = dynamics.size();
 
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewportState.viewportCount = 1;
-    viewportState.pViewports = &viewport;
     viewportState.scissorCount = 1;
-    viewportState.pScissors = &scissor;
 
     VkPipelineRasterizationStateCreateInfo rasterizer{};
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -867,6 +850,7 @@ void RenderServer::create_mesh3d_pipeline(VkRenderPass renderPass, VkExtent2D vi
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
+    pipelineInfo.pDynamicState = &dynamic; // Make viewport and scissor dynamic.
 
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
@@ -878,14 +862,14 @@ void RenderServer::create_mesh3d_pipeline(VkRenderPass renderPass, VkExtent2D vi
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
-void RenderServer::create_mesh2d_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) {
-    auto device = Window::get_singleton()->device;
+void RenderServer::create_mesh2d_pipeline(VkRenderPass renderPass, VkPipeline &pipeline) {
+    auto device = DisplayServer::get_singleton()->get_device();
 
     auto vertShaderCode = load_file_as_bytes("../src/shaders/mesh2d_vert.spv");
     auto fragShaderCode = load_file_as_bytes("../src/shaders/mesh2d_frag.spv");
 
-    VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
-    VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
+    VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
+    VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
 
     // Specify shader stages.
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -921,24 +905,17 @@ void RenderServer::create_mesh2d_pipeline(VkRenderPass renderPass, VkExtent2D vi
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float)viewportExtent.width;
-    viewport.height = (float)viewportExtent.height;
-    viewport.minDepth = 0.0f; // The depth range for the viewport.
-    viewport.maxDepth = 1.0f;
+    // Specify that these states will be dynamic, i.e. not part of pipeline state object.
+    std::array<VkDynamicState, 2> dynamics{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 
-    VkRect2D scissor{};
-    scissor.offset = {0, 0};
-    scissor.extent = viewportExtent;
+    VkPipelineDynamicStateCreateInfo dynamic{VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
+    dynamic.pDynamicStates = dynamics.data();
+    dynamic.dynamicStateCount = dynamics.size();
 
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewportState.viewportCount = 1;
-    viewportState.pViewports = &viewport;
     viewportState.scissorCount = 1;
-    viewportState.pScissors = &scissor;
 
     VkPipelineRasterizationStateCreateInfo rasterizer{};
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -1008,6 +985,7 @@ void RenderServer::create_mesh2d_pipeline(VkRenderPass renderPass, VkExtent2D vi
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
+    pipelineInfo.pDynamicState = &dynamic; // Make viewport and scissor dynamic.
 
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
@@ -1019,16 +997,14 @@ void RenderServer::create_mesh2d_pipeline(VkRenderPass renderPass, VkExtent2D vi
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
-void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass,
-                                                   VkExtent2D viewportExtent,
-                                                   VkPipeline &pipeline) {
-    auto device = Window::get_singleton()->device;
+void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass, VkPipeline &pipeline) {
+    auto device = DisplayServer::get_singleton()->get_device();
 
     auto vertShaderCode = load_file_as_bytes("../src/shaders/skeleton_2d_vert.spv");
     auto fragShaderCode = load_file_as_bytes("../src/shaders/skeleton_2d_frag.spv");
 
-    VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
-    VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
+    VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
+    VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
 
     // Specify shader stages.
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -1064,24 +1040,17 @@ void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass,
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float)viewportExtent.width;
-    viewport.height = (float)viewportExtent.height;
-    viewport.minDepth = 0.0f; // The depth range for the viewport.
-    viewport.maxDepth = 1.0f;
+    // Specify that these states will be dynamic, i.e. not part of pipeline state object.
+    std::array<VkDynamicState, 2> dynamics{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 
-    VkRect2D scissor{};
-    scissor.offset = {0, 0};
-    scissor.extent = viewportExtent;
+    VkPipelineDynamicStateCreateInfo dynamic{VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
+    dynamic.pDynamicStates = dynamics.data();
+    dynamic.dynamicStateCount = dynamics.size();
 
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewportState.viewportCount = 1;
-    viewportState.pViewports = &viewport;
     viewportState.scissorCount = 1;
-    viewportState.pScissors = &scissor;
 
     VkPipelineRasterizationStateCreateInfo rasterizer{};
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -1151,6 +1120,7 @@ void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass,
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
+    pipelineInfo.pDynamicState = &dynamic; // Make viewport and scissor dynamic.
 
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
@@ -1162,16 +1132,14 @@ void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass,
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
 }
 
-void RenderServer::create_skybox_pipeline(VkRenderPass renderPass,
-                                          VkExtent2D viewportExtent,
-                                          VkPipeline &pipeline) const {
-    auto device = Window::get_singleton()->device;
+void RenderServer::create_skybox_pipeline(VkRenderPass renderPass, VkPipeline &pipeline) const {
+    auto device = DisplayServer::get_singleton()->get_device();
 
     auto vertShaderCode = load_file_as_bytes("../src/shaders/skybox_vert.spv");
     auto fragShaderCode = load_file_as_bytes("../src/shaders/skybox_frag.spv");
 
-    VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
-    VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
+    VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
+    VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
 
     // Specify shader stages.
     VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
@@ -1207,24 +1175,17 @@ void RenderServer::create_skybox_pipeline(VkRenderPass renderPass,
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float)viewportExtent.width;
-    viewport.height = (float)viewportExtent.height;
-    viewport.minDepth = 0.0f; // The depth range for the viewport.
-    viewport.maxDepth = 1.0f;
+    // Specify that these states will be dynamic, i.e. not part of pipeline state object.
+    std::array<VkDynamicState, 2> dynamics{VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
 
-    VkRect2D scissor{};
-    scissor.offset = {0, 0};
-    scissor.extent = viewportExtent;
+    VkPipelineDynamicStateCreateInfo dynamic{VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
+    dynamic.pDynamicStates = dynamics.data();
+    dynamic.dynamicStateCount = dynamics.size();
 
     VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewportState.viewportCount = 1;
-    viewportState.pViewports = &viewport;
     viewportState.scissorCount = 1;
-    viewportState.pScissors = &scissor;
 
     VkPipelineRasterizationStateCreateInfo rasterizer{};
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -1285,6 +1246,7 @@ void RenderServer::create_skybox_pipeline(VkRenderPass renderPass,
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     pipelineInfo.pDepthStencilState = &depthStencil;
+    pipelineInfo.pDynamicState = &dynamic; // Make viewport and scissor dynamic.
 
     // Create pipeline.
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
@@ -1294,6 +1256,35 @@ void RenderServer::create_skybox_pipeline(VkRenderPass renderPass,
     // Clean up shader modules.
     vkDestroyShaderModule(device, fragShaderModule, nullptr);
     vkDestroyShaderModule(device, vertShaderModule, nullptr);
+}
+
+void RenderServer::cleanup() {
+    auto device = DisplayServer::get_singleton()->get_device();
+
+    // Pipeline layouts.
+    vkDestroyPipelineLayout(device, mesh_pipeline_layout, nullptr);
+    vkDestroyPipelineLayout(device, blit_pipeline_layout, nullptr);
+    vkDestroyPipelineLayout(device, skeleton2d_mesh_pipeline_layout, nullptr);
+    vkDestroyPipelineLayout(device, skybox_pipeline_layout, nullptr);
+
+    // Descriptor set layouts.
+    vkDestroyDescriptorSetLayout(device, mesh_descriptor_set_layout, nullptr);
+    vkDestroyDescriptorSetLayout(device, blit_descriptor_set_layout, nullptr);
+    vkDestroyDescriptorSetLayout(device, skeleton2d_mesh_descriptor_set_layout, nullptr);
+    vkDestroyDescriptorSetLayout(device, skybox_descriptor_set_layout, nullptr);
+
+    if (mesh_pipeline) {
+        vkDestroyPipeline(device, mesh_pipeline, nullptr);
+    }
+    if (blit_pipeline) {
+        vkDestroyPipeline(device, blit_pipeline, nullptr);
+    }
+    if (skeleton2d_mesh_pipeline) {
+        vkDestroyPipeline(device, skeleton2d_mesh_pipeline, nullptr);
+    }
+    if (skybox_pipeline) {
+        vkDestroyPipeline(device, skybox_pipeline, nullptr);
+    }
 }
 
 } // namespace Flint

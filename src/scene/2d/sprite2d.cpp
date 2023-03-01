@@ -68,7 +68,7 @@ void Sprite2d::update_mvp() {
 //    push_constant.mvp = mvp.model;
 }
 
-void Sprite2d::draw(VkCommandBuffer p_command_buffer) {
+void Sprite2d::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     if (mesh == nullptr) {
         Logger::warn("No valid mesh set for Sprite 2D!");
         return;

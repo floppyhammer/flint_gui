@@ -117,7 +117,7 @@ void TabContainer::draw() {
     //        global_pos + Vec2F{0, tab_button_height}, global_pos + Vec2F{size.x, tab_button_height}, 1,
     //        ColorU::white());
 
-    button_container->propagate_draw(VK_NULL_HANDLE);
+    button_container->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
 }
 
 void TabContainer::input(InputEvent &event) {

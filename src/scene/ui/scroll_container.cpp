@@ -138,7 +138,7 @@ int32_t ScrollContainer::get_vscroll() {
     return vscroll;
 }
 
-void ScrollContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
+void ScrollContainer::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     auto global_pos = get_global_position();
     auto size = get_size();
     auto dst_rect = RectF(global_pos, global_pos + size);
@@ -156,7 +156,7 @@ void ScrollContainer::propagate_draw(VkCommandBuffer p_command_buffer) {
 
     vector_server->global_transform_offset = Transform2::from_translation(-global_pos);
 
-    Node::propagate_draw(p_command_buffer);
+    Node::propagate_draw(render_pass, cmd_buffer);
 
     vector_server->global_transform_offset = Transform2();
 
