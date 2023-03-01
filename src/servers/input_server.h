@@ -24,17 +24,18 @@ enum class InputEventType {
 };
 
 enum class KeyCode {
-    UNKNOWN,
-    BACKSPACE,
-    LEFT,
-    RIGHT,
-    UP,
-    DOWN,
+    Unknown,
+    Backspace,
+    Left,
+    Right,
+    Up,
+    Down,
 };
 
 class InputEvent {
 public:
     InputEventType type = InputEventType::Max;
+    GLFWwindow *window{};
 
     union Args {
         struct {
@@ -103,7 +104,7 @@ public:
 
     InputServer();
 
-    void init(GLFWwindow *window);
+    void initialize_window_callbacks(GLFWwindow *window);
 
     void collect_events();
 
@@ -112,15 +113,13 @@ public:
 
     std::vector<InputEvent> input_queue;
 
-    GLFWwindow *current_window{};
+    void set_cursor_captured(GLFWwindow *window, bool captured);
 
-    void set_cursor_captured(bool captured);
+    void hide_cursor(GLFWwindow *window);
 
-    void hide_cursor();
+    void restore_cursor(GLFWwindow *window);
 
-    void restore_cursor();
-
-    void set_cursor(CursorShape shape);
+    void set_cursor(GLFWwindow *window, CursorShape shape);
 
 private:
     GLFWcursor *arrow_cursor, *ibeam_cursor, *crosshair_cursor, *hand_cursor, *resize_cursor_h, *resize_cursor_v;

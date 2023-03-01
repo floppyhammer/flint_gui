@@ -2,6 +2,8 @@
 
 #include <set>
 
+#include "input_server.h"
+
 namespace Flint {
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
@@ -112,6 +114,8 @@ GLFWwindow *DisplayServer::create_window(Vec2I size, const std::string &title) {
     // Assign this to window user, so we can fetch it when the window size changes.
     glfwSetWindowUserPointer(glfw_window, this);
     //        glfwSetFramebufferSizeCallback(glfw_window, framebufferResizeCallback);
+
+    InputServer::get_singleton()->initialize_callbacks(glfw_window);
 
     return glfw_window;
 }

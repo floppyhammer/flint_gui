@@ -84,6 +84,10 @@ public:
 
     VkQueue graphicsQueue{};
 
+    // It's a bit different from the frame count or MAX_FRAMES_IN_FLIGHT.
+    // I don't understand it well.
+    uint32_t swapchain_image_count = 0;
+
 private:
     bool initialized = false;
     // There is no global state in Vulkan and all per-application state is stored in a VkInstance object.
@@ -95,6 +99,10 @@ private:
 
     /// Logical device.
     VkDevice device{};
+
+
+
+    GLFWwindow *focused_window{};
 
 private:
     /// Initialize the Vulkan library by creating an instance.

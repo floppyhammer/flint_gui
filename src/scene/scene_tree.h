@@ -21,6 +21,7 @@
 #include "ui/text_edit.h"
 #include "ui/texture_rect.h"
 #include "ui/tree.h"
+#include "window_proxy.h"
 #include "world.h"
 
 namespace Flint {

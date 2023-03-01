@@ -15,6 +15,8 @@ class WindowProxy : public Node {
 public:
     WindowProxy(Vec2I _size, bool _dummy);
 
+    void propagate_input(InputEvent &event) override;
+
     void propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     Vec2I get_size() const;
@@ -24,6 +26,8 @@ public:
     }
 
     std::shared_ptr<SwapChain> swapchain;
+
+
 
 private:
     /// Window size.

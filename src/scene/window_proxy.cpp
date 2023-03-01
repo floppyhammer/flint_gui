@@ -33,13 +33,15 @@ Vec2I WindowProxy::get_size() const {
 }
 
 void WindowProxy::record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_t image_index) const {
+    auto cmd_buffer = command_buffers[image_index];
+
     // Reset the current command buffer.
-    vkResetCommandBuffer(command_buffers[image_index], 0);
+    vkResetCommandBuffer(cmd_buffer, 0);
 
     // Begin recording commands.
     VkCommandBufferBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    if (vkBeginCommandBuffer(command_buffers[image_index], &begin_info) != VK_SUCCESS) {
+    if (vkBeginCommandBuffer(cmd_buffer, &begin_info) != VK_SUCCESS) {
         throw std::runtime_error("Failed to begin recording command buffer!");
     }
 
@@ -62,21 +64,42 @@ void WindowProxy::record_commands(std::vector<VkCommandBuffer> &command_buffers,
         render_pass_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
         render_pass_info.pClearValues = clear_values.data();
 
-        vkCmdBeginRenderPass(command_buffers[image_index], &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBeginRenderPass(cmd_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
     }
+
+    // Set viewport and scissor dynamically.
+    VkViewport viewport{};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = size.x;
+    viewport.height = size.y;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+    vkCmdSetViewport(cmd_buffer, 0, 1, &viewport);
+
+    VkRect2D scissor{};
+    scissor.extent.width = size.x;
+    scissor.extent.height = size.y;
+    vkCmdSetScissor(cmd_buffer, 0, 1, &scissor);
 
     // Record drawing commands from the scene manager.
     for (auto &child : children) {
-        child->propagate_draw(swapchain->renderPass, command_buffers[image_index]);
+        child->propagate_draw(swapchain->renderPass, cmd_buffer);
     }
 
     // End main render pass.
-    vkCmdEndRenderPass(command_buffers[image_index]);
+    vkCmdEndRenderPass(cmd_buffer);
 
     // End recording commands.
-    if (vkEndCommandBuffer(command_buffers[image_index]) != VK_SUCCESS) {
+    if (vkEndCommandBuffer(cmd_buffer) != VK_SUCCESS) {
         throw std::runtime_error("Failed to record command buffer!");
     }
+}
+
+void WindowProxy::propagate_input(InputEvent &event)  {
+    InputServer::get_singleton()->collect_events();
+
+
 }
 
 void WindowProxy::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
