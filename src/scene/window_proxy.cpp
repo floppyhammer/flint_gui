@@ -16,15 +16,6 @@ WindowProxy::WindowProxy(Vec2I _size, bool _dummy) {
     DisplayServer::get_singleton()->initialize_after_surface_creation(window->surface);
     DisplayServer::get_singleton()->create_graphics_queues(window->surface, window->presentQueue);
 
-    // 5. Initialize vector server.
-    std::shared_ptr<Pathfinder::Driver> driver =
-        std::make_shared<Pathfinder::DriverVk>(DisplayServer::get_singleton()->get_device(),
-                                               DisplayServer::get_singleton()->physicalDevice,
-                                               DisplayServer::get_singleton()->graphicsQueue,
-                                               DisplayServer::get_singleton()->command_pool);
-    auto vector_server = VectorServer::get_singleton();
-    vector_server->init(driver, size.x, size.y);
-
     swapchain = std::make_shared<Flint::SwapChain>(window.get());
 }
 

@@ -241,6 +241,9 @@ std::shared_ptr<ImageTexture> VectorServer::get_texture() {
     return ImageTexture::from_wrapper(texture_vk->get_image_view(), texture_vk->get_sampler(), texture_vk->get_size());
 }
 
+void VectorServer::set_dst_texture(std::shared_ptr<ImageTexture>) {
+}
+
 std::shared_ptr<Pathfinder::Canvas> VectorServer::get_canvas() const {
     return canvas;
 }

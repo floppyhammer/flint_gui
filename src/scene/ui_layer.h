@@ -24,9 +24,14 @@ public:
 
     std::shared_ptr<Mesh2d> mesh;
 
+    // Same as the framebuffer size.
     Vec2I view_size;
 
     MvpPushConstant push_constant;
+
+    std::shared_ptr<Pathfinder::Scene> vector_scene;
+
+    std::shared_ptr<Texture> texture;
 };
 
 } // namespace Flint

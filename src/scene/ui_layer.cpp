@@ -16,16 +16,24 @@ UiLayer::UiLayer() {
     update_mvp();
 
     mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
+
+//    texture = ImageTexture::from_empty(view_size, VK_FORMAT_R8G8B8A8_UNORM);
 }
 
 void UiLayer::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
+    auto vs = VectorServer::get_singleton();
+
+//    auto old_scene = vs->get_canvas()->replace_scene(vector_scene);
+
     // Record drawing commands.
     for (auto& child : children) {
         child->propagate_draw(render_pass, cmd_buffer);
     }
 
     // Draw UI nodes.
-    VectorServer::get_singleton()->submit();
+    vs->submit();
+
+//    vs->get_canvas()->set_scene(old_scene);
 
     // TODO: let the scene tree manage UI layer drawing, so we can properly order UI and 2D/3D worlds.
     // Draw resulted UI texture.
@@ -63,9 +71,8 @@ void UiLayer::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
         cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
 
     // Unlike Sprite 2D, Texture Rect should not support custom mesh.
-    rs->blit(cmd_buffer,
-             pipeline,
-             mesh->surface->get_material()->get_desc_set()->getDescriptorSet(get_current_image()));
+    rs->blit(
+        cmd_buffer, pipeline, mesh->surface->get_material()->get_desc_set()->getDescriptorSet(get_current_image()));
 }
 
 void UiLayer::when_window_size_changed(Vec2I new_size) {

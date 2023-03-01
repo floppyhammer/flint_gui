@@ -37,6 +37,8 @@ public:
 
     std::shared_ptr<ImageTexture> get_texture();
 
+    void set_dst_texture(std::shared_ptr<ImageTexture>);
+
     void draw_line(Vec2F start, Vec2F end, float width, ColorU color);
 
     void draw_rectangle(const RectF &rect, float line_width, ColorU color);

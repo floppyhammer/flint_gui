@@ -115,7 +115,7 @@ GLFWwindow *DisplayServer::create_window(Vec2I size, const std::string &title) {
     glfwSetWindowUserPointer(glfw_window, this);
     //        glfwSetFramebufferSizeCallback(glfw_window, framebufferResizeCallback);
 
-    InputServer::get_singleton()->initialize_callbacks(glfw_window);
+    InputServer::get_singleton()->initialize_window_callbacks(glfw_window);
 
     return glfw_window;
 }

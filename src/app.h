@@ -16,23 +16,23 @@
 #include "resources/surface.h"
 #include "scene/scene_tree.h"
 
+using namespace Flint;
+
 class App {
 public:
     App(int32_t window_width, int32_t window_height);
 
+    ~App();
+
     void main_loop();
 
-    void cleanup();
+    SceneTree* get_tree();
 
+private:
     std::unique_ptr<Flint::SceneTree> tree;
 
 private:
-    /**
-     * Record commands into the current command buffer.
-     * @dependency Render pass, swap chain framebuffers, graphics pipeline, vertex buffer, index buffer, pipeline
-     * layout.
-     */
-    void record_commands(std::vector<VkCommandBuffer> &command_buffers, uint32_t image_index) const;
+    void cleanup();
 };
 
 #endif // FLINT_APP_H

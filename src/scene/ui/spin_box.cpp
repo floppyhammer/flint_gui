@@ -5,6 +5,7 @@
 
 #include "../../common/geometry.h"
 #include "../../resources/vector_texture.h"
+#include "../window_proxy.h"
 
 namespace Flint {
 
@@ -60,7 +61,7 @@ void SpinBox::input(InputEvent &event) {
             drag_to_adjust_value = true;
 
             // Capture cursor when dragging.
-            InputServer::get_singleton()->set_cursor_captured(true);
+            InputServer::get_singleton()->set_cursor_captured(get_window()->get_real().get(), true);
         }
 
         if (active_rect.contains_point(args.position)) {
@@ -74,7 +75,7 @@ void SpinBox::input(InputEvent &event) {
         if (!args.pressed) {
             if (pressed_inside) {
                 // Release cursor when dragging ends.
-                InputServer::get_singleton()->set_cursor_captured(false);
+                InputServer::get_singleton()->set_cursor_captured(get_window()->get_real().get(), false);
             }
 
             pressed_inside = false;

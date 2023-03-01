@@ -3,6 +3,7 @@
 #include <string>
 
 #include "../../common/logger.h"
+#include "../window_proxy.h"
 
 namespace Flint {
 
@@ -111,7 +112,7 @@ void TextEdit::input(InputEvent &event) {
         case InputEventType::Key: {
             auto key_args = event.args.key;
 
-            if (key_args.key == KeyCode::BACKSPACE && current_caret_index > -1) {
+            if (key_args.key == KeyCode::Backspace && current_caret_index > -1) {
                 if (key_args.pressed || key_args.repeated) {
                     if (selected_caret_index != current_caret_index) {
                         delete_selection();
@@ -128,11 +129,11 @@ void TextEdit::input(InputEvent &event) {
             }
 
             if (key_args.pressed || key_args.repeated) {
-                if (key_args.key == KeyCode::LEFT && current_caret_index > -1) {
+                if (key_args.key == KeyCode::Left && current_caret_index > -1) {
                     current_caret_index--;
                     selected_caret_index--;
                     caret_blink_timer = 0;
-                } else if (key_args.key == KeyCode::RIGHT && current_caret_index < glyph_count - 1) {
+                } else if (key_args.key == KeyCode::Right && current_caret_index < glyph_count - 1) {
                     current_caret_index++;
                     selected_caret_index++;
                     caret_blink_timer = 0;
@@ -257,11 +258,11 @@ void TextEdit::set_editable(bool new_value) {
 }
 
 void TextEdit::cursor_entered() {
-    InputServer::get_singleton()->set_cursor(CursorShape::IBeam);
+    InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::IBeam);
 }
 
 void TextEdit::cursor_exited() {
-    InputServer::get_singleton()->set_cursor(CursorShape::Arrow);
+    InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::Arrow);
 }
 
 void TextEdit::delete_selection() {

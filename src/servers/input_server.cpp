@@ -151,7 +151,7 @@ void InputServer::collect_events() {
     glfwPollEvents();
 }
 
-void InputServer::set_cursor(GLFWwindow *window, CursorShape shape) {
+void InputServer::set_cursor(Window *window, CursorShape shape) {
     GLFWcursor *current_cursor{};
 
     switch (shape) {
@@ -181,19 +181,19 @@ void InputServer::set_cursor(GLFWwindow *window, CursorShape shape) {
         } break;
     }
 
-    glfwSetCursor(window, current_cursor);
+    glfwSetCursor(window->glfw_window, current_cursor);
 }
 
-void InputServer::set_cursor_captured(GLFWwindow *window, bool captured) {
-    glfwSetInputMode(window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+void InputServer::set_cursor_captured(Window *window, bool captured) {
+    glfwSetInputMode(window->glfw_window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }
 
-void InputServer::hide_cursor(GLFWwindow *window) {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+void InputServer::hide_cursor(Window *window) {
+    glfwSetInputMode(window->glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
-void InputServer::restore_cursor(GLFWwindow *window) {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+void InputServer::restore_cursor(Window *window) {
+    glfwSetInputMode(window->glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 } // namespace Flint

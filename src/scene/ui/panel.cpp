@@ -3,6 +3,7 @@
 #include <string>
 
 #include "../../common/logger.h"
+#include "../window_proxy.h"
 
 namespace Flint {
 
@@ -140,13 +141,13 @@ void Panel::input(InputEvent &event) {
         }
 
         if (h_resize && v_resize) {
-            InputServer::get_singleton()->set_cursor(CursorShape::ResizeTlbr);
+            InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::ResizeTlbr);
         } else if (h_resize) {
-            InputServer::get_singleton()->set_cursor(CursorShape::ResizeH);
+            InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::ResizeH);
         } else if (v_resize) {
-            InputServer::get_singleton()->set_cursor(CursorShape::ResizeV);
+            InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::ResizeV);
         } else {
-            InputServer::get_singleton()->set_cursor(CursorShape::Arrow);
+            InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::Arrow);
         }
     }
 

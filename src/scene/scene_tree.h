@@ -29,7 +29,7 @@ namespace Flint {
 /// Processing order: Input -> Update -> Draw.
 class SceneTree {
 public:
-    SceneTree();
+    explicit SceneTree(Vec2I main_window_size);
 
     void process(double dt) const;
 

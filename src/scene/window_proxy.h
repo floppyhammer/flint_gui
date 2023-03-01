@@ -27,8 +27,6 @@ public:
 
     std::shared_ptr<SwapChain> swapchain;
 
-
-
 private:
     /// Window size.
     Vec2I size;

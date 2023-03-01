@@ -32,7 +32,15 @@ App::App(int32_t window_width, int32_t window_height) {
     //    auto input_server = InputServer::get_singleton();
     //    input_server->init(window->glfw_window);
 
-    tree = std::make_unique<Flint::SceneTree>();
+    tree = std::make_unique<Flint::SceneTree>(Vec2I{window_width, window_height});
+}
+
+App::~App() {
+    cleanup();
+}
+
+SceneTree* App::get_tree() {
+    return tree.get();
 }
 
 void App::main_loop() {

@@ -6,11 +6,22 @@
 
 namespace Flint {
 
-SceneTree::SceneTree() {
-    root = std::make_shared<WindowProxy>(Vec2I{400, 300}, false);
+SceneTree::SceneTree(Vec2I main_window_size) {
+    root = std::make_shared<WindowProxy>(main_window_size, false);
     root->name = "Main Window";
 
+    // Initialize the render server after creating the first window (surface).
     auto render_server = RenderServer::get_singleton();
+
+    auto display_server = DisplayServer::get_singleton();
+
+    // Initialize the vector server.
+    auto driver = std::make_shared<Pathfinder::DriverVk>(display_server->get_device(),
+                                                         display_server->physicalDevice,
+                                                         display_server->graphicsQueue,
+                                                         display_server->command_pool);
+    auto vector_server = VectorServer::get_singleton();
+    vector_server->init(driver, main_window_size.x, main_window_size.y);
 }
 
 void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
@@ -47,7 +58,9 @@ void SceneTree::process(double dt) const {
     //        VectorServer::get_singleton()->get_canvas()->set_new_dst_texture(new_size);
     //    }
 
-//    root->propagate_input(dt);
+    for (auto& event : InputServer::get_singleton()->input_queue) {
+        root->propagate_input(event);
+    }
 
     root->propagate_update(dt);
 

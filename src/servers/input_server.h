@@ -2,6 +2,7 @@
 #define FLINT_INPUT_SERVER_H
 
 #include "../common/geometry.h"
+#include "../render/window.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -113,13 +114,13 @@ public:
 
     std::vector<InputEvent> input_queue;
 
-    void set_cursor_captured(GLFWwindow *window, bool captured);
+    void set_cursor_captured(Window *window, bool captured);
 
-    void hide_cursor(GLFWwindow *window);
+    void hide_cursor(Window *window);
 
-    void restore_cursor(GLFWwindow *window);
+    void restore_cursor(Window *window);
 
-    void set_cursor(GLFWwindow *window, CursorShape shape);
+    void set_cursor(Window *window, CursorShape shape);
 
 private:
     GLFWcursor *arrow_cursor, *ibeam_cursor, *crosshair_cursor, *hand_cursor, *resize_cursor_h, *resize_cursor_v;
