@@ -165,7 +165,7 @@ ImageTexture::ImageTexture(const std::string &path) : Texture(path) {
     RenderServer::get_singleton()->createTextureSampler(sampler, VK_FILTER_LINEAR);
 }
 
-std::shared_ptr<ImageTexture> ImageTexture::from_wrapper(VkImageView image_view, VkSampler sampler, Vec2I size) {
+std::shared_ptr<ImageTexture> ImageTexture::from_wrapping(VkImageView image_view, VkSampler sampler, Vec2I size) {
     auto texture = std::make_shared<ImageTexture>();
     texture->size = size;
     texture->resource_ownership = false;

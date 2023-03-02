@@ -87,10 +87,19 @@ void WindowProxy::record_commands(std::vector<VkCommandBuffer> &command_buffers,
     }
 }
 
-void WindowProxy::propagate_input(InputEvent &event)  {
-    InputServer::get_singleton()->collect_events();
+void WindowProxy::propagate_input(InputEvent &event) {
+    // Filter events not belonging to this window.
+    if (event.window != window->glfw_window) {
+        return;
+    }
 
+    auto it = children.rbegin();
+    while (it != children.rend()) {
+        (*it)->propagate_input(event);
+        it++;
+    }
 
+    input(event);
 }
 
 void WindowProxy::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {

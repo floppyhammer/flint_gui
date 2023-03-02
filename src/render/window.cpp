@@ -101,10 +101,10 @@ bool Window::process() {
 //    //    InputServer::get_singleton()->collect_events();
 //    //
 //    //    // Engine processing.
-//    //    CoreServer::get_singleton()->tick();
+//    //    Engine::get_singleton()->tick();
 //    //
 //    //    // Get frame time.
-//    //    auto dt = CoreServer::get_singleton()->get_delta();
+//    //    auto dt = Engine::get_singleton()->get_delta();
 //
 //    // Acquire next image.
 //    // We should do this before updating the scenes as we need to modify different

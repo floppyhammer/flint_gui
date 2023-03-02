@@ -11,8 +11,8 @@
 #include "resources/image_texture.h"
 #include "resources/mesh.h"
 #include "resources/resource_manager.h"
-#include "servers/core_server.h"
 #include "servers/display_server.h"
+#include "servers/engine.h"
 #include "servers/input_server.h"
 #include "servers/render_server.h"
 #include "servers/vector_server.h"
@@ -50,10 +50,10 @@ void App::main_loop() {
         glfwPollEvents();
 
         // Engine processing.
-        CoreServer::get_singleton()->tick();
+        Engine::get_singleton()->tick();
 
         // Get frame time.
-        auto dt = CoreServer::get_singleton()->get_delta();
+        auto dt = Engine::get_singleton()->get_delta();
 
         // Propagate input events.
         //        tree->input(InputServer::get_singleton()->input_queue);

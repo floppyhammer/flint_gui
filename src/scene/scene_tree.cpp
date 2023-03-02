@@ -1,8 +1,6 @@
 #include "scene_tree.h"
 
 #include "render/swap_chain.h"
-#include "ui_layer.h"
-#include "window_proxy.h"
 
 namespace Flint {
 
@@ -21,7 +19,7 @@ SceneTree::SceneTree(Vec2I main_window_size) {
                                                          display_server->graphicsQueue,
                                                          display_server->command_pool);
     auto vector_server = VectorServer::get_singleton();
-    vector_server->init(driver, main_window_size.x, main_window_size.y);
+    vector_server->init(driver);
 }
 
 void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {

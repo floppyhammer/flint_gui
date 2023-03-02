@@ -20,10 +20,14 @@ int main() {
         auto node_ui = std::make_shared<NodeUi>();
         app.get_tree()->replace_scene(node_ui);
 
-        node_ui->add_child(std::make_shared<Label>("Main window"));
-
-        node_ui->add_child(std::make_shared<WindowProxy>(Vec2I{400, 300}, false));
         node_ui->add_child(std::make_shared<Button>());
+
+        auto another_window = std::make_shared<WindowProxy>(Vec2I{400, 300}, false);
+        node_ui->add_child(another_window);
+
+        auto another_ui_layer = std::make_shared<UiLayer>();
+        another_ui_layer->add_child(std::make_shared<Label>("This is another window"));
+        another_window->add_child(another_ui_layer);
     }
 
     app.main_loop();

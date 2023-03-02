@@ -7,7 +7,7 @@
 #include "../../resources/default_resource.h"
 #include "../../resources/image_texture.h"
 #include "../../resources/vector_texture.h"
-#include "../../servers/core_server.h"
+#include "../../servers/engine.h"
 #include "../world.h"
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

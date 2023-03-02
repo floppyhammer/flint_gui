@@ -29,15 +29,13 @@ public:
 
     VectorServer() = default;
 
-    void init(const std::shared_ptr<Pathfinder::Driver> &driver, int32_t canvas_width, int32_t canvas_height);
+    void init(const std::shared_ptr<Pathfinder::Driver> &driver);
+
+    void set_dst_texture(const std::shared_ptr<ImageTexture>& texture);
 
     void cleanup();
 
-    void submit();
-
-    std::shared_ptr<ImageTexture> get_texture();
-
-    void set_dst_texture(std::shared_ptr<ImageTexture>);
+    void submit_and_clear();
 
     void draw_line(Vec2F start, Vec2F end, float width, ColorU color);
 
