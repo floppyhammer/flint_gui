@@ -23,6 +23,8 @@ public:
 
     Vec2I get_size() const;
 
+    void set_visibility(bool _visible) override;
+
     std::shared_ptr<Window> get_real() {
         return window;
     }

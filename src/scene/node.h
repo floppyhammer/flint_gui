@@ -108,7 +108,7 @@ public:
 
     std::string get_node_path() const;
 
-    void set_visibility(bool _visible);
+    virtual void set_visibility(bool _visible);
 
     bool get_visibility() const;
 

@@ -115,12 +115,7 @@ void WindowProxy::propagate_update(double dt) {
 
     // Closing a window just hides it.
     if (window->should_close() && visible) {
-        visible = false;
-        glfwHideWindow(window->glfw_window);
-    }
-
-    if (!window->should_close() && visible) {
-//        glfwShowWindow(window->glfw_window);
+        set_visibility(false);
     }
 
     if (!visible) {
@@ -150,6 +145,22 @@ void WindowProxy::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_b
 
     // Submit commands for drawing.
     swapchain->flush(image_index);
+}
+
+void WindowProxy::set_visibility(bool _visible) {
+    if (visible == _visible) {
+        return;
+    }
+
+    visible = _visible;
+
+    if (visible) {
+        // If the window was hidden by closing, we need to reset the flag.
+        glfwSetWindowShouldClose(window->glfw_window, false);
+        glfwShowWindow(window->glfw_window);
+    } else {
+        glfwHideWindow(window->glfw_window);
+    }
 }
 
 } // namespace Flint

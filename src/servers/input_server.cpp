@@ -4,6 +4,7 @@
 #include <locale>
 
 namespace Flint {
+
 std::string cpp11_codepoint_to_utf8(char32_t codepoint) {
     char utf8[4];
     char *end_of_utf8;

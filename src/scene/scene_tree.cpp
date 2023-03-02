@@ -53,6 +53,7 @@ void SceneTree::process(double dt) const {
     for (auto& event : InputServer::get_singleton()->input_queue) {
         root->propagate_input(event);
     }
+    InputServer::get_singleton()->input_queue.clear();
 
     root->propagate_update(dt);
 
