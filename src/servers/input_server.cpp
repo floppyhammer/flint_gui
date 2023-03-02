@@ -4,6 +4,7 @@
 #include <locale>
 
 namespace Flint {
+
 std::string cpp11_codepoint_to_utf8(char32_t codepoint) {
     char utf8[4];
     char *end_of_utf8;
@@ -60,14 +61,12 @@ InputServer::InputServer() {
     resize_trbl_cursor = glfwCreateStandardCursor(GLFW_RESIZE_NESW_CURSOR);
 }
 
-void InputServer::init(GLFWwindow *window) {
-    // GLFW input callbacks.
-    current_window = window;
-
+void InputServer::initialize_window_callbacks(GLFWwindow *window) {
     // A lambda function that doesn't capture anything can be implicitly converted to a regular function pointer.
     auto cursor_position_callback = [](GLFWwindow *window, double x_pos, double y_pos) {
         InputEvent input_event{};
         input_event.type = InputEventType::MouseMotion;
+        input_event.window = window;
         input_event.args.mouse_motion.position = {(float)x_pos, (float)y_pos};
         auto input_server = InputServer::get_singleton();
         input_server->last_cursor_position = input_server->cursor_position;
@@ -80,6 +79,7 @@ void InputServer::init(GLFWwindow *window) {
     auto cursor_button_callback = [](GLFWwindow *window, int button, int action, int mods) {
         InputEvent input_event{};
         input_event.type = InputEventType::MouseButton;
+        input_event.window = window;
         input_event.args.mouse_button.button = button;
         input_event.args.mouse_button.pressed = action == GLFW_PRESS;
         auto input_server = InputServer::get_singleton();
@@ -91,6 +91,7 @@ void InputServer::init(GLFWwindow *window) {
     auto cursor_scroll_callback = [](GLFWwindow *window, double x_offset, double y_offset) {
         InputEvent input_event{};
         input_event.type = InputEventType::MouseScroll;
+        input_event.window = window;
         input_event.args.mouse_scroll.x_delta = x_offset;
         input_event.args.mouse_scroll.y_delta = y_offset;
 
@@ -104,28 +105,28 @@ void InputServer::init(GLFWwindow *window) {
 
         InputEvent input_event{};
         input_event.type = InputEventType::Key;
+        input_event.window = window;
         input_event.args.key.pressed = action == GLFW_PRESS;
         input_event.args.key.repeated = action == GLFW_REPEAT;
-        input_event.args.key.key = KeyCode::UNKNOWN;
 
         switch (key) {
             case GLFW_KEY_BACKSPACE: {
-                input_event.args.key.key = KeyCode::BACKSPACE;
+                input_event.args.key.key = KeyCode::Backspace;
             } break;
             case GLFW_KEY_LEFT: {
-                input_event.args.key.key = KeyCode::LEFT;
+                input_event.args.key.key = KeyCode::Left;
             } break;
             case GLFW_KEY_RIGHT: {
-                input_event.args.key.key = KeyCode::RIGHT;
+                input_event.args.key.key = KeyCode::Right;
             } break;
             case GLFW_KEY_UP: {
-                input_event.args.key.key = KeyCode::UP;
+                input_event.args.key.key = KeyCode::Up;
             } break;
             case GLFW_KEY_DOWN: {
-                input_event.args.key.key = KeyCode::DOWN;
+                input_event.args.key.key = KeyCode::Down;
             } break;
             default: {
-                input_event.args.key.key = KeyCode::UNKNOWN;
+                input_event.args.key.key = KeyCode::Unknown;
             }
         }
 
@@ -136,6 +137,7 @@ void InputServer::init(GLFWwindow *window) {
     auto character_callback = [](GLFWwindow *window, unsigned int codepoint) {
         InputEvent input_event{};
         input_event.type = InputEventType::Text;
+        input_event.window = window;
         input_event.args.text.codepoint = codepoint;
         auto input_server = InputServer::get_singleton();
         input_server->input_queue.push_back(input_event);
@@ -150,7 +152,7 @@ void InputServer::collect_events() {
     glfwPollEvents();
 }
 
-void InputServer::set_cursor(CursorShape shape) {
+void InputServer::set_cursor(Window *window, CursorShape shape) {
     GLFWcursor *current_cursor{};
 
     switch (shape) {
@@ -180,18 +182,19 @@ void InputServer::set_cursor(CursorShape shape) {
         } break;
     }
 
-    glfwSetCursor(current_window, current_cursor);
+    glfwSetCursor(window->glfw_window, current_cursor);
 }
 
-void InputServer::set_cursor_captured(bool captured) {
-    glfwSetInputMode(current_window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+void InputServer::set_cursor_captured(Window *window, bool captured) {
+    glfwSetInputMode(window->glfw_window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }
 
-void InputServer::hide_cursor() {
-    glfwSetInputMode(current_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+void InputServer::hide_cursor(Window *window) {
+    glfwSetInputMode(window->glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
-void InputServer::restore_cursor() {
-    glfwSetInputMode(current_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+void InputServer::restore_cursor(Window *window) {
+    glfwSetInputMode(window->glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
+
 } // namespace Flint

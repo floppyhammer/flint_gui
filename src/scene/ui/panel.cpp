@@ -3,6 +3,7 @@
 #include <string>
 
 #include "../../common/logger.h"
+#include "../window_proxy.h"
 
 namespace Flint {
 
@@ -140,13 +141,13 @@ void Panel::input(InputEvent &event) {
         }
 
         if (h_resize && v_resize) {
-            InputServer::get_singleton()->set_cursor(CursorShape::ResizeTlbr);
+            InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::ResizeTlbr);
         } else if (h_resize) {
-            InputServer::get_singleton()->set_cursor(CursorShape::ResizeH);
+            InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::ResizeH);
         } else if (v_resize) {
-            InputServer::get_singleton()->set_cursor(CursorShape::ResizeV);
+            InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::ResizeV);
         } else {
-            InputServer::get_singleton()->set_cursor(CursorShape::Arrow);
+            InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::Arrow);
         }
     }
 
@@ -187,7 +188,7 @@ void Panel::update(double dt) {
     NodeUi::update(dt);
 }
 
-void Panel::propagate_draw(VkCommandBuffer cmd_buffer) {
+void Panel::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     if (!visible) {
         return;
     }
@@ -195,7 +196,7 @@ void Panel::propagate_draw(VkCommandBuffer cmd_buffer) {
     draw();
 
     if (!collapsed) {
-        Node::propagate_draw(cmd_buffer);
+        Node::propagate_draw(render_pass, cmd_buffer);
     }
 }
 
@@ -220,7 +221,7 @@ void Panel::draw() {
                                                {global_position.x + size.x, global_position.y + title_bar_height});
             }
 
-            title_container->propagate_draw(VK_NULL_HANDLE);
+            title_container->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
         } else {
             if (!collapsed) {
                 vector_server->draw_style_box(theme_panel.value(), get_global_position(), size);
@@ -229,7 +230,7 @@ void Panel::draw() {
     }
 
     if (title_bar) {
-        title_container->propagate_draw(VK_NULL_HANDLE);
+        title_container->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
     }
 }
 

@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include "../render/render_server.h"
 #include "GLFW/glfw3.h"
+#include "servers/render_server.h"
 #include "texture.h"
 
 namespace Flint {
@@ -23,7 +23,7 @@ public:
     /// Create an empty texture with specific size.
     static std::shared_ptr<ImageTexture> from_empty(Vec2I size, VkFormat format);
 
-    static std::shared_ptr<ImageTexture> from_wrapper(VkImageView image_view, VkSampler sampler, Vec2I size);
+    static std::shared_ptr<ImageTexture> from_wrapping(VkImageView image_view, VkSampler sampler, Vec2I size);
 
     /// If this texture should take the responsibility of managing GPU resources.
     bool resource_ownership = true;

@@ -1,15 +1,25 @@
 #include "scene_tree.h"
 
 #include "render/swap_chain.h"
-#include "ui_layer.h"
-#include "window.h"
 
 namespace Flint {
 
-SceneTree::SceneTree() {
-    root = std::make_shared<WindowNode>(
-        Vec2I(SwapChain::get_singleton()->swapChainExtent.width, SwapChain::get_singleton()->swapChainExtent.height));
+SceneTree::SceneTree(Vec2I main_window_size) {
+    auto display_server = DisplayServer::get_singleton();
+
+    root = std::make_shared<WindowProxy>(main_window_size, false);
     root->name = "Main Window";
+
+    // Initialize the render server after creating the first window (surface).
+    auto render_server = RenderServer::get_singleton();
+
+    // Initialize the vector server.
+    auto driver = std::make_shared<Pathfinder::DriverVk>(display_server->get_device(),
+                                                         display_server->physicalDevice,
+                                                         display_server->graphicsQueue,
+                                                         display_server->command_pool);
+    auto vector_server = VectorServer::get_singleton();
+    vector_server->init(driver);
 }
 
 void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
@@ -35,36 +45,19 @@ void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
     }
 }
 
-void SceneTree::input(std::vector<InputEvent>& input_queue) const {
-    if (root == nullptr || input_queue.empty()) {
+void SceneTree::process(double dt) const {
+    if (root == nullptr) {
         return;
     }
 
-    for (auto& event : input_queue) {
+    for (auto& event : InputServer::get_singleton()->input_queue) {
         root->propagate_input(event);
     }
-}
-
-void SceneTree::update(double dt) const {
-    if (root == nullptr) {
-        return;
-    }
-
-    if (Window::get_singleton()->framebufferResized) {
-        auto new_size = Vec2I(Window::get_singleton()->framebuffer_width, Window::get_singleton()->framebuffer_height);
-        when_window_size_changed(new_size);
-        VectorServer::get_singleton()->get_canvas()->set_new_dst_texture(new_size);
-    }
+    InputServer::get_singleton()->input_queue.clear();
 
     root->propagate_update(dt);
-}
 
-void SceneTree::draw(VkCommandBuffer cmd_buffer) const {
-    if (root == nullptr) {
-        return;
-    }
-
-    root->propagate_draw(cmd_buffer);
+    root->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
 }
 
 void SceneTree::when_window_size_changed(Vec2I new_size) const {
@@ -74,6 +67,14 @@ void SceneTree::when_window_size_changed(Vec2I new_size) const {
             cast_child->when_window_size_changed(new_size);
         }
     }
+}
+
+void SceneTree::quit() {
+    quited = true;
+}
+
+bool SceneTree::has_quited() const {
+    return quited;
 }
 
 } // namespace Flint

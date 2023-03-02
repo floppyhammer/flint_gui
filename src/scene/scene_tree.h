@@ -21,6 +21,8 @@
 #include "ui/text_edit.h"
 #include "ui/texture_rect.h"
 #include "ui/tree.h"
+#include "ui_layer.h"
+#include "window_proxy.h"
 #include "world.h"
 
 namespace Flint {
@@ -28,20 +30,22 @@ namespace Flint {
 /// Processing order: Input -> Update -> Draw.
 class SceneTree {
 public:
-    SceneTree();
+    explicit SceneTree(Vec2I main_window_size);
 
-    void input(std::vector<InputEvent>& input_queue) const;
-
-    void update(double dt) const;
-
-    void draw(VkCommandBuffer cmd_buffer) const;
+    void process(double dt) const;
 
     void replace_scene(const std::shared_ptr<Node>& new_scene);
 
     void when_window_size_changed(Vec2I new_size) const;
 
+    void quit();
+
+    bool has_quited() const;
+
 private:
     std::shared_ptr<Node> root;
+
+    bool quited = false;
 };
 
 } // namespace Flint

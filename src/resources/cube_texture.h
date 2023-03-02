@@ -5,8 +5,8 @@
 
 #include <memory>
 
-#include "../render/render_server.h"
 #include "GLFW/glfw3.h"
+#include "servers/render_server.h"
 #include "texture.h"
 
 namespace Flint {

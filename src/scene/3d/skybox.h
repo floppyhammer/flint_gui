@@ -15,7 +15,7 @@ public:
 protected:
     void update(double dt) override;
 
-    void draw(VkCommandBuffer cmd_buffer) override;
+    void draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     std::shared_ptr<MaterialSkybox> material;
 

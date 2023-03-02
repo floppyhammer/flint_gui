@@ -15,7 +15,7 @@ Model::Model() {
     type = NodeType::Model;
 }
 
-void Model::draw(VkCommandBuffer cmd_buffer) {
+void Model::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     auto world = get_world();
     if (!world) {
         return;
@@ -26,7 +26,7 @@ void Model::draw(VkCommandBuffer cmd_buffer) {
         return;
     }
 
-    VkPipeline pipeline = camera->subview->mesh_pipeline;
+    VkPipeline pipeline = RenderServer::get_singleton()->get_pipeline(render_pass, "mesh3d");
     VkPipelineLayout pipeline_layout = RenderServer::get_singleton()->mesh_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
@@ -37,12 +37,12 @@ void Model::draw(VkCommandBuffer cmd_buffer) {
         const auto &desc_set = surface->get_material()->get_desc_set();
 
         VkBuffer vertexBuffers[] = {surface->get_vertex_buffer()};
-        RenderServer::get_singleton()->draw_mesh(cmd_buffer,
-                                                pipeline,
-                                                desc_set->getDescriptorSet(SwapChain::get_singleton()->currentImage),
-                                                vertexBuffers,
-                                                surface->get_index_buffer(),
-                                                surface->get_index_count());
+        RenderServer::get_singleton()->draw_mesh3d(cmd_buffer,
+                                                   pipeline,
+                                                   desc_set->getDescriptorSet(get_current_image()),
+                                                   vertexBuffers,
+                                                   surface->get_index_buffer(),
+                                                   surface->get_index_count());
     }
 }
 

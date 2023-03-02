@@ -6,6 +6,7 @@
 #include "render/swap_chain.h"
 #include "resources/default_resource.h"
 #include "scene/ui/node_ui.h"
+#include "scene/window_proxy.h"
 #include "servers/vector_server.h"
 
 namespace Flint {
@@ -18,18 +19,36 @@ UiLayer::UiLayer() {
     mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
 }
 
-void UiLayer::propagate_draw(VkCommandBuffer cmd_buffer) {
-    // Record drawing commands.
-    for (auto& child : children) {
-        child->propagate_draw(cmd_buffer);
+void UiLayer::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
+    if (!get_window()) {
+        return;
     }
 
-    // Draw UI nodes.
-    VectorServer::get_singleton()->submit();
+    if (!texture) {
+        texture = ImageTexture::from_empty(get_window()->get_size(), VK_FORMAT_R8G8B8A8_UNORM);
+    }
+
+    auto vs = VectorServer::get_singleton();
+
+    // Save the scene which belongs to another UiLayer;
+    auto old_scene = vs->get_canvas()->take_scene();
+
+    // Record drawing commands.
+    for (auto& child : children) {
+        child->propagate_draw(render_pass, cmd_buffer);
+    }
+
+    // Set the dst texture just before drawing, in case we have other child UiLayers.
+    vs->set_dst_texture(texture);
+
+    vs->submit_and_clear();
+
+    // Restore the old scene;
+    vs->get_canvas()->set_scene(old_scene);
 
     // TODO: let the scene tree manage UI layer drawing, so we can properly order UI and 2D/3D worlds.
     // Draw resulted UI texture.
-    draw(cmd_buffer);
+    draw(render_pass, cmd_buffer);
 }
 
 void UiLayer::update_mvp() {
@@ -49,13 +68,12 @@ void UiLayer::update_mvp() {
     push_constant.mvp = mvp.model;
 }
 
-void UiLayer::draw(VkCommandBuffer cmd_buffer) {
-    auto image_texture = VectorServer::get_singleton()->get_texture();
-    mesh->surface->get_material()->set_texture(image_texture.get());
+void UiLayer::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
+    mesh->surface->get_material()->set_texture(texture.get());
 
     auto rs = RenderServer::get_singleton();
 
-    VkPipeline pipeline = rs->blit_pipeline;
+    VkPipeline pipeline = rs->get_pipeline(render_pass, "mesh2d");
     VkPipelineLayout pipeline_layout = rs->blit_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
@@ -63,9 +81,8 @@ void UiLayer::draw(VkCommandBuffer cmd_buffer) {
         cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
 
     // Unlike Sprite 2D, Texture Rect should not support custom mesh.
-    rs->blit(cmd_buffer,
-             pipeline,
-             mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::get_singleton()->currentImage));
+    rs->blit(
+        cmd_buffer, pipeline, mesh->surface->get_material()->get_desc_set()->getDescriptorSet(get_current_image()));
 }
 
 void UiLayer::when_window_size_changed(Vec2I new_size) {

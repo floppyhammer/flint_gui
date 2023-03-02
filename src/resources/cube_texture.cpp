@@ -6,6 +6,7 @@
 
 #include "../common/logger.h"
 #include "../common/macros.h"
+#include "../servers/display_server.h"
 
 namespace Flint {
 
@@ -14,7 +15,7 @@ CubeTexture::CubeTexture(const std::string &path) {
 }
 
 void CubeTexture::load_from_file(const std::string &path) {
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
     // TODO: Add mip levels.
     uint32_t mipLevels = 1;

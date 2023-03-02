@@ -13,7 +13,7 @@ const uint32_t WINDOW_WIDTH = 640;
 const uint32_t WINDOW_HEIGHT = 480;
 
 int main() {
-    App app(WINDOW_WIDTH, WINDOW_HEIGHT);
+    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
@@ -22,7 +22,7 @@ int main() {
         panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         panel->set_anchor_flag(AnchorFlag::FullRect);
         panel->apply_fullscreen_style();
-        app.tree->replace_scene(panel);
+        app.get_tree()->replace_scene(panel);
 
         auto margin_container = std::make_shared<MarginContainer>();
         margin_container->set_position({0, 0});
@@ -63,8 +63,6 @@ int main() {
     }
 
     app.main_loop();
-
-    app.cleanup();
 
     return EXIT_SUCCESS;
 }

@@ -1,18 +1,18 @@
 #ifndef FLINT_SWAP_CHAIN_H
 #define FLINT_SWAP_CHAIN_H
 
-#include "platform.h"
+#include "window.h"
 
 namespace Flint {
 
+/// How many frames should be processed concurrently.
+const int MAX_FRAMES_IN_FLIGHT = 2;
+
 class SwapChain {
 public:
-    SwapChain();
+    explicit SwapChain(Window* _window);
 
-    static SwapChain *get_singleton() {
-        static SwapChain singleton;
-        return &singleton;
-    }
+    ~SwapChain();
 
     VkSwapchainKHR swapChain;
 
@@ -101,7 +101,7 @@ public:
 
     void createSyncObjects();
 
-    bool acquireSwapChainImage(uint32_t &imageIndex);
+    bool acquireSwapChainImage(uint32_t& imageIndex);
 
     /**
      * Set up command queues.
@@ -112,6 +112,9 @@ public:
     void flush(uint32_t imageIndex);
 
     void cleanup();
+
+private:
+    Window* window;
 };
 
 } // namespace Flint

@@ -22,7 +22,7 @@ public:
 private:
     void update(double delta) override;
 
-    void draw(VkCommandBuffer p_command_buffer) override;
+    void draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     void update_mvp();
 

@@ -76,7 +76,7 @@ public:
 private:
     void update(double delta) override;
 
-    void draw(VkCommandBuffer p_command_buffer) override;
+    void draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     std::shared_ptr<Bone2d> root_bone;
 

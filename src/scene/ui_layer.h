@@ -14,9 +14,9 @@ class UiLayer : public Node {
 public:
     UiLayer();
 
-    void draw(VkCommandBuffer cmd_buffer) override;
+    void draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
-    void propagate_draw(VkCommandBuffer cmd_buffer) override;
+    void propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     void update_mvp();
 
@@ -24,9 +24,11 @@ public:
 
     std::shared_ptr<Mesh2d> mesh;
 
-    Vec2I view_size;
-
     MvpPushConstant push_constant;
+
+    std::shared_ptr<Pathfinder::Scene> vector_scene;
+
+    std::shared_ptr<ImageTexture> texture;
 };
 
 } // namespace Flint

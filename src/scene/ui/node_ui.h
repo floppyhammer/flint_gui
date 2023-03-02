@@ -5,12 +5,12 @@
 
 #include "../../common/geometry.h"
 #include "../../render/mvp.h"
-#include "../../render/render_server.h"
 #include "../../resources/mesh.h"
 #include "../../resources/style_box.h"
 #include "../../servers/input_server.h"
 #include "../../servers/vector_server.h"
 #include "../node.h"
+#include "servers/render_server.h"
 
 using Pathfinder::ColorF;
 
@@ -86,7 +86,7 @@ public:
 
     virtual void draw();
 
-    void propagate_draw(VkCommandBuffer cmd_buffer) override;
+    void propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     void set_mouse_filter(MouseFilter filter);
 

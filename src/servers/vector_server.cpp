@@ -4,18 +4,27 @@ using namespace Pathfinder;
 
 namespace Flint {
 
-void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver,
-                        int32_t canvas_width,
-                        int32_t canvas_height) {
+void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver) {
     canvas = std::make_shared<Pathfinder::Canvas>(driver);
-    canvas->set_new_dst_texture({canvas_width, canvas_height});
 }
 
 void VectorServer::cleanup() {
     canvas.reset();
 }
 
-void VectorServer::submit() {
+void VectorServer::set_dst_texture(const std::shared_ptr<ImageTexture> &texture) {
+    auto pathfinder_texture = Pathfinder::TextureVk::from_wrapping(
+        {texture->get_size(), Pathfinder::TextureFormat::Rgba8Unorm, "vector canvas"},
+        texture->image,
+        texture->imageMemory,
+        texture->imageView,
+        texture->sampler,
+        Pathfinder::TextureLayout::ShaderReadOnly);
+
+    canvas->set_dst_texture(pathfinder_texture);
+}
+
+void VectorServer::submit_and_clear() {
     canvas->draw();
     canvas->clear();
 
@@ -37,6 +46,10 @@ void VectorServer::submit() {
     texture_vk->set_layout(Pathfinder::TextureLayout::ShaderReadOnly);
 
     RenderServer::get_singleton()->endSingleTimeCommands(cmd_buffer);
+}
+
+std::shared_ptr<Pathfinder::Canvas> VectorServer::get_canvas() const {
+    return canvas;
 }
 
 void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) {
@@ -234,15 +247,6 @@ shared_ptr<Pathfinder::SvgScene> VectorServer::load_svg(const std::string &path)
     svg_scene->load_from_memory(bytes, *canvas);
 
     return svg_scene;
-}
-
-std::shared_ptr<ImageTexture> VectorServer::get_texture() {
-    auto texture_vk = static_cast<Pathfinder::TextureVk *>(canvas->get_dst_texture().get());
-    return ImageTexture::from_wrapper(texture_vk->get_image_view(), texture_vk->get_sampler(), texture_vk->get_size());
-}
-
-std::shared_ptr<Pathfinder::Canvas> VectorServer::get_canvas() const {
-    return canvas;
 }
 
 } // namespace Flint

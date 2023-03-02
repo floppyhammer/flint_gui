@@ -1,16 +1,16 @@
 #ifndef FLINT_RENDER_SERVER_H
 #define FLINT_RENDER_SERVER_H
 
-#include "mvp.h"
-#include "platform.h"
+#include "render/mvp.h"
+#include "render/window.h"
 
 #define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #include <array>
 #include <iostream>
 #include <optional>
 #include <vector>
+
+#include "glfw/include/GLFW/glfw3.h"
 
 namespace Flint {
 
@@ -23,13 +23,36 @@ public:
 
     RenderServer();
 
-    /**
-     * As long as the swap chain extent changes, render pass also changes.
-     * As a result, we need to recreate the pipelines.
-     * @param render_pass
-     * @param swapchain_extent
-     */
-    void create_swapchain_related_resources(VkRenderPass render_pass, VkExtent2D swapchain_extent);
+    ~RenderServer();
+
+    VkPipeline get_pipeline(VkRenderPass renderPass, std::string name);
+
+    // Layouts.
+    // --------------------------------------------------
+    VkDescriptorSetLayout mesh_descriptor_set_layout{};
+    VkPipelineLayout mesh_pipeline_layout{};
+
+    VkDescriptorSetLayout blit_descriptor_set_layout{};
+    VkPipelineLayout blit_pipeline_layout{};
+
+    VkDescriptorSetLayout skeleton2d_mesh_descriptor_set_layout{};
+    VkPipelineLayout skeleton2d_mesh_pipeline_layout{};
+
+    VkDescriptorSetLayout skybox_descriptor_set_layout{};
+    VkPipelineLayout skybox_pipeline_layout{};
+    // --------------------------------------------------
+
+private:
+    // Pipelines.
+    // --------------------------------------------------
+    VkPipeline mesh_pipeline{};
+
+    VkPipeline blit_pipeline{};
+
+    VkPipeline skeleton2d_mesh_pipeline{};
+
+    VkPipeline skybox_pipeline{};
+    // --------------------------------------------------
 
 public:
     void cleanup();
@@ -38,7 +61,7 @@ public:
      * Create a shader module, but the shader stage is not specified yet.
      * @return Shader module.
      */
-    [[nodiscard]] static VkShaderModule createShaderModule(const std::vector<char> &code);
+    [[nodiscard]] VkShaderModule createShaderModule(VkDevice device, const std::vector<char> &code) const;
 
     /**
      * Create a command buffer in the command pool, and start recording.
@@ -49,7 +72,7 @@ public:
     /**
      * End recording, submit the command buffer to a queue, then free the command buffer in the command pool.
      */
-    void endSingleTimeCommands(VkCommandBuffer commandBuffer) const;
+    void endSingleTimeCommands(VkCommandBuffer cmd_buffer) const;
 
     static void transitionImageLayout(VkCommandBuffer cmd_buffer,
                                       VkImage image,
@@ -132,6 +155,13 @@ public:
 
     void createTextureSampler(VkSampler &textureSampler, VkFilter filter) const;
 
+    /// Create descriptor set layout and pipeline layout.
+    static void create_dsl_and_pl(VkDevice device,
+                                  std::vector<VkDescriptorSetLayoutBinding> dsl_bindings,
+                                  std::vector<VkPushConstantRange> pc_ranges,
+                                  VkDescriptorSetLayout &dsl,
+                                  VkPipelineLayout &pl);
+
     /**
      * Set up shaders, viewport, blend state, etc.
      * @param renderPass Target render pass.
@@ -141,9 +171,13 @@ public:
      * chains.
      * @dependency Descriptor set layout, render pass, viewport extent.
      */
-    void create_mesh_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
+    void create_mesh3d_pipeline(VkRenderPass renderPass, VkPipeline &pipeline);
 
-    void create_skybox_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline) const;
+    void create_mesh2d_pipeline(VkRenderPass renderPass, VkPipeline &pipeline);
+
+    void create_skeleton2d_mesh_pipeline(VkRenderPass renderPass, VkPipeline &pipeline);
+
+    void create_skybox_pipeline(VkRenderPass renderPass, VkPipeline &pipeline) const;
 
     /**
      * Draw a single mesh.
@@ -154,19 +188,19 @@ public:
      * @param indexBuffer
      * @param indexCount
      */
-    void draw_mesh(VkCommandBuffer commandBuffer,
-                   VkPipeline meshGraphicsPipeline,
-                   VkDescriptorSet const &descriptorSet,
-                   VkBuffer *vertexBuffers,
-                   VkBuffer indexBuffer,
-                   uint32_t indexCount) const;
+    void draw_mesh3d(VkCommandBuffer commandBuffer,
+                     VkPipeline meshGraphicsPipeline,
+                     VkDescriptorSet const &descriptorSet,
+                     VkBuffer *vertexBuffers,
+                     VkBuffer indexBuffer,
+                     uint32_t indexCount) const;
 
-    void draw_mesh_2d(VkCommandBuffer commandBuffer,
-                      VkPipeline graphicsPipeline,
-                      const VkDescriptorSet &descriptorSet,
-                      VkBuffer vertexBuffers[],
-                      VkBuffer indexBuffer,
-                      uint32_t indexCount) const;
+    void draw_mesh2d(VkCommandBuffer commandBuffer,
+                     VkPipeline graphicsPipeline,
+                     const VkDescriptorSet &descriptorSet,
+                     VkBuffer vertexBuffers[],
+                     VkBuffer indexBuffer,
+                     uint32_t indexCount) const;
 
     void blit(VkCommandBuffer commandBuffer, VkPipeline graphicsPipeline, const VkDescriptorSet &descriptorSet) const;
 
@@ -184,35 +218,6 @@ public:
                      VkBuffer indexBuffer,
                      uint32_t indexCount) const;
     // --------------------------------------------------
-
-    void cleanup_swapchain_related_resources() const;
-
-    void create_command_pool();
-
-    void create_blit_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
-
-    void create_skeleton2d_mesh_pipeline(VkRenderPass renderPass, VkExtent2D viewportExtent, VkPipeline &pipeline);
-
-public:
-    // Various pipelines.
-    // --------------------------------------------------
-    VkDescriptorSetLayout mesh_descriptor_set_layout{};
-    VkPipelineLayout mesh_pipeline_layout{};
-    VkPipeline mesh_pipeline{};
-
-    VkDescriptorSetLayout blit_descriptor_set_layout{};
-    VkPipelineLayout blit_pipeline_layout{};
-    VkPipeline blit_pipeline{};
-
-    VkDescriptorSetLayout skeleton2d_mesh_descriptor_set_layout{};
-    VkPipelineLayout skeleton2d_mesh_pipeline_layout{};
-    VkPipeline skeleton2d_mesh_pipeline{};
-
-    VkDescriptorSetLayout skybox_descriptor_set_layout{};
-    VkPipelineLayout skybox_pipeline_layout{};
-    VkPipeline skybox_pipeline{};
-
-    VkCommandPool command_pool{};
 
 private:
     /**

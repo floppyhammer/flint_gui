@@ -18,7 +18,7 @@ World::World(bool _is_2d) {
     update_mvp();
 }
 
-void World::propagate_draw(VkCommandBuffer cmd_buffer) {
+void World::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     Subview* subview;
     ColorF clear_color;
 
@@ -31,7 +31,7 @@ void World::propagate_draw(VkCommandBuffer cmd_buffer) {
 
             draw_subtree(subview, clear_color, current_camera2d->get_texture().get());
 
-            draw(cmd_buffer);
+            draw(render_pass, cmd_buffer);
         }
     } else {
         for (auto& cam : camera3ds) {
@@ -41,7 +41,7 @@ void World::propagate_draw(VkCommandBuffer cmd_buffer) {
 
             draw_subtree(subview, clear_color, current_camera3d->get_texture().get());
 
-            draw(cmd_buffer);
+            draw(render_pass, cmd_buffer);
         }
     }
 }
@@ -70,7 +70,7 @@ void World::draw_subtree(Subview* subview, ColorF clear_color, ImageTexture* ima
 
     // Start recursive calling to draw all node under this sub-viewport.
     for (auto& child : children) {
-        child->propagate_draw(cmd_buffer);
+        child->propagate_draw(subview->render_pass, cmd_buffer);
     }
 
     // End render pass.
@@ -117,7 +117,7 @@ void World::update_mvp() {
     push_constant.mvp = mvp.model;
 }
 
-void World::draw(VkCommandBuffer cmd_buffer) {
+void World::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     std::shared_ptr<ImageTexture> image_texture;
 
     if (is_2d) {
@@ -128,7 +128,7 @@ void World::draw(VkCommandBuffer cmd_buffer) {
 
     mesh->surface->get_material()->set_texture(image_texture.get());
 
-    VkPipeline pipeline = RenderServer::get_singleton()->blit_pipeline;
+    VkPipeline pipeline = RenderServer::get_singleton()->get_pipeline(render_pass, "mesh2d");;
     VkPipelineLayout pipeline_layout = RenderServer::get_singleton()->blit_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
@@ -136,9 +136,7 @@ void World::draw(VkCommandBuffer cmd_buffer) {
         cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
 
     RenderServer::get_singleton()->blit(
-        cmd_buffer,
-        pipeline,
-        mesh->surface->get_material()->get_desc_set()->getDescriptorSet(SwapChain::get_singleton()->currentImage));
+        cmd_buffer, pipeline, mesh->surface->get_material()->get_desc_set()->getDescriptorSet(get_current_image()));
 }
 
 } // namespace Flint

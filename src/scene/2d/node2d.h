@@ -24,7 +24,7 @@ public:
     Vec2F get_global_position() const;
 
 protected:
-    void draw(VkCommandBuffer p_command_buffer) override;
+    void draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     std::shared_ptr<Mesh2d> mesh;
 

@@ -1,5 +1,5 @@
-#ifndef FLINT_CORE_SERVER_H
-#define FLINT_CORE_SERVER_H
+#ifndef FLINT_ENGINE_H
+#define FLINT_ENGINE_H
 
 #include <chrono>
 
@@ -10,15 +10,15 @@ enum class Signal {
     RebuildCommandBuffer,
 };
 
-class CoreServer {
+class Engine {
 public:
-    static CoreServer *get_singleton() {
-        static CoreServer singleton;
+    static Engine *get_singleton() {
+        static Engine singleton;
 
         return &singleton;
     }
 
-    CoreServer();
+    Engine();
 
     void tick();
 
@@ -37,4 +37,4 @@ private:
 
 } // namespace Flint
 
-#endif // FLINT_CORE_SERVER_H
+#endif // FLINT_ENGINE_H

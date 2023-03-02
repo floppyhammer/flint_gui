@@ -13,7 +13,7 @@ const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
 
 int main() {
-    App app(WINDOW_WIDTH, WINDOW_HEIGHT);
+    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
@@ -22,7 +22,7 @@ int main() {
         margin_container->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         margin_container->set_margin_all(32);
         margin_container->set_anchor_flag(AnchorFlag::FullRect);
-        app.tree->replace_scene(margin_container);
+        app.get_tree()->replace_scene(margin_container);
 
         auto vstack_container = std::make_shared<VStackContainer>();
         vstack_container->set_separation(16);
@@ -53,8 +53,6 @@ int main() {
     }
 
     app.main_loop();
-
-    app.cleanup();
 
     return EXIT_SUCCESS;
 }

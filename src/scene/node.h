@@ -4,10 +4,10 @@
 #include <memory>
 #include <vector>
 
-#include "../render/render_server.h"
-#include "../servers/core_server.h"
+#include "../servers/engine.h"
 #include "../servers/input_server.h"
 #include "common/logger.h"
+#include "servers/render_server.h"
 
 namespace Flint {
 
@@ -26,6 +26,7 @@ enum class NodeType {
     VStackContainer,
     ScrollContainer,
     Window,
+    Popup,
     TabContainer,
     Button,
     Label,
@@ -51,7 +52,7 @@ enum class NodeType {
 };
 
 class World;
-class WindowNode;
+class WindowProxy;
 
 class Node {
 public:
@@ -64,7 +65,8 @@ public:
 
     virtual void propagate_notify(Signal signal);
 
-    virtual void propagate_draw(VkCommandBuffer cmd_buffer);
+    // Override this to intercept the propagation of rendering operations.
+    virtual void propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer);
 
     virtual void propagate_cleanup();
 
@@ -74,7 +76,7 @@ public:
 
     virtual void notify(Signal signal);
 
-    virtual void draw(VkCommandBuffer cmd_buffer);
+    virtual void draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer);
 
     void add_child(const std::shared_ptr<Node> &new_child);
 
@@ -86,7 +88,9 @@ public:
      */
     World *get_world();
 
-    WindowNode *get_window();
+    WindowProxy *get_window();
+
+    uint32_t get_current_image();
 
     void set_parent(Node *node);
 
@@ -104,7 +108,7 @@ public:
 
     std::string get_node_path() const;
 
-    void set_visibility(bool _visible);
+    virtual void set_visibility(bool _visible);
 
     bool get_visibility() const;
 

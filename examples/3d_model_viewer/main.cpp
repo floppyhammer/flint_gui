@@ -13,13 +13,13 @@ const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
 
 int main() {
-    App app(WINDOW_WIDTH, WINDOW_HEIGHT);
+    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
         auto node_ui = std::make_shared<NodeUi>();
         node_ui->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
-        app.tree->replace_scene(node_ui);
+        app.get_tree()->replace_scene(node_ui);
 
         auto world3d = std::make_shared<World>(false);
         node_ui->add_child(world3d);
@@ -130,8 +130,6 @@ int main() {
     }
 
     app.main_loop();
-
-    app.cleanup();
 
     return EXIT_SUCCESS;
 }

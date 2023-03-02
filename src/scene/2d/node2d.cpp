@@ -27,7 +27,7 @@ Vec2F Node2d::get_global_position() const {
     return position;
 }
 
-void Node2d::draw(VkCommandBuffer p_command_buffer) {
+void Node2d::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     VectorServer::get_singleton()->draw_path(position_indicator, Transform2::from_translation(position));
 }
 

@@ -32,7 +32,7 @@ public:
 
     void propagate_input(InputEvent &event) override;
 
-    void propagate_draw(VkCommandBuffer p_command_buffer) override;
+    void propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
     void set_size(Vec2F p_size) override;
 

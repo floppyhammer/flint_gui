@@ -9,12 +9,12 @@ const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
 
 int main() {
-    App app(WINDOW_WIDTH, WINDOW_HEIGHT);
+    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
         auto node_ui = std::make_shared<NodeUi>();
-        app.tree->replace_scene(node_ui);
+        app.get_tree()->replace_scene(node_ui);
 
         auto image_texture = ResourceManager::get_singleton()->load<ImageTexture>("../assets/duck.png");
         auto vector_texture = ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Button.svg");
@@ -24,13 +24,13 @@ int main() {
             texture_rect_svg->set_position({400.0f, i * 100.0f});
             texture_rect_svg->set_size({200, 100});
             texture_rect_svg->set_texture(vector_texture);
-            texture_rect_svg->set_debug_mode(true);
+            texture_rect_svg->enable_visual_debug(true);
             node_ui->add_child(texture_rect_svg);
 
             auto texture_rect_image = std::make_shared<TextureRect>();
             texture_rect_image->set_texture(image_texture);
             texture_rect_image->set_position({0.0f, i * 100.0f});
-            texture_rect_image->set_debug_mode(true);
+            texture_rect_image->enable_visual_debug(true);
             texture_rect_image->set_size({200, 100});
             node_ui->add_child(texture_rect_image);
 
@@ -62,8 +62,6 @@ int main() {
     }
 
     app.main_loop();
-
-    app.cleanup();
 
     return EXIT_SUCCESS;
 }

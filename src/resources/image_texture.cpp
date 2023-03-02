@@ -2,6 +2,7 @@
 
 #include "../common/logger.h"
 #include "../common/macros.h"
+#include "../servers/display_server.h"
 
 // Already defined in Pathfinder.
 // #define STB_IMAGE_IMPLEMENTATION
@@ -18,7 +19,7 @@ ImageTexture::ImageTexture() {
 ImageTexture::~ImageTexture() {
     if (!resource_ownership) return;
 
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
 
     vkDestroySampler(device, sampler, nullptr);
 
@@ -92,8 +93,8 @@ void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uin
     layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     // Clean up staging stuff.
-    vkDestroyBuffer(Window::get_singleton()->device, stagingBuffer, nullptr);
-    vkFreeMemory(Window::get_singleton()->device, stagingBufferMemory, nullptr);
+    vkDestroyBuffer(DisplayServer::get_singleton()->get_device(), stagingBuffer, nullptr);
+    vkFreeMemory(DisplayServer::get_singleton()->get_device(), stagingBufferMemory, nullptr);
 }
 
 std::shared_ptr<ImageTexture> ImageTexture::from_empty(Vec2I size, VkFormat format) {
@@ -130,7 +131,7 @@ std::shared_ptr<ImageTexture> ImageTexture::from_empty(Vec2I size, VkFormat form
 
 void ImageTexture::set_filter(VkFilter filter) {
     // Destroy the old sampler.
-    auto device = Window::get_singleton()->device;
+    auto device = DisplayServer::get_singleton()->get_device();
     vkDestroySampler(device, sampler, nullptr);
 
     // Create a new sampler.
@@ -164,7 +165,7 @@ ImageTexture::ImageTexture(const std::string &path) : Texture(path) {
     RenderServer::get_singleton()->createTextureSampler(sampler, VK_FILTER_LINEAR);
 }
 
-std::shared_ptr<ImageTexture> ImageTexture::from_wrapper(VkImageView image_view, VkSampler sampler, Vec2I size) {
+std::shared_ptr<ImageTexture> ImageTexture::from_wrapping(VkImageView image_view, VkSampler sampler, Vec2I size) {
     auto texture = std::make_shared<ImageTexture>();
     texture->size = size;
     texture->resource_ownership = false;
