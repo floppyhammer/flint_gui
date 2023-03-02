@@ -5,13 +5,13 @@
 namespace Flint {
 
 SceneTree::SceneTree(Vec2I main_window_size) {
+    auto display_server = DisplayServer::get_singleton();
+
     root = std::make_shared<WindowProxy>(main_window_size, false);
     root->name = "Main Window";
 
     // Initialize the render server after creating the first window (surface).
     auto render_server = RenderServer::get_singleton();
-
-    auto display_server = DisplayServer::get_singleton();
 
     // Initialize the vector server.
     auto driver = std::make_shared<Pathfinder::DriverVk>(display_server->get_device(),

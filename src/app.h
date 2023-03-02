@@ -20,7 +20,7 @@ using namespace Flint;
 
 class App {
 public:
-    App(int32_t window_width, int32_t window_height);
+    App(Vec2I window_size);
 
     ~App();
 
@@ -29,10 +29,10 @@ public:
     SceneTree* get_tree();
 
 private:
-    std::unique_ptr<Flint::SceneTree> tree;
+    void cleanup();
 
 private:
-    void cleanup();
+    std::unique_ptr<Flint::SceneTree> tree;
 };
 
 #endif // FLINT_APP_H

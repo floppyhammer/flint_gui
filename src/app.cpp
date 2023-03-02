@@ -19,20 +19,11 @@
 
 using namespace Flint;
 
-App::App(int32_t window_width, int32_t window_height) {
+App::App(Vec2I window_size) {
     // Set logger level.
     Logger::set_level(Logger::VERBOSE);
 
-    auto display_server = DisplayServer::get_singleton();
-
-    //    // 3. Initialize swap chain.
-    //    auto swap_chain = SwapChain::get_singleton();
-    //
-    //    // 4. Initialize input server.
-    //    auto input_server = InputServer::get_singleton();
-    //    input_server->init(window->glfw_window);
-
-    tree = std::make_unique<Flint::SceneTree>(Vec2I{window_width, window_height});
+    tree = std::make_unique<Flint::SceneTree>(window_size);
 }
 
 App::~App() {
