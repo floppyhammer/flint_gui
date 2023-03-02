@@ -50,12 +50,6 @@ void SceneTree::process(double dt) const {
         return;
     }
 
-    //    if (Window::get_singleton()->framebufferResized) {
-    //        auto new_size = Vec2I(Window::get_singleton()->framebuffer_width,
-    //        Window::get_singleton()->framebuffer_height); when_window_size_changed(new_size);
-    //        VectorServer::get_singleton()->get_canvas()->set_new_dst_texture(new_size);
-    //    }
-
     for (auto& event : InputServer::get_singleton()->input_queue) {
         root->propagate_input(event);
     }

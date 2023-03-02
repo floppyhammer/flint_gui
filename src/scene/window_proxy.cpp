@@ -88,6 +88,10 @@ void WindowProxy::record_commands(std::vector<VkCommandBuffer> &command_buffers,
 }
 
 void WindowProxy::propagate_input(InputEvent &event) {
+    if (!visible) {
+        return;
+    }
+
     // Filter events not belonging to this window.
     if (event.window != window->glfw_window) {
         return;
@@ -102,7 +106,37 @@ void WindowProxy::propagate_input(InputEvent &event) {
     input(event);
 }
 
+void WindowProxy::propagate_update(double dt) {
+    if (window->framebufferResized) {
+        auto new_size = Vec2I(window->framebuffer_width, window->framebuffer_height);
+        //        when_window_size_changed(new_size);
+        //        VectorServer::get_singleton()->get_canvas()->set_new_dst_texture(new_size);
+    }
+
+    // Closing a window just hides it.
+    if (window->should_close() && visible) {
+        visible = false;
+        glfwHideWindow(window->glfw_window);
+    }
+
+    if (!window->should_close() && visible) {
+//        glfwShowWindow(window->glfw_window);
+    }
+
+    if (!visible) {
+        return;
+    }
+
+    for (auto &child : children) {
+        child->propagate_update(dt);
+    }
+}
+
 void WindowProxy::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
+    if (!visible) {
+        return;
+    }
+
     // Acquire next image.
     // We should do this before updating the scenes as we need to modify different
     // buffers according to the current image index.

@@ -8,6 +8,15 @@
 
 Flint is a vector-based Vulkan GUI framework in development.
 
+Features:
+
+* Scene tree.
+* Vulkan backend.
+* High quality anti-aliasing.
+* Multiple window support.
+* Cross-platform.
+* I18N support.
+
 The development work has been mostly done on Windows, but it should be easy to make
 it run on other platforms.
 

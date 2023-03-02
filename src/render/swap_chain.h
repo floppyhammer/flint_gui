@@ -5,9 +5,12 @@
 
 namespace Flint {
 
+/// How many frames should be processed concurrently.
+const int MAX_FRAMES_IN_FLIGHT = 2;
+
 class SwapChain {
 public:
-    SwapChain(Window* _window);
+    explicit SwapChain(Window* _window);
 
     ~SwapChain();
 
@@ -98,7 +101,7 @@ public:
 
     void createSyncObjects();
 
-    bool acquireSwapChainImage(uint32_t &imageIndex);
+    bool acquireSwapChainImage(uint32_t& imageIndex);
 
     /**
      * Set up command queues.

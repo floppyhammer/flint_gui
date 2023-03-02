@@ -1,8 +1,8 @@
 #ifndef FLINT_WINDOW_PROXY_H
 #define FLINT_WINDOW_PROXY_H
 
-#include "node.h"
 #include "../render/swap_chain.h"
+#include "node.h"
 
 using Pathfinder::ColorF;
 using Pathfinder::Vec2I;
@@ -16,6 +16,8 @@ public:
     WindowProxy(Vec2I _size, bool _dummy);
 
     void propagate_input(InputEvent &event) override;
+
+    void propagate_update(double dt) override;
 
     void propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 

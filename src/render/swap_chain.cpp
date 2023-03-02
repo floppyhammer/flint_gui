@@ -401,8 +401,8 @@ void SwapChain::flush(uint32_t imageIndex) {
     }
     // -------------------------------------
 
-    // Queue an image for presentation after queueing all rendering commands and transitioning the image to the correct
-    // layout.
+    // Queue an image for presentation after queueing all rendering commands
+    // and transitioning the image to the correct layout.
     // -------------------------------------
     VkPresentInfoKHR presentInfo{};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -419,14 +419,14 @@ void SwapChain::flush(uint32_t imageIndex) {
     presentInfo.pImageIndices = &imageIndex;
 
     VkResult result = vkQueuePresentKHR(window->presentQueue, &presentInfo);
-    // -------------------------------------
-
+    
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window->framebufferResized) {
         window->framebufferResized = false;
         recreateSwapChain();
     } else if (result != VK_SUCCESS) {
         throw std::runtime_error("Failed to present swap chain image!");
     }
+    // -------------------------------------
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }

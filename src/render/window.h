@@ -9,13 +9,8 @@
 #include "../servers/display_server.h"
 
 using Pathfinder::Vec2I;
-using namespace Flint;
 
-#define GLFW_INCLUDE_VULKAN
-#include "GLFW/glfw3.h"
-
-/// How many frames should be processed concurrently.
-const int MAX_FRAMES_IN_FLIGHT = 2;
+namespace Flint {
 
 class SwapChain;
 
@@ -65,5 +60,7 @@ public:
 private:
     void create_surface();
 };
+
+} // namespace Flint
 
 #endif // FLINT_WINDOW_H
