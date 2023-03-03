@@ -68,6 +68,21 @@ void World::draw_subtree(Subview* subview, ColorF clear_color, ImageTexture* ima
 
     vkCmdBeginRenderPass(cmd_buffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
+    // Set viewport and scissor dynamically.
+    VkViewport viewport{};
+    viewport.x = 0.0f;
+    viewport.y = 0.0f;
+    viewport.width = subview->get_extent().x;
+    viewport.height = subview->get_extent().y;
+    viewport.minDepth = 0.0f;
+    viewport.maxDepth = 1.0f;
+    vkCmdSetViewport(cmd_buffer, 0, 1, &viewport);
+
+    VkRect2D scissor{};
+    scissor.extent.width = subview->get_extent().x;
+    scissor.extent.height = subview->get_extent().y;
+    vkCmdSetScissor(cmd_buffer, 0, 1, &scissor);
+
     // Start recursive calling to draw all node under this sub-viewport.
     for (auto& child : children) {
         child->propagate_draw(subview->render_pass, cmd_buffer);

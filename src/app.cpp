@@ -36,9 +36,8 @@ SceneTree* App::get_tree() {
 
 void App::main_loop() {
     while (!tree->has_quited()) {
-        //        // Collect input and window events.
-        //        InputServer::get_singleton()->collect_events();
-        glfwPollEvents();
+        // Collect input and window events.
+        InputServer::get_singleton()->collect_events();
 
         // Engine processing.
         Engine::get_singleton()->tick();
