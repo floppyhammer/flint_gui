@@ -57,9 +57,16 @@ public:
 
     std::shared_ptr<Font> get_font() const;
 
-    StyleBox theme_background;
+    float get_position_by_glyph(uint32_t glyph_index);
 
-    float get_glyph_position(uint32_t glyph_index);
+    /// Get the caret position of a given codepoint index.
+    float get_position_by_codepoint(uint32_t codepoint_index);
+
+    /// Get the closest codepoint to a mouse click.
+    uint32_t get_codepoint_by_position(Vec2F position);
+
+public:
+    StyleBox theme_background;
 
 private:
     void measure();
@@ -77,11 +84,12 @@ private:
 
     bool autowrap = false;
 
-    // Layout independent.
+    // Layout-independent.
     std::vector<Glyph> glyphs;
 
-    // Layout dependent.
+    // Layout-dependent.
     std::vector<Pathfinder::Range> para_ranges;
+    std::vector<Pathfinder::Range> line_ranges;
 
     // Layout-dependent.
     std::vector<Vec2F> glyph_positions;

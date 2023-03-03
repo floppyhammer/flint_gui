@@ -88,18 +88,20 @@ void Label::measure() {
     glyph_boxes.clear();
     character_boxes.clear();
 
+    float line_height = font->get_size();
+
     float cursor_x = 0;
     float cursor_y = 0;
 
     // Build layout.
-    for (auto &para : para_ranges) {
-        for (int i = para.start; i < para.end; i++) {
-            auto &g = glyphs[i];
+    for (auto &range : para_ranges) {
+        for (int i = range.start; i < range.end; i++) {
+            const auto &g = glyphs[i];
 
             // The glyph's layout box in the text's local coordinates.
             // The origin is the top-left corner of the text box.
-            RectF glyph_layout_box = RectF(
-                cursor_x + g.x_offset, cursor_y + g.y_offset, cursor_x + g.x_advance, cursor_y + font->get_size());
+            RectF glyph_layout_box =
+                RectF(cursor_x + g.x_offset, cursor_y + g.y_offset, cursor_x + g.x_advance, cursor_y + line_height);
 
             glyph_positions.emplace_back(cursor_x + g.x_offset, cursor_y + g.y_offset);
 
@@ -111,7 +113,7 @@ void Label::measure() {
         }
 
         cursor_x = 0;
-        cursor_y += font->get_size();
+        cursor_y += line_height;
     }
 }
 
@@ -234,7 +236,7 @@ std::shared_ptr<Font> Label::get_font() const {
     return font;
 }
 
-float Label::get_glyph_position(uint32_t glyph_index) {
+float Label::get_position_by_glyph(uint32_t glyph_index) {
     float pos = 0;
 
     for (int i = 0; i < glyph_index; i++) {
@@ -242,6 +244,17 @@ float Label::get_glyph_position(uint32_t glyph_index) {
     }
 
     return pos;
+}
+
+float Label::get_position_by_codepoint(uint32_t codepoint_index) {
+    float pos = 0;
+
+    // TODO
+
+    return pos;
+}
+uint32_t Label::get_codepoint_by_position(Vec2F position) {
+    return 0;
 }
 
 } // namespace Flint

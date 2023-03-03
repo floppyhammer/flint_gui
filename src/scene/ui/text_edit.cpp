@@ -194,7 +194,7 @@ void TextEdit::draw() {
 
         float current_glyph_right_edge = 0;
         if (current_caret_index > -1 && current_caret_index < label->get_glyphs().size()) {
-            current_glyph_right_edge = label->get_glyph_position(current_caret_index);
+            current_glyph_right_edge = label->get_position_by_glyph(current_caret_index);
         }
 
         auto start = label->get_global_position() + Vec2F(current_glyph_right_edge, 3);
@@ -215,7 +215,7 @@ int32_t TextEdit::calculate_caret_index(Vec2F local_cursor_position) {
     auto &glyphs = label->get_glyphs();
 
     for (int i = 0; i < glyphs.size(); i++) {
-        float glyph_right_edge = label->get_glyph_position(i);
+        float glyph_right_edge = label->get_position_by_glyph(i);
 
         // Mouse position to the right boundary of the glyph.
         auto distance = abs(local_cursor_position.x - glyph_right_edge);
@@ -239,7 +239,7 @@ Vec2F TextEdit::calculate_caret_position(int32_t target_caret_index) {
     auto closest_distance = std::numeric_limits<float>::max();
 
     if (target_caret_index > -1) {
-        return {label->get_glyph_position(target_caret_index), 0};
+        return {label->get_position_by_glyph(target_caret_index), 0};
     } else {
         return {0, 0};
     }
