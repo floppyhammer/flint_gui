@@ -8,6 +8,7 @@
 namespace Flint {
 
 /// Subview is a texture to which you can draw things.
+/// It is used with a camera to create a viewport.
 class Subview {
 public:
     explicit Subview(Vec2I view_size);
@@ -40,15 +41,15 @@ private:
     // Render pass doesn't care about extent.
     void create_render_pass();
 
-    void extent_dependent_init();
-
-    void extent_dependent_cleanup() const;
+    void create_extent_dependent_resources();
 
     void create_images();
 
     // The color attachment of this framebuffer will then be used
     // to sample from in the fragment shader of the final pass.
     void create_framebuffer();
+
+    void destroy_extent_dependent_resources() const;
 };
 
 } // namespace Flint

@@ -213,7 +213,7 @@ void Font::get_glyphs(const std::string &text,
 
     do {
         // Paragraphs are seperated by line breaks.
-        std::cout << "Paragraphs: " << text << std::endl;
+//        std::cout << "Paragraphs: " << text << std::endl;
 
         // Set paragraphs.
         ubidi_setPara(para_bidi, uchar_data, uchar_count, UBIDI_DEFAULT_LTR, nullptr, &error_code);
@@ -236,9 +236,9 @@ void Font::get_glyphs(const std::string &text,
                 break;
             }
 
-            std::string para_text = convert.to_bytes(text_u16.substr(para_start, para_end));
-            std::cout << "Paragraph text: " << para_text << std::endl;
-            std::cout << "Paragraph range: " << para_start << " -> " << para_end << std::endl;
+//            std::string para_text = convert.to_bytes(text_u16.substr(para_start, para_end));
+//            std::cout << "Paragraph text: " << para_text << std::endl;
+//            std::cout << "Paragraph range: " << para_start << " -> " << para_end << std::endl;
 
             // Set a paragraph (lines).
             ubidi_setLine(para_bidi, para_start, para_end, line_bidi, &error_code);
@@ -265,8 +265,8 @@ void Font::get_glyphs(const std::string &text,
                 std::u16string run_text_u16 = text_u16.substr(para_start + logical_start, length);
                 std::string run_text = convert.to_bytes(run_text_u16);
 
-                std::cout << "Visual run in paragraph: \t" << run_index << "\t" << run_is_rtl << "\t" << logical_start
-                          << '\t' << length << '\t' << run_text << std::endl;
+//                std::cout << "Visual run in paragraph: \t" << run_index << "\t" << run_is_rtl << "\t" << logical_start
+//                          << '\t' << length << '\t' << run_text << std::endl;
 
                 auto run_script = get_text_script(run_text);
 

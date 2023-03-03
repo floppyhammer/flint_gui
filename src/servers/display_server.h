@@ -100,8 +100,6 @@ private:
     /// Logical device.
     VkDevice device{};
 
-
-
     GLFWwindow *focused_window{};
 
 private:

@@ -50,13 +50,7 @@ void World::draw_subtree(Subview* subview, ColorF clear_color, ImageTexture* ima
     auto cmd_buffer = RenderServer::get_singleton()->beginSingleTimeCommands();
 
     // Begin render pass.
-    // It seems not feasible to wrap begin info into rendering Viewport.
-    VkRenderPassBeginInfo renderPassInfo{};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    renderPassInfo.renderPass = subview->render_pass;
-    renderPassInfo.framebuffer = subview->framebuffer; // Set target framebuffer.
-    renderPassInfo.renderArea.offset = {0, 0};
-    renderPassInfo.renderArea.extent = VkExtent2D{(uint32_t)subview->get_extent().x, (uint32_t)subview->get_extent().y};
+    VkRenderPassBeginInfo renderPassInfo = subview->get_render_pass_info();
 
     // Clear color.
     std::array<VkClearValue, 2> clearValues{};

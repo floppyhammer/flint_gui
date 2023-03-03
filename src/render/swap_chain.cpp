@@ -108,8 +108,8 @@ void SwapChain::cleanup() {
 void SwapChain::createSwapChain() {
     auto device = DisplayServer::get_singleton()->get_device();
 
-    SwapChainSupportDetails swapChainSupport = DisplayServer::get_singleton()->querySwapChainSupport(
-        DisplayServer::get_singleton()->physicalDevice, window->surface);
+    SwapChainSupportDetails swapChainSupport =
+        DisplayServer::querySwapChainSupport(DisplayServer::get_singleton()->physicalDevice, window->surface);
 
     VkSurfaceFormatKHR surfaceFormat = window->chooseSwapSurfaceFormat(swapChainSupport.formats);
     VkPresentModeKHR presentMode = window->chooseSwapPresentMode(swapChainSupport.presentModes);
@@ -132,8 +132,8 @@ void SwapChain::createSwapChain() {
     createInfo.imageArrayLayers = 1;
     createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-    QueueFamilyIndices qfIndices = DisplayServer::get_singleton()->findQueueFamilies(
-        DisplayServer::get_singleton()->physicalDevice, window->surface);
+    QueueFamilyIndices qfIndices =
+        DisplayServer::findQueueFamilies(DisplayServer::get_singleton()->physicalDevice, window->surface);
     uint32_t queueFamilyIndices[] = {qfIndices.graphicsFamily.value(), qfIndices.presentFamily.value()};
 
     if (qfIndices.graphicsFamily != qfIndices.presentFamily) {
@@ -419,7 +419,7 @@ void SwapChain::flush(uint32_t imageIndex) {
     presentInfo.pImageIndices = &imageIndex;
 
     VkResult result = vkQueuePresentKHR(window->presentQueue, &presentInfo);
-    
+
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || window->framebufferResized) {
         window->framebufferResized = false;
         recreateSwapChain();

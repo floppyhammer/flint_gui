@@ -7,16 +7,16 @@ namespace Flint {
 Subview::Subview(Vec2I view_size) {
     extent = view_size;
 
-    // Render pass is not extent dependent.
+    // Render pass is not extent-dependent.
     create_render_pass();
 
-    extent_dependent_init();
+    create_extent_dependent_resources();
 }
 
 Subview::~Subview() {
     auto device = DisplayServer::get_singleton()->get_device();
 
-    extent_dependent_cleanup();
+    create_extent_dependent_resources();
 
     vkDestroyRenderPass(device, render_pass, nullptr);
 }
@@ -55,28 +55,29 @@ void Subview::create_render_pass() {
     // Color attachment.
     // ----------------------------------------
     VkAttachmentDescription colorAttachment{};
-    colorAttachment.format =
-        VK_FORMAT_R8G8B8A8_UNORM; // Specifying the format of the image view that will be used for the attachment.
-    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT; // Specifying the number of samples of the image.
-    colorAttachment.loadOp =
-        VK_ATTACHMENT_LOAD_OP_CLEAR; // Specifying how the contents of color and depth components of the attachment are
-                                     // treated at the beginning of the subpass where it is first used.
-    colorAttachment.storeOp =
-        VK_ATTACHMENT_STORE_OP_STORE; // Specifying how the contents of color and depth components of the attachment are
-                                      // treated at the end of the subpass where it is last used.
+    // Specifying the format of the image view that will be used for the attachment.
+    colorAttachment.format = VK_FORMAT_R8G8B8A8_UNORM;
+    // Specifying the number of samples of the image.
+    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    // Specifying how the contents of color and depth components of the attachment are
+    // treated at the beginning of the subpass where it is first used.
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    // Specifying how the contents of color and depth components of the attachment are
+    // treated at the end of the subpass where it is last used.
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    colorAttachment.initialLayout =
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // The layout the attachment image subresource will be in
-                                                  // when a render pass instance begins.
-    colorAttachment.finalLayout =
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; // The layout the attachment image subresource will be transitioned to
-                                                  // when a render pass instance ends.
+    // The layout the attachment image subresource will be in
+    // when a render pass instance begins.
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    // The layout the attachment image subresource will be transitioned to
+    // when a render pass instance ends.
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     VkAttachmentReference colorAttachmentRef{};
     colorAttachmentRef.attachment = 0;
-    colorAttachmentRef.layout =
-        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL; // Specifying the layout the attachment uses during the subpass.
+    // Specifying the layout the attachment uses during the subpass.
+    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     // ----------------------------------------
 
     // Depth attachment.
@@ -181,8 +182,8 @@ VkRenderPassBeginInfo Subview::get_render_pass_info() {
 void Subview::set_extent(Vec2I new_extent) {
     if (extent != new_extent) {
         extent = new_extent;
-        extent_dependent_cleanup();
-        extent_dependent_init();
+        destroy_extent_dependent_resources();
+        create_extent_dependent_resources();
     }
 }
 
@@ -190,14 +191,14 @@ Vec2I Subview::get_extent() {
     return extent;
 }
 
-void Subview::extent_dependent_init() {
+void Subview::create_extent_dependent_resources() {
     // Create color & depth images.
     create_images();
 
     create_framebuffer();
 }
 
-void Subview::extent_dependent_cleanup() const {
+void Subview::destroy_extent_dependent_resources() const {
     auto device = DisplayServer::get_singleton()->get_device();
 
     // Depth resources.
