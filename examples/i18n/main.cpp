@@ -29,7 +29,8 @@ int main() {
         margin_container->add_child(vstack_container);
 
         std::string text = "";
-        text += "🌤你好世界！\n";                 // Chinese
+        text += "👍😁😂\n";                         // Emoji
+        text += "你好世界！\n";                  // Chinese
         text += "こんにちは世界！\n";            // Japanese
         text += "مرحبا بالعالم!\n";              // Arabic
         text += "ওহে বিশ্ব!\n";                   // Bengali

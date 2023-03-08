@@ -20,6 +20,7 @@ Label::Label(const std::string &_text) {
     debug_size_box.border_color = ColorU::red();
 
     font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/Arial Unicode MS Font.ttf");
+    emoji_font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/NotoEmoji-Regular.ttf");
 
     set_text(_text);
 

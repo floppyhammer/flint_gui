@@ -199,7 +199,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         // Add stroke if needed.
         canvas->set_stroke_paint(Paint::from_color(text_style.stroke_color));
         canvas->set_line_width(text_style.stroke_width);
-        canvas->set_line_join(LineJoin::Bevel);
+        canvas->set_line_join(LineJoin::Round);
         canvas->stroke_path(g.path);
     }
 

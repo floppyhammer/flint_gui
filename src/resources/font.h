@@ -55,6 +55,8 @@ struct Glyph {
     // A particular glyph ID within the font does not necessarily correlate to a predictable Unicode codepoint.
     uint16_t index = 0;
 
+    bool emoji = false;
+
     int32_t x_offset = 0; // Offset from the origin of the glyph on baseline.
     int32_t y_offset = 0;
 

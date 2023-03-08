@@ -78,7 +78,7 @@ private:
 private:
     std::string text;
 
-    std::shared_ptr<Font> font;
+    std::shared_ptr<Font> font, emoji_font;
 
     bool clip = false;
 
