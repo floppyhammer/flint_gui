@@ -123,7 +123,7 @@ void Font::get_metrics() {
     // Calculate font scaling.
     scale = stbtt_ScaleForPixelHeight(&stbtt_info, size);
 
-    // The origin is baseline and the Y axis points u.
+    // The origin is baseline and the Y axis points upward.
     // So, ascent is usually positive, and descent negative.
     int unscaled_ascent;
     int unscaled_descent;

@@ -112,7 +112,7 @@ public:
 
 private:
     /// Stores font data, should not be freed until font is deleted.
-    unsigned char *stbtt_buffer;
+    unsigned char *stbtt_buffer{};
 
     stbtt_fontinfo stbtt_info{};
 
