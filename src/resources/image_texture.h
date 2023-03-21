@@ -30,6 +30,8 @@ public:
 
     void set_filter(VkFilter filter);
 
+    std::shared_ptr<Pathfinder::Image> image_data;
+
 public:
     VkFormat format = VK_FORMAT_R8G8B8A8_UNORM;
 

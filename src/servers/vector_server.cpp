@@ -117,8 +117,15 @@ void VectorServer::draw_path(VectorPath &vector_path, Transform2 transform) {
 }
 
 void VectorServer::draw_image_texture(ImageTexture &texture, Transform2 transform) {
-    Pathfinder::Vec2F pos = {100, 200};
-    //    canvas->draw_image(image, Pathfinder::RectF(pos, pos + image.size.to_f32()));
+    canvas->save_state();
+
+    canvas->set_transform(global_transform_offset * transform);
+
+    auto image = texture.image_data;
+
+    canvas->draw_image(image, RectF({}, Vec2F() + image->size.to_f32()));
+
+    canvas->restore_state();
 }
 
 void VectorServer::draw_vector_texture(VectorTexture &texture, Transform2 transform) {

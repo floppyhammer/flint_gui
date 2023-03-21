@@ -17,7 +17,9 @@ ImageTexture::ImageTexture() {
 }
 
 ImageTexture::~ImageTexture() {
-    if (!resource_ownership) return;
+    if (!resource_ownership) {
+        return;
+    }
 
     auto device = DisplayServer::get_singleton()->get_device();
 
@@ -41,6 +43,11 @@ void ImageTexture::create_image_from_bytes(void *pixels, uint32_t tex_width, uin
     int pixel_bytes;
     if (tex_format == VK_FORMAT_R8G8B8A8_UNORM) {
         pixel_bytes = 4;
+
+        std::vector<ColorU> bytes(tex_width * tex_height * 4);
+        memcpy(bytes.data(), pixels, bytes.size());
+
+        image_data = std::make_shared<Pathfinder::Image>(size, bytes);
     } else if (tex_format == VK_FORMAT_R32G32B32A32_SFLOAT) {
         pixel_bytes = 16;
     } else {
