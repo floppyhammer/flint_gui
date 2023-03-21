@@ -148,11 +148,11 @@ void ScrollContainer::propagate_draw(VkRenderPass render_pass, VkCommandBuffer c
     auto canvas = vector_server->get_canvas();
 
     // Use a RenderTarget to achieve content clip, instead of using clip path.
-    if (sub_render_target.size == Vec2I()) {
-        sub_render_target = Pathfinder::RenderTarget(canvas->get_driver(), size.to_i32(), "Scroller render target");
+    if (render_target_desc.size == Vec2I()) {
+        render_target_desc = {size.to_i32(), "Scroller render target"};
     }
 
-    auto render_target_id = canvas->get_scene()->push_render_target(sub_render_target);
+    auto render_target_id = canvas->get_scene()->push_render_target(render_target_desc);
 
     vector_server->global_transform_offset = Transform2::from_translation(-global_pos);
 

@@ -36,7 +36,7 @@ protected:
     int32_t hscroll = 0;
     int32_t vscroll = 0;
 
-    Pathfinder::RenderTarget sub_render_target;
+    Pathfinder::RenderTargetDesc render_target_desc;
 
     StyleBox theme_scroll_bar;
     StyleBox theme_scroll_grabber;
