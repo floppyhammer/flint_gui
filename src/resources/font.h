@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "common/logger.h"
 #include "resource.h"
 
 using Pathfinder::ColorU;
@@ -24,8 +25,12 @@ struct HarfBuzzRes {
 
     HarfBuzzRes() = default;
 
-    explicit HarfBuzzRes(const std::string &filename) {
-        blob = hb_blob_create_from_file(filename.c_str()); /* or hb_blob_create_from_file_or_fail() */
+    explicit HarfBuzzRes(const std::vector<char> &bytes) {
+        blob = hb_blob_create(bytes.data(),
+                              bytes.size(),
+                              HB_MEMORY_MODE_READONLY,
+                              nullptr,
+                              nullptr); /* or hb_blob_create_from_file_or_fail() */
         face = hb_face_create(blob, 0);
         font = hb_font_create(face);
     }
@@ -66,6 +71,9 @@ struct Glyph {
     // Glyph path. The points are in the glyph's baseline coordinates.
     Pathfinder::Path2d path;
 
+    // Only emojis have SVG data.
+    std::vector<char> svg;
+
     /// Glyph box in the baseline coordinates.
     RectF box;
 
@@ -77,25 +85,15 @@ class Font : public Resource {
 public:
     explicit Font(const std::string &path);
 
-    explicit Font(std::vector<char> &bytes);
-
     ~Font() override;
-
-    static std::shared_ptr<Font> from_file(const char *file_path) {
-        std::shared_ptr<Font> font;
-
-        auto font_buffer = Pathfinder::load_file_as_bytes(file_path);
-
-        font = std::make_shared<Font>(font_buffer);
-
-        return font;
-    }
 
     void set_size(uint32_t new_font_size);
 
     uint32_t get_size() const;
 
     Pathfinder::Path2d get_glyph_path(uint16_t glyph_index) const;
+
+    std::vector<char> get_glyph_svg(uint16_t glyph_index) const;
 
     /// Paragraphs and lines are different concepts.
     /// Paragraphs are seperated by line breaks, while lines are results of automatic layout.
@@ -128,6 +126,8 @@ private:
     std::shared_ptr<HarfBuzzRes> harfbuzz_res;
 
     std::unordered_map<uint16_t, Glyph> glyph_cache;
+
+    std::vector<char> font_data;
 
 private:
     void get_metrics();

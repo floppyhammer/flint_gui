@@ -49,6 +49,9 @@ add_subdirectory(external/glm)
 include_directories(third_party/poly2tri)
 add_subdirectory(third_party/poly2tri)
 
+include_directories(third_party/zlib-1.2.13)
+add_subdirectory(third_party/zlib-1.2.13)
+
 # icu4c.
 if (NOT WIN32)
     # For non-Windows platforms, we need to compile ICU from source.

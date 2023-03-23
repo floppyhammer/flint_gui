@@ -219,7 +219,14 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
 
         // Add fill.
         canvas->set_fill_paint(Paint::from_color(text_style.color));
-        canvas->fill_path(g.path, FillRule::Winding);
+        //        canvas->fill_path(g.path, FillRule::Winding);
+
+        if (!g.svg.empty()) {
+            auto svg_scene = std::make_shared<Pathfinder::SvgScene>();
+            svg_scene->load_from_memory(g.svg, *canvas);
+
+            canvas->get_scene()->append_scene(*(svg_scene->get_scene()), global_transform_offset * transform);
+        }
 
         if (text_style.debug) {
             canvas->set_line_width(1);

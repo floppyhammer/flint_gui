@@ -29,6 +29,12 @@
     #include <unicode/utypes.h>
 #endif
 
+#include <gzip/compress.hpp>
+#include <gzip/config.hpp>
+#include <gzip/decompress.hpp>
+#include <gzip/utils.hpp>
+#include <gzip/version.hpp>
+
 namespace Flint {
 
 enum class Script {
@@ -84,12 +90,12 @@ Script get_text_script(const std::string &text) {
 }
 
 Font::Font(const std::string &path) : Resource(path) {
-    auto bytes = load_file_as_bytes(path.c_str());
+    font_data = load_file_as_bytes(path.c_str());
 
-    auto byte_size = bytes.size() * sizeof(unsigned char);
+    auto byte_size = font_data.size() * sizeof(unsigned char);
 
     stbtt_buffer = static_cast<unsigned char *>(malloc(byte_size));
-    memcpy(stbtt_buffer, bytes.data(), byte_size);
+    memcpy(stbtt_buffer, font_data.data(), byte_size);
 
     // Prepare font info.
     if (!stbtt_InitFont(&stbtt_info, stbtt_buffer, 0)) {
@@ -98,21 +104,7 @@ Font::Font(const std::string &path) : Resource(path) {
 
     get_metrics();
 
-    harfbuzz_res = std::make_shared<HarfBuzzRes>(path);
-}
-
-Font::Font(std::vector<char> &bytes) {
-    auto byte_size = bytes.size() * sizeof(unsigned char);
-
-    stbtt_buffer = static_cast<unsigned char *>(malloc(byte_size));
-    memcpy(stbtt_buffer, bytes.data(), byte_size);
-
-    // Prepare font info.
-    if (!stbtt_InitFont(&stbtt_info, stbtt_buffer, 0)) {
-        Logger::error("Failed to prepare font info!", "Font");
-    }
-
-    get_metrics();
+    harfbuzz_res = std::make_shared<HarfBuzzRes>(font_data);
 }
 
 Font::~Font() {
@@ -133,6 +125,23 @@ void Font::get_metrics() {
     // Take scale into account.
     ascent = roundf(float(unscaled_ascent) * scale);
     descent = roundf(float(unscaled_descent) * scale);
+}
+
+std::vector<char> Font::get_glyph_svg(uint16_t glyph_index) const {
+    const char *data{};
+    size_t data_size = stbtt_GetGlyphSVG(&stbtt_info, glyph_index, &data);
+    if (data_size > 0) {
+        // Check if compressed. Can check both gzip and zlib.
+        bool compressed = gzip::is_compressed(data, data_size);
+
+        if (compressed) {
+            std::string decompressed_data = gzip::decompress(data, data_size);
+            return {std::vector<char>(decompressed_data.begin(), decompressed_data.end())};
+        }
+
+        return {data, data + data_size};
+    }
+    return {};
 }
 
 Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
@@ -213,7 +222,7 @@ void Font::get_glyphs(const std::string &text,
 
     do {
         // Paragraphs are seperated by line breaks.
-//        std::cout << "Paragraphs: " << text << std::endl;
+        //        std::cout << "Paragraphs: " << text << std::endl;
 
         // Set paragraphs.
         ubidi_setPara(para_bidi, uchar_data, uchar_count, UBIDI_DEFAULT_LTR, nullptr, &error_code);
@@ -236,9 +245,9 @@ void Font::get_glyphs(const std::string &text,
                 break;
             }
 
-//            std::string para_text = convert.to_bytes(text_u16.substr(para_start, para_end));
-//            std::cout << "Paragraph text: " << para_text << std::endl;
-//            std::cout << "Paragraph range: " << para_start << " -> " << para_end << std::endl;
+            //            std::string para_text = convert.to_bytes(text_u16.substr(para_start, para_end));
+            //            std::cout << "Paragraph text: " << para_text << std::endl;
+            //            std::cout << "Paragraph range: " << para_start << " -> " << para_end << std::endl;
 
             // Set a paragraph (lines).
             ubidi_setLine(para_bidi, para_start, para_end, line_bidi, &error_code);
@@ -265,8 +274,9 @@ void Font::get_glyphs(const std::string &text,
                 std::u16string run_text_u16 = text_u16.substr(para_start + logical_start, length);
                 std::string run_text = convert.to_bytes(run_text_u16);
 
-//                std::cout << "Visual run in paragraph: \t" << run_index << "\t" << run_is_rtl << "\t" << logical_start
-//                          << '\t' << length << '\t' << run_text << std::endl;
+                //                std::cout << "Visual run in paragraph: \t" << run_index << "\t" << run_is_rtl << "\t"
+                //                << logical_start
+                //                          << '\t' << length << '\t' << run_text << std::endl;
 
                 auto run_script = get_text_script(run_text);
 
@@ -338,6 +348,7 @@ void Font::get_glyphs(const std::string &text,
 
                     // Get glyph path.
                     glyph.path = get_glyph_path(glyph.index);
+                    glyph.svg = get_glyph_svg(glyph.index);
 
                     // The glyph's layout box in the glyph's local coordinates.
                     // The origin is the baseline. The Y axis is downward.
