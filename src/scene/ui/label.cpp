@@ -85,7 +85,7 @@ void Label::measure() {
         if (glyph.codepoints.size() == 1) {
             uint16_t glyph_index = emoji_font->find_glyph_index_by_codepoint(glyph.codepoints.front());
             glyph.svg = emoji_font->get_glyph_svg(glyph_index);
-            if (!glyph.svg.empty()) {
+            if (!glyph.svg.empty() && glyph.index == 0) {
                 glyph.x_advance = font->get_size();
                 glyph.box = {0, 0, (float)font->get_size(), (float)font->get_size()};
                 glyph.emoji = true;
