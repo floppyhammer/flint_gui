@@ -110,7 +110,7 @@ Font::~Font() {
 
 void Font::get_metrics() {
     // Calculate font scaling.
-    scale = stbtt_ScaleForPixelHeight(&stbtt_info, size);
+    scale = stbtt_ScaleForPixelHeight(&stbtt_info, (float)size);
 
     // The origin is baseline and the Y axis points upward.
     // So, ascent is usually positive, and descent negative.
@@ -144,8 +144,7 @@ std::string Font::get_glyph_svg(uint16_t glyph_index) const {
 Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
     Pathfinder::Path2d path;
 
-    stbtt_vertex *vertices = nullptr;
-
+    stbtt_vertex *vertices{};
     int num_vertices = stbtt_GetGlyphShape(&stbtt_info, glyph_index, &vertices);
 
     // Glyph has no shape (e.g. Space).
@@ -205,6 +204,8 @@ void Font::get_glyphs(const std::string &text,
 
     std::wstring_convert<std::codecvt<char16_t, char, std::mbstate_t>, char16_t> convert;
     std::u16string text_u16 = convert.from_bytes(text);
+
+    std::wstring_convert<std::codecvt<char32_t, char, std::mbstate_t>, char32_t> u32_converter;
 
     const UChar *uchar_data = text_u16.c_str();
     const int32_t uchar_count = text_u16.length();
@@ -294,6 +295,11 @@ void Font::get_glyphs(const std::string &text,
                 hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(hb_buffer, &glyph_count);
                 hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(hb_buffer, &glyph_count);
 
+                std::vector<hb_glyph_info_t> debug_glyph_info;
+                for (int i = 0; i < glyph_count; i++) {
+                    debug_glyph_info.push_back(glyph_info[i]);
+                }
+
                 // Shaped glyph positions will always be in one line (regardless of line breaks).
                 for (int i = 0; i < glyph_count; i++) {
                     auto &info = glyph_info[i];
@@ -303,7 +309,13 @@ void Font::get_glyphs(const std::string &text,
                     Pathfinder::Range current_cluster;
                     if (!run_is_rtl) {
                         if (i < glyph_count - 1) {
-                            current_cluster = {info.cluster, glyph_info[i + 1].cluster};
+                            // Multiple glyphs may share the same cluster.
+                            for (int j = 1; i + j < glyph_count; j++) {
+                                if (info.cluster != glyph_info[i + j].cluster) {
+                                    current_cluster = {info.cluster, glyph_info[i + j].cluster};
+                                    break;
+                                }
+                            }
                         } else {
                             current_cluster = {info.cluster, (unsigned long long)(para_start + logical_start + length)};
                         }
@@ -311,13 +323,23 @@ void Font::get_glyphs(const std::string &text,
                         if (i == 0) {
                             current_cluster = {info.cluster, (unsigned long long)(para_start + logical_start + length)};
                         } else {
-                            current_cluster = {info.cluster, glyph_info[i - 1].cluster};
+                            // Multiple glyphs may share the same cluster.
+                            for (int j = 1; i - j >= 0; j++) {
+                                if (info.cluster != glyph_info[i - j].cluster) {
+                                    current_cluster = {info.cluster, glyph_info[i - j].cluster};
+                                    break;
+                                }
+                            }
                         }
                     }
 
                     std::u16string glyph_text_u16 = text_u16.substr(current_cluster.start, current_cluster.length());
                     std::string glyph_text = convert.to_bytes(glyph_text_u16);
                     //                    std::cout << "Glyph text: " << glyph_text << std::endl;
+
+                    // One glyph may have multiple codepoints.
+                    // Eg. स् = स + ्
+                    std::u32string glyph_text_u32 = u32_converter.from_bytes(glyph_text);
 
                     // Skip line breaks, so they're not drawn.
                     if (glyph_text == "\n") {
@@ -326,7 +348,9 @@ void Font::get_glyphs(const std::string &text,
 
                     Glyph glyph;
 
-                    glyph.text = glyph_text_u16;
+                    glyph.codepoints = glyph_text_u32;
+
+                    glyph.text = glyph_text;
 
                     // Codepoint property is replaced with glyph ID after shaping.
                     glyph.index = info.codepoint;
@@ -343,22 +367,17 @@ void Font::get_glyphs(const std::string &text,
                     // Don't know why harfbuzz returns incorrect advance.
                     // So, we use the info provided by freetype.
                     //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
-                    glyph.x_advance = get_advance(glyph.index);
+                    glyph.x_advance = get_glyph_advance(glyph.index);
 
-                    // Get glyph path/svg.
-                    glyph.svg = get_glyph_svg(glyph.index);
-                    if (!glyph.svg.empty()) {
-                        glyph.emoji = true;
-                    } else {
-                        glyph.path = get_glyph_path(glyph.index);
-                    }
+                    // Get glyph path.
+                    glyph.path = get_glyph_path(glyph.index);
 
                     // The glyph's layout box in the glyph's local coordinates.
                     // The origin is the baseline. The Y axis is downward.
                     glyph.box = RectF(0, (float)-ascent, glyph.x_advance, (float)-descent);
 
                     // Get the glyph path's bounding box. The Y axis points down.
-                    RectI bounding_box = get_bounds(glyph.index);
+                    RectI bounding_box = get_glyph_bounds(glyph.index);
 
                     // BBox in the glyph's local coordinates.
                     glyph.bbox = bounding_box.to_f32();
@@ -378,11 +397,11 @@ void Font::get_glyphs(const std::string &text,
     ubidi_close(para_bidi);
 }
 
-int32_t Font::find_index(int codepoint) {
+uint16_t Font::find_glyph_index_by_codepoint(int codepoint) {
     return stbtt_FindGlyphIndex(&stbtt_info, codepoint);
 }
 
-RectI Font::get_bounds(uint16_t glyph_index) const {
+RectI Font::get_glyph_bounds(uint16_t glyph_index) const {
     RectI bounding_box;
 
     stbtt_GetGlyphBitmapBox(&stbtt_info,
@@ -397,7 +416,7 @@ RectI Font::get_bounds(uint16_t glyph_index) const {
     return bounding_box;
 }
 
-float Font::get_advance(uint16_t glyph_index) const {
+float Font::get_glyph_advance(uint16_t glyph_index) const {
     // The horizontal distance to increment (for left-to-right writing) or decrement (for right-to-left writing)
     // the pen position after a glyph has been rendered when processing text.
     // It is always positive for horizontal layouts, and zero for vertical ones.

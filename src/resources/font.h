@@ -60,7 +60,9 @@ struct Glyph {
     // A particular glyph ID within the font does not necessarily correlate to a predictable Unicode codepoint.
     uint16_t index = 0;
 
-    std::u16string text;
+    std::u32string codepoints;
+
+    std::string text;
 
     bool emoji = false;
 
@@ -90,7 +92,7 @@ public:
 
     ~Font() override;
 
-    void set_size(uint32_t new_font_size);
+    void set_size(uint32_t new_size);
 
     uint32_t get_size() const;
 
@@ -103,11 +105,11 @@ public:
     /// A paragraph may contain one or more lines.
     void get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Pathfinder::Range> &para_ranges);
 
-    int32_t find_index(int codepoint);
+    uint16_t find_glyph_index_by_codepoint(int codepoint);
 
-    float get_advance(uint16_t glyph_index) const;
+    float get_glyph_advance(uint16_t glyph_index) const;
 
-    RectI get_bounds(uint16_t glyph_index) const;
+    RectI get_glyph_bounds(uint16_t glyph_index) const;
 
     int get_ascent() const;
 

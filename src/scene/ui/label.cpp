@@ -80,18 +80,15 @@ void Label::measure() {
 
     font->get_glyphs(text, glyphs, para_ranges);
 
-    std::vector<Glyph> emoji_glyphs;
-    std::vector<Pathfinder::Range> dummy_ranges;
-    emoji_font->get_glyphs(text, emoji_glyphs, dummy_ranges);
-
     // Add emoji data.
     for (auto &glyph : glyphs) {
-        for (auto &emoji_glyph : emoji_glyphs) {
-            if (glyph.text == emoji_glyph.text) {
-                if (emoji_glyph.emoji) {
-                    glyph = emoji_glyph;
-                    break;
-                }
+        if (glyph.codepoints.size() == 1) {
+            uint16_t glyph_index = emoji_font->find_glyph_index_by_codepoint(glyph.codepoints.front());
+            glyph.svg = emoji_font->get_glyph_svg(glyph_index);
+            if (!glyph.svg.empty()) {
+                glyph.x_advance = font->get_size();
+                glyph.box = {0, 0, (float)font->get_size(), (float)font->get_size()};
+                glyph.emoji = true;
             }
         }
     }
