@@ -60,6 +60,8 @@ struct Glyph {
     // A particular glyph ID within the font does not necessarily correlate to a predictable Unicode codepoint.
     uint16_t index = 0;
 
+    std::u16string text;
+
     bool emoji = false;
 
     int32_t x_offset = 0; // Offset from the origin of the glyph on baseline.
@@ -72,12 +74,13 @@ struct Glyph {
     Pathfinder::Path2d path;
 
     // Only emojis have SVG data.
-    std::vector<char> svg;
+    std::string svg;
 
-    /// Glyph box in the baseline coordinates.
+    /// Glyph box in the baseline coordinates, which has nothing to do with the glyph position in the text paragraph.
     RectF box;
 
-    /// Glyph path's bounding box in the baseline coordinates.
+    /// Glyph path's bounding box in the baseline coordinates, which has nothing to do with the glyph position in the
+    /// text paragraph.
     RectF bbox;
 };
 
@@ -93,7 +96,7 @@ public:
 
     Pathfinder::Path2d get_glyph_path(uint16_t glyph_index) const;
 
-    std::vector<char> get_glyph_svg(uint16_t glyph_index) const;
+    std::string get_glyph_svg(uint16_t glyph_index) const;
 
     /// Paragraphs and lines are different concepts.
     /// Paragraphs are seperated by line breaks, while lines are results of automatic layout.

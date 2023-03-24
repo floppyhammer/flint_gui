@@ -45,10 +45,9 @@ int main() {
         label->set_text_style(TextStyle{
             ColorU::white(),
             ColorU::red(),
-            8,
+            0,
             false,
         });
-        label->get_font()->set_size(64);
         label->enable_visual_debug(true);
         vstack_container->add_child(label);
     }

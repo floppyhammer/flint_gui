@@ -29,11 +29,8 @@
     #include <unicode/utypes.h>
 #endif
 
-#include <gzip/compress.hpp>
-#include <gzip/config.hpp>
 #include <gzip/decompress.hpp>
 #include <gzip/utils.hpp>
-#include <gzip/version.hpp>
 
 namespace Flint {
 
@@ -127,7 +124,7 @@ void Font::get_metrics() {
     descent = roundf(float(unscaled_descent) * scale);
 }
 
-std::vector<char> Font::get_glyph_svg(uint16_t glyph_index) const {
+std::string Font::get_glyph_svg(uint16_t glyph_index) const {
     const char *data{};
     size_t data_size = stbtt_GetGlyphSVG(&stbtt_info, glyph_index, &data);
     if (data_size > 0) {
@@ -136,7 +133,7 @@ std::vector<char> Font::get_glyph_svg(uint16_t glyph_index) const {
 
         if (compressed) {
             std::string decompressed_data = gzip::decompress(data, data_size);
-            return {std::vector<char>(decompressed_data.begin(), decompressed_data.end())};
+            return decompressed_data;
         }
 
         return {data, data + data_size};
@@ -318,8 +315,8 @@ void Font::get_glyphs(const std::string &text,
                         }
                     }
 
-                    std::string glyph_text =
-                        convert.to_bytes(text_u16.substr(current_cluster.start, current_cluster.length()));
+                    std::u16string glyph_text_u16 = text_u16.substr(current_cluster.start, current_cluster.length());
+                    std::string glyph_text = convert.to_bytes(glyph_text_u16);
                     //                    std::cout << "Glyph text: " << glyph_text << std::endl;
 
                     // Skip line breaks, so they're not drawn.
@@ -328,6 +325,8 @@ void Font::get_glyphs(const std::string &text,
                     }
 
                     Glyph glyph;
+
+                    glyph.text = glyph_text_u16;
 
                     // Codepoint property is replaced with glyph ID after shaping.
                     glyph.index = info.codepoint;
@@ -346,9 +345,13 @@ void Font::get_glyphs(const std::string &text,
                     //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
                     glyph.x_advance = get_advance(glyph.index);
 
-                    // Get glyph path.
-                    glyph.path = get_glyph_path(glyph.index);
+                    // Get glyph path/svg.
                     glyph.svg = get_glyph_svg(glyph.index);
+                    if (!glyph.svg.empty()) {
+                        glyph.emoji = true;
+                    } else {
+                        glyph.path = get_glyph_path(glyph.index);
+                    }
 
                     // The glyph's layout box in the glyph's local coordinates.
                     // The origin is the baseline. The Y axis is downward.

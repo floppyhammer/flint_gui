@@ -201,6 +201,10 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         auto &g = glyphs[i];
         auto &p = glyph_positions[i];
 
+        if (g.emoji) {
+            continue;
+        }
+
         canvas->set_transform(global_transform_offset * Transform2::from_translation(p) * transform);
 
         // Add stroke if needed.
@@ -215,20 +219,29 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         auto &g = glyphs[i];
         auto &p = glyph_positions[i];
 
-        canvas->set_transform(global_transform_offset * Transform2::from_translation(p) * transform);
+        auto glyph_global_transform = global_transform_offset * Transform2::from_translation(p) * transform;
 
-        // Add fill.
-        canvas->set_fill_paint(Paint::from_color(text_style.color));
-        //        canvas->fill_path(g.path, FillRule::Winding);
+        if (!g.emoji) {
+            canvas->set_transform(glyph_global_transform);
 
-        if (!g.svg.empty()) {
+            // Add fill.
+            canvas->set_fill_paint(Paint::from_color(text_style.color));
+            canvas->fill_path(g.path, FillRule::Winding);
+        } else {
             auto svg_scene = std::make_shared<Pathfinder::SvgScene>();
-            svg_scene->load_from_memory(g.svg, *canvas);
+            svg_scene->load_from_string(g.svg, *canvas);
 
-            canvas->get_scene()->append_scene(*(svg_scene->get_scene()), global_transform_offset * transform);
+            // The emoji's svg size is always fixed for a specific font no matter what the font size you set.
+            auto svg_size = svg_scene->get_scene()->get_view_box().size();
+            auto glyph_size = g.box.size();
+
+            auto emoji_scale = Transform2::from_scale(glyph_size / svg_size);
+
+            canvas->get_scene()->append_scene(*(svg_scene->get_scene()), glyph_global_transform * emoji_scale);
         }
 
         if (text_style.debug) {
+            canvas->set_transform(glyph_global_transform);
             canvas->set_line_width(1);
 
             // Add box.
@@ -255,10 +268,10 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
 }
 
 shared_ptr<Pathfinder::SvgScene> VectorServer::load_svg(const std::string &path) {
-    auto bytes = Pathfinder::load_file_as_bytes(path);
+    auto bytes = Pathfinder::load_file_as_string(path);
 
     auto svg_scene = std::make_shared<Pathfinder::SvgScene>();
-    svg_scene->load_from_memory(bytes, *canvas);
+    svg_scene->load_from_string(bytes, *canvas);
 
     return svg_scene;
 }

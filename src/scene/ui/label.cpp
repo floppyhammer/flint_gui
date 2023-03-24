@@ -19,13 +19,12 @@ Label::Label(const std::string &_text) {
 
     debug_size_box.border_color = ColorU::red();
 
-//    font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/Arial Unicode MS Font.ttf");
-    font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/EmojiOneColor.otf");
+    font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/Arial Unicode MS Font.ttf");
+    emoji_font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/EmojiOneColor.otf");
 
     set_text(_text);
 
     text_style.color = {163, 163, 163, 255};
-    //    text_style.debug = true;
 
     theme_background = DefaultResource::get_singleton()->get_default_theme()->label.styles["background"];
 }
@@ -80,6 +79,22 @@ void Label::measure() {
     int descent = font->get_descent();
 
     font->get_glyphs(text, glyphs, para_ranges);
+
+    std::vector<Glyph> emoji_glyphs;
+    std::vector<Pathfinder::Range> dummy_ranges;
+    emoji_font->get_glyphs(text, emoji_glyphs, dummy_ranges);
+
+    // Add emoji data.
+    for (auto &glyph : glyphs) {
+        for (auto &emoji_glyph : emoji_glyphs) {
+            if (glyph.text == emoji_glyph.text) {
+                if (emoji_glyph.emoji) {
+                    glyph = emoji_glyph;
+                    break;
+                }
+            }
+        }
+    }
 
     // Reset text's layout box.
     layout_box = RectF();
