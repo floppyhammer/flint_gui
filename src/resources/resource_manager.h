@@ -9,6 +9,10 @@
 
 namespace Flint {
 
+struct ResId {
+    uint64_t unique_id;
+};
+
 class ResourceManager {
 public:
     static ResourceManager *get_singleton() {
