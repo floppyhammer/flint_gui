@@ -75,6 +75,8 @@ add_compile_definitions(FRIBIDI_BUILD)
 
 add_library(flint ${SOURCE_FILES})
 
+set(LINKING_LIBS glfw Vulkan::Vulkan pathfinder poly2tri harfbuzz icu zlib)
+
 # Add examples.
 add_subdirectory(examples/file_selection)
 add_subdirectory(examples/2d_skeleton)
