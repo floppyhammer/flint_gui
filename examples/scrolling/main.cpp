@@ -23,7 +23,6 @@ int main() {
 
         auto scroll_container = std::make_shared<ScrollContainer>();
         scroll_container->set_size({400, 300});
-        scroll_container->set_position({0, 48});
         panel->add_child(scroll_container);
 
         auto scroll_content = std::make_shared<Tree>();

@@ -43,7 +43,6 @@ int main() {
         // Inspector.
         // ------------------------------------------
         auto inspector_panel = std::make_shared<Panel>();
-        inspector_panel->set_title("Inspector");
         inspector_panel->set_size({400, 400});
         node_ui->add_child(inspector_panel);
 

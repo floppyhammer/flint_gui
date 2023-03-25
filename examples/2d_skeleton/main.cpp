@@ -24,7 +24,6 @@ int main() {
         // ----------------------------------------------------
         auto scene_panel = std::make_shared<Panel>();
         scene_panel->set_position({50, 100});
-        scene_panel->set_title("Scene");
         scene_panel->set_size({400, 400});
         scene_panel->set_anchor_flag(AnchorFlag::TopLeft);
         node_ui->add_child(scene_panel);
@@ -33,7 +32,6 @@ int main() {
         item_tree->set_size({400, 400});
 
         auto margin_container = std::make_shared<MarginContainer>();
-        margin_container->set_position({0, 48});
         margin_container->set_size({400, 400});
         margin_container->add_child(item_tree);
         scene_panel->add_child(margin_container);

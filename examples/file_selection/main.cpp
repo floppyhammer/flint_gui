@@ -18,10 +18,8 @@ int main() {
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
         auto panel = std::make_shared<Panel>();
-        panel->enable_title_bar(false);
         panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         panel->set_anchor_flag(AnchorFlag::FullRect);
-        panel->apply_fullscreen_style();
         app.get_tree()->replace_scene(panel);
 
         auto margin_container = std::make_shared<MarginContainer>();
