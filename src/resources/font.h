@@ -76,6 +76,10 @@ struct Glyph {
     Pathfinder::Path2d path;
 
     // Only emojis have SVG data.
+    //
+    // The points' origin is not top-left (like normal SVG images) but the font baseline,
+    // so the points don't fall in the view box specified by the image.
+    // Therefore, we need to pass an appropriate transform when appending the SVG scene.
     std::string svg;
 
     /// Glyph box in the baseline coordinates, which has nothing to do with the glyph position in the text paragraph.
