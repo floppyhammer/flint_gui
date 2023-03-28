@@ -2,11 +2,11 @@
 #define FLINT_CUBE_TEXTURE_H
 
 #define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
 #include <memory>
 
-#include "GLFW/glfw3.h"
-#include "servers/render_server.h"
+#include "../servers/render_server.h"
 #include "texture.h"
 
 namespace Flint {
