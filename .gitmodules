@@ -1,4 +1,4 @@
-# Run `git submodule sync --recursive` after editing this file.
+# Run `git submodule sync --recursive` after manually editing this file.
 # First time: git submodule update --init --recursive
 # Update: git pull --recurse-submodules | git submodule update --remote --recursive
 [submodule "glfw"]

@@ -1,12 +1,8 @@
 # Flint
 
-<p align="center">
-  <a href="https://github.com/floppyhammer/flint">
-    <img src="logo.svg" width="128" alt="Flint logo">
-  </a>
-</p>
+This is an experimental vector-based GUI framework.
 
-Flint is a vector-based Vulkan GUI framework in development.
+**Warning: this is not intended for production use and never will be.**
 
 Features:
 
