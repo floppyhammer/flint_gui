@@ -36,11 +36,16 @@ inline std::string load_file_as_string(const char *file_path) {
 }
 
 inline std::vector<char> load_file_as_bytes(const char *file_path) {
-    std::ifstream input(file_path, std::ios::binary);
-
-    std::vector<char> bytes((std::istreambuf_iterator<char>(input)), (std::istreambuf_iterator<char>()));
-
-    input.close();
+    auto file = fopen(file_path, "r");
+    if (!file) {
+        return {};
+    }
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    std::vector<char> bytes(length);
+    fseek(file, 0, SEEK_SET);
+    fread(bytes.data(), 1, length, file);
+    fclose(file);
 
     return bytes;
 }
