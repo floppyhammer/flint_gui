@@ -52,6 +52,8 @@ struct TextStyle {
     ColorU color = ColorU::white();
     ColorU stroke_color;
     float stroke_width = 0;
+    bool italic = false;
+    bool bold = false;
     bool debug = false;
 };
 

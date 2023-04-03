@@ -196,6 +196,11 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         canvas->clip_path(clip_path, FillRule::Winding);
     }
 
+    auto skew_xform = Transform2::from_scale({1, 1});
+    if (text_style.italic) {
+        skew_xform = Transform2({1, 0, tan(-15.f * 3.1415926f / 180.f), 1}, {});
+    }
+
     // Draw glyph strokes. The strokes go below the fills.
     for (int i = 0; i < glyphs.size(); i++) {
         auto &g = glyphs[i];
@@ -205,7 +210,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
             continue;
         }
 
-        canvas->set_transform(global_transform_offset * Transform2::from_translation(p) * transform);
+        canvas->set_transform(global_transform_offset * Transform2::from_translation(p) * transform * skew_xform);
 
         // Add stroke if needed.
         canvas->set_stroke_paint(Paint::from_color(text_style.stroke_color));
@@ -219,7 +224,8 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         auto &g = glyphs[i];
         auto &p = glyph_positions[i];
 
-        auto glyph_global_transform = global_transform_offset * Transform2::from_translation(p) * transform;
+        auto glyph_global_transform =
+            global_transform_offset * Transform2::from_translation(p) * transform * skew_xform;
 
         if (!g.emoji) {
             canvas->set_transform(glyph_global_transform);
