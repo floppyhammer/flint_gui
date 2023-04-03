@@ -224,15 +224,23 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         auto &g = glyphs[i];
         auto &p = glyph_positions[i];
 
-        auto glyph_global_transform =
-            global_transform_offset * Transform2::from_translation(p) * transform * skew_xform;
+        // No italic for emojis and debug boxes.
+        auto glyph_global_transform = global_transform_offset * Transform2::from_translation(p) * transform;
 
         if (!g.emoji) {
-            canvas->set_transform(glyph_global_transform);
+            canvas->set_transform(glyph_global_transform * skew_xform);
 
             // Add fill.
             canvas->set_fill_paint(Paint::from_color(text_style.color));
             canvas->fill_path(g.path, FillRule::Winding);
+
+            // Use stroke to make a pseudo bold effect.
+            if (text_style.bold) {
+                canvas->set_stroke_paint(Paint::from_color(text_style.color));
+                canvas->set_line_width(1);
+                canvas->set_line_join(LineJoin::Bevel);
+                canvas->stroke_path(g.path);
+            }
         } else {
             auto svg_scene = std::make_shared<Pathfinder::SvgScene>();
             svg_scene->load_from_string(g.svg, *canvas);

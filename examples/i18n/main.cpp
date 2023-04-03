@@ -29,7 +29,7 @@ int main() {
         margin_container->add_child(vstack_container);
 
         std::string text = "";
-        text += "👍😁😂\n";                         // Emoji
+        text += "👍😁😂\n";                      // Emoji
         text += "你好世界！\n";                  // Chinese
         text += "こんにちは世界！\n";            // Japanese
         text += "مرحبا بالعالم!\n";              // Arabic
@@ -46,6 +46,8 @@ int main() {
             ColorU::white(),
             ColorU::red(),
             0,
+            true,
+            true,
             false,
         });
         label->enable_visual_debug(true);

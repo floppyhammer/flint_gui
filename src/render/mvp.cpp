@@ -1,6 +1,6 @@
 #include "mvp.h"
 
-#include "servers/render_server.h"
+#include "../servers/render_server.h"
 #include "swap_chain.h"
 
 namespace Flint {
