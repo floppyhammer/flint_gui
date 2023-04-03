@@ -35,8 +35,9 @@ inline std::string load_file_as_string(const char *file_path) {
     return output;
 }
 
+/// Load a file in binary mode.
 inline std::vector<char> load_file_as_bytes(const char *file_path) {
-    auto file = fopen(file_path, "r");
+    auto file = fopen(file_path, "rb");
     if (!file) {
         return {};
     }
