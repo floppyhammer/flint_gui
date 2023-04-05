@@ -1,7 +1,7 @@
 #ifndef FLINT_VERTEX_H
 #define FLINT_VERTEX_H
 
-#include "servers/render_server.h"
+#include "../servers/render_server.h"
 
 namespace Flint {
 

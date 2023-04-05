@@ -52,6 +52,9 @@ add_subdirectory(third_party/poly2tri)
 include_directories(third_party/zlib-1.2.13)
 add_subdirectory(third_party/zlib-1.2.13)
 
+include_directories(third_party/entt-3.11.1/src)
+add_subdirectory(third_party/entt-3.11.1)
+
 # icu4c.
 if (NOT WIN32)
     # For non-Windows platforms, we need to compile ICU from source.
@@ -89,3 +92,4 @@ add_subdirectory(examples/progress_bars)
 add_subdirectory(examples/i18n)
 add_subdirectory(examples/labels)
 add_subdirectory(examples/multiple_windows)
+add_subdirectory(examples/ecs)
