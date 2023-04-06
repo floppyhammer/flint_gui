@@ -13,6 +13,8 @@ struct C_Relations {
     entt::entity parent{entt::null};
 };
 
+std::vector<entt::entity> extract_entities_from_hierarchy(entt::registry &registry, entt::entity root);
+
 } // namespace Flint::Ecs
 
 #endif // FLINT_ECS_HIERARCHY_H

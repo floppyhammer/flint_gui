@@ -26,6 +26,10 @@ void render_system(entt::registry &registry) {
     // Get render context.
     auto render_server = registry.ctx().get<RenderServer *>();
 
+    // Update graph.
+
+    // Run graph and generate command queue.
+
     // Render each renderable (a view is needed instead of an observer).
     auto view = registry.view<const C_GlobalTransform, C_Handle<Mesh>, C_Handle<Material>, C_Visibility>();
 

@@ -104,7 +104,7 @@ struct C_Camera {
     bool hdr;
     // todo: reflect this when #6042 lands
     /// The [`CameraOutputMode`] for this camera.
-//    CameraOutputMode output_mode;
+    //    CameraOutputMode output_mode;
     /// If this is enabled, a previous camera exists that shares this camera's render target, and this camera has MSAA
     /// enabled, then the previous camera's outputs will be written to the intermediate multi-sampled render target
     /// textures for this camera. This enables cameras with MSAA enabled to "write their results on top" of previous

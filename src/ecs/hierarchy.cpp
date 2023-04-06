@@ -25,7 +25,7 @@ void traverse_children(entt::registry &registry, entt::entity entity, std::vecto
     }
 }
 
-std::vector<entt::entity> hierarchy_system(entt::registry &registry, entt::entity root) {
+std::vector<entt::entity> extract_entities_from_hierarchy(entt::registry &registry, entt::entity root) {
     std::vector<entt::entity> entities;
     traverse_children(registry, root, entities);
 

@@ -4,9 +4,11 @@
 #include <uuid.h>
 
 #include <optional>
+#include <unordered_map>
 
 #include "../common/mat3x3.h"
 #include "../common/quat.h"
+#include "graph.h"
 
 using namespace Flint::Math;
 
@@ -28,7 +30,7 @@ struct C_Visibility {
 };
 
 struct HandleId {
-    enum Type {
+    enum class Type {
         Id,
         AssetPathId,
     } type;
@@ -81,8 +83,19 @@ struct R_ComponentUniforms {
     std::unordered_map<uint64_t, std::shared_ptr<int>> uniforms;
 };
 
+/// Cache for all pipelines.
 struct R_PipelineCache {
     std::unordered_map<uint64_t, std::shared_ptr<int>> pipelines;
+};
+
+struct RenderGraphRunner {
+    void run(RenderGraph &graph) {
+        // Run the main graph.
+        run_graph(graph);
+    };
+
+    /// Run a graph.
+    void run_graph(RenderGraph &graph){};
 };
 
 } // namespace Flint::Ecs
