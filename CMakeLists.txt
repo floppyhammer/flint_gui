@@ -52,8 +52,8 @@ add_subdirectory(third_party/poly2tri)
 include_directories(third_party/zlib-1.2.13)
 add_subdirectory(third_party/zlib-1.2.13)
 
-include_directories(third_party/entt-3.11.1/src)
-add_subdirectory(third_party/entt-3.11.1)
+include_directories(external/enttsrc)
+add_subdirectory(external/entt)
 
 # icu4c.
 if (NOT WIN32)
