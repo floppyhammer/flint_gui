@@ -52,7 +52,7 @@ add_subdirectory(third_party/poly2tri)
 include_directories(third_party/zlib-1.2.13)
 add_subdirectory(third_party/zlib-1.2.13)
 
-include_directories(external/enttsrc)
+include_directories(external/entt/src)
 add_subdirectory(external/entt)
 
 # icu4c.

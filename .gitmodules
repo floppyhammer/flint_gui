@@ -15,6 +15,9 @@
 # See the submodule URLs:
 # git submodule foreach -q git config remote.origin.url
 
+# Set branch:
+# git submodule set-branch --branch [BRANCH_NAME] [SUBMODULE_PATH]
+
 [submodule "external/glfw"]
 	path = external/glfw
 	url = https://github.com/floppyhammer/glfw.git
@@ -22,16 +25,16 @@
 [submodule "external/pathfinder-cpp"]
 	path = external/pathfinder-cpp
 	url = https://github.com/floppyhammer/pathfinder-cpp.git
-    branch = master
+	branch = master
 [submodule "external/harfbuzz"]
 	path = external/harfbuzz
 	url = https://github.com/harfbuzz/harfbuzz.git
-    branch = main
+	branch = main
 [submodule "external/glm"]
 	path = external/glm
 	url = https://github.com/g-truc/glm.git
-    branch = master
+	branch = master
 [submodule "external/entt"]
 	path = external/entt
 	url = https://github.com/skypjack/entt.git
-    branch = v3.11.x
+	branch = v3.11.x
