@@ -3,13 +3,15 @@
 namespace Flint::Ecs {
 
 World::World(RenderServer *render_server) {
+    // Add resources.
     registry.ctx().insert_or_assign(render_server);
 }
 
 World::~World() {
-    // resets the context variable by type
+    // Remove resources.
     registry.ctx().erase<RenderServer *>();
 
+    // Clear all entities.
     registry.clear();
 }
 
@@ -19,17 +21,8 @@ entt::entity World::spawn() {
     return entity;
 }
 
-void World::update(double dt) {
-}
+void World::update() {
 
-void World::render() {
-    auto &var = registry.ctx().get<RenderServer *>();
-
-    std::vector<entt::organizer::vertex> render_graph = render_organizer.graph();
-
-    for (auto &&node : render_graph) {
-        node.prepare(registry);
-    }
 }
 
 } // namespace Flint::Ecs

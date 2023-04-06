@@ -38,3 +38,6 @@
 	path = external/entt
 	url = https://github.com/skypjack/entt.git
 	branch = v3.11.x
+[submodule "external/GSL"]
+	path = external/GSL
+	url = https://github.com/microsoft/GSL.git

@@ -28,9 +28,11 @@ public:
         c = component;
     }
 
-    void update(double dt);
+    // Advances the execution of the Schedule by one cycle.
+    void update();
 
-    void render();
+    void add_system() {
+    }
 
 private:
     entt::registry registry;

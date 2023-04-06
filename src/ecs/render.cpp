@@ -2,32 +2,46 @@
 
 #include <entt/entt.hpp>
 
+#include "servers/render_server.h"
+
 namespace Flint::Ecs {
 
-void render(entt::registry &registry) {
-    entt::observer observer{registry, entt::collector.update<C_Transform>()};
+void render_system(entt::registry &registry) {
+    // Update uniform buffers (excluding those unchanged).
+    entt::observer observer{registry, entt::collector.update<C_GlobalTransform>()};
+
     for (const auto entity : observer) {
         // ...
     }
 
     observer.clear();
 
-    auto view = registry.view<const C_Transform, C_Mesh>();
+    // Prepare render graph.
+    //    std::vector<entt::organizer::vertex> render_graph = render_organizer.graph();
+    //
+    //    for (auto &&node : render_graph) {
+    //        node.prepare(registry);
+    //    }
 
-    // use a callback
-    view.each([](const auto &pos, auto &vel) { /* ... */ });
+    // Get render context.
+    auto render_server = registry.ctx().get<RenderServer *>();
 
-    // use an extended callback
-    view.each([](const auto entity, const auto &pos, auto &vel) { /* ... */ });
+    // Render each renderable (a view is needed instead of an observer).
+    auto view = registry.view<const C_GlobalTransform, C_Handle<Mesh>, C_Handle<Material>, C_Visibility>();
 
-    // use a range-for
-    for (auto [entity, pos, vel] : view.each()) {
-        // ...
-    }
+    //    // use a callback
+    //    view.each([](const auto &pos, auto &vel) { /* ... */ });
+    //
+    //    // use an extended callback
+    //    view.each([](const auto entity, const auto &pos, auto &vel) { /* ... */ });
+    //
+    //    // use forward iterators and get only the components of interest
+    //    for (auto entity : view) {
+    //        auto &vel = view.get<C_Transform>(entity);
+    //        // ...
+    //    }
 
-    // use forward iterators and get only the components of interest
-    for (auto entity : view) {
-        auto &vel = view.get<C_Transform>(entity);
+    for (auto [entity, xform, mesh_handle, material_handle, visibility] : view.each()) {
         // ...
     }
 }

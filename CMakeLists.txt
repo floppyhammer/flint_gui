@@ -55,6 +55,9 @@ add_subdirectory(third_party/zlib-1.2.13)
 include_directories(external/entt/src)
 add_subdirectory(external/entt)
 
+include_directories(external/gsl/include)
+add_subdirectory(external/gsl)
+
 # icu4c.
 if (NOT WIN32)
     # For non-Windows platforms, we need to compile ICU from source.

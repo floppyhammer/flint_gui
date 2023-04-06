@@ -11,7 +11,6 @@ struct C_Relations {
     entt::entity prev_sibling{entt::null};
     entt::entity next_sibling{entt::null};
     entt::entity parent{entt::null};
-    // ... other data members ...
 };
 
 } // namespace Flint::Ecs
