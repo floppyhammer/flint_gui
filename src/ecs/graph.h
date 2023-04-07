@@ -8,6 +8,8 @@
 
 #include "../common/mat3x3.h"
 #include "../common/quat.h"
+#include "data.h"
+#include "entt/entity/entity.hpp"
 
 using namespace Flint::Math;
 
@@ -42,6 +44,11 @@ struct GraphInputNode {
 
 struct NodeId {
     uint64_t v;
+
+    // For hashing.
+    inline bool operator<(const NodeId& rhs) const {
+        return v < rhs.v;
+    }
 };
 
 struct Node;
@@ -81,14 +88,52 @@ struct Edge {
         NodeEdge,
     } type;
 
-    std::optional<SlotEdge> slot_edge;
-    std::optional<NodeEdge> node_edge;
+    union {
+        std::optional<SlotEdge> slot_edge;
+        std::optional<NodeEdge> node_edge;
+    };
+
+    /// Returns the id of the `input_node`.
+    NodeId get_input_node() {
+        if (type == Type::SlotEdge) {
+            return slot_edge.value().input_node;
+        } else {
+            return node_edge.value().input_node;
+        }
+    }
+
+    /// Returns the id of the `output_node`.
+    NodeId get_output_node() {
+        if (type == Type::SlotEdge) {
+            return slot_edge.value().output_node;
+        } else {
+            return node_edge.value().output_node;
+        }
+    }
 };
 
 /// A collection of input or output [`SlotInfos`](SlotInfo) for
 /// a [`NodeState`](super::NodeState).
 struct SlotInfos {
     std::vector<SlotInfo> slots;
+};
+
+/// A value passed between render [`Nodes`](super::Node).
+/// Corresponds to the [`SlotType`] specified in the [`RenderGraph`](super::RenderGraph).
+///
+/// Slots can have four different types of values:
+/// [`Buffer`], [`TextureView`], [`Sampler`] and [`Entity`].
+///
+/// These values do not contain the actual render data, but only the ids to retrieve them.
+struct SlotValue {
+    SlotType type;
+
+    union {
+        VkBuffer* buffer;
+        VkImageView* texture_view;
+        VkSampler* sampler;
+        entt::entity* entity;
+    };
 };
 
 /// A collection of input and output [`Edges`](Edge) for a [`Node`].
@@ -107,7 +152,7 @@ struct NodeState {
     std::optional<std::string> name;
     /// The name of the type that implements [`Node`].
     std::string type_name;
-    std::unique_ptr<Node> node;
+    std::shared_ptr<Node> node;
     SlotInfos input_slots;
     SlotInfos output_slots;
     Edges edges;
@@ -115,7 +160,7 @@ struct NodeState {
 
 class RenderGraph {
 private:
-    std::unordered_map<NodeId, NodeState> nodes;
+    std::map<NodeId, NodeState> nodes;
     std::unordered_map<std::string, NodeId> node_names;
     std::unordered_map<std::string, RenderGraph> sub_graphs;
     std::optional<NodeId> input_node;
@@ -134,6 +179,91 @@ public:
             sub_graph.second.update();
         }
     }
+
+    /// Returns an iterator over the [`NodeStates`](NodeState).
+    std::vector<std::reference_wrapper<NodeState>> iter_nodes() {
+        std::vector<std::reference_wrapper<NodeState>> node_states;
+
+        node_states.reserve(nodes.size());
+
+        for (auto& node : nodes) {
+            node_states.emplace_back(node.second);
+        }
+
+        return node_states;
+    };
+
+    /// Returns an iterator over a tuple of the input edges and the corresponding output nodes
+    /// for the node referenced by the label.
+    std::optional<std::vector<std::pair<Edge, std::reference_wrapper<NodeState>>>> iter_node_inputs(NodeId id);
+
+    /// Returns an iterator over a tuple of the output edges and the corresponding input nodes
+    /// for the node referenced by the label.
+    std::optional<std::vector<std::pair<Edge, std::reference_wrapper<NodeState>>>> iter_node_outputs(NodeId id);
+
+    /// Retrieves the [`NodeState`] referenced by the `label`.
+    std::optional<std::reference_wrapper<NodeState>> get_node_state(NodeId id);
+
+    /// Returns the [`NodeState`] of the input node of this graph.
+    ///
+    /// # See also
+    ///
+    /// - [`input_node`](Self::input_node) for an unchecked version.
+    std::optional<std::reference_wrapper<NodeState>> get_input_node();
+
+    /// Retrieves the sub graph corresponding to the `name`.
+    std::optional<RenderGraph> get_sub_graph(const std::string& name);
+};
+
+enum class RenderGraphRunnerError {
+    None,
+    NodeRunError,
+    EmptyNodeOutputSlot,
+    MissingInput,
+    MismatchedInputSlotType,
+    MismatchedInputCount,
+};
+
+struct RenderGraphRunner {
+    void run(RenderGraph& graph){
+        // Run the main graph.
+        //        run_graph(graph);
+    };
+
+    /// Run a graph.
+    RenderGraphRunnerError run_graph(RenderGraph& graph,
+                                     const std::optional<std::string>& graph_name,
+                                     std::vector<SlotValue>& inputs,
+                                     std::optional<entt::entity> view_entity);
+};
+
+/// A command that signals the graph runner to run the sub graph corresponding to the `name`
+/// with the specified `inputs` next.
+struct RunSubGraph {
+    std::string name;
+    std::vector<SlotValue> inputs;
+    std::optional<entt::entity> view_entity;
+};
+
+/// The context with all graph information required to run a [`Node`](super::Node).
+/// This context is created for each node by the `RenderGraphRunner`.
+///
+/// The slot input can be read from here and the outputs must be written back to the context for
+/// passing them onto the next node.
+///
+/// Sub graphs can be queued for running by adding a [`RunSubGraph`] command to the context.
+/// After the node has finished running the graph runner is responsible for executing the sub graphs.
+struct RenderGraphContext {
+    RenderGraph& graph;
+    NodeState& node;
+    std::vector<SlotValue>& inputs;
+    std::vector<std::optional<SlotValue>>& outputs;
+    std::vector<RunSubGraph> run_sub_graphs;
+    /// The view_entity associated with the render graph being executed
+    /// This is optional because you aren't required to have a view_entity for a node.
+    /// For example, compute shader nodes don't have one.
+    /// It should always be set when the RenderGraph is running on a View.
+    std::optional<entt::entity> view_entity;
 };
 
 } // namespace Flint::Ecs

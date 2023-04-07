@@ -1,13 +1,12 @@
 #ifndef FLINT_ECS_RENDER_H
 #define FLINT_ECS_RENDER_H
 
-#include <uuid.h>
-
 #include <optional>
 #include <unordered_map>
 
 #include "../common/mat3x3.h"
 #include "../common/quat.h"
+#include "data.h"
 #include "graph.h"
 
 using namespace Flint::Math;
@@ -27,25 +26,6 @@ struct C_GlobalTransform {
 
 struct C_Visibility {
     bool visible = true;
-};
-
-struct HandleId {
-    enum class Type {
-        Id,
-        AssetPathId,
-    } type;
-    /// A handle id of a loaded asset.
-    std::optional<uuids::uuid> uuid;
-
-    /// A handle id of a pending asset.
-    std::optional<std::string> asset_path_id;
-};
-
-template <class T>
-struct C_Handle {
-    HandleId id;
-
-    std::shared_ptr<T> data;
 };
 
 // Should be used with a Handle.
@@ -86,16 +66,6 @@ struct R_ComponentUniforms {
 /// Cache for all pipelines.
 struct R_PipelineCache {
     std::unordered_map<uint64_t, std::shared_ptr<int>> pipelines;
-};
-
-struct RenderGraphRunner {
-    void run(RenderGraph &graph) {
-        // Run the main graph.
-        run_graph(graph);
-    };
-
-    /// Run a graph.
-    void run_graph(RenderGraph &graph){};
 };
 
 } // namespace Flint::Ecs
