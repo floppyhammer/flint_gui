@@ -15,6 +15,8 @@ using namespace Flint::Math;
 
 namespace Flint::Ecs {
 
+struct RenderContext;
+
 /// Describes the render resources created (output) or used (input) by
 /// the render [`Nodes`](super::Node).
 ///
@@ -51,7 +53,52 @@ struct NodeId {
     }
 };
 
-struct Node;
+struct RenderGraphContext;
+
+enum class NodeRunError {
+    // Encountered an input slot error.
+    InputSlotError,
+    // Encountered an output slot error.
+    OutputSlotError,
+    // Encountered an error when running a sub-graph.
+    RunSubGraphError,
+};
+
+/// A render node that can be added to a [`RenderGraph`](super::RenderGraph).
+///
+/// Nodes are the fundamental part of the graph and used to extend its functionality, by
+/// generating draw calls and/or running subgraphs.
+/// They are added via the `render_graph::add_node(my_node)` method.
+///
+/// To determine their position in the graph and ensure that all required dependencies (inputs)
+/// are already executed, [`Edges`](Edge) are used.
+///
+/// A node can produce outputs used as dependencies by other nodes.
+/// Those inputs and outputs are called slots and are the default way of passing render data
+/// inside the graph. For more information see [`SlotType`](super::SlotType).
+class Node {
+public:
+    /// Specifies the required input slots for this node.
+    /// They will then be available during the run method inside the [`RenderGraphContext`].
+    virtual auto input() -> std::vector<SlotInfo> {
+        return {};
+    }
+    /// Specifies the produced output slots for this node.
+    /// They can then be passed one inside [`RenderGraphContext`] during the run method.
+    virtual auto output() -> std::vector<SlotInfo> {
+        return {};
+    }
+
+    /// Updates internal node state using the current render [`World`] prior to the run method.
+    virtual void update() {
+    }
+
+    /// Runs the graph node logic, issues draw calls, updates the output slots and
+    /// optionally queues up subgraphs for execution. The graph data, input and output values are
+    /// passed via the [`RenderGraphContext`].
+    virtual auto run(const RenderGraphContext& graph, RenderContext& render_context) -> NodeRunError {
+    }
+};
 
 /// An edge describing to ordering of both nodes (`output_node` before `input_node`)
 /// and connecting the output slot at the `output_index` of the output_node
@@ -94,7 +141,7 @@ struct Edge {
     };
 
     /// Returns the id of the `input_node`.
-    NodeId get_input_node() {
+    NodeId get_input_node() const {
         if (type == Type::SlotEdge) {
             return slot_edge.value().input_node;
         } else {
@@ -103,7 +150,7 @@ struct Edge {
     }
 
     /// Returns the id of the `output_node`.
-    NodeId get_output_node() {
+    NodeId get_output_node() const {
         if (type == Type::SlotEdge) {
             return slot_edge.value().output_node;
         } else {
@@ -161,8 +208,8 @@ struct NodeState {
 class RenderGraph {
 private:
     std::map<NodeId, NodeState> nodes;
-    std::unordered_map<std::string, NodeId> node_names;
-    std::unordered_map<std::string, RenderGraph> sub_graphs;
+    std::map<std::string, NodeId> node_names;
+    std::map<std::string, RenderGraph> sub_graphs;
     std::optional<NodeId> input_node;
 
 public:
@@ -181,38 +228,32 @@ public:
     }
 
     /// Returns an iterator over the [`NodeStates`](NodeState).
-    std::vector<std::reference_wrapper<NodeState>> iter_nodes() {
-        std::vector<std::reference_wrapper<NodeState>> node_states;
-
-        node_states.reserve(nodes.size());
-
-        for (auto& node : nodes) {
-            node_states.emplace_back(node.second);
-        }
-
-        return node_states;
-    };
+    std::vector<std::reference_wrapper<const NodeState>> iter_nodes() const;
 
     /// Returns an iterator over a tuple of the input edges and the corresponding output nodes
     /// for the node referenced by the label.
-    std::optional<std::vector<std::pair<Edge, std::reference_wrapper<NodeState>>>> iter_node_inputs(NodeId id);
+    std::optional<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>> iter_node_inputs(
+        NodeId id) const;
 
     /// Returns an iterator over a tuple of the output edges and the corresponding input nodes
     /// for the node referenced by the label.
-    std::optional<std::vector<std::pair<Edge, std::reference_wrapper<NodeState>>>> iter_node_outputs(NodeId id);
+    std::optional<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>> iter_node_outputs(
+        NodeId id) const;
 
     /// Retrieves the [`NodeState`] referenced by the `label`.
-    std::optional<std::reference_wrapper<NodeState>> get_node_state(NodeId id);
+    std::optional<std::reference_wrapper<const NodeState>> get_node_state(NodeId id) const;
 
     /// Returns the [`NodeState`] of the input node of this graph.
     ///
     /// # See also
     ///
     /// - [`input_node`](Self::input_node) for an unchecked version.
-    std::optional<std::reference_wrapper<NodeState>> get_input_node();
+    std::optional<std::reference_wrapper<const NodeState>> get_input_node() const;
 
     /// Retrieves the sub graph corresponding to the `name`.
-    std::optional<RenderGraph> get_sub_graph(const std::string& name);
+    std::optional<std::reference_wrapper<const RenderGraph>> get_sub_graph(const std::string& name) const;
+
+    std::optional<std::reference_wrapper<RenderGraph>> get_sub_graph_mut(const std::string& name);
 };
 
 enum class RenderGraphRunnerError {
@@ -225,16 +266,14 @@ enum class RenderGraphRunnerError {
 };
 
 struct RenderGraphRunner {
-    void run(RenderGraph& graph){
-        // Run the main graph.
-        //        run_graph(graph);
-    };
+    RenderGraphRunnerError run(RenderGraph& graph);
 
     /// Run a graph.
-    RenderGraphRunnerError run_graph(RenderGraph& graph,
+    RenderGraphRunnerError run_graph(const RenderGraph& graph,
                                      const std::optional<std::string>& graph_name,
-                                     std::vector<SlotValue>& inputs,
-                                     std::optional<entt::entity> view_entity);
+                                     RenderContext& render_context,
+                                     const std::vector<SlotValue>& inputs,
+                                     const std::optional<entt::entity> view_entity);
 };
 
 /// A command that signals the graph runner to run the sub graph corresponding to the `name`
@@ -254,9 +293,9 @@ struct RunSubGraph {
 /// Sub graphs can be queued for running by adding a [`RunSubGraph`] command to the context.
 /// After the node has finished running the graph runner is responsible for executing the sub graphs.
 struct RenderGraphContext {
-    RenderGraph& graph;
-    NodeState& node;
-    std::vector<SlotValue>& inputs;
+    const RenderGraph& graph;
+    const NodeState& node;
+    const std::vector<SlotValue>& inputs;
     std::vector<std::optional<SlotValue>>& outputs;
     std::vector<RunSubGraph> run_sub_graphs;
     /// The view_entity associated with the render graph being executed

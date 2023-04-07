@@ -68,6 +68,15 @@ struct R_PipelineCache {
     std::unordered_map<uint64_t, std::shared_ptr<int>> pipelines;
 };
 
+/// The context with all information required to interact with the GPU.
+///
+/// The [`RenderDevice`] is used to create render resources and the
+/// the [`CommandEncoder`] is used to record a series of GPU operations.
+struct RenderContext {
+    //                    command_encoder: Option<CommandEncoder>,
+    //                                      command_buffers: Vec<CommandBuffer>,
+};
+
 } // namespace Flint::Ecs
 
 #endif // FLINT_ECS_RENDER_H

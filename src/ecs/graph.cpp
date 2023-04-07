@@ -1,15 +1,34 @@
 #include "graph.h"
 
+#include "render.h"
+
 namespace Flint::Ecs {
 
-RenderGraphRunnerError RenderGraphRunner::run_graph(RenderGraph& graph,
+RenderGraphRunnerError RenderGraphRunner::run(RenderGraph& graph) {
+    RenderContext render_context;
+
+    // Run the main graph.
+    // Render commands will be fed to the render context.
+    auto error = run_graph(graph, {}, render_context, {}, {});
+
+    if (error != RenderGraphRunnerError::None) {
+        return error;
+    }
+
+    // queue.submit(render_context.finish());
+
+    return RenderGraphRunnerError::None;
+}
+
+RenderGraphRunnerError RenderGraphRunner::run_graph(const RenderGraph& graph,
                                                     const std::optional<std::string>& graph_name,
-                                                    std::vector<SlotValue>& _inputs,
-                                                    std::optional<entt::entity> view_entity) {
+                                                    RenderContext& render_context,
+                                                    const std::vector<SlotValue>& _inputs,
+                                                    const std::optional<entt::entity> view_entity) {
     std::map<NodeId, std::vector<SlotValue>> node_outputs;
 
     // Queue up nodes without inputs, which can be run immediately.
-    std::vector<std::reference_wrapper<NodeState>> node_queue;
+    std::vector<std::reference_wrapper<const NodeState>> node_queue;
     for (auto& node_state : graph.iter_nodes()) {
         if (node_state.get().input_slots.slots.empty()) {
             node_queue.push_back(node_state);
@@ -41,7 +60,7 @@ RenderGraphRunnerError RenderGraphRunner::run_graph(RenderGraph& graph,
 
         node_outputs[input_node.get().id] = input_values;
 
-        std::optional<std::vector<std::pair<Edge, std::reference_wrapper<NodeState>>>> output =
+        std::optional<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>> output =
             graph.iter_node_outputs(input_node.get().id);
 
         if (output.has_value()) {
@@ -133,9 +152,7 @@ RenderGraphRunnerError RenderGraphRunner::run_graph(RenderGraph& graph,
                 context.view_entity = view_entity;
             }
 
-            {
-                // node_state.node.run(&mut context, render_context, world);
-            }
+            { node_state.get().node->run(context, render_context); }
 
             for (auto& run_sub_graph : context.run_sub_graphs) {
                 auto sub_graph = graph.get_sub_graph(run_sub_graph.name);
@@ -147,6 +164,7 @@ RenderGraphRunnerError RenderGraphRunner::run_graph(RenderGraph& graph,
 
                 auto error = run_graph(sub_graph.value(),
                                        std::make_optional(run_sub_graph.name),
+                                       render_context,
                                        run_sub_graph.inputs,
                                        run_sub_graph.view_entity);
 
@@ -181,15 +199,28 @@ RenderGraphRunnerError RenderGraphRunner::run_graph(RenderGraph& graph,
     return RenderGraphRunnerError::None;
 }
 
-std::optional<std::vector<std::pair<Edge, std::reference_wrapper<NodeState>>>> RenderGraph::iter_node_inputs(
-    NodeId id) {
+/// Returns an iterator over the [`NodeStates`](NodeState).
+std::vector<std::reference_wrapper<const NodeState>> RenderGraph::iter_nodes() const {
+    std::vector<std::reference_wrapper<const NodeState>> node_states;
+
+    node_states.reserve(nodes.size());
+
+    for (auto& node : nodes) {
+        node_states.emplace_back(node.second);
+    }
+
+    return node_states;
+}
+
+std::optional<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>> RenderGraph::iter_node_inputs(
+    NodeId id) const {
     auto node = get_node_state(id);
 
     if (!node.has_value()) {
         return {};
     }
 
-    std::vector<std::pair<Edge, std::reference_wrapper<NodeState>>> inputs;
+    std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>> inputs;
     for (auto& edge : node.value().get().edges.input_edges) {
         inputs.emplace_back(edge, get_node_state(edge.get_output_node()).value());
     }
@@ -197,31 +228,32 @@ std::optional<std::vector<std::pair<Edge, std::reference_wrapper<NodeState>>>> R
     return {std::move(inputs)};
 }
 
-std::optional<std::vector<std::pair<Edge, std::reference_wrapper<NodeState>>>> RenderGraph::iter_node_outputs(
-    NodeId id) {
+std::optional<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>> RenderGraph::iter_node_outputs(
+    NodeId id) const {
     auto node = get_node_state(id);
 
     if (!node.has_value()) {
         return {};
     }
 
-    std::vector<std::pair<Edge, std::reference_wrapper<NodeState>>> outputs;
-    for (auto& edge : node.value().get().edges.output_edges) {
+    std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>> outputs;
+    for (const auto& edge : node.value().get().edges.output_edges) {
         outputs.emplace_back(edge, get_node_state(edge.get_input_node()).value());
     }
 
     return {std::move(outputs)};
 }
 
-std::optional<std::reference_wrapper<NodeState>> RenderGraph::get_node_state(NodeId id) {
-    if (nodes.find(id) != nodes.end()) {
-        return std::make_optional(std::reference_wrapper(nodes[id]));
+std::optional<std::reference_wrapper<const NodeState>> RenderGraph::get_node_state(NodeId id) const {
+    auto iter = nodes.find(id);
+    if (iter != nodes.end()) {
+        return std::make_optional(std::cref(iter->second));
     }
 
     return {};
 }
 
-std::optional<std::reference_wrapper<NodeState>> RenderGraph::get_input_node() {
+std::optional<std::reference_wrapper<const NodeState>> RenderGraph::get_input_node() const {
     if (input_node.has_value()) {
         return get_node_state(input_node.value());
     }
@@ -229,9 +261,18 @@ std::optional<std::reference_wrapper<NodeState>> RenderGraph::get_input_node() {
     return {};
 }
 
-std::optional<RenderGraph> RenderGraph::get_sub_graph(const std::string& name) {
+std::optional<std::reference_wrapper<const RenderGraph>> RenderGraph::get_sub_graph(const std::string& name) const {
+    auto iter = sub_graphs.find(name);
+    if (iter != sub_graphs.end()) {
+        return std::make_optional(std::cref(iter->second));
+    } else {
+        return {};
+    }
+}
+
+std::optional<std::reference_wrapper<RenderGraph>> RenderGraph::get_sub_graph_mut(const std::string& name) {
     if (sub_graphs.find(name) != sub_graphs.end()) {
-        return std::make_optional(sub_graphs[name]);
+        return std::make_optional(std::ref(sub_graphs[name]));
     } else {
         return {};
     }
