@@ -7,7 +7,6 @@
 #include "../common/mat3x3.h"
 #include "../common/quat.h"
 #include "data.h"
-#include "graph.h"
 
 using namespace Flint::Math;
 
@@ -66,15 +65,6 @@ struct R_ComponentUniforms {
 /// Cache for all pipelines.
 struct R_PipelineCache {
     std::unordered_map<uint64_t, std::shared_ptr<int>> pipelines;
-};
-
-/// The context with all information required to interact with the GPU.
-///
-/// The [`RenderDevice`] is used to create render resources and the
-/// the [`CommandEncoder`] is used to record a series of GPU operations.
-struct RenderContext {
-    //                    command_encoder: Option<CommandEncoder>,
-    //                                      command_buffers: Vec<CommandBuffer>,
 };
 
 } // namespace Flint::Ecs

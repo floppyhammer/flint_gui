@@ -58,6 +58,9 @@ add_subdirectory(external/entt)
 include_directories(external/GSL/include)
 add_subdirectory(external/GSL)
 
+include_directories(external/stduuid/include)
+add_subdirectory(external/stduuid)
+
 # icu4c.
 if (NOT WIN32)
     # For non-Windows platforms, we need to compile ICU from source.

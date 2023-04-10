@@ -1,7 +1,11 @@
 #ifndef FLINT_ECS_DATA_H
 #define FLINT_ECS_DATA_H
 
-#include <uuid.h>
+#ifndef FLINT_UUID
+    #define FLINT_UUID
+    #define UUID_SYSTEM_GENERATOR
+    #include <uuid.h>
+#endif
 
 #include <optional>
 

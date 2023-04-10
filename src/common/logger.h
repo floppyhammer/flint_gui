@@ -45,7 +45,7 @@ public:
         return &singleton;
     }
 
-    enum Level {
+    enum class Level {
         VERBOSE = 0,
         DEBUG,
         INFO,
