@@ -477,12 +477,12 @@ NodeId RenderGraph::add_node(std::string name, const std::shared_ptr<Node>& node
     return id;
 }
 
-std::pair<std::optional<std::shared_ptr<Node>>, RenderGraphError> RenderGraph::get_node(const NodeLabel& label) {
+Result<std::shared_ptr<Node>, RenderGraphError> RenderGraph::get_node(const NodeLabel& label) {
     auto node_state = get_node_state(label);
     if (node_state.first.has_value()) {
-        return {node_state.first.value().get().node, {}};
+        return {node_state.first.value().get().node};
     } else {
-        return {{}, node_state.second};
+        return {node_state.second};
     }
 }
 
@@ -594,11 +594,11 @@ void test_get_node_typed() {
 
     graph.add_node("A", std::make_shared<MyNode>(42));
 
-    auto node = graph.get_node(NodeLabel::from_name("A")).first.value();
+    auto node = graph.get_node(NodeLabel::from_name("A")).unwrap();
     assert(((MyNode*)node.get())->value == 42 && "node value matches");
 
     auto result = graph.get_node(NodeLabel::from_name("A"));
-    assert(result.second == RenderGraphError::WrongNodeType && "expect a wrong node type error");
+    assert(result.error() == RenderGraphError::WrongNodeType && "expect a wrong node type error");
 }
 
 void test_slot_already_occupied() {

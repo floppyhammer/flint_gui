@@ -10,6 +10,45 @@
 
 namespace Flint::Ecs {
 
+template <typename C, typename E>
+class Result {
+public:
+private:
+    enum class Type {
+        Ok,
+        Error,
+    } _type;
+
+    C _content;
+    E _error;
+
+public:
+    Result(C content) {
+        _type = Type::Ok;
+        _content = content;
+    }
+
+    Result(E error) {
+        _type = Type::Error;
+        _error = error;
+    }
+
+    bool is_ok() const {
+        return _type == Type::Ok;
+    }
+
+    C unwrap() const {
+        if (!is_ok()) {
+            abort();
+        }
+        return _content;
+    }
+
+    E error() const {
+        return _error;
+    }
+};
+
 enum class RenderGraphError {
     None,
     InvalidNode,
@@ -124,7 +163,7 @@ public:
     NodeId add_node(std::string name, const std::shared_ptr<Node>& node);
 
     /// Retrieves the [`Node`] referenced by the `label`.
-    std::pair<std::optional<std::shared_ptr<Node>>, RenderGraphError> get_node(const NodeLabel& label);
+    Result<std::shared_ptr<Node>, RenderGraphError> get_node(const NodeLabel& label);
 
     /// Adds the [`Edge::SlotEdge`] to the graph. This guarantees that the `output_node`
     /// is run before the `input_node` and also connects the `output_slot` to the `input_slot`.
