@@ -5,7 +5,7 @@
 #include "../../resources/mesh.h"
 #include "node3d.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 // TODO: skybox should not be a node.
 class Skybox : public Node3d {

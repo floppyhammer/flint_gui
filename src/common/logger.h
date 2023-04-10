@@ -37,7 +37,8 @@
         printf("\n")
 #endif
 
-namespace Flint {
+namespace Flint::Utils {
+
 class Logger {
 public:
     static Logger *get_singleton() {
@@ -101,6 +102,7 @@ public:
 
     void operator=(Logger const &) = delete;
 };
-} // namespace Flint
+
+} // namespace Flint::Utils
 
 #endif // FLINT_LOGGER_H

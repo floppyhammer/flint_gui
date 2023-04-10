@@ -7,7 +7,7 @@
 #include "../../resources/vector_texture.h"
 #include "../window_proxy.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 SpinBox::SpinBox() {
     type = NodeType::SpinBox;

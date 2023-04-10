@@ -4,7 +4,7 @@
 #include "button.h"
 #include "container.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 class TabContainer : public Container {
 public:

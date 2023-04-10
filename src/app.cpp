@@ -21,16 +21,16 @@ using namespace Flint;
 
 App::App(Vec2I window_size) {
     // Set logger level.
-    Logger::set_level(Logger::Level::VERBOSE);
+    Utils::Logger::set_level(Utils::Logger::Level::VERBOSE);
 
-    tree = std::make_unique<Flint::SceneTree>(window_size);
+    tree = std::make_unique<Scene::SceneTree>(window_size);
 }
 
 App::~App() {
     cleanup();
 }
 
-SceneTree* App::get_tree() {
+Scene::SceneTree* App::get_tree() {
     return tree.get();
 }
 
@@ -66,14 +66,14 @@ void App::cleanup() {
     tree.reset();
 
     VectorServer::get_singleton()->cleanup();
-    Logger::verbose("Cleaned up VectorServer.", "App");
+    Utils::Logger::verbose("Cleaned up VectorServer.", "App");
 
     DefaultResource::get_singleton()->cleanup();
-    Logger::verbose("Cleaned up DefaultResource.", "App");
+    Utils::Logger::verbose("Cleaned up DefaultResource.", "App");
 
     RenderServer::get_singleton()->cleanup();
-    Logger::verbose("Cleaned up RenderServer.", "App");
+    Utils::Logger::verbose("Cleaned up RenderServer.", "App");
 
     DisplayServer::get_singleton()->cleanup();
-    Logger::verbose("Cleaned up DisplayServer.", "App");
+    Utils::Logger::verbose("Cleaned up DisplayServer.", "App");
 }

@@ -6,7 +6,7 @@
 #include "3d/camera3d.h"
 #include "resources/default_resource.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 World::World(bool _is_2d) {
     type = NodeType::World;
@@ -92,7 +92,7 @@ void World::draw_subtree(Subview* subview, ColorF clear_color, ImageTexture* ima
 
 void World::add_camera2d(Camera2d* new_camera) {
     if (!is_2d) {
-        Logger::error("Failed to add a Camera2d to a 3D World!", "World");
+        Utils::Logger::error("Failed to add a Camera2d to a 3D World!", "World");
         return;
     }
 
@@ -101,7 +101,7 @@ void World::add_camera2d(Camera2d* new_camera) {
 
 void World::add_camera3d(Camera3d* new_camera) {
     if (is_2d) {
-        Logger::error("Failed to add a Camera3d to a 2D World!", "World");
+        Utils::Logger::error("Failed to add a Camera3d to a 2D World!", "World");
         return;
     }
 
@@ -137,7 +137,8 @@ void World::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
 
     mesh->surface->get_material()->set_texture(image_texture.get());
 
-    VkPipeline pipeline = RenderServer::get_singleton()->get_pipeline(render_pass, "mesh2d");;
+    VkPipeline pipeline = RenderServer::get_singleton()->get_pipeline(render_pass, "mesh2d");
+    ;
     VkPipelineLayout pipeline_layout = RenderServer::get_singleton()->blit_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
@@ -148,4 +149,4 @@ void World::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
         cmd_buffer, pipeline, mesh->surface->get_material()->get_desc_set()->getDescriptorSet(get_current_image()));
 }
 
-} // namespace Flint
+} // namespace Flint::Scene

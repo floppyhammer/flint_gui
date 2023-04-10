@@ -1,6 +1,6 @@
 #include "container.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 Container::Container() {
     // This class is not meant for direct use as a node.

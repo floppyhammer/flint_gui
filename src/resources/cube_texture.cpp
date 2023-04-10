@@ -24,7 +24,7 @@ void CubeTexture::load_from_file(const std::string &path) {
     stbi_uc *pixels = stbi_load(path.c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
 
     if (!pixels) {
-        Logger::warn("Failed to load image file: " + path, "CubeTexture");
+        Utils::Logger::warn("Failed to load image file: " + path, "CubeTexture");
         throw std::runtime_error("Failed to load texture image!");
     }
 

@@ -4,7 +4,7 @@
 
 #include "../../common/logger.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 Tree::Tree() {
     type = NodeType::Panel;
@@ -131,7 +131,7 @@ std::shared_ptr<TreeItem> TreeItem::get_child(uint32_t idx) {
     if (idx < children.size()) {
         return children[idx];
     } else {
-        Logger::error("Invalid child index!", "TreeItem");
+        Utils::Logger::error("Invalid child index!", "TreeItem");
         return nullptr;
     }
 }
@@ -217,7 +217,7 @@ void TreeItem::input(InputEvent &event, Vec2F global_position) {
             if (item_global_rect.contains_point(button_event.position)) {
                 selected = true;
                 tree->selected_item = this;
-                Logger::verbose("Item selected: " + label->get_text(), "Tree");
+                Utils::Logger::verbose("Item selected: " + label->get_text(), "Tree");
             }
         }
     }
@@ -231,4 +231,4 @@ void TreeItem::set_icon(const std::shared_ptr<Texture> &texture) {
     icon->set_texture(texture);
 }
 
-} // namespace Flint
+} // namespace Flint::Scene

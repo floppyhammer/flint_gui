@@ -9,7 +9,6 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/hash.hpp>
-
 #include <unordered_map>
 
 namespace std {
@@ -22,7 +21,8 @@ struct hash<Flint::Vertex> {
 };
 } // namespace std
 
-namespace Flint {
+namespace Flint::Utils {
+
 void ObjImporter::load_file(const std::string &path, std::vector<std::shared_ptr<Surface3d>> &surfaces) {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -102,4 +102,5 @@ void ObjImporter::load_file(const std::string &path, std::vector<std::shared_ptr
         surfaces.push_back(surface);
     }
 }
-} // namespace Flint
+
+} // namespace Flint::Utils

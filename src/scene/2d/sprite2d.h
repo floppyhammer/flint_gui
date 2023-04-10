@@ -5,7 +5,7 @@
 #include "../../resources/mesh.h"
 #include "node2d.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 class Sprite2d : public Node2d {
 public:

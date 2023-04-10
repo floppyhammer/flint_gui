@@ -5,7 +5,7 @@
 
 using Pathfinder::Rect;
 
-namespace Flint {
+namespace Flint::Scene {
 
 class MarginContainer : public Container {
 public:

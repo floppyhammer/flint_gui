@@ -14,7 +14,7 @@
 #include "../world.h"
 #include "servers/render_server.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 void Bone2d::add_child(const std::shared_ptr<Bone2d> &child) {
     children.push_back(child);
@@ -504,7 +504,7 @@ void Skeleton2d::update_bone_rest() {
             auto &weights = bone->weights;
 
             if (weights.size() != points.size()) {
-                Logger::error("Weights number is different from points number!", "Skeleton2d");
+                Utils::Logger::error("Weights number is different from points number!", "Skeleton2d");
                 continue;
             }
 
@@ -610,7 +610,7 @@ void Skeleton2d::update_bone_rest() {
                     }
 
                     if (!found_vertex) {
-                        Logger::error(
+                        Utils::Logger::error(
                             "Couldn't find the same vertex during triangulation. A new vertex has been generated, "
                             "which is not allowed!",
                             "Skeleton2D");
@@ -776,7 +776,7 @@ void Skeleton2d::upload_bone_transforms() {
 
 void Skeleton2d::set_bone_transform(uint32_t bone_index, const Transform2 &p_transform) {
     if (bone_index >= bone_count) {
-        Logger::error("Invalid bone index!", "Skeleton 2D");
+        Utils::Logger::error("Invalid bone index!", "Skeleton 2D");
         return;
     }
 

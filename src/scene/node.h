@@ -9,7 +9,7 @@
 #include "common/logger.h"
 #include "servers/render_server.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 enum class NodeType {
     // General.

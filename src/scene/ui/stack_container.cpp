@@ -1,6 +1,6 @@
 #include "stack_container.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 void StackContainer::adjust_layout() {
     if (children.empty()) {

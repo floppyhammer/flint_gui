@@ -4,7 +4,7 @@
 #include "container.h"
 #include "tree.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 class ScrollContainer : public Container {
 public:

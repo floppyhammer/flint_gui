@@ -5,7 +5,7 @@
 #include "node2d.h"
 #include "render/subview.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 class Camera2d : public Node2d {
 public:

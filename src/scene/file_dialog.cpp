@@ -2,10 +2,10 @@
 
 #include "../common/logger.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 std::string FileDialog::show() {
-    Logger::info("File dialog", "FileDialog");
+    Utils::Logger::info("File dialog", "FileDialog");
 
     // In case of multiple files, the separator is `|`.
     // Returns NULL on cancel.
@@ -17,7 +17,7 @@ std::string FileDialog::show() {
                                       0);      // 0
 
     if (path) {
-        Logger::info("File dialog selected: " + std::string(path), "FileDialog");
+        Utils::Logger::info("File dialog selected: " + std::string(path), "FileDialog");
         return path;
     }
 

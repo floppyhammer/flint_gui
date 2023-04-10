@@ -7,13 +7,13 @@
 #include "../render/mvp.h"
 #include "../resources/surface.h"
 
-namespace Flint {
+namespace Flint::Utils {
 
 class ObjImporter {
 public:
     static void load_file(const std::string &filename, std::vector<std::shared_ptr<Surface3d>> &surfaces);
 };
 
-} // namespace Flint
+} // namespace Flint::Utils
 
 #endif // FLINT_OBJ_IMPORTER_H

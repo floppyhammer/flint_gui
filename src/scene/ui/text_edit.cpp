@@ -5,9 +5,9 @@
 #include "../../common/logger.h"
 #include "../window_proxy.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
-Flint::TextEdit::TextEdit() {
+TextEdit::TextEdit() {
     type = NodeType::TextEdit;
 
     label = std::make_shared<Label>("");
@@ -83,7 +83,7 @@ void TextEdit::input(InputEvent &event) {
                 current_caret_index = calculate_caret_index(get_local_mouse_position());
                 caret_blink_timer = 0;
 
-                Logger::verbose("Caret position: current - " + std::to_string(current_caret_index) + ", selected - " +
+                Utils::Logger::verbose("Caret position: current - " + std::to_string(current_caret_index) + ", selected - " +
                                     std::to_string(selected_caret_index),
                                 "TextEdit");
             }
@@ -275,4 +275,4 @@ void TextEdit::delete_selection() {
     current_caret_index = selected_caret_index = start_index - 1;
 }
 
-} // namespace Flint
+} // namespace Flint::Scene

@@ -7,7 +7,7 @@
 #include "../../resources/texture.h"
 #include "node_ui.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 /**
  * Used to display an ImageTexture or a VectorTexture.

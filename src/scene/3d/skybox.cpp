@@ -8,7 +8,7 @@
 #include "../world.h"
 #include "camera3d.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 Skybox::Skybox() {
     type = NodeType::Skybox;

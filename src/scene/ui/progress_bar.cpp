@@ -2,7 +2,7 @@
 
 #include "../../common/geometry.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 ProgressBar::ProgressBar() {
     type = NodeType::ProgressBar;

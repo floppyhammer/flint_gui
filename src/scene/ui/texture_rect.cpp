@@ -14,7 +14,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace Flint {
+namespace Flint::Scene {
 
 TextureRect::TextureRect() {
     type = NodeType::TextureRect;
@@ -55,7 +55,7 @@ void TextureRect::draw() {
             } break;
             case StretchMode::Scale: {
                 if (texture_size.area() == 0) {
-                    Logger::error("Vector texture size is invalid!", "TextureRect");
+                    Utils::Logger::error("Vector texture size is invalid!", "TextureRect");
                     return;
                 }
                 auto scale = size / texture_size;
@@ -65,7 +65,7 @@ void TextureRect::draw() {
             case StretchMode::KeepAspect:
             case StretchMode::KeepAspectCentered: {
                 if (texture_size.area() == 0) {
-                    Logger::error("Vector texture size is invalid!", "TextureRect");
+                    Utils::Logger::error("Vector texture size is invalid!", "TextureRect");
                     return;
                 }
 

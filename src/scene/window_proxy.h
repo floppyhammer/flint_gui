@@ -7,7 +7,7 @@
 using Pathfinder::ColorF;
 using Pathfinder::Vec2I;
 
-namespace Flint {
+namespace Flint::Scene {
 
 class WindowProxy : public Node {
     friend class SceneTree;

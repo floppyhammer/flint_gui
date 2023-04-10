@@ -9,7 +9,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace Flint {
+namespace Flint::Scene {
 
 Sprite2d::Sprite2d() {
     type = NodeType::Sprite2d;
@@ -70,7 +70,7 @@ void Sprite2d::update_mvp() {
 
 void Sprite2d::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     if (mesh == nullptr) {
-        Logger::warn("No valid mesh set for Sprite 2D!");
+        Utils::Logger::warn("No valid mesh set for Sprite 2D!");
         return;
     }
 //

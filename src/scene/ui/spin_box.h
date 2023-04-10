@@ -10,7 +10,7 @@
 #include "stack_container.h"
 #include "texture_rect.h"
 
-namespace Flint {
+namespace Flint::Scene {
 /**
  * Numerical input field.
  */

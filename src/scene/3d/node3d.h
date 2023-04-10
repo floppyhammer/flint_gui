@@ -6,7 +6,7 @@
 #include "../node.h"
 #include "glm/glm.hpp"
 
-namespace Flint {
+namespace Flint::Scene {
 
 class Node3d : public Node {
 public:

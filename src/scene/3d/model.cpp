@@ -9,7 +9,7 @@
 #include "../world.h"
 #include "camera3d.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 Model::Model() {
     type = NodeType::Model;

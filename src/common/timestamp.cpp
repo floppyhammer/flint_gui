@@ -7,7 +7,8 @@
 
 #include "logger.h"
 
-namespace Flint {
+namespace Flint::Utils {
+
 Timestamp::Timestamp() {
     start_time = std::chrono::steady_clock::now();
 }
@@ -46,4 +47,5 @@ void Timestamp::print() {
 void Timestamp::set_enabled(bool p_enabled) {
     enabled = p_enabled;
 }
-} // namespace Flint
+
+} // namespace Flint::Utils

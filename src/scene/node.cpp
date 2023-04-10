@@ -6,7 +6,7 @@
 #include "window_proxy.h"
 #include "world.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 void Node::propagate_update(double dt) {
     update(dt);
@@ -202,4 +202,4 @@ uint32_t Node::get_current_image() {
     return current_image;
 }
 
-} // namespace Flint
+} // namespace Flint::Scene

@@ -2,7 +2,7 @@
 
 #include "../servers/vector_server.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 WindowProxy::WindowProxy(Vec2I _size, bool _dummy) {
     type = NodeType::Window;
@@ -137,7 +137,7 @@ void WindowProxy::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_b
     // buffers according to the current image index.
     uint32_t image_index;
     if (!swapchain->acquireSwapChainImage(image_index)) {
-        Logger::error("Invalid swap chain image index!", "Swap Chain");
+        Utils::Logger::error("Invalid swap chain image index!", "Swap Chain");
         return;
     }
 

@@ -5,7 +5,7 @@
 #include "../../common/logger.h"
 #include "../window_proxy.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 Panel::Panel() {
     type = NodeType::Panel;

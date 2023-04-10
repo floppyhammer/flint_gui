@@ -29,7 +29,7 @@ void Engine::tick() {
         // Set frame time.
         std::ostringstream string_stream;
         string_stream << "FPS " << round(fps * 10.f) * 0.1f;
-        Logger::verbose(string_stream.str(), "Engine");
+        Utils::Logger::verbose(string_stream.str(), "Engine");
     }
 }
 

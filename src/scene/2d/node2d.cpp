@@ -2,7 +2,7 @@
 
 #include "../../resources/default_resource.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 Node2d::Node2d() {
     type = NodeType::Node2d;

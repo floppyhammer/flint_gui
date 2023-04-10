@@ -5,7 +5,8 @@
 #include <string>
 #include <vector>
 
-namespace Flint {
+namespace Flint::Utils {
+
 class Timestamp {
 private:
     std::chrono::time_point<std::chrono::steady_clock> start_time;
@@ -26,6 +27,7 @@ public:
 
     void set_enabled(bool p_enabled);
 };
-} // namespace Flint
+
+} // namespace Flint::Utils
 
 #endif // FLINT_TIMESTAMP_H

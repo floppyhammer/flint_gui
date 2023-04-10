@@ -7,7 +7,7 @@
 #include "node2d.h"
 #include "sprite2d.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 class Skeleton2d;
 

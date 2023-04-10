@@ -154,7 +154,7 @@ ImageTexture::ImageTexture(const std::string &path) : Texture(path) {
     stbi_uc *pixels = stbi_load(path.c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
 
     if (!pixels) {
-        Flint::Logger::warn("Failed to load image file " + path, "Texture");
+        Utils::Logger::warn("Failed to load image file " + path, "Texture");
         throw std::runtime_error("Failed to load texture image!");
     }
 

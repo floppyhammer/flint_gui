@@ -8,7 +8,7 @@
 #include "../../resources/style_box.h"
 #include "label.h"
 
-namespace Flint {
+namespace Flint::Scene {
 /**
  * Single-Line text input field.
  */

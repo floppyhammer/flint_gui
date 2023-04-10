@@ -1,6 +1,6 @@
 #include "tab_container.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 TabContainer::TabContainer() {
     type = NodeType::TabContainer;

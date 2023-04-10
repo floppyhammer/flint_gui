@@ -12,7 +12,7 @@
 #include "label.h"
 #include "node_ui.h"
 
-namespace Flint {
+namespace Flint::Scene {
 
 /**
  * With different features enabled, a panel can become a window, a collapsable panel, etc.

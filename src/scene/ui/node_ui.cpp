@@ -7,7 +7,7 @@
 
 using Pathfinder::Rect;
 
-namespace Flint {
+namespace Flint::Scene {
 
 NodeUi::NodeUi() {
     type = NodeType::NodeUi;
