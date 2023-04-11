@@ -618,12 +618,12 @@ void test_add_node_edges() {
     auto b_id = graph.add_node("B", std::make_shared<SimpleNode>());
     auto c_id = graph.add_node("C", std::make_shared<SimpleNode>());
 
-    //    graph.add_node_edges(&[ "A", "B", "C" ]);
-    //
-    //    assert !(output_nodes("A", &graph) == HashSet::from_iter(vec ![b_id]), "A -> B");
-    //    assert !(input_nodes("B", &graph) == HashSet::from_iter(vec ![a_id]), "A -> B");
-    //    assert !(output_nodes("B", &graph) == HashSet::from_iter(vec ![c_id]), "B -> C");
-    //    assert !(input_nodes("C", &graph) == HashSet::from_iter(vec ![b_id]), "B -> C");
+    graph.add_node_edges({"A", "B", "C"});
+
+    assert(output_nodes("A", graph) == std::set({b_id}) && "A -> B");
+    assert(input_nodes("B", graph) == std::set({a_id}) && "A -> B");
+    assert(output_nodes("B", graph) == std::set({c_id}) && "B -> C");
+    assert(input_nodes("C", graph) == std::set({b_id}) && "B -> C");
 }
 
 void run_graph_tests() {
@@ -631,6 +631,8 @@ void run_graph_tests() {
     test_get_node_typed();
     test_slot_already_occupied();
     test_edge_already_exists();
+    test_add_node_edges();
+
     std::cout << "Graph tests passed." << std::endl;
 }
 #endif

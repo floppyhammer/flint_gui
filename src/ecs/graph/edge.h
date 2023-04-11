@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "node.h"
-#include "../data.h"
+#include "utils.h"
 
 namespace Flint::Ecs {
 
@@ -66,22 +66,10 @@ struct Edge {
     }
 
     /// Returns the id of the `input_node`.
-    NodeId get_input_node() const {
-        if (type == Type::SlotEdge) {
-            return slot_edge.value().input_node;
-        } else {
-            return node_edge.value().input_node;
-        }
-    }
+    NodeId get_input_node() const;
 
     /// Returns the id of the `output_node`.
-    NodeId get_output_node() const {
-        if (type == Type::SlotEdge) {
-            return slot_edge.value().output_node;
-        } else {
-            return node_edge.value().output_node;
-        }
-    }
+    NodeId get_output_node() const;
 
     inline bool operator==(const Edge& rhs) const {
         if (type == rhs.type) {
@@ -109,14 +97,10 @@ struct Edges {
     std::vector<Edge> output_edges;
 
     /// Checks whether the input edge already exists.
-    bool has_input_edge(const Edge& edge) {
-        return std::find(input_edges.begin(), input_edges.end(), edge) != input_edges.end();
-    }
+    bool has_input_edge(const Edge& edge) const;
 
     /// Checks whether the output edge already exists.
-    bool has_output_edge(const Edge& edge) {
-        return std::find(output_edges.begin(), output_edges.end(), edge) != output_edges.end();
-    }
+    bool has_output_edge(const Edge& edge) const;
 
     /// Adds an edge to the `input_edges` if it does not already exist.
     Result<int, RenderGraphError> add_input_edge(const Edge& edge);

@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "../../servers/display_server.h"
+
 namespace Flint::Ecs {
 
 /// A [`SlotLabel`] is used to reference a slot by either its name or index
@@ -91,9 +93,9 @@ struct SlotValue {
     SlotType type;
 
     union {
-        //        VkBuffer buffer;
-        //        VkImageView texture_view;
-        //        VkSampler sampler;
+        VkBuffer buffer;
+        VkImageView texture_view;
+        VkSampler sampler;
         entt::entity entity;
     };
 };

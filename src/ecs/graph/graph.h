@@ -8,6 +8,7 @@
 #include "edge.h"
 #include "node.h"
 #include "slot.h"
+#include "utils.h"
 
 namespace Flint::Ecs {
 
@@ -206,17 +207,19 @@ public:
     /// Defining an edge that already exists is not considered an error with this api.
     /// It simply won't create a new edge.
     void add_node_edges(std::vector<std::string> edges) {
-        //        for window in edges.windows(2) {
-        //        let [a, b] = window else { break; };
-        //        if let Err(err) = self.try_add_node_edge(*a, *b) {
-        //                match err {
-        //                    // Already existing edges are very easy to produce with this api
-        //                    // and shouldn't cause a panic
-        //                    RenderGraphError::EdgeAlreadyExists(_) => {}
-        //                    _ => panic!("{err:?}"),
-        //                }
-        //            }
-        //        }
+        if (edges.size() < 2) {
+            return;
+        }
+        for (int i = 0; (i + 1) < edges.size(); i++) {
+            auto res = try_add_node_edge(NodeLabel::from_name(edges[i]), NodeLabel::from_name(edges[i + 1]));
+            // Already existing edges are very easy to produce with this api
+            // and shouldn't cause a panic.
+            if (!res.is_ok()) {
+                if (res.error() != RenderGraphError::EdgeAlreadyExists) {
+                    abort();
+                }
+            }
+        }
     }
 
     /// Returns the [`NodeState`] of the input node of this graph.

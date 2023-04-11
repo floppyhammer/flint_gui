@@ -23,57 +23,11 @@ struct HandleId {
     std::optional<std::string> asset_path_id;
 };
 
-template <class T>
+template <typename T>
 struct C_Handle {
     HandleId id;
 
     std::shared_ptr<T> data;
-};
-
-
-
-#define CHECK_RESULT_RETURN(res) \
-    if (!res.is_ok()) {          \
-        return {res.error()};    \
-    }
-
-template <typename C, typename E>
-class Result {
-public:
-private:
-    enum class Type {
-        Ok,
-        Error,
-    } _type;
-
-    C _content{};
-    E _error{};
-
-public:
-    Result(C content) {
-        _type = Type::Ok;
-        _content = content;
-    }
-
-    Result(E error) {
-        _type = Type::Error;
-        _error = error;
-    }
-
-    bool is_ok() const {
-        return _type == Type::Ok;
-    }
-
-    C unwrap() const {
-        if (!is_ok()) {
-            abort();
-        }
-        return _content;
-    }
-
-    E error() const {
-        return _error;
-    }
 };
 
 } // namespace Flint::Ecs
