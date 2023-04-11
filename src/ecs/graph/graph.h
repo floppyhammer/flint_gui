@@ -3,51 +3,13 @@
 
 #include <map>
 #include <optional>
+#include <type_traits>
 
 #include "edge.h"
 #include "node.h"
 #include "slot.h"
 
 namespace Flint::Ecs {
-
-template <typename C, typename E>
-class Result {
-public:
-private:
-    enum class Type {
-        Ok,
-        Error,
-    } _type;
-
-    C _content;
-    E _error;
-
-public:
-    Result(C content) {
-        _type = Type::Ok;
-        _content = content;
-    }
-
-    Result(E error) {
-        _type = Type::Error;
-        _error = error;
-    }
-
-    bool is_ok() const {
-        return _type == Type::Ok;
-    }
-
-    C unwrap() const {
-        if (!is_ok()) {
-            abort();
-        }
-        return _content;
-    }
-
-    E error() const {
-        return _error;
-    }
-};
 
 enum class RenderGraphError {
     None,
@@ -87,12 +49,12 @@ struct NodeState {
     SlotInfos output_slots;
     Edges edges;
 
-    template <class NodeType>
-    static NodeState from_node(NodeId id_, const std::shared_ptr<NodeType>& node_) {
+    template <class T>
+    static NodeState from_node(NodeId id_, const std::shared_ptr<T>& node_) {
         return NodeState{
             id_,
             {},
-            typeid(NodeType).name(),
+            typeid(T).name(),
             node_,
             SlotInfos{node_->input()},
             SlotInfos{node_->output()},
@@ -102,6 +64,16 @@ struct NodeState {
                 {},
             },
         };
+    }
+
+    /// Retrieves the [`Node`].
+    template <typename T>
+    Result<T*, RenderGraphError> get_node() const {
+        if (typeid(T).name() == type_name) {
+            return {(T*)node.get()};
+        } else {
+            return {RenderGraphError::WrongNodeType};
+        }
     }
 };
 
@@ -140,30 +112,44 @@ public:
 
     /// Returns an iterator over a tuple of the input edges and the corresponding output nodes
     /// for the node referenced by the label.
-    std::optional<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>> iter_node_inputs(
+    Result<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>, RenderGraphError> iter_node_inputs(
         const NodeLabel& label) const;
 
     /// Returns an iterator over a tuple of the output edges and the corresponding input nodes
     /// for the node referenced by the label.
-    std::optional<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>> iter_node_outputs(
+    Result<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>, RenderGraphError> iter_node_outputs(
         const NodeLabel& label) const;
 
     /// Retrieves the [`NodeId`] referenced by the `label`.
-    std::pair<std::optional<NodeId>, RenderGraphError> get_node_id(const NodeLabel& label) const;
+    Result<NodeId, RenderGraphError> get_node_id(const NodeLabel& label) const;
 
     /// Retrieves the [`NodeState`] referenced by the `label`.
-    std::pair<std::optional<std::reference_wrapper<const NodeState>>, RenderGraphError> get_node_state(
+    Result<std::optional<std::reference_wrapper<const NodeState>>, RenderGraphError> get_node_state(
         const NodeLabel& label) const;
 
-    std::pair<std::optional<std::reference_wrapper<NodeState>>, RenderGraphError> get_node_state_mut(
+    Result<std::optional<std::reference_wrapper<NodeState>>, RenderGraphError> get_node_state_mut(
         const NodeLabel& label);
 
     /// Adds the `node` with the `name` to the graph.
     /// If the name is already present replaces it instead.
-    NodeId add_node(std::string name, const std::shared_ptr<Node>& node);
+    template <typename T>
+    NodeId add_node(std::string name, const std::shared_ptr<T>& node) {
+        auto id = NodeId();
+        auto node_state = NodeState::from_node(id, node);
+        node_state.name = std::make_optional(name);
+        _nodes[id] = node_state;
+        _node_names[name] = id;
+        return id;
+    }
 
     /// Retrieves the [`Node`] referenced by the `label`.
-    Result<std::shared_ptr<Node>, RenderGraphError> get_node(const NodeLabel& label);
+    template <typename T>
+    Result<T*, RenderGraphError> get_node(const NodeLabel& label) const {
+        auto node_state = get_node_state(label);
+        CHECK_RESULT_RETURN(node_state)
+
+        return node_state.unwrap().value().get().get_node<T>();
+    }
 
     /// Adds the [`Edge::SlotEdge`] to the graph. This guarantees that the `output_node`
     /// is run before the `input_node` and also connects the `output_slot` to the `input_slot`.
@@ -173,10 +159,10 @@ public:
     /// # See also
     ///
     /// - [`add_slot_edge`](Self::add_slot_edge) for an infallible version.
-    RenderGraphError try_add_slot_edge(const NodeLabel& output_node,
-                                       const SlotLabel& output_slot,
-                                       const NodeLabel& input_node,
-                                       const SlotLabel& input_slot);
+    Result<int, RenderGraphError> try_add_slot_edge(const NodeLabel& output_node,
+                                                    const SlotLabel& output_slot,
+                                                    const NodeLabel& input_node,
+                                                    const SlotLabel& input_slot);
 
     /// Adds the [`Edge::SlotEdge`] to the graph. This guarantees that the `output_node`
     /// is run before the `input_node` and also connects the `output_slot` to the `input_slot`.
@@ -201,7 +187,7 @@ public:
     /// # See also
     ///
     /// - [`add_node_edge`](Self::add_node_edge) for an infallible version.
-    RenderGraphError try_add_node_edge(const NodeLabel& output_node, const NodeLabel& input_node);
+    Result<int, RenderGraphError> try_add_node_edge(const NodeLabel& output_node, const NodeLabel& input_node);
 
     /// Adds the [`Edge::NodeEdge`] to the graph. This guarantees that the `output_node`
     /// is run before the `input_node`.
@@ -247,7 +233,7 @@ public:
 
     /// Verifies that the edge existence is as expected and
     /// checks that slot edges are connected correctly.
-    RenderGraphError validate_edge(const Edge& edge, EdgeExistence should_exist);
+    Result<int, RenderGraphError> validate_edge(const Edge& edge, EdgeExistence should_exist);
 
     bool RenderGraph::has_edge(const Edge& edge) const;
 };

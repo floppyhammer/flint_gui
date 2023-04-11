@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "node.h"
+#include "../data.h"
 
 namespace Flint::Ecs {
 
@@ -118,10 +119,10 @@ struct Edges {
     }
 
     /// Adds an edge to the `input_edges` if it does not already exist.
-    RenderGraphError add_input_edge(const Edge& edge);
+    Result<int, RenderGraphError> add_input_edge(const Edge& edge);
 
     /// Adds an edge to the `output_edges` if it does not already exist.
-    RenderGraphError add_output_edge(const Edge& edge);
+    Result<int, RenderGraphError> add_output_edge(const Edge& edge);
 };
 
 } // namespace Flint::Ecs

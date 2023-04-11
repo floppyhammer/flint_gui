@@ -1,5 +1,6 @@
 #include "graph.h"
 
+#include <iostream>
 #include <utility>
 
 namespace Flint::Ecs {
@@ -60,11 +61,10 @@ RenderGraphRunnerError RenderGraphRunner::run_graph(const RenderGraph& graph,
 
         node_outputs[input_node.get().id] = input_values;
 
-        std::optional<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>> output =
-            graph.iter_node_outputs(NodeLabel::from_id(input_node.get().id));
+        auto output = graph.iter_node_outputs(NodeLabel::from_id(input_node.get().id));
 
-        if (output.has_value()) {
-            for (auto& pair : output.value()) {
+        if (output.is_ok()) {
+            for (auto& pair : output.unwrap()) {
                 node_queue.insert(node_queue.begin(), pair.second);
             }
         }
@@ -85,8 +85,8 @@ RenderGraphRunnerError RenderGraphRunner::run_graph(const RenderGraph& graph,
 
         // Check if all dependencies have finished running.
         auto node_inputs = graph.iter_node_inputs(NodeLabel::from_id(node_state.get().id));
-        if (node_inputs.has_value()) {
-            for (auto& p : node_inputs.value()) {
+        if (node_inputs.is_ok()) {
+            for (auto& p : node_inputs.unwrap()) {
                 auto& edge = p.first;
                 auto& input_node = p.second;
 
@@ -186,8 +186,8 @@ RenderGraphRunnerError RenderGraphRunner::run_graph(const RenderGraph& graph,
         node_outputs[node_state.get().id] = values;
 
         auto iter_node_outputs = graph.iter_node_outputs(NodeLabel::from_id(node_state.get().id));
-        if (iter_node_outputs.has_value()) {
-            for (auto& p : iter_node_outputs.value()) {
+        if (iter_node_outputs.is_ok()) {
+            for (auto& p : iter_node_outputs.unwrap()) {
                 node_queue.insert(node_queue.begin(), p.second);
             }
         } else {
@@ -212,167 +212,157 @@ std::vector<std::reference_wrapper<const NodeState>> RenderGraph::iter_nodes() c
     return node_states;
 }
 
-std::optional<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>> RenderGraph::iter_node_inputs(
-    const NodeLabel& label) const {
-    auto node = get_node_state(label).first;
-
-    if (!node.has_value()) {
-        return {};
-    }
+Result<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>, RenderGraphError>
+RenderGraph::iter_node_inputs(const NodeLabel& label) const {
+    auto node = get_node_state(label);
+    CHECK_RESULT_RETURN(node)
 
     std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>> inputs;
-    for (auto& edge : node.value().get().edges.input_edges) {
-        inputs.emplace_back(edge, get_node_state(NodeLabel::from_id(edge.get_output_node())).first.value());
+    for (auto& edge : node.unwrap().value().get().edges.input_edges) {
+        inputs.emplace_back(edge, get_node_state(NodeLabel::from_id(edge.get_output_node())).unwrap().value());
     }
 
     return {std::move(inputs)};
 }
 
-std::optional<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>> RenderGraph::iter_node_outputs(
-    const NodeLabel& label) const {
-    auto node = get_node_state(label).first;
-
-    if (!node.has_value()) {
-        return {};
-    }
+Result<std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>>, RenderGraphError>
+RenderGraph::iter_node_outputs(const NodeLabel& label) const {
+    auto node = get_node_state(label);
+    CHECK_RESULT_RETURN(node)
 
     std::vector<std::pair<Edge, std::reference_wrapper<const NodeState>>> outputs;
-    for (const auto& edge : node.value().get().edges.output_edges) {
-        outputs.emplace_back(edge, get_node_state(NodeLabel::from_id(edge.get_input_node())).first.value());
+    for (const auto& edge : node.unwrap().value().get().edges.output_edges) {
+        outputs.emplace_back(edge, get_node_state(NodeLabel::from_id(edge.get_input_node())).unwrap().value());
     }
 
     return {std::move(outputs)};
 }
 
-std::pair<std::optional<NodeId>, RenderGraphError> RenderGraph::get_node_id(const NodeLabel& label) const {
+Result<NodeId, RenderGraphError> RenderGraph::get_node_id(const NodeLabel& label) const {
     if (label.type == NodeLabel::Type::Id) {
-        return {std::make_optional(label.id), {}};
+        return {label.id};
     } else {
         auto iter = _node_names.find(label.name);
         if (iter != _node_names.end()) {
-            return {std::make_optional(iter->second), {}};
+            return {iter->second};
         }
     }
 
-    return {{}, RenderGraphError::InvalidNode};
+    return {RenderGraphError::InvalidNode};
 }
 
-std::pair<std::optional<std::reference_wrapper<const NodeState>>, RenderGraphError> RenderGraph::get_node_state(
+Result<std::optional<std::reference_wrapper<const NodeState>>, RenderGraphError> RenderGraph::get_node_state(
     const NodeLabel& label) const {
     auto node_id = get_node_id(label);
-    if (!node_id.first.has_value()) {
-        return {{}, node_id.second};
-    }
+    CHECK_RESULT_RETURN(node_id)
 
-    auto iter = _nodes.find(node_id.first.value());
+    auto iter = _nodes.find(node_id.unwrap());
     if (iter != _nodes.end()) {
-        return {std::make_optional(std::cref(iter->second)), {}};
+        return {std::make_optional(std::cref(iter->second))};
     }
 
-    return {{}, RenderGraphError::InvalidNode};
+    return {RenderGraphError::InvalidNode};
 }
 
-std::pair<std::optional<std::reference_wrapper<NodeState>>, RenderGraphError> RenderGraph::get_node_state_mut(
+Result<std::optional<std::reference_wrapper<NodeState>>, RenderGraphError> RenderGraph::get_node_state_mut(
     const NodeLabel& label) {
     auto node_id = get_node_id(label);
-    if (!node_id.first.has_value()) {
-        return {{}, node_id.second};
-    }
+    CHECK_RESULT_RETURN(node_id)
 
-    auto iter = _nodes.find(node_id.first.value());
+    auto iter = _nodes.find(node_id.unwrap());
     if (iter != _nodes.end()) {
-        return {std::make_optional(std::ref(iter->second)), {}};
+        return {std::make_optional(std::ref(iter->second))};
     }
 
-    return {{}, RenderGraphError::InvalidNode};
+    return {RenderGraphError::InvalidNode};
 }
 
-RenderGraphError RenderGraph::try_add_slot_edge(const NodeLabel& output_node_,
-                                                const SlotLabel& output_slot_,
-                                                const NodeLabel& input_node_,
-                                                const SlotLabel& input_slot_) {
-    auto output_node_id = get_node_id(output_node_).first.value();
-    auto input_node_id = get_node_id(input_node_).first.value();
+Result<int, RenderGraphError> RenderGraph::try_add_slot_edge(const NodeLabel& output_node_,
+                                                             const SlotLabel& output_slot_,
+                                                             const NodeLabel& input_node_,
+                                                             const SlotLabel& input_slot_) {
+    auto output_node_id = get_node_id(output_node_);
+    CHECK_RESULT_RETURN(output_node_id)
+    auto input_node_id = get_node_id(input_node_);
+    CHECK_RESULT_RETURN(input_node_id)
 
-    auto& output_node_state = get_node_state(output_node_).first.value().get();
-    const auto output_index = output_node_state.output_slots.get_slot_index(output_slot_).value();
+    auto output_node_state = get_node_state(output_node_);
+    CHECK_RESULT_RETURN(output_node_state)
+    const auto output_index = output_node_state.unwrap().value().get().output_slots.get_slot_index(output_slot_);
+    if (!output_index.has_value()) {
+        return {RenderGraphError::InvalidOutputNodeSlot};
+    }
 
-    auto& input_node_state = get_node_state(input_node_).first.value().get();
-    const auto input_index = input_node_state.input_slots.get_slot_index(input_slot_).value();
+    auto input_node_state = get_node_state(input_node_);
+    CHECK_RESULT_RETURN(input_node_state)
+    const auto input_index = input_node_state.unwrap().value().get().input_slots.get_slot_index(input_slot_);
+    if (!input_index.has_value()) {
+        return {RenderGraphError::InvalidOutputNodeSlot};
+    }
 
     auto edge = Edge::from_slot_edge({
-        input_node_id,
-        input_index,
-        output_node_id,
-        output_index,
+        input_node_id.unwrap(),
+        input_index.value(),
+        output_node_id.unwrap(),
+        output_index.value(),
     });
 
     auto error = validate_edge(edge, EdgeExistence::DoesNotExist);
-    if (error != RenderGraphError::None) {
-        abort();
-    }
+    CHECK_RESULT_RETURN(error)
 
-    auto output_node = get_node_state_mut(NodeLabel::from_id(output_node_id)).first.value();
-    error = output_node.get().edges.add_output_edge(edge);
-    if (error != RenderGraphError::None) {
-        abort();
-    }
+    auto output_node = get_node_state_mut(NodeLabel::from_id(output_node_id.unwrap()));
+    CHECK_RESULT_RETURN(output_node)
+    error = output_node.unwrap().value().get().edges.add_output_edge(edge);
+    CHECK_RESULT_RETURN(error)
 
-    auto input_node = get_node_state_mut(NodeLabel::from_id(input_node_id)).first.value();
-    error = input_node.get().edges.add_input_edge(edge);
-    if (error != RenderGraphError::None) {
-        abort();
-    }
+    auto input_node = get_node_state_mut(NodeLabel::from_id(input_node_id.unwrap()));
+    CHECK_RESULT_RETURN(input_node)
+    error = input_node.unwrap().value().get().edges.add_input_edge(edge);
+    CHECK_RESULT_RETURN(error)
 
-    return RenderGraphError::None;
+    return {0};
 }
 
 void RenderGraph::add_slot_edge(const NodeLabel& output_node,
                                 const SlotLabel& output_slot,
                                 const NodeLabel& input_node,
                                 const SlotLabel& input_slot) {
-    auto error = try_add_slot_edge(output_node, output_slot, input_node, input_slot);
-    if (error != RenderGraphError::None) {
-        abort();
-    }
+    try_add_slot_edge(output_node, output_slot, input_node, input_slot).unwrap();
 }
 
-RenderGraphError RenderGraph::try_add_node_edge(const NodeLabel& output_node_, const NodeLabel& input_node_) {
-    auto output_node_id = get_node_id(output_node_).first.value();
-    auto input_node_id = get_node_id(input_node_).first.value();
+Result<int, RenderGraphError> RenderGraph::try_add_node_edge(const NodeLabel& output_node_,
+                                                             const NodeLabel& input_node_) {
+    auto output_node_id = get_node_id(output_node_);
+    CHECK_RESULT_RETURN(output_node_id)
+    auto input_node_id = get_node_id(input_node_);
+    CHECK_RESULT_RETURN(input_node_id)
 
-    auto edge = Edge::from_node_edge({input_node_id, output_node_id});
+    auto edge = Edge::from_node_edge({input_node_id.unwrap(), output_node_id.unwrap()});
 
     auto error = validate_edge(edge, EdgeExistence::DoesNotExist);
-    if (error != RenderGraphError::None) {
-        abort();
-    }
+    CHECK_RESULT_RETURN(error)
 
-    auto output_node = get_node_state_mut(NodeLabel::from_id(output_node_id)).first.value();
-    error = output_node.get().edges.add_output_edge(edge);
-    if (error != RenderGraphError::None) {
-        abort();
-    }
+    auto output_node = get_node_state_mut(NodeLabel::from_id(output_node_id.unwrap()));
+    CHECK_RESULT_RETURN(output_node)
 
-    auto input_node = get_node_state_mut(NodeLabel::from_id(input_node_id)).first.value();
-    error = input_node.get().edges.add_input_edge(edge);
-    if (error != RenderGraphError::None) {
-        abort();
-    }
+    error = output_node.unwrap().value().get().edges.add_output_edge(edge);
+    CHECK_RESULT_RETURN(error)
 
-    return RenderGraphError::None;
+    auto input_node = get_node_state_mut(NodeLabel::from_id(input_node_id.unwrap()));
+    CHECK_RESULT_RETURN(input_node)
+    error = input_node.unwrap().value().get().edges.add_input_edge(edge);
+    CHECK_RESULT_RETURN(error)
+
+    return {0};
 }
 
 void RenderGraph::add_node_edge(const NodeLabel& output_node_, const NodeLabel& input_node_) {
-    auto error = try_add_node_edge(output_node_, input_node_);
-    if (error != RenderGraphError::None) {
-        abort();
-    }
+    try_add_node_edge(output_node_, input_node_).unwrap();
 }
 
 std::optional<std::reference_wrapper<const NodeState>> RenderGraph::get_input_node() const {
     if (_input_node.has_value()) {
-        return get_node_state(NodeLabel::from_id(_input_node.value())).first;
+        return get_node_state(NodeLabel::from_id(_input_node.value())).unwrap();
     }
 
     return {};
@@ -397,14 +387,14 @@ std::optional<std::reference_wrapper<RenderGraph>> RenderGraph::get_sub_graph_mu
 
 /// Checks whether the `edge` already exists in the graph.
 bool RenderGraph::has_edge(const Edge& edge) const {
-    auto output_node_state = get_node_state(NodeLabel::from_id(edge.get_output_node())).first;
-    auto input_node_state = get_node_state(NodeLabel::from_id(edge.get_input_node())).first;
+    auto output_node_state = get_node_state(NodeLabel::from_id(edge.get_output_node()));
+    auto input_node_state = get_node_state(NodeLabel::from_id(edge.get_input_node()));
 
-    if (output_node_state.has_value()) {
-        auto& output_edges = output_node_state.value().get().edges.output_edges;
+    if (output_node_state.is_ok()) {
+        auto& output_edges = output_node_state.unwrap().value().get().edges.output_edges;
         if (std::find(output_edges.begin(), output_edges.end(), edge) != output_edges.end()) {
-            if (input_node_state.has_value()) {
-                auto& input_edges = input_node_state.value().get().edges.input_edges;
+            if (input_node_state.is_ok()) {
+                auto& input_edges = input_node_state.unwrap().value().get().edges.input_edges;
                 if (std::find(input_edges.begin(), input_edges.end(), edge) != input_edges.end()) {
                     return true;
                 }
@@ -415,32 +405,36 @@ bool RenderGraph::has_edge(const Edge& edge) const {
     return false;
 }
 
-RenderGraphError RenderGraph::validate_edge(const Edge& edge, EdgeExistence should_exist) {
+Result<int, RenderGraphError> RenderGraph::validate_edge(const Edge& edge, EdgeExistence should_exist) {
     if (should_exist == EdgeExistence::Exists && !has_edge(edge)) {
-        return RenderGraphError::EdgeDoesNotExist;
+        return {RenderGraphError::EdgeDoesNotExist};
     } else if (should_exist == EdgeExistence::DoesNotExist && has_edge(edge)) {
-        return RenderGraphError::EdgeAlreadyExists;
+        return {RenderGraphError::EdgeAlreadyExists};
     }
 
     switch (edge.type) {
         case Edge::Type::SlotEdge: {
             auto& slot_edge = edge.slot_edge.value();
 
-            auto& output_node_state = get_node_state(NodeLabel::from_id(slot_edge.output_node)).first.value().get();
-            auto& input_node_state = get_node_state(NodeLabel::from_id(slot_edge.input_node)).first.value().get();
+            auto output_node_state = get_node_state(NodeLabel::from_id(slot_edge.output_node));
+            CHECK_RESULT_RETURN(output_node_state)
+            auto input_node_state = get_node_state(NodeLabel::from_id(slot_edge.input_node));
+            CHECK_RESULT_RETURN(input_node_state)
 
-            auto output_slot = output_node_state.output_slots.get_slot(SlotLabel::from_index(slot_edge.output_index));
+            auto output_slot = output_node_state.unwrap().value().get().output_slots.get_slot(
+                SlotLabel::from_index(slot_edge.output_index));
             if (!output_slot.has_value()) {
-                return RenderGraphError::InvalidOutputNodeSlot;
+                return {RenderGraphError::InvalidOutputNodeSlot};
             }
 
-            auto input_slot = input_node_state.input_slots.get_slot(SlotLabel::from_index(slot_edge.input_index));
+            auto input_slot = input_node_state.unwrap().value().get().input_slots.get_slot(
+                SlotLabel::from_index(slot_edge.input_index));
             if (!input_slot.has_value()) {
-                return RenderGraphError::InvalidInputNodeSlot;
+                return {RenderGraphError::InvalidInputNodeSlot};
             }
 
             NodeId current_output_node;
-            auto& input_edges = input_node_state.edges.input_edges;
+            auto& input_edges = input_node_state.unwrap().value().get().edges.input_edges;
             auto iter = input_edges.begin();
 
             bool found = false;
@@ -453,37 +447,19 @@ RenderGraphError RenderGraph::validate_edge(const Edge& edge, EdgeExistence shou
 
             if (found) {
                 if (should_exist == EdgeExistence::DoesNotExist) {
-                    return RenderGraphError::NodeInputSlotAlreadyOccupied;
+                    return {RenderGraphError::NodeInputSlotAlreadyOccupied};
                 }
             }
 
             if (output_slot.value().slot_type != input_slot.value().slot_type) {
-                return RenderGraphError::MismatchedNodeSlots;
+                return {RenderGraphError::MismatchedNodeSlots};
             }
         }
         case Edge::Type::NodeEdge: { /* Nothing to validate here */
         } break;
     }
 
-    return RenderGraphError::None;
-}
-
-NodeId RenderGraph::add_node(std::string name, const std::shared_ptr<Node>& node) {
-    auto id = NodeId();
-    auto node_state = NodeState::from_node(id, node);
-    node_state.name = std::make_optional(name);
-    _nodes[id] = node_state;
-    _node_names[name] = id;
-    return id;
-}
-
-Result<std::shared_ptr<Node>, RenderGraphError> RenderGraph::get_node(const NodeLabel& label) {
-    auto node_state = get_node_state(label);
-    if (node_state.first.has_value()) {
-        return {node_state.first.value().get().node};
-    } else {
-        return {node_state.second};
-    }
+    return {true};
 }
 
 #define FLINT_TEST
@@ -531,10 +507,9 @@ std::set<NodeId> input_nodes(const std::string& name, const RenderGraph& graph) 
     std::set<NodeId> nodes;
 
     auto inputs = graph.iter_node_inputs(NodeLabel::from_name(name));
-    if (inputs.has_value()) {
-        for (auto& p : *inputs) {
-            nodes.insert(p.second.get().id);
-        }
+
+    for (auto& p : inputs.unwrap()) {
+        nodes.insert(p.second.get().id);
     }
 
     return nodes;
@@ -544,10 +519,9 @@ std::set<NodeId> output_nodes(const std::string& name, const RenderGraph& graph)
     std::set<NodeId> nodes;
 
     auto outputs = graph.iter_node_outputs(NodeLabel::from_name(name));
-    if (outputs.has_value()) {
-        for (auto& p : *outputs) {
-            nodes.insert(p.second.get().id);
-        }
+
+    for (auto& p : outputs.unwrap()) {
+        nodes.insert(p.second.get().id);
     }
 
     return nodes;
@@ -594,10 +568,10 @@ void test_get_node_typed() {
 
     graph.add_node("A", std::make_shared<MyNode>(42));
 
-    auto node = graph.get_node(NodeLabel::from_name("A")).unwrap();
-    assert(((MyNode*)node.get())->value == 42 && "node value matches");
+    auto node = graph.get_node<MyNode>(NodeLabel::from_name("A")).unwrap();
+    assert(node->value == 42 && "node value matches");
 
-    auto result = graph.get_node(NodeLabel::from_name("A"));
+    auto result = graph.get_node<TestNode>(NodeLabel::from_name("A"));
     assert(result.error() == RenderGraphError::WrongNodeType && "expect a wrong node type error");
 }
 
@@ -613,7 +587,8 @@ void test_slot_already_occupied() {
     assert(graph.try_add_slot_edge(NodeLabel::from_name("B"),
                                    SlotLabel::from_index(0),
                                    NodeLabel::from_name("C"),
-                                   SlotLabel::from_index(0)) == RenderGraphError::None &&
+                                   SlotLabel::from_index(0))
+                   .error() == RenderGraphError::NodeInputSlotAlreadyOccupied &&
            "Adding to a slot that is already occupied should return an error");
 }
 
@@ -628,7 +603,8 @@ void test_edge_already_exists() {
     assert(graph.try_add_slot_edge(NodeLabel::from_name("A"),
                                    SlotLabel::from_index(0),
                                    NodeLabel::from_name("B"),
-                                   SlotLabel::from_index(0)) == RenderGraphError::EdgeAlreadyExists &&
+                                   SlotLabel::from_index(0))
+                   .error() == RenderGraphError::EdgeAlreadyExists &&
            "Adding to a duplicate edge should return an error");
 }
 
@@ -655,6 +631,7 @@ void run_graph_tests() {
     test_get_node_typed();
     test_slot_already_occupied();
     test_edge_already_exists();
+    std::cout << "Graph tests passed." << std::endl;
 }
 #endif
 
