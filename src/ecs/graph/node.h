@@ -4,6 +4,8 @@
 #include <cassert>
 #include <utility>
 
+#include "utils.h"
+
 #define NOMINMAX
 #define UUID_SYSTEM_GENERATOR
 #include <uuid.h>
@@ -89,7 +91,7 @@ public:
     /// Runs the graph node logic, issues draw calls, updates the output slots and
     /// optionally queues up subgraphs for execution. The graph data, input and output values are
     /// passed via the [`RenderGraphContext`].
-    virtual NodeRunError run(const RenderGraphContext& graph, RenderContext& render_context) const;
+    virtual Result<int, NodeRunError> run(const RenderGraphContext& graph, RenderContext& render_context) const;
 };
 
 } // namespace Flint::Ecs

@@ -1,7 +1,5 @@
 #include "node.h"
 
-#include "graph.h"
-
 namespace Flint::Ecs {
 
 NodeId::NodeId() {
@@ -22,8 +20,8 @@ std::vector<SlotInfo> Node::output() const {
 void Node::update() {
 }
 
-NodeRunError Node::run(const RenderGraphContext& graph, RenderContext& render_context) const {
-    return NodeRunError::None;
+Result<int, NodeRunError> Node::run(const RenderGraphContext& graph, RenderContext& render_context) const {
+    return {NodeRunError::None};
 }
 
 } // namespace Flint::Ecs

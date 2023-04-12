@@ -146,7 +146,10 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
                 context.view_entity = view_entity;
             }
 
-            { node_state.get().node->run(context, render_context); }
+            auto node_res = node_state.get().node->run(context, render_context);
+            if (!node_res.is_ok()) {
+                return {RenderGraphRunnerError::NodeRunError};
+            }
 
             for (auto& run_sub_graph : context.run_sub_graphs) {
                 auto sub_graph = graph.get_sub_graph(run_sub_graph.name);
@@ -161,7 +164,6 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
                                      render_context,
                                      run_sub_graph.inputs,
                                      run_sub_graph.view_entity);
-
                 CHECK_RESULT_RETURN(res)
             }
         }
@@ -191,7 +193,30 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
     return RenderGraphRunnerError::None;
 }
 
-/// Returns an iterator over the [`NodeStates`](NodeState).
+void RenderGraph::update() {
+    // Update nodes in this graph.
+    // NB: val in the loop is a copy, so we have to access
+    // the map element using the key.
+    for (auto& [key, val] : _nodes) {
+        _nodes[key].node->update();
+    }
+
+    // Update sub graphs.
+    // NB: val in the loop is a copy, so we have to access
+    // the map element using the key.
+    for (auto& [key, val] : _sub_graphs) {
+        _sub_graphs[key].update();
+    }
+}
+
+NodeId RenderGraph::set_input(const std::vector<SlotInfo>& inputs) {
+    assert(!_input_node.has_value() && "Graph already has an input node");
+
+    auto id = add_node("GraphInputNode", std::make_shared<GraphInputNode>(inputs));
+    _input_node = std::make_optional(id);
+    return id;
+}
+
 std::vector<std::reference_wrapper<const NodeState>> RenderGraph::iter_nodes() const {
     std::vector<std::reference_wrapper<const NodeState>> node_states;
 

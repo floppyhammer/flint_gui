@@ -21,12 +21,12 @@ private:
     E _error{};
 
 public:
-    Result(C content) {
+    Result(const C& content) {
         _type = Type::Ok;
         _content = content;
     }
 
-    Result(E error) {
+    Result(const E& error) {
         _type = Type::Error;
         _error = error;
     }
