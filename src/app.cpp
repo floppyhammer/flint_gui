@@ -21,7 +21,7 @@ using namespace Flint;
 
 App::App(Vec2I window_size) {
     // Set logger level.
-    Utils::Logger::set_level(Utils::Logger::Level::VERBOSE);
+    Utils::Logger::set_level(Utils::Logger::Level::Verbose);
 
     tree = std::make_unique<Scene::SceneTree>(window_size);
 }

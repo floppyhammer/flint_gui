@@ -5,27 +5,24 @@
 
 namespace Flint::Ecs {
 
-RenderGraphRunnerError RenderGraphRunner::run(RenderGraph& graph) {
+Result<int, RenderGraphRunnerError> RenderGraphRunner::run(RenderGraph& graph) {
     RenderContext render_context;
 
     // Run the main graph.
-    // Render commands will be fed to the render context.
-    auto error = run_graph(graph, {}, render_context, {}, {});
-
-    if (error != RenderGraphRunnerError::None) {
-        return error;
-    }
+    // Generated render commands will be stored in the render context.
+    auto res = run_graph(graph, {}, render_context, {}, {});
+    CHECK_RESULT_RETURN(res)
 
     // queue.submit(render_context.finish());
 
-    return RenderGraphRunnerError::None;
+    return {0};
 }
 
-RenderGraphRunnerError RenderGraphRunner::run_graph(const RenderGraph& graph,
-                                                    const std::optional<std::string>& graph_name,
-                                                    RenderContext& render_context,
-                                                    const std::vector<SlotValue>& _inputs,
-                                                    const std::optional<entt::entity> view_entity) {
+Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGraph& graph,
+                                                                 const std::optional<std::string>& graph_name,
+                                                                 RenderContext& render_context,
+                                                                 const std::vector<SlotValue>& _inputs,
+                                                                 const std::optional<entt::entity> view_entity) {
     std::map<NodeId, std::vector<SlotValue>> node_outputs;
 
     // Queue up nodes without inputs, which can be run immediately.
@@ -49,13 +46,11 @@ RenderGraphRunnerError RenderGraphRunner::run_graph(const RenderGraph& graph,
             if (i < _inputs.size()) {
                 auto& input_value = _inputs[i];
                 if (input_slot.slot_type != input_value.type) {
-                    // Mismatched input slot type.
-                    abort();
+                    return {RenderGraphRunnerError::MismatchedInputSlotType};
                 }
                 input_values.push_back(input_value);
             } else {
-                // Missing input.
-                abort();
+                return {RenderGraphRunnerError::MissingInput};
             }
         }
 
@@ -85,44 +80,44 @@ RenderGraphRunnerError RenderGraphRunner::run_graph(const RenderGraph& graph,
 
         // Check if all dependencies have finished running.
         auto node_inputs = graph.iter_node_inputs(NodeLabel::from_id(node_state.get().id));
-        if (node_inputs.is_ok()) {
-            for (auto& p : node_inputs.unwrap()) {
-                auto& edge = p.first;
-                auto& input_node = p.second;
+        if (!node_inputs.is_ok()) {
+            // Expect the node is in graph.
+            abort();
+        }
 
-                switch (edge.type) {
-                    case Edge::Type::SlotEdge: {
-                        auto output_index = edge.slot_edge->output_index;
-                        auto input_index = edge.slot_edge->input_index;
+        for (auto& p : node_inputs.unwrap()) {
+            auto& edge = p.first;
+            auto& input_node = p.second;
 
-                        if (node_outputs.find(input_node.get().id) != node_outputs.end()) {
-                            auto& outputs = node_outputs[input_node.get().id];
-                            slot_indices_and_inputs.emplace_back(input_index, outputs[output_index]);
-                        } else {
-                            node_queue.insert(node_queue.begin(), node_state);
+            switch (edge.type) {
+                case Edge::Type::SlotEdge: {
+                    auto output_index = edge.slot_edge->output_index;
+                    auto input_index = edge.slot_edge->input_index;
 
-                            // Continue the outermost while loop.
-                            continue_while_loop = true;
-                            break;
-                        }
+                    if (node_outputs.find(input_node.get().id) != node_outputs.end()) {
+                        auto& outputs = node_outputs[input_node.get().id];
+                        slot_indices_and_inputs.emplace_back(input_index, outputs[output_index]);
+                    } else {
+                        node_queue.insert(node_queue.begin(), node_state);
+
+                        // Continue the outermost while loop.
+                        continue_while_loop = true;
+                        break;
                     }
-                    case Edge::Type::NodeEdge: {
-                        if (node_outputs.find(input_node.get().id) == node_outputs.end()) {
-                            node_queue.insert(node_queue.begin(), node_state);
-                            // Continue the outermost while loop.
-                            continue_while_loop = true;
-                            break;
-                        }
+                }
+                case Edge::Type::NodeEdge: {
+                    if (node_outputs.find(input_node.get().id) == node_outputs.end()) {
+                        node_queue.insert(node_queue.begin(), node_state);
+                        // Continue the outermost while loop.
+                        continue_while_loop = true;
+                        break;
                     }
                 }
             }
+        }
 
-            if (continue_while_loop) {
-                continue;
-            }
-        } else {
-            // Expect the node is in graph.
-            abort();
+        if (continue_while_loop) {
+            continue;
         }
 
         struct by_key {
@@ -140,8 +135,7 @@ RenderGraphRunnerError RenderGraphRunner::run_graph(const RenderGraph& graph,
         }
 
         if (inputs.size() != node_state.get().input_slots.slots.size()) {
-            // Mismatched input count.
-            abort();
+            return {RenderGraphRunnerError::MismatchedInputCount};
         }
 
         std::vector<std::optional<SlotValue>> outputs(node_state.get().output_slots.slots.size());
@@ -162,15 +156,13 @@ RenderGraphRunnerError RenderGraphRunner::run_graph(const RenderGraph& graph,
                     abort();
                 }
 
-                auto error = run_graph(sub_graph.value(),
-                                       std::make_optional(run_sub_graph.name),
-                                       render_context,
-                                       run_sub_graph.inputs,
-                                       run_sub_graph.view_entity);
+                auto res = run_graph(sub_graph.value(),
+                                     std::make_optional(run_sub_graph.name),
+                                     render_context,
+                                     run_sub_graph.inputs,
+                                     run_sub_graph.view_entity);
 
-                if (error != RenderGraphRunnerError::None) {
-                    return error;
-                }
+                CHECK_RESULT_RETURN(res)
             }
         }
 
@@ -307,18 +299,18 @@ Result<int, RenderGraphError> RenderGraph::try_add_slot_edge(const NodeLabel& ou
         output_index.value(),
     });
 
-    auto error = validate_edge(edge, EdgeExistence::DoesNotExist);
-    CHECK_RESULT_RETURN(error)
+    auto res = validate_edge(edge, EdgeExistence::DoesNotExist);
+    CHECK_RESULT_RETURN(res)
 
     auto output_node = get_node_state_mut(NodeLabel::from_id(output_node_id.unwrap()));
     CHECK_RESULT_RETURN(output_node)
-    error = output_node.unwrap().value().get().edges.add_output_edge(edge);
-    CHECK_RESULT_RETURN(error)
+    res = output_node.unwrap().value().get().edges.add_output_edge(edge);
+    CHECK_RESULT_RETURN(res)
 
     auto input_node = get_node_state_mut(NodeLabel::from_id(input_node_id.unwrap()));
     CHECK_RESULT_RETURN(input_node)
-    error = input_node.unwrap().value().get().edges.add_input_edge(edge);
-    CHECK_RESULT_RETURN(error)
+    res = input_node.unwrap().value().get().edges.add_input_edge(edge);
+    CHECK_RESULT_RETURN(res)
 
     return {0};
 }
@@ -339,19 +331,19 @@ Result<int, RenderGraphError> RenderGraph::try_add_node_edge(const NodeLabel& ou
 
     auto edge = Edge::from_node_edge({input_node_id.unwrap(), output_node_id.unwrap()});
 
-    auto error = validate_edge(edge, EdgeExistence::DoesNotExist);
-    CHECK_RESULT_RETURN(error)
+    auto res = validate_edge(edge, EdgeExistence::DoesNotExist);
+    CHECK_RESULT_RETURN(res)
 
     auto output_node = get_node_state_mut(NodeLabel::from_id(output_node_id.unwrap()));
     CHECK_RESULT_RETURN(output_node)
 
-    error = output_node.unwrap().value().get().edges.add_output_edge(edge);
-    CHECK_RESULT_RETURN(error)
+    res = output_node.unwrap().value().get().edges.add_output_edge(edge);
+    CHECK_RESULT_RETURN(res)
 
     auto input_node = get_node_state_mut(NodeLabel::from_id(input_node_id.unwrap()));
     CHECK_RESULT_RETURN(input_node)
-    error = input_node.unwrap().value().get().edges.add_input_edge(edge);
-    CHECK_RESULT_RETURN(error)
+    res = input_node.unwrap().value().get().edges.add_input_edge(edge);
+    CHECK_RESULT_RETURN(res)
 
     return {0};
 }

@@ -238,7 +238,7 @@ public:
     /// checks that slot edges are connected correctly.
     Result<int, RenderGraphError> validate_edge(const Edge& edge, EdgeExistence should_exist);
 
-    bool RenderGraph::has_edge(const Edge& edge) const;
+    bool has_edge(const Edge& edge) const;
 };
 
 enum class RenderGraphRunnerError {
@@ -251,14 +251,14 @@ enum class RenderGraphRunnerError {
 };
 
 struct RenderGraphRunner {
-    RenderGraphRunnerError run(RenderGraph& graph);
+    Result<int, RenderGraphRunnerError> run(RenderGraph& graph);
 
     /// Run a graph.
-    RenderGraphRunnerError run_graph(const RenderGraph& graph,
-                                     const std::optional<std::string>& graph_name,
-                                     RenderContext& render_context,
-                                     const std::vector<SlotValue>& inputs,
-                                     const std::optional<entt::entity> view_entity);
+    Result<int, RenderGraphRunnerError> run_graph(const RenderGraph& graph,
+                                                  const std::optional<std::string>& graph_name,
+                                                  RenderContext& render_context,
+                                                  const std::vector<SlotValue>& inputs,
+                                                  const std::optional<entt::entity> view_entity);
 };
 
 /// A command that signals the graph runner to run the sub graph corresponding to the `name`

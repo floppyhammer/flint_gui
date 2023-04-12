@@ -74,9 +74,9 @@ struct Edge {
     inline bool operator==(const Edge& rhs) const {
         if (type == rhs.type) {
             if (type == Type::SlotEdge) {
-                return *slot_edge == *rhs.slot_edge;
+                return slot_edge.value() == rhs.slot_edge.value();
             } else {
-                return *node_edge == *rhs.node_edge;
+                return node_edge.value() == rhs.node_edge.value();
             }
         }
         return false;

@@ -4,6 +4,10 @@
 #include <cassert>
 #include <utility>
 
+#define NOMINMAX
+#define UUID_SYSTEM_GENERATOR
+#include <uuid.h>
+
 #include "slot.h"
 
 namespace Flint::Ecs {
@@ -23,13 +27,9 @@ enum class NodeRunError {
 };
 
 struct NodeId {
-    uint64_t v;
-    static uint64_t counter;
+    uuids::uuid v;
 
-    NodeId() {
-        v = NodeId::counter;
-        NodeId::counter++;
-    }
+    NodeId();
 
     // For hashing.
     inline bool operator<(const NodeId& rhs) const {

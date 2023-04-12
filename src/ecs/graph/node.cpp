@@ -4,7 +4,12 @@
 
 namespace Flint::Ecs {
 
-uint64_t NodeId::counter = 0;
+NodeId::NodeId() {
+    v = uuids::uuid_system_generator{}();
+    assert(!v.is_nil());
+    assert(v.version() == uuids::uuid_version::random_number_based);
+    assert(v.variant() == uuids::uuid_variant::rfc);
+}
 
 std::vector<SlotInfo> Node::input() const {
     return {};
