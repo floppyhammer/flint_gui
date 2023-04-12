@@ -13,7 +13,7 @@ using std::vector;
 namespace Flint {
 
 VectorTexture::VectorTexture(Vec2I _size) {
-    type = TextureType::VECTOR;
+    type = TextureType::Vector;
 
     size = _size;
 }

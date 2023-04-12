@@ -13,7 +13,7 @@
 namespace Flint {
 
 ImageTexture::ImageTexture() {
-    type = TextureType::IMAGE;
+    type = TextureType::Image;
 }
 
 ImageTexture::~ImageTexture() {
@@ -146,7 +146,7 @@ void ImageTexture::set_filter(VkFilter filter) {
 }
 
 ImageTexture::ImageTexture(const std::string &path) : Texture(path) {
-    type = TextureType::IMAGE;
+    type = TextureType::Image;
 
     // The STBI_rgb_alpha value forces the image to be loaded with an alpha channel,
     // even if it doesn't have one, which is nice for consistency with other textures in the future.

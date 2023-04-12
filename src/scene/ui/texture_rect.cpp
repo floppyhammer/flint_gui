@@ -96,7 +96,7 @@ void TextureRect::draw() {
         auto vector_server = VectorServer::get_singleton();
 
         // Image texture.
-        if (texture->get_type() == TextureType::IMAGE) {
+        if (texture->get_type() == TextureType::Image) {
             auto image_texture = static_cast<ImageTexture *>(texture.get());
             vector_server->draw_image_texture(*image_texture, transform);
         }

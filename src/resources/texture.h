@@ -7,10 +7,10 @@
 namespace Flint {
 
 enum class TextureType {
-    IMAGE,
-    VECTOR,
-    CUBE,
-    MAX,
+    Image,
+    Vector,
+    Cube,
+    Max,
 };
 
 /// A texture's layout is always SHADER_READ_ONLY.
@@ -25,7 +25,7 @@ public:
     TextureType get_type();
 
 protected:
-    TextureType type = TextureType::MAX;
+    TextureType type = TextureType::Max;
 
     Vec2I size;
 };
