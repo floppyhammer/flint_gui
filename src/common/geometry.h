@@ -2,10 +2,10 @@
 #define FLINT_GEOMETRY_H
 
 #include <pathfinder.h>
-#include <pathfinder-cpp/src/common/math/mat4x4.h>
 
 using Pathfinder::ColorF;
 using Pathfinder::ColorU;
+using Pathfinder::Range;
 using Pathfinder::Transform2;
 using Pathfinder::Vec2F;
 using Pathfinder::Vec2I;

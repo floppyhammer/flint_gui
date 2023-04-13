@@ -3,7 +3,7 @@
 #include <random>
 #include <stdexcept>
 
-#include "../../src/ecs/graph/graph.h"
+#include "../../src/ecs/render_graph/graph.h"
 #include "app.h"
 
 using namespace Flint;

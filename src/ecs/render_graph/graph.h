@@ -196,21 +196,7 @@ public:
     ///
     /// Defining an edge that already exists is not considered an error with this api.
     /// It simply won't create a new edge.
-    void add_node_edges(std::vector<std::string> edges) {
-        if (edges.size() < 2) {
-            return;
-        }
-        for (int i = 0; (i + 1) < edges.size(); i++) {
-            auto res = try_add_node_edge(NodeLabel::from_name(edges[i]), NodeLabel::from_name(edges[i + 1]));
-            // Already existing edges are very easy to produce with this api
-            // and shouldn't cause a panic.
-            if (!res.is_ok()) {
-                if (res.error() != RenderGraphError::EdgeAlreadyExists) {
-                    abort();
-                }
-            }
-        }
-    }
+    void add_node_edges(std::vector<std::string> edges);
 
     /// Returns the [`NodeState`] of the input node of this graph.
     ///
@@ -241,14 +227,15 @@ enum class RenderGraphRunnerError {
 };
 
 struct RenderGraphRunner {
-    Result<int, RenderGraphRunnerError> run(RenderGraph& graph);
+    Result<int, RenderGraphRunnerError> run(RenderGraph& graph, const World& world);
 
     /// Run a graph.
     Result<int, RenderGraphRunnerError> run_graph(const RenderGraph& graph,
                                                   const std::optional<std::string>& graph_name,
                                                   RenderContext& render_context,
+                                                  const World& world,
                                                   const std::vector<SlotValue>& inputs,
-                                                  const std::optional<entt::entity> view_entity);
+                                                  const std::optional<entt::entity>& view_entity);
 };
 
 void run_graph_tests();

@@ -18,6 +18,8 @@ struct RenderGraphContext;
 
 struct RenderContext;
 
+class World;
+
 enum class NodeRunError {
     None,
     // Encountered an input slot error.
@@ -91,7 +93,9 @@ public:
     /// Runs the graph node logic, issues draw calls, updates the output slots and
     /// optionally queues up subgraphs for execution. The graph data, input and output values are
     /// passed via the [`RenderGraphContext`].
-    virtual Result<int, NodeRunError> run(const RenderGraphContext& graph, RenderContext& render_context) const;
+    virtual Result<int, NodeRunError> run(const RenderGraphContext& graph,
+                                          RenderContext& render_context,
+                                          const World& world) const;
 };
 
 } // namespace Flint::Ecs

@@ -34,9 +34,9 @@ public:
     void add_system() {
     }
 
-private:
     entt::registry registry;
 
+private:
     entt::organizer physics_organizer;
     entt::organizer render_organizer;
 };

@@ -5,12 +5,12 @@
 
 namespace Flint::Ecs {
 
-Result<int, RenderGraphRunnerError> RenderGraphRunner::run(RenderGraph& graph) {
+Result<int, RenderGraphRunnerError> RenderGraphRunner::run(RenderGraph& graph, const World& world) {
     RenderContext render_context;
 
     // Run the main graph.
     // Generated render commands will be stored in the render context.
-    auto res = run_graph(graph, {}, render_context, {}, {});
+    auto res = run_graph(graph, {}, render_context, world, {}, {});
     CHECK_RESULT_RETURN(res)
 
     // queue.submit(render_context.finish());
@@ -21,8 +21,9 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run(RenderGraph& graph) {
 Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGraph& graph,
                                                                  const std::optional<std::string>& graph_name,
                                                                  RenderContext& render_context,
+                                                                 const World& world,
                                                                  const std::vector<SlotValue>& inputs,
-                                                                 const std::optional<entt::entity> view_entity) {
+                                                                 const std::optional<entt::entity>& view_entity) {
     std::map<NodeId, std::vector<SlotValue>> node_outputs;
 
     // Queue up nodes without inputs, which can be run immediately.
@@ -152,7 +153,7 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
                 context.view_entity = view_entity;
             }
 
-            auto node_res = node_state.get().node->run(context, render_context);
+            auto node_res = node_state.get().node->run(context, render_context, world);
             if (!node_res.is_ok()) {
                 return {RenderGraphRunnerError::NodeRunError};
             }
@@ -168,6 +169,7 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
                 auto res = run_graph(sub_graph.value(),
                                      std::make_optional(run_sub_graph.name),
                                      render_context,
+                                     world,
                                      run_sub_graph.inputs,
                                      run_sub_graph.view_entity);
                 CHECK_RESULT_RETURN(res)
@@ -381,6 +383,22 @@ Result<int, RenderGraphError> RenderGraph::try_add_node_edge(const NodeLabel& ou
 
 void RenderGraph::add_node_edge(const NodeLabel& output_node_, const NodeLabel& input_node_) {
     try_add_node_edge(output_node_, input_node_).unwrap();
+}
+
+void RenderGraph::add_node_edges(std::vector<std::string> edges) {
+    if (edges.size() < 2) {
+        return;
+    }
+    for (int i = 0; (i + 1) < edges.size(); i++) {
+        auto res = try_add_node_edge(NodeLabel::from_name(edges[i]), NodeLabel::from_name(edges[i + 1]));
+        // Already existing edges are very easy to produce with this api
+        // and shouldn't cause a panic.
+        if (!res.is_ok()) {
+            if (res.error() != RenderGraphError::EdgeAlreadyExists) {
+                abort();
+            }
+        }
+    }
 }
 
 std::optional<std::reference_wrapper<const NodeState>> RenderGraph::get_input_node() const {

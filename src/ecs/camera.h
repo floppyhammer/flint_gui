@@ -113,6 +113,20 @@ struct C_Camera {
     bool msaa_writeback;
 };
 
+struct C_ExtractedCamera {
+    //    pub target: Option<NormalizedRenderTarget>,
+    std::optional<Vec2I> physical_viewport_size;
+    std::optional<Vec2I> physical_target_size;
+    std::optional<Viewport> viewport;
+    std::string render_graph;
+    int32_t order;
+    size_t sorted_camera_index_for_target;
+};
+
+struct C_Camera2d {
+    ColorU clear_color;
+};
+
 } // namespace Flint::Ecs
 
 #endif // FLINT_ECS_RENDER_H
