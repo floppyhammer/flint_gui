@@ -21,7 +21,7 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run(RenderGraph& graph) {
 Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGraph& graph,
                                                                  const std::optional<std::string>& graph_name,
                                                                  RenderContext& render_context,
-                                                                 const std::vector<SlotValue>& _inputs,
+                                                                 const std::vector<SlotValue>& inputs,
                                                                  const std::optional<entt::entity> view_entity) {
     std::map<NodeId, std::vector<SlotValue>> node_outputs;
 
@@ -41,10 +41,10 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
         input_values.reserve(4);
 
         for (int i = 0; i < input_node.get().input_slots.slots.size(); i++) {
-            auto& input_slot = input_node.get().input_slots.slots[i];
+            const auto& input_slot = input_node.get().input_slots.slots[i];
 
-            if (i < _inputs.size()) {
-                auto& input_value = _inputs[i];
+            if (i < inputs.size()) {
+                const auto& input_value = inputs[i];
                 if (input_slot.slot_type != input_value.type) {
                     return {RenderGraphRunnerError::MismatchedInputSlotType};
                 }
@@ -56,17 +56,19 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
 
         node_outputs[input_node.get().id] = input_values;
 
-        auto output = graph.iter_node_outputs(NodeLabel::from_id(input_node.get().id));
+        const auto output = graph.iter_node_outputs(NodeLabel::from_id(input_node.get().id));
+        if (!output.is_ok()) {
+            // Expect node exists.
+            abort();
+        }
 
-        if (output.is_ok()) {
-            for (auto& pair : output.unwrap()) {
-                node_queue.insert(node_queue.begin(), pair.second);
-            }
+        for (const auto& pair : output.unwrap()) {
+            node_queue.insert(node_queue.begin(), pair.second);
         }
     }
 
     while (!node_queue.empty()) {
-        bool continue_while_loop = false;
+        bool continue_the_while_loop = false;
 
         auto node_state = node_queue.back();
         node_queue.pop_back();
@@ -77,6 +79,7 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
         }
 
         std::vector<std::pair<size_t, SlotValue>> slot_indices_and_inputs;
+        slot_indices_and_inputs.reserve(4);
 
         // Check if all dependencies have finished running.
         auto node_inputs = graph.iter_node_inputs(NodeLabel::from_id(node_state.get().id));
@@ -85,9 +88,9 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
             abort();
         }
 
-        for (auto& p : node_inputs.unwrap()) {
-            auto& edge = p.first;
-            auto& input_node = p.second;
+        for (const auto& p : node_inputs.unwrap()) {
+            const auto& edge = p.first;
+            const auto& input_node = p.second;
 
             switch (edge.type) {
                 case Edge::Type::SlotEdge: {
@@ -95,33 +98,35 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
                     auto input_index = edge.slot_edge->input_index;
 
                     if (node_outputs.find(input_node.get().id) != node_outputs.end()) {
-                        auto& outputs = node_outputs[input_node.get().id];
+                        const auto& outputs = node_outputs[input_node.get().id];
                         slot_indices_and_inputs.emplace_back(input_index, outputs[output_index]);
                     } else {
                         node_queue.insert(node_queue.begin(), node_state);
 
                         // Continue the outermost while loop.
-                        continue_while_loop = true;
-                        break;
+                        continue_the_while_loop = true;
                     }
-                }
+                } break;
                 case Edge::Type::NodeEdge: {
                     if (node_outputs.find(input_node.get().id) == node_outputs.end()) {
                         node_queue.insert(node_queue.begin(), node_state);
-                        // Continue the outermost while loop.
-                        continue_while_loop = true;
-                        break;
+
+                        continue_the_while_loop = true;
                     }
-                }
+                } break;
+            }
+
+            if (continue_the_while_loop) {
+                break;
             }
         }
 
-        if (continue_while_loop) {
+        if (continue_the_while_loop) {
             continue;
         }
 
         struct by_key {
-            bool operator()(std::pair<size_t, SlotValue> const& a, std::pair<size_t, SlotValue> const& b) const {
+            bool operator()(const std::pair<size_t, SlotValue>& a, const std::pair<size_t, SlotValue>& b) const {
                 return a.first < b.first;
             }
         };
@@ -129,18 +134,19 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
         // Construct final sorted input list.
         std::sort(slot_indices_and_inputs.begin(), slot_indices_and_inputs.end(), by_key());
 
-        std::vector<SlotValue> inputs;
-        for (auto& p : slot_indices_and_inputs) {
-            inputs.push_back(p.second);
+        std::vector<SlotValue> inputs2;
+        inputs2.reserve(slot_indices_and_inputs.size());
+        for (const auto& p : slot_indices_and_inputs) {
+            inputs2.push_back(p.second);
         }
 
-        if (inputs.size() != node_state.get().input_slots.slots.size()) {
+        if (inputs2.size() != node_state.get().input_slots.slots.size()) {
             return {RenderGraphRunnerError::MismatchedInputCount};
         }
 
         std::vector<std::optional<SlotValue>> outputs(node_state.get().output_slots.slots.size());
         {
-            auto context = RenderGraphContext{graph, node_state, inputs, outputs};
+            auto context = RenderGraphContext{graph, node_state, inputs2, outputs};
 
             if (view_entity.has_value()) {
                 context.view_entity = view_entity;
@@ -151,8 +157,8 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
                 return {RenderGraphRunnerError::NodeRunError};
             }
 
-            for (auto& run_sub_graph : context.run_sub_graphs) {
-                auto sub_graph = graph.get_sub_graph(run_sub_graph.name);
+            for (const auto& run_sub_graph : context.run_sub_graphs) {
+                const auto& sub_graph = graph.get_sub_graph(run_sub_graph.name);
 
                 if (!sub_graph.has_value()) {
                     // Sub graph should exist because it was validated when queued.
@@ -170,7 +176,7 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
 
         std::vector<SlotValue> values;
         for (int i = 0; i < outputs.size(); i++) {
-            auto& output = outputs[i];
+            const auto& output = outputs[i];
             if (output.has_value()) {
                 values.push_back(output.value());
             } else {
@@ -181,16 +187,16 @@ Result<int, RenderGraphRunnerError> RenderGraphRunner::run_graph(const RenderGra
 
         auto iter_node_outputs = graph.iter_node_outputs(NodeLabel::from_id(node_state.get().id));
         if (iter_node_outputs.is_ok()) {
-            for (auto& p : iter_node_outputs.unwrap()) {
+            for (const auto& p : iter_node_outputs.unwrap()) {
                 node_queue.insert(node_queue.begin(), p.second);
             }
         } else {
-            // Node should exist.
+            // Expect node exists.
             abort();
         }
     }
 
-    return RenderGraphRunnerError::None;
+    return {0};
 }
 
 void RenderGraph::update() {
