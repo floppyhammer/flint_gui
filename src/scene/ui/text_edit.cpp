@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../../common/logger.h"
+#include "../../common/utils.h"
 #include "../window_proxy.h"
 
 namespace Flint::Scene {

@@ -8,7 +8,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "common/logger.h"
+#include "common/utils.h"
 #include "resource.h"
 
 using Pathfinder::ColorU;

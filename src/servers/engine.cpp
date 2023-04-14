@@ -1,6 +1,6 @@
 #include <sstream>
 
-#include "../common/logger.h"
+#include "../common/utils.h"
 #include "engine.h"
 
 namespace Flint {

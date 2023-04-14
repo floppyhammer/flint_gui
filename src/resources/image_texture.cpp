@@ -1,7 +1,7 @@
 #include "image_texture.h"
 
-#include "../common/logger.h"
 #include "../common/macros.h"
+#include "../common/utils.h"
 #include "../servers/display_server.h"
 
 // Already defined in Pathfinder.

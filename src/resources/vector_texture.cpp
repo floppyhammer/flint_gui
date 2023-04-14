@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "../common/load_file.h"
-#include "../common/logger.h"
+#include "../common/utils.h"
 #include "../servers/vector_server.h"
 
 using std::vector;

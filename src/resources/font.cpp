@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "../common/load_file.h"
-#include "../common/logger.h"
+#include "../common/utils.h"
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb/stb_truetype.h>

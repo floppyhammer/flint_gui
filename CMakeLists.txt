@@ -46,11 +46,9 @@ add_subdirectory(external/harfbuzz)
 include_directories(external/glm)
 add_subdirectory(external/glm)
 
-include_directories(third_party/poly2tri)
 add_subdirectory(third_party/poly2tri)
 
-include_directories(third_party/zlib-1.2.13)
-add_subdirectory(third_party/zlib-1.2.13)
+add_subdirectory(third_party/zlib)
 
 include_directories(external/entt/src)
 add_subdirectory(external/entt)

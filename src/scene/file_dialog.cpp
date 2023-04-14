@@ -1,6 +1,6 @@
 #include "file_dialog.h"
 
-#include "../common/logger.h"
+#include "../common/utils.h"
 
 namespace Flint::Scene {
 

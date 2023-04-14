@@ -6,7 +6,7 @@
 
 #include "../servers/engine.h"
 #include "../servers/input_server.h"
-#include "common/logger.h"
+#include "common/utils.h"
 #include "servers/render_server.h"
 
 namespace Flint::Scene {
@@ -140,6 +140,6 @@ protected:
     bool visual_debug = false;
 };
 
-} // namespace Flint
+} // namespace Flint::Scene
 
 #endif // FLINT_NODE_H

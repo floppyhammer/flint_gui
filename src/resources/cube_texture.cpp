@@ -4,7 +4,7 @@
 
 #include <stdexcept>
 
-#include "../common/logger.h"
+#include "../common/utils.h"
 #include "../common/macros.h"
 #include "../servers/display_server.h"
 

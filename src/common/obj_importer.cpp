@@ -2,7 +2,7 @@
 
 #include "../resources/resource_manager.h"
 #include "load_file.h"
-#include "logger.h"
+#include "utils.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader/tiny_obj_loader.h>

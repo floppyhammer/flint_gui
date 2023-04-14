@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-#include "../common/logger.h"
+#include "../common/utils.h"
 #include "../servers/display_server.h"
 #include "../servers/render_server.h"
 
@@ -22,7 +22,6 @@ void Window::init(Vec2I size) {
 
 void Window::create_swapchain_related_resources(VkRenderPass render_pass, VkExtent2D swapchain_extent) {
     auto rs = RenderServer::get_singleton();
-
 }
 
 bool Window::should_close() const {
@@ -87,45 +86,43 @@ void Window::cleanup() {
 }
 
 void Window::cleanup_swapchain_related_resources() const {
-
 }
 
 bool Window::process() {
-//    if (should_close()) {
-//        // Wait on the host for the completion of outstanding queue operations for all queues on a given logical device.
-//        vkDeviceWaitIdle(DisplayServer::get_singleton()->get_device());
-//        return false;
-//    }
-//
-//    //    // Collect input and window events.
-//    //    InputServer::get_singleton()->collect_events();
-//    //
-//    //    // Engine processing.
-//    //    Engine::get_singleton()->tick();
-//    //
-//    //    // Get frame time.
-//    //    auto dt = Engine::get_singleton()->get_delta();
-//
-//    // Acquire next image.
-//    // We should do this before updating the scenes as we need to modify different
-//    // buffers according to the current image index.
-//    uint32_t image_index;
-//    if (!swapchain->acquireSwapChainImage(image_index)) {
-//        Logger::error("Invalid swap chain image index!", "Swap Chain");
-//        return true;
-//    }
-//
-//    //    // Propagate input events.
-//    //    tree->input(InputServer::get_singleton()->input_queue);
-//    //
-//    //    // Update the scene tree.
-//    //    tree->update(dt);
-//
-//    // Record draw calls.
-//    record_commands(swapchain->commandBuffers, image_index);
-//
-//    // Submit commands for drawing.
-//    swapchain->flush(image_index);
+    //    if (should_close()) {
+    //        // Wait on the host for the completion of outstanding queue operations for all queues on a given logical
+    //        device. vkDeviceWaitIdle(DisplayServer::get_singleton()->get_device()); return false;
+    //    }
+    //
+    //    //    // Collect input and window events.
+    //    //    InputServer::get_singleton()->collect_events();
+    //    //
+    //    //    // Engine processing.
+    //    //    Engine::get_singleton()->tick();
+    //    //
+    //    //    // Get frame time.
+    //    //    auto dt = Engine::get_singleton()->get_delta();
+    //
+    //    // Acquire next image.
+    //    // We should do this before updating the scenes as we need to modify different
+    //    // buffers according to the current image index.
+    //    uint32_t image_index;
+    //    if (!swapchain->acquireSwapChainImage(image_index)) {
+    //        Logger::error("Invalid swap chain image index!", "Swap Chain");
+    //        return true;
+    //    }
+    //
+    //    //    // Propagate input events.
+    //    //    tree->input(InputServer::get_singleton()->input_queue);
+    //    //
+    //    //    // Update the scene tree.
+    //    //    tree->update(dt);
+    //
+    //    // Record draw calls.
+    //    record_commands(swapchain->commandBuffers, image_index);
+    //
+    //    // Submit commands for drawing.
+    //    swapchain->flush(image_index);
 
     return true;
 }

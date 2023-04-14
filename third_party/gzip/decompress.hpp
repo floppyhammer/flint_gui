@@ -1,7 +1,7 @@
 #include <gzip/config.hpp>
 
 // zlib
-#include <zlib.h>
+#include <zlib/zlib.h>
 
 // std
 #include <limits>

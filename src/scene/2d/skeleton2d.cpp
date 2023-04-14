@@ -1,13 +1,13 @@
 #include "skeleton2d.h"
 
-#include <poly2tri.h>
+#include <poly2tri/poly2tri.h>
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "../../common/geometry.h"
-#include "../../common/logger.h"
+#include "../../common/utils.h"
 #include "../../render/mvp.h"
 #include "../../render/swap_chain.h"
 #include "../../resources/resource_manager.h"
@@ -346,7 +346,8 @@ Skeleton2d::Skeleton2d() {
     poolInfo.pPoolSizes = poolSizes.data();
     poolInfo.maxSets = 1;
 
-    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptor_pool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptor_pool) !=
+        VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor pool!");
     }
 
@@ -798,4 +799,4 @@ void Skeleton2d::set_bone_transform(uint32_t bone_index, const Transform2 &p_tra
     bone_transforms[offset + 2] = 0;
     bone_transforms[offset + 3] = p_transform.get_position().y;
 }
-} // namespace Flint
+} // namespace Flint::Scene
