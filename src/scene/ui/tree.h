@@ -12,7 +12,7 @@
 #include "node_ui.h"
 #include "stack_container.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 class TreeItem {
     friend class Tree;

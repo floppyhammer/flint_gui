@@ -5,7 +5,7 @@
 #include "../../resources/mesh.h"
 #include "node3d.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 class Model : public Node3d {
 public:

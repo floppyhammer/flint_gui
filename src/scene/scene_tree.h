@@ -25,7 +25,7 @@
 #include "window_proxy.h"
 #include "world.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 /// Processing order: Input -> Update -> Draw.
 class SceneTree {

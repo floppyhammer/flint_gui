@@ -9,7 +9,7 @@
 #include "scene/window_proxy.h"
 #include "servers/vector_server.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 UiLayer::UiLayer() {
     type = NodeType::UiLayer;

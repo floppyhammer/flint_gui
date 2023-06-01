@@ -14,7 +14,7 @@
 
 using Pathfinder::ColorF;
 
-namespace Flint::Scene {
+namespace Flint {
 
 /// How a GUI node handles mouse input propagation.
 enum class MouseFilter {

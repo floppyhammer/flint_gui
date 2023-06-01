@@ -14,7 +14,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-namespace Flint::Scene {
+namespace Flint {
 
 TextureRect::TextureRect() {
     type = NodeType::TextureRect;

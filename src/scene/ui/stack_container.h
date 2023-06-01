@@ -3,7 +3,7 @@
 
 #include "container.h"
 
-namespace Flint::Scene {
+namespace Flint {
 /// StackContainer is not meant for direct use as a node.
 /// Instead, use HStackContainer/VStackContainer.
 class StackContainer : public Container {

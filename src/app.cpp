@@ -23,14 +23,14 @@ App::App(Vec2I window_size) {
     // Set logger level.
     Utils::Logger::set_level(Utils::Logger::Level::Verbose);
 
-    tree = std::make_unique<Scene::SceneTree>(window_size);
+    tree = std::make_unique<SceneTree>(window_size);
 }
 
 App::~App() {
     cleanup();
 }
 
-Scene::SceneTree* App::get_tree() {
+SceneTree* App::get_tree() {
     return tree.get();
 }
 

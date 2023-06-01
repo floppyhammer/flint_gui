@@ -5,7 +5,7 @@
 #include "../../common/utils.h"
 #include "../window_proxy.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 TextEdit::TextEdit() {
     type = NodeType::TextEdit;
@@ -275,4 +275,4 @@ void TextEdit::delete_selection() {
     current_caret_index = selected_caret_index = start_index - 1;
 }
 
-} // namespace Flint::Scene
+} // namespace Flint

@@ -14,7 +14,7 @@
 #include "../world.h"
 #include "servers/render_server.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 void Bone2d::add_child(const std::shared_ptr<Bone2d> &child) {
     children.push_back(child);
@@ -799,4 +799,4 @@ void Skeleton2d::set_bone_transform(uint32_t bone_index, const Transform2 &p_tra
     bone_transforms[offset + 2] = 0;
     bone_transforms[offset + 3] = p_transform.get_position().y;
 }
-} // namespace Flint::Scene
+} // namespace Flint

@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace Flint::Scene {
+namespace Flint {
 
 Sprite2d::Sprite2d() {
     type = NodeType::Sprite2d;
@@ -104,4 +104,4 @@ void Sprite2d::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     //    Node2d::draw(p_command_buffer);
 }
 
-} // namespace Flint::Scene
+} // namespace Flint

@@ -2,7 +2,7 @@
 
 #include "../common/utils.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 std::string FileDialog::show() {
     Utils::Logger::info("File dialog", "FileDialog");

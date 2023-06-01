@@ -26,13 +26,13 @@ public:
 
     void main_loop();
 
-    Scene::SceneTree* get_tree();
+    SceneTree* get_tree();
 
 private:
     void cleanup();
 
 private:
-    std::unique_ptr<Scene::SceneTree> tree;
+    std::unique_ptr<SceneTree> tree;
 };
 
 #endif // FLINT_APP_H

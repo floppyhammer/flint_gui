@@ -9,7 +9,7 @@
 #include "common/utils.h"
 #include "servers/render_server.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 enum class NodeType {
     // General.
@@ -140,6 +140,6 @@ protected:
     bool visual_debug = false;
 };
 
-} // namespace Flint::Scene
+} // namespace Flint
 
 #endif // FLINT_NODE_H

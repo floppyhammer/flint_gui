@@ -7,7 +7,7 @@
 #include "../world.h"
 #include "camera3d.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 Node3d::Node3d() {
     type = NodeType::Node3d;

@@ -6,7 +6,7 @@
 #include "3d/camera3d.h"
 #include "resources/default_resource.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 World::World(bool _is_2d) {
     type = NodeType::World;
@@ -149,4 +149,4 @@ void World::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
         cmd_buffer, pipeline, mesh->surface->get_material()->get_desc_set()->getDescriptorSet(get_current_image()));
 }
 
-} // namespace Flint::Scene
+} // namespace Flint

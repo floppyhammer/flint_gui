@@ -11,7 +11,7 @@
 using Pathfinder::ColorF;
 using Pathfinder::Vec2I;
 
-namespace Flint::Scene {
+namespace Flint {
 
 class Camera3d;
 class Camera2d;

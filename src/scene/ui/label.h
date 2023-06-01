@@ -12,7 +12,7 @@
 
 using Pathfinder::Rect;
 
-namespace Flint::Scene {
+namespace Flint {
 
 enum class Alignment {
     Begin,

@@ -2,7 +2,7 @@
 
 using Pathfinder::clamp;
 
-namespace Flint::Scene {
+namespace Flint {
 
 ScrollContainer::ScrollContainer() {
     type = NodeType::ScrollContainer;

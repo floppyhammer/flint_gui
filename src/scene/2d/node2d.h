@@ -7,7 +7,7 @@
 #include "../node.h"
 #include "../../servers/vector_server.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 class Node2d : public Node {
 public:

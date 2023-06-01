@@ -6,7 +6,7 @@
 
 using Pathfinder::Transform2;
 
-namespace Flint::Scene {
+namespace Flint {
 
 enum class Bidi {
     Auto,

@@ -4,7 +4,7 @@
 
 #include "../../common/utils.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 Tree::Tree() {
     type = NodeType::Panel;
@@ -231,4 +231,4 @@ void TreeItem::set_icon(const std::shared_ptr<Texture> &texture) {
     icon->set_texture(texture);
 }
 
-} // namespace Flint::Scene
+} // namespace Flint

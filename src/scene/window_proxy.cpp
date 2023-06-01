@@ -2,7 +2,7 @@
 
 #include "../servers/vector_server.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 WindowProxy::WindowProxy(Vec2I _size, bool _dummy) {
     type = NodeType::Window;

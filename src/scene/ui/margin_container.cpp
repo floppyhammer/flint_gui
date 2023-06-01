@@ -1,6 +1,6 @@
 #include "margin_container.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 void MarginContainer::adjust_layout() {
     // Child's local position.

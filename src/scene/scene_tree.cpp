@@ -2,7 +2,7 @@
 
 #include "render/swap_chain.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 SceneTree::SceneTree(Vec2I main_window_size) {
     auto display_server = DisplayServer::get_singleton();

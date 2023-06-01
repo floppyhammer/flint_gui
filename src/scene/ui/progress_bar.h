@@ -7,7 +7,7 @@
 #include "label.h"
 #include "node_ui.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 class ProgressBar : public NodeUi {
 public:

@@ -5,7 +5,7 @@
 
 #include "window_proxy.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 class Popup : public WindowProxy {
 public:

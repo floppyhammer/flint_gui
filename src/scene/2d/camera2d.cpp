@@ -4,7 +4,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 
-namespace Flint::Scene {
+namespace Flint {
 
 void Camera2d::set_active(bool new_value) {
     active = new_value;

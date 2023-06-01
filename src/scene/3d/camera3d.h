@@ -7,7 +7,7 @@
 #include "node3d.h"
 #include "render/subview.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 class Camera3d : public Node3d {
 public:

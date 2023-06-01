@@ -7,7 +7,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 
-namespace Flint::Scene {
+namespace Flint {
 
 void Camera3d::look_at(const glm::vec3 &target) {
     view_matrix = glm::lookAt(position, target, up);

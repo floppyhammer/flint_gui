@@ -7,7 +7,7 @@
 #include "node.h"
 #include "resources/mesh.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 /// UiLayer will draw every child UI nodes directly to the screen.
 class UiLayer : public Node {

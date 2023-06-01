@@ -3,7 +3,7 @@
 
 #include "node_ui.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 /**
  * Containers adjust their container children's layouts automatically.

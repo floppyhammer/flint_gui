@@ -4,7 +4,7 @@
 #include "../../resources/default_resource.h"
 #include "../../resources/vector_texture.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 Button::Button() {
     type = NodeType::Button;

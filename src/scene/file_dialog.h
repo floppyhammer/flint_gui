@@ -4,7 +4,7 @@
 #include "node.h"
 #include "tinyfiledialogs/tinyfiledialogs.h"
 
-namespace Flint::Scene {
+namespace Flint {
 
 class FileDialog : public Node {
 public:
