@@ -9,9 +9,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 # Enable Flint's debug mode, which includes visual indicators.
 add_compile_definitions(FLINT_DEBUG)
 
-# Fix "too many characters in constant" error when using CMake with MSVC.
-string(APPEND CMAKE_CXX_FLAGS " /utf-8")
-
 # More generally, you are using find_package and then later you're using add_subdirectory
 # to try to incorporate these external projects. That's not how it works. find_package will
 # look for a pre-existing binary of the package, while add_subdirectory isn't designed to
@@ -59,30 +56,30 @@ add_subdirectory(external/GSL)
 include_directories(external/stduuid/include)
 add_subdirectory(external/stduuid)
 
-# icu4c.
-if (NOT WIN32)
-    # For non-Windows platforms, we need to compile ICU from source.
-    file(APPEND GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
-            third_party/icu4c/common/*.cpp)
+if (WIN32)
+    # Fix "too many characters in constant" error when using CMake with MSVC.
+    string(APPEND CMAKE_CXX_FLAGS " /utf-8")
 
-    add_compile_definitions(U_STATIC_IMPLEMENTATION)
-    add_compile_definitions(U_COMMON_IMPLEMENTATION)
-    add_compile_definitions(ICU_STATIC_DATA)
-    include_directories(third_party/icu4c/common)
+    set(LINKING_LIBS glfw Vulkan::Vulkan pathfinder poly2tri harfbuzz icu zlib)
+else ()
+    # icu4c.
+    find_package(ICU 70.0 COMPONENTS uc i18n REQUIRED)
+
+    set(LINKING_LIBS glfw Vulkan::Vulkan pathfinder poly2tri harfbuzz ICU::uc ICU::i18n zlib)
 endif ()
 
-# Alternative to icu4c. If the target platform comes with ICU, we just use it.
-# Else, we build fribidi. It's too cumbersome to build ICU ourselves.
-include_directories(third_party/fribidi)
-include_directories(third_party/fribidi/generated)
-#add_compile_definitions(DONT_HAVE_FRIBIDI_CONFIG_H)
-#add_compile_definitions(DONT_HAVE_FRIBIDI_UNICODE_VERSION_H)
-add_compile_definitions(HAVE_STRINGIZE=1)
-add_compile_definitions(FRIBIDI_BUILD)
+if (ON)
+    # Alternative to icu4c. If the target platform comes with ICU, we just use it.
+    # Else, we build fribidi. It's too cumbersome to build ICU ourselves.
+    include_directories(third_party/fribidi)
+    include_directories(third_party/fribidi/generated)
+    #add_compile_definitions(DONT_HAVE_FRIBIDI_CONFIG_H)
+    #add_compile_definitions(DONT_HAVE_FRIBIDI_UNICODE_VERSION_H)
+    add_compile_definitions(HAVE_STRINGIZE=1)
+    add_compile_definitions(FRIBIDI_BUILD)
+endif ()
 
 add_library(flint ${SOURCE_FILES})
-
-set(LINKING_LIBS glfw Vulkan::Vulkan pathfinder poly2tri harfbuzz icu zlib)
 
 # Add examples.
 add_subdirectory(examples/file_selection)

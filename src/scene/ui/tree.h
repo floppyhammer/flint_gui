@@ -14,6 +14,8 @@
 
 namespace Flint {
 
+class Tree;
+
 class TreeItem {
     friend class Tree;
 

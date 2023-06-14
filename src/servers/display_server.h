@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #include <cstdint>
+#include <cstring>
 #include <optional>
 #include <vector>
 

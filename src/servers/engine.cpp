@@ -1,7 +1,8 @@
+#include "engine.h"
+
 #include <sstream>
 
 #include "../common/utils.h"
-#include "engine.h"
 
 namespace Flint {
 

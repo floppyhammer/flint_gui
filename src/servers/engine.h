@@ -29,7 +29,7 @@ public:
     float get_fps() const;
 
 private:
-    std::chrono::time_point<std::chrono::steady_clock> last_time_updated_fps;
+    std::chrono::time_point<std::chrono::system_clock> last_time_updated_fps;
     float fps = 0;
     double elapsed = 0;
     double delta = 0;
