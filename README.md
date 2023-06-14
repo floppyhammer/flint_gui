@@ -6,12 +6,12 @@ This is an experimental vector-based GUI framework.
 
 Features:
 
-* Scene tree.
-* Vulkan backend.
-* High quality anti-aliasing.
-* Multiple window support.
-* Cross-platform.
-* I18N support.
+* Node-based scene manager
+* Vulkan backend
+* High quality antialiasing
+* Multiple window support
+* Cross-platform (Windows, Linux)
+* I18n support
 
 The development work has been mostly done on Windows, but it should be easy to make
 it run on other platforms.
