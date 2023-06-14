@@ -76,12 +76,6 @@ void from_utf8(const std::string &source, std::basic_string<T, std::char_traits<
 }
 
 Script get_text_script(const std::string &text) {
-#ifdef _WIN32
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-#else
-//    std::wstring_convert<std::codecvt_utf8<char16_t>, char> converter;
-#endif
-
     std::u16string utf16_string;
     from_utf8(text, utf16_string);
 
@@ -219,11 +213,8 @@ void Font::get_glyphs(const std::string &text,
 
     // Note: don't use icu::UnicodeString, it doesn't work. Use plain UChar* instead.
 
-    //    std::wstring_convert<std::codecvt<char16_t, char, std::mbstate_t>, char16_t> convert;
     std::u16string text_u16;
     from_utf8(text, text_u16);
-
-    //    std::wstring_convert<std::codecvt<char32_t, char, std::mbstate_t>, char32_t> u32_converter;
 
     const UChar *uchar_data = text_u16.c_str();
     const int32_t uchar_count = text_u16.length();
@@ -261,7 +252,7 @@ void Font::get_glyphs(const std::string &text,
                 break;
             }
 
-            //            std::string para_text = convert.to_bytes(text_u16.substr(para_start, para_end));
+            //            std::string para_text = to_utf8(text_u16.substr(para_start, para_end));
             //            std::cout << "Paragraph text: " << para_text << std::endl;
             //            std::cout << "Paragraph range: " << para_start << " -> " << para_end << std::endl;
 
