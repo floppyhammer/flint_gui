@@ -24,8 +24,6 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
         third_party/tinyfiledialogs/*.c
         third_party/fribidi/*.c)
 
-add_compile_definitions(PATHFINDER_USE_VULKAN)
-
 # Include external and third-party headers.
 include_directories(external third_party)
 
@@ -34,6 +32,7 @@ include_directories(external/glfw/include)
 add_subdirectory(external/glfw)
 
 # Pathfinder library.
+add_compile_definitions(PATHFINDER_USE_VULKAN)
 include_directories(external/pathfinder-cpp/include)
 add_subdirectory(external/pathfinder-cpp)
 

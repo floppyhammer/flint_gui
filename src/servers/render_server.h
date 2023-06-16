@@ -1,8 +1,8 @@
 #ifndef FLINT_RENDER_SERVER_H
 #define FLINT_RENDER_SERVER_H
 
-#include "render/mvp.h"
-#include "render/window.h"
+#include "../render/mvp.h"
+#include "../render/window.h"
 
 #define GLFW_INCLUDE_VULKAN
 #include <array>
