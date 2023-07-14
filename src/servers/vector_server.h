@@ -29,9 +29,9 @@ public:
 
     VectorServer() = default;
 
-    void init(const std::shared_ptr<Pathfinder::Driver> &driver);
+    void init(const std::shared_ptr<Pathfinder::Device> &device);
 
-    void set_dst_texture(const std::shared_ptr<ImageTexture>& texture);
+    void set_dst_texture(const std::shared_ptr<ImageTexture> &texture);
 
     void cleanup();
 

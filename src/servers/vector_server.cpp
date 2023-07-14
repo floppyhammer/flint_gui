@@ -4,8 +4,8 @@ using namespace Pathfinder;
 
 namespace Flint {
 
-void VectorServer::init(const std::shared_ptr<Pathfinder::Driver> &driver) {
-    canvas = std::make_shared<Pathfinder::Canvas>(driver);
+void VectorServer::init(const std::shared_ptr<Pathfinder::Device> &device) {
+    canvas = std::make_shared<Pathfinder::Canvas>(device);
 }
 
 void VectorServer::cleanup() {
@@ -13,13 +13,13 @@ void VectorServer::cleanup() {
 }
 
 void VectorServer::set_dst_texture(const std::shared_ptr<ImageTexture> &texture) {
-    auto pathfinder_texture = Pathfinder::TextureVk::from_wrapping(
-        {texture->get_size(), Pathfinder::TextureFormat::Rgba8Unorm, "vector canvas"},
-        texture->image,
-        texture->imageMemory,
-        texture->imageView,
-        texture->sampler,
-        Pathfinder::TextureLayout::ShaderReadOnly);
+    auto pathfinder_texture =
+        Pathfinder::TextureVk::from_wrapping({texture->get_size(), Pathfinder::TextureFormat::Rgba8Unorm},
+                                             texture->image,
+                                             texture->imageMemory,
+                                             texture->imageView,
+                                             texture->sampler,
+                                             Pathfinder::TextureLayout::ShaderReadOnly);
 
     canvas->set_dst_texture(pathfinder_texture);
 }

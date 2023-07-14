@@ -14,12 +14,12 @@ SceneTree::SceneTree(Vec2I main_window_size) {
     auto render_server = RenderServer::get_singleton();
 
     // Initialize the vector server.
-    auto driver = std::make_shared<Pathfinder::DriverVk>(display_server->get_device(),
+    auto device = std::make_shared<Pathfinder::DeviceVk>(display_server->get_device(),
                                                          display_server->physicalDevice,
                                                          display_server->graphicsQueue,
                                                          display_server->command_pool);
     auto vector_server = VectorServer::get_singleton();
-    vector_server->init(driver);
+    vector_server->init(device);
 }
 
 void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
