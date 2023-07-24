@@ -107,7 +107,11 @@ void Node::add_child(const std::shared_ptr<Node> &new_child) {
 
     children.push_back(new_child);
 
-    //        get_tree()->
+    if (new_child->get_node_type() == NodeType::Camera2d) {
+        get_world()->add_camera2d((Camera2d *)new_child.get());
+    } else if (new_child->get_node_type() == NodeType::Camera3d) {
+        get_world()->add_camera3d((Camera3d *)new_child.get());
+    }
 }
 
 std::shared_ptr<Node> Node::get_child(size_t index) {

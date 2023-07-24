@@ -9,8 +9,8 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "../render/mesh.h"
 #include "../render/vertex.h"
+#include "../resources/mesh.h"
 #include "common/utils.h"
 #include "resource.h"
 
@@ -41,8 +41,8 @@ public:
         }
 
         // Make mesh object from the glyph.
-        ttf_mesh_t *mesh;
-        if (ttf_glyph2mesh(&font->glyphs[index], &mesh, TTF_QUALITY_NORMAL, TTF_FEATURES_DFLT) != TTF_DONE) {
+        ttf_mesh3d_t *mesh;
+        if (ttf_glyph2mesh3d(&font->glyphs[index], &mesh, TTF_QUALITY_NORMAL, TTF_FEATURES_DFLT, 0.2) != TTF_DONE) {
             return nullptr;
         }
 
@@ -51,7 +51,7 @@ public:
         auto glyph_mesh = std::make_shared<MeshCpu<Vertex>>();
 
         for (int v = 0; v < mesh->nvert; v++) {
-            glyph_mesh->vertices.push_back({{mesh->vert[v].x, mesh->vert[v].y, 0}, {}, {}});
+            glyph_mesh->vertices.push_back({{mesh->vert[v].x, mesh->vert[v].y, mesh->vert[v].z}, {}, {}});
         }
 
         for (int i = 0; i < mesh->nfaces; i++) {
@@ -60,7 +60,7 @@ public:
             glyph_mesh->indices.push_back(mesh->faces[i].v3);
         }
 
-        ttf_free_mesh(mesh);
+        ttf_free_mesh3d(mesh);
 
         return glyph_mesh;
     }

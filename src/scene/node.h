@@ -41,6 +41,7 @@ enum class NodeType {
     Node2d,
     Sprite2d,
     Skeleton2d,
+    Camera2d,
 
     // 3D.
     Node3d,
@@ -48,6 +49,7 @@ enum class NodeType {
     MeshInstance3d,
     Skybox,
     Text3d,
+    Camera3d,
 
     Max,
 };

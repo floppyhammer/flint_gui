@@ -23,7 +23,9 @@ void Node3d::update_mvp() {
     // Determined by model transform.
     mvp.model = glm::translate(glm::mat4(1.0f), glm::vec3(position.x, position.y, position.z));
     mvp.model = glm::scale(mvp.model, glm::vec3(scale.x, scale.y, scale.z));
-    mvp.model = glm::rotate(mvp.model, 0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+    mvp.model = glm::rotate(mvp.model, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    mvp.model = glm::rotate(mvp.model, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    mvp.model = glm::rotate(mvp.model, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 
     // Determined by camera.
     auto world = get_world();

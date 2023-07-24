@@ -11,7 +11,7 @@ class MeshInstance3d : public Node3d {
 public:
     MeshInstance3d();
 
-    void set_surfaces(std::vector<std::shared_ptr<Surface3d>> new_surfaces);
+    void set_surfaces(const std::vector<std::shared_ptr<Surface3d>> &new_surfaces);
 
 protected:
     void update(double dt) override;

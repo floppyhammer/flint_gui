@@ -46,8 +46,8 @@ void MeshInstance3d::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) 
     }
 }
 
-void MeshInstance3d::set_surfaces(std::vector<std::shared_ptr<Surface3d>> new_surfaces) {
-    surfaces = std::move(new_surfaces);
+void MeshInstance3d::set_surfaces(const std::vector<std::shared_ptr<Surface3d>> &new_surfaces) {
+    surfaces = new_surfaces;
 }
 
 void MeshInstance3d::update(double dt) {

@@ -13,7 +13,8 @@ struct MeshCpu {
 
     MeshCpu() = default;
 
-    MeshCpu(std::vector<T> _vertices, std::vector<uint32_t> _indices) : vertices(_vertices), indices(_indices) {
+    MeshCpu(const std::vector<T> &_vertices, const std::vector<uint32_t> &_indices)
+        : vertices(_vertices), indices(_indices) {
     }
 };
 
