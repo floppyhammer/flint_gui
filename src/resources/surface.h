@@ -6,6 +6,7 @@
 #include <utility>
 #include <vector>
 
+#include "../render/mesh.h"
 #include "../render/vertex.h"
 #include "material.h"
 
@@ -26,10 +27,10 @@ public:
 
     uint32_t get_index_count();
 
-    void set_gpu_resources(std::shared_ptr<VertexGpuResources<Vertex>> new_gpu_resources);
+    void set_gpu_resources(std::shared_ptr<MeshGpu<Vertex>> new_gpu_resources);
 
 private:
-    std::shared_ptr<VertexGpuResources<Vertex>> gpu_resources;
+    std::shared_ptr<MeshGpu<Vertex>> gpu_resources;
 };
 
 class Surface2d : public Surface {
@@ -65,7 +66,7 @@ public:
         return std::make_shared<Surface3d>();
     }
 
-    void set_material(const std::shared_ptr<Material3d> &p_material);
+    void set_material(const std::shared_ptr<Material3d> &_material);
 
     std::shared_ptr<Material3d> get_material() const;
 

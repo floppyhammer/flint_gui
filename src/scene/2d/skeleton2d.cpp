@@ -653,7 +653,7 @@ void Skeleton2d::update_bone_rest() {
             gpu_weights[i * 4], gpu_weights[i * 4 + 1], gpu_weights[i * 4 + 2], gpu_weights[i * 4 + 3]};
     }
 
-    mesh->gpu_resources = std::make_shared<VertexGpuResources<SkeletonVertex>>(vertex_data, total_indices);
+    mesh->gpu_resources = std::make_shared<MeshGpu<SkeletonVertex>>(vertex_data, total_indices);
 }
 
 void Skeleton2d::allocate_bone_transforms(uint32_t new_bone_count) {

@@ -22,7 +22,8 @@ include_directories(${Vulkan_INCLUDE_DIRS})
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
         src/*.cpp
         third_party/tinyfiledialogs/*.c
-        third_party/fribidi/*.c)
+        third_party/fribidi/*.c
+        third_party/ttf2mesh/ttf2mesh.c)
 
 # Include external and third-party headers.
 include_directories(external third_party)

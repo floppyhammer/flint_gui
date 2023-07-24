@@ -19,7 +19,7 @@ protected:
 
     std::shared_ptr<MaterialSkybox> material;
 
-    std::shared_ptr<VertexGpuResources<SkyboxVertex>> surface_gpu_resources;
+    std::shared_ptr<MeshGpu<SkyboxVertex>> surface_gpu_resources;
 };
 
 } // namespace Flint

@@ -47,6 +47,7 @@ enum class NodeType {
     Sprite3d,
     Model,
     Skybox,
+    Text3d,
 
     Max,
 };

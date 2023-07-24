@@ -20,8 +20,8 @@ std::shared_ptr<Surface2d> Surface2d::from_default() {
     return surface;
 }
 
-void Surface3d::set_material(const std::shared_ptr<Material3d> &p_material) {
-    material = p_material;
+void Surface3d::set_material(const std::shared_ptr<Material3d> &_material) {
+    material = _material;
 }
 
 std::shared_ptr<Material3d> Surface3d::get_material() const {
@@ -29,24 +29,30 @@ std::shared_ptr<Material3d> Surface3d::get_material() const {
 }
 
 VkBuffer Surface::get_vertex_buffer() {
-    if (gpu_resources == nullptr) return nullptr;
+    if (gpu_resources == nullptr) {
+        return nullptr;
+    }
 
     return gpu_resources->get_vertex_buffer();
 }
 
 VkBuffer Surface::get_index_buffer() {
-    if (gpu_resources == nullptr) return nullptr;
+    if (gpu_resources == nullptr) {
+        return nullptr;
+    }
 
     return gpu_resources->get_index_buffer();
 }
 
 uint32_t Surface::get_index_count() {
-    if (gpu_resources == nullptr) return 0;
+    if (gpu_resources == nullptr) {
+        return 0;
+    }
 
     return gpu_resources->get_index_count();
 }
 
-void Surface::set_gpu_resources(std::shared_ptr<VertexGpuResources<Vertex>> new_gpu_resources) {
+void Surface::set_gpu_resources(std::shared_ptr<MeshGpu<Vertex>> new_gpu_resources) {
     gpu_resources = std::move(new_gpu_resources);
 }
 

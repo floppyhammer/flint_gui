@@ -27,7 +27,7 @@ public:
                 3,
             };
 
-            default_surface_2d_gpu_resources = std::make_shared<VertexGpuResources<Vertex>>(vertices, indices);
+            default_surface_2d_gpu_resources = std::make_shared<MeshGpu<Vertex>>(vertices, indices);
         }
 
         // Default vertex and index data for Skybox.
@@ -49,7 +49,7 @@ public:
             };
 
             default_skybox_gpu_resources =
-                std::make_shared<VertexGpuResources<SkyboxVertex>>(skybox_vertices, skybox_indices);
+                std::make_shared<MeshGpu<SkyboxVertex>>(skybox_vertices, skybox_indices);
         }
 
         default_theme = std::make_shared<Theme>();
@@ -60,11 +60,11 @@ public:
         return &singleton;
     }
 
-    inline std::shared_ptr<VertexGpuResources<Vertex>> get_default_surface_2d_gpu_resources() {
+    inline std::shared_ptr<MeshGpu<Vertex>> get_default_surface_2d_gpu_resources() {
         return default_surface_2d_gpu_resources;
     }
 
-    inline std::shared_ptr<VertexGpuResources<SkyboxVertex>> get_default_skybox_gpu_resources() {
+    inline std::shared_ptr<MeshGpu<SkyboxVertex>> get_default_skybox_gpu_resources() {
         return default_skybox_gpu_resources;
     }
 
@@ -95,9 +95,9 @@ public:
 
 private:
     // Default resources should never be modified.
-    std::shared_ptr<VertexGpuResources<Vertex>> default_surface_2d_gpu_resources;
+    std::shared_ptr<MeshGpu<Vertex>> default_surface_2d_gpu_resources;
 
-    std::shared_ptr<VertexGpuResources<SkyboxVertex>> default_skybox_gpu_resources;
+    std::shared_ptr<MeshGpu<SkyboxVertex>> default_skybox_gpu_resources;
 
     std::shared_ptr<Theme> default_theme;
 };

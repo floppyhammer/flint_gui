@@ -93,7 +93,12 @@ void ObjImporter::load_file(const std::string &path, std::vector<std::shared_ptr
             indices.push_back(uniqueVertices[vertex]);
         }
 
-        surface->set_gpu_resources(std::make_shared<VertexGpuResources<Vertex>>(vertices, indices));
+        auto mesh_cpu = std::make_shared<MeshCpu<Vertex>>(vertices, indices);
+
+        auto mesh_gpu = std::make_shared<MeshGpu<Vertex>>();
+        mesh_gpu->upload(mesh_cpu);
+
+        surface->set_gpu_resources(mesh_gpu);
 
         if (material_id >= 0 && material_id < materials.size()) {
             surface->set_material(materials[material_id]);

@@ -18,7 +18,6 @@ void VectorServer::set_dst_texture(const std::shared_ptr<ImageTexture> &texture)
                                              texture->image,
                                              texture->imageMemory,
                                              texture->imageView,
-                                             texture->sampler,
                                              Pathfinder::TextureLayout::ShaderReadOnly);
 
     canvas->set_dst_texture(pathfinder_texture);
