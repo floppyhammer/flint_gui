@@ -16,7 +16,7 @@ UiLayer::UiLayer() {
 
     update_mvp();
 
-    mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
+    surface = DefaultResource::get_singleton()->new_default_surface_2d();
 }
 
 void UiLayer::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
@@ -69,7 +69,7 @@ void UiLayer::update_mvp() {
 }
 
 void UiLayer::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
-    mesh->surface->get_material()->set_texture(texture.get());
+    surface->get_material()->set_texture(texture.get());
 
     auto rs = RenderServer::get_singleton();
 
@@ -81,8 +81,7 @@ void UiLayer::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
         cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
 
     // Unlike Sprite 2D, Texture Rect should not support custom mesh.
-    rs->blit(
-        cmd_buffer, pipeline, mesh->surface->get_material()->get_desc_set()->getDescriptorSet(get_current_image()));
+    rs->blit(cmd_buffer, pipeline, surface->get_material()->get_desc_set()->getDescriptorSet(get_current_image()));
 }
 
 void UiLayer::when_window_size_changed(Vec2I new_size) {

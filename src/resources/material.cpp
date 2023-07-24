@@ -184,10 +184,10 @@ Material2d::Material2d() {
     desc_set = std::make_shared<Material2dDescSet>();
 }
 
-void Material2d::set_texture(ImageTexture *p_texture) {
-    texture = p_texture;
+void Material2d::set_texture(ImageTexture *new_texture) {
+    texture = new_texture;
 
-    desc_set->updateDescriptorSet(p_texture);
+    desc_set->updateDescriptorSet(new_texture);
 }
 
 ImageTexture *Material2d::get_texture() {

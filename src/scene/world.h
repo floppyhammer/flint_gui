@@ -5,7 +5,7 @@
 #include "../render/subview.h"
 #include "../resources/image_texture.h"
 #include "node.h"
-#include "resources/mesh.h"
+#include "resources/surface.h"
 #include "servers/render_server.h"
 
 using Pathfinder::ColorF;
@@ -38,7 +38,7 @@ public:
 
     void update_mvp();
 
-    std::shared_ptr<Mesh2d> mesh;
+    std::shared_ptr<Surface2d> surface;
 
     Vec2I view_size;
 

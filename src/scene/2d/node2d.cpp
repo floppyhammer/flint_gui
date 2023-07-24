@@ -7,7 +7,7 @@ namespace Flint {
 Node2d::Node2d() {
     type = NodeType::Node2d;
 
-    mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
+    surface = DefaultResource::get_singleton()->new_default_surface_2d();
 
     position_indicator.path2d.move_to(-12, 0);
     position_indicator.path2d.line_to(12, 0);

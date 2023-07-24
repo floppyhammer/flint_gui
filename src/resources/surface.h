@@ -15,6 +15,7 @@
 
 namespace Flint {
 
+/// Surface = Mesh + Material
 class Surface {
 public:
     Surface() = default;

@@ -10,8 +10,8 @@
 #include <cstdlib>
 
 #include "../render/mesh.h"
+#include "../render/vertex.h"
 #include "common/utils.h"
-#include "mesh.h"
 #include "resource.h"
 
 using Pathfinder::ColorU;

@@ -2,7 +2,7 @@
 #define FLINT_SKELETON2D_H
 
 #include "../../render/mvp.h"
-#include "../../resources/mesh.h"
+#include "../../resources/surface.h"
 #include "../../servers/vector_server.h"
 #include "node2d.h"
 #include "sprite2d.h"

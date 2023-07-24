@@ -15,24 +15,26 @@ Sprite2d::Sprite2d() {
     type = NodeType::Sprite2d;
 }
 
-void Sprite2d::set_texture(std::shared_ptr<ImageTexture> p_texture) {
-    if (!p_texture) return;
+void Sprite2d::set_texture(std::shared_ptr<ImageTexture> _texture) {
+    if (!_texture) {
+        return;
+    }
 
-    texture = p_texture;
+    texture = _texture;
 
-    mesh->surface->get_material()->set_texture(p_texture.get());
+    surface->get_material()->set_texture(_texture.get());
 }
 
 std::shared_ptr<ImageTexture> Sprite2d::get_texture() const {
     return texture;
 }
 
-void Sprite2d::set_mesh(const std::shared_ptr<Mesh2d> &p_mesh) {
-    mesh = p_mesh;
+void Sprite2d::set_surface(const std::shared_ptr<Surface2d> &_surface) {
+    surface = _surface;
 }
 
-void Sprite2d::set_material(const std::shared_ptr<Material2d> &p_material) {
-    mesh->surface->set_material(p_material);
+void Sprite2d::set_material(const std::shared_ptr<Material2d> &_material) {
+    surface->set_material(_material);
 }
 
 void Sprite2d::update(double delta) {
@@ -40,7 +42,7 @@ void Sprite2d::update(double delta) {
 }
 
 void Sprite2d::update_mvp() {
-    if (mesh == nullptr || mesh->surface == nullptr) {
+    if (surface == nullptr) {
         return;
     }
     //
@@ -70,7 +72,7 @@ void Sprite2d::update_mvp() {
 }
 
 void Sprite2d::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
-    if (mesh == nullptr) {
+    if (surface == nullptr) {
         Utils::Logger::warn("No valid mesh set for Sprite 2D!");
         return;
     }

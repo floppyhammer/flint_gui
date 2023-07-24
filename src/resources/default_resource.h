@@ -1,7 +1,6 @@
 #ifndef FLINT_DEFAULT_RESOURCE_H
 #define FLINT_DEFAULT_RESOURCE_H
 
-#include "mesh.h"
 #include "surface.h"
 #include "theme.h"
 
@@ -48,8 +47,7 @@ public:
                 1, 5, 6, 1, 6, 2, 3, 7, 0, 4, 0, 7, 5, 1, 4, 4, 1, 0,
             };
 
-            default_skybox_gpu_resources =
-                std::make_shared<MeshGpu<SkyboxVertex>>(skybox_vertices, skybox_indices);
+            default_skybox_gpu_resources = std::make_shared<MeshGpu<SkyboxVertex>>(skybox_vertices, skybox_indices);
         }
 
         default_theme = std::make_shared<Theme>();
@@ -81,16 +79,14 @@ public:
      * Same vertex and index buffers will be shared by all default 2D meshes.
      * @return Mesh2d
      */
-    inline std::shared_ptr<Mesh2d> new_default_mesh_2d() const {
-        auto surface = std::make_shared<Surface2d>();
+    inline std::shared_ptr<Surface2d> new_default_surface_2d() const {
         auto material = std::make_shared<Material2d>();
 
-        auto mesh = std::make_shared<Mesh2d>();
-        mesh->surface = surface;
-        mesh->surface->set_gpu_resources(default_surface_2d_gpu_resources);
-        mesh->surface->set_material(material);
+        auto surface = std::make_shared<Surface2d>();
+        surface->set_gpu_resources(default_surface_2d_gpu_resources);
+        surface->set_material(material);
 
-        return mesh;
+        return surface;
     }
 
 private:

@@ -5,7 +5,7 @@
 #include "2d/skeleton2d.h"
 #include "2d/sprite2d.h"
 #include "3d/camera3d.h"
-#include "3d/model.h"
+#include "3d/mesh_instance_3d.h"
 #include "3d/skybox.h"
 #include "file_dialog.h"
 #include "node.h"

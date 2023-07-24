@@ -13,7 +13,7 @@ World::World(bool _is_2d) {
 
     is_2d = _is_2d;
 
-    mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
+    surface = DefaultResource::get_singleton()->new_default_surface_2d();
 
     update_mvp();
 }
@@ -135,10 +135,10 @@ void World::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
         image_texture = current_camera3d->get_texture();
     }
 
-    mesh->surface->get_material()->set_texture(image_texture.get());
+    surface->get_material()->set_texture(image_texture.get());
 
     VkPipeline pipeline = RenderServer::get_singleton()->get_pipeline(render_pass, "mesh2d");
-    ;
+
     VkPipelineLayout pipeline_layout = RenderServer::get_singleton()->blit_pipeline_layout;
 
     // Upload the model matrix to the GPU via push constants.
@@ -146,7 +146,7 @@ void World::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
         cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
 
     RenderServer::get_singleton()->blit(
-        cmd_buffer, pipeline, mesh->surface->get_material()->get_desc_set()->getDescriptorSet(get_current_image()));
+        cmd_buffer, pipeline, surface->get_material()->get_desc_set()->getDescriptorSet(get_current_image()));
 }
 
 } // namespace Flint

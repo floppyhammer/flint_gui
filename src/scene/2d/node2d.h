@@ -3,9 +3,9 @@
 
 #include "../../common/geometry.h"
 #include "../../render/mvp.h"
-#include "../../resources/mesh.h"
-#include "../node.h"
+#include "../../resources/surface.h"
 #include "../../servers/vector_server.h"
+#include "../node.h"
 
 namespace Flint {
 
@@ -26,7 +26,7 @@ public:
 protected:
     void draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
 
-    std::shared_ptr<Mesh2d> mesh;
+    std::shared_ptr<Surface2d> surface;
 
     VectorPath position_indicator;
 };

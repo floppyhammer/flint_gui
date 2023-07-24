@@ -2,7 +2,7 @@
 #define FLINT_SKYBOX_H
 
 #include "../../resources/cube_texture.h"
-#include "../../resources/mesh.h"
+#include "../../resources/surface.h"
 #include "node3d.h"
 
 namespace Flint {

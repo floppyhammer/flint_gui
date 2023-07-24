@@ -45,7 +45,7 @@ enum class NodeType {
     // 3D.
     Node3d,
     Sprite3d,
-    Model,
+    MeshInstance3d,
     Skybox,
     Text3d,
 

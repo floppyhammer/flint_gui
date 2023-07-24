@@ -5,8 +5,8 @@
 
 #include "../../common/geometry.h"
 #include "../../render/mvp.h"
-#include "../../resources/mesh.h"
 #include "../../resources/style_box.h"
+#include "../../resources/surface.h"
 #include "../../servers/input_server.h"
 #include "../../servers/vector_server.h"
 #include "../node.h"

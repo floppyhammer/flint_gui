@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "node.h"
-#include "resources/mesh.h"
+#include "resources/surface.h"
 
 namespace Flint {
 
@@ -22,7 +22,7 @@ public:
 
     void when_window_size_changed(Vec2I new_size);
 
-    std::shared_ptr<Mesh2d> mesh;
+    std::shared_ptr<Surface2d> surface;
 
     MvpPushConstant push_constant;
 

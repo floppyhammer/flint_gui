@@ -1,4 +1,4 @@
-#include "model.h"
+#include "mesh_instance_3d.h"
 
 #include <utility>
 
@@ -11,11 +11,11 @@
 
 namespace Flint {
 
-Model::Model() {
-    type = NodeType::Model;
+MeshInstance3d::MeshInstance3d() {
+    type = NodeType::MeshInstance3d;
 }
 
-void Model::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
+void MeshInstance3d::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     auto world = get_world();
     if (!world) {
         return;
@@ -33,7 +33,7 @@ void Model::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     vkCmdPushConstants(
         cmd_buffer, pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MvpPushConstant), &push_constant);
 
-    for (auto &surface : mesh->surfaces) {
+    for (auto &surface : surfaces) {
         const auto &desc_set = surface->get_material()->get_desc_set();
 
         VkBuffer vertexBuffers[] = {surface->get_vertex_buffer()};
@@ -46,11 +46,11 @@ void Model::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     }
 }
 
-void Model::set_mesh(std::shared_ptr<Mesh3d> new_mesh) {
-    mesh = std::move(new_mesh);
+void MeshInstance3d::set_surfaces(std::vector<std::shared_ptr<Surface3d>> new_surfaces) {
+    surfaces = std::move(new_surfaces);
 }
 
-void Model::update(double dt) {
+void MeshInstance3d::update(double dt) {
     update_mvp();
 }
 

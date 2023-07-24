@@ -85,7 +85,7 @@ class Material2d : public Material {
 public:
     Material2d();
 
-    void set_texture(ImageTexture *p_texture);
+    void set_texture(ImageTexture *new_texture);
 
     ImageTexture *get_texture();
 
