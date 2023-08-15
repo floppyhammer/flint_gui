@@ -29,7 +29,7 @@ public:
 
     VectorServer() = default;
 
-    void init(const std::shared_ptr<Pathfinder::Device> &device);
+    void init(const std::shared_ptr<Pathfinder::Device> &device, const std::shared_ptr<Pathfinder::Queue> &queue);
 
     void set_dst_texture(const std::shared_ptr<ImageTexture> &texture);
 

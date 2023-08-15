@@ -1,5 +1,7 @@
 #include "scene_tree.h"
 
+#include <pathfinder-cpp/include/pathfinder.h>
+
 #include "render/swap_chain.h"
 
 namespace Flint {
@@ -18,8 +20,10 @@ SceneTree::SceneTree(Vec2I main_window_size) {
                                                          display_server->physicalDevice,
                                                          display_server->graphicsQueue,
                                                          display_server->command_pool);
+    auto queue = std::make_shared<Pathfinder::QueueVk>(
+        display_server->get_device(), display_server->graphicsQueue, display_server->graphicsQueue);
     auto vector_server = VectorServer::get_singleton();
-    vector_server->init(device);
+    vector_server->init(device, queue);
 }
 
 void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
