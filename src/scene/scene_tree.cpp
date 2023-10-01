@@ -20,10 +20,8 @@ SceneTree::SceneTree(Vec2I main_window_size) {
                                                          display_server->physicalDevice,
                                                          display_server->graphicsQueue,
                                                          display_server->command_pool);
-    auto queue = std::make_shared<Pathfinder::QueueVk>(
-        display_server->get_device(), display_server->graphicsQueue, display_server->graphicsQueue);
     auto vector_server = VectorServer::get_singleton();
-    vector_server->init(device, queue);
+    vector_server->init(device);
 }
 
 void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {

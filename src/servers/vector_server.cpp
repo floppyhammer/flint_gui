@@ -4,9 +4,8 @@ using namespace Pathfinder;
 
 namespace Flint {
 
-void VectorServer::init(const std::shared_ptr<Pathfinder::Device> &device,
-                        const std::shared_ptr<Pathfinder::Queue> &queue) {
-    canvas = std::make_shared<Pathfinder::Canvas>(device, queue);
+void VectorServer::init(const std::shared_ptr<Pathfinder::Device> &device) {
+    canvas = std::make_shared<Pathfinder::Canvas>(device);
 }
 
 void VectorServer::cleanup() {
