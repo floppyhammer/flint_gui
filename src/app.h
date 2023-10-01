@@ -14,7 +14,7 @@
 
 #include "resources/image_texture.h"
 #include "resources/surface.h"
-#include "scene/scene_tree.h"
+#include "nodes/scene_tree.h"
 
 using namespace Flint;
 

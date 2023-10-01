@@ -4,8 +4,11 @@ using namespace Pathfinder;
 
 namespace Flint {
 
-void VectorServer::init(const std::shared_ptr<Pathfinder::Device> &device) {
-    canvas = std::make_shared<Pathfinder::Canvas>(device);
+void VectorServer::init(Pathfinder::Vec2I size,
+                        const std::shared_ptr<Pathfinder::Device> &device,
+                        const std::shared_ptr<Pathfinder::Queue> &queue,
+                        Pathfinder::RenderLevel level) {
+    canvas = std::make_shared<Pathfinder::Canvas>(size, device, queue, level);
 }
 
 void VectorServer::cleanup() {
@@ -24,8 +27,7 @@ void VectorServer::set_dst_texture(const std::shared_ptr<ImageTexture> &texture)
 }
 
 void VectorServer::submit_and_clear() {
-    canvas->draw();
-    canvas->clear();
+    canvas->draw(true);
 
     // TODO: clear the dst texture every frame even when there's nothing to draw on the canvas.
     // Get the dst texture.
@@ -241,8 +243,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
                 canvas->stroke_path(g.path);
             }
         } else {
-            auto svg_scene = std::make_shared<Pathfinder::SvgScene>();
-            svg_scene->load_from_string(g.svg, *canvas);
+            auto svg_scene = std::make_shared<Pathfinder::SvgScene>(g.svg, *canvas);
 
             // The emoji's svg size is always fixed for a specific font no matter what the font size you set.
             auto svg_size = svg_scene->get_scene()->get_view_box().size();
@@ -283,8 +284,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
 shared_ptr<Pathfinder::SvgScene> VectorServer::load_svg(const std::string &path) {
     auto bytes = Pathfinder::load_file_as_string(path);
 
-    auto svg_scene = std::make_shared<Pathfinder::SvgScene>();
-    svg_scene->load_from_string(bytes, *canvas);
+    auto svg_scene = std::make_shared<Pathfinder::SvgScene>(bytes, *canvas);
 
     return svg_scene;
 }
