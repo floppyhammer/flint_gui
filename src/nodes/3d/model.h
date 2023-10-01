@@ -1,5 +1,5 @@
-#ifndef FLINT_MESH_INSTANCE_3D_H
-#define FLINT_MESH_INSTANCE_3D_H
+#ifndef FLINT_MODEL_H
+#define FLINT_MODEL_H
 
 #include "../../resources/image_texture.h"
 #include "../../resources/surface.h"
@@ -7,9 +7,9 @@
 
 namespace Flint {
 
-class MeshInstance3d : public Node3d {
+class Model : public Node3d {
 public:
-    MeshInstance3d();
+    Model();
 
     void set_surfaces(const std::vector<std::shared_ptr<Surface3d>> &new_surfaces);
 
@@ -23,4 +23,4 @@ protected:
 
 } // namespace Flint
 
-#endif // FLINT_MESH_INSTANCE_3D_H
+#endif // FLINT_MODEL_H

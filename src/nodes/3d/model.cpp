@@ -1,4 +1,4 @@
-#include "mesh_instance_3d.h"
+#include "model.h"
 
 #include <utility>
 
@@ -11,11 +11,11 @@
 
 namespace Flint {
 
-MeshInstance3d::MeshInstance3d() {
-    type = NodeType::MeshInstance3d;
+Model::Model() {
+    type = NodeType::Model;
 }
 
-void MeshInstance3d::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
+void Model::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
     auto world = get_world();
     if (!world) {
         return;
@@ -46,11 +46,11 @@ void MeshInstance3d::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) 
     }
 }
 
-void MeshInstance3d::set_surfaces(const std::vector<std::shared_ptr<Surface3d>> &new_surfaces) {
+void Model::set_surfaces(const std::vector<std::shared_ptr<Surface3d>> &new_surfaces) {
     surfaces = new_surfaces;
 }
 
-void MeshInstance3d::update(double dt) {
+void Model::update(double dt) {
     update_mvp();
 }
 
