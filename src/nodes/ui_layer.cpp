@@ -1,13 +1,10 @@
 #include "ui_layer.h"
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/rotate_vector.hpp"
-#include "nodes/ui/node_ui.h"
-#include "nodes/window_proxy.h"
-#include "render/swap_chain.h"
-#include "resources/default_resource.h"
-#include "servers/vector_server.h"
+#include "../render/swap_chain.h"
+#include "../resources/default_resource.h"
+#include "../servers/vector_server.h"
+#include "ui/node_ui.h"
+#include "window_proxy.h"
 
 namespace Flint {
 

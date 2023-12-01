@@ -2,8 +2,8 @@
 #define FLINT_CAMERA2D_H
 
 #include "../../common/geometry.h"
+#include "../../render/subview.h"
 #include "node2d.h"
-#include "render/subview.h"
 
 namespace Flint {
 

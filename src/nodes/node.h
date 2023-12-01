@@ -4,10 +4,10 @@
 #include <memory>
 #include <vector>
 
+#include "../common/utils.h"
 #include "../servers/engine.h"
 #include "../servers/input_server.h"
-#include "common/utils.h"
-#include "servers/render_server.h"
+#include "../servers/render_server.h"
 
 namespace Flint {
 

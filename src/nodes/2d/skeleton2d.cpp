@@ -7,8 +7,9 @@
 #include "../../render/mvp.h"
 #include "../../render/swap_chain.h"
 #include "../../resources/resource_manager.h"
+#include "../../servers/display_server.h"
+#include "../../servers/render_server.h"
 #include "../world.h"
-#include "servers/render_server.h"
 
 namespace Flint {
 

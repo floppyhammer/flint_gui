@@ -4,8 +4,9 @@
 #include <memory>
 #include <vector>
 
+#include "../render/mvp.h"
+#include "../resources/surface.h"
 #include "node.h"
-#include "resources/surface.h"
 
 namespace Flint {
 

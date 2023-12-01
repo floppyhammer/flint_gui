@@ -28,20 +28,16 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
 # Include external and third-party headers.
 include_directories(third_party)
 
-# GLFW library.
+include_directories(third_party/fribidi third_party/fribidi/generated)
+
 include_directories(external/glfw/include)
 add_subdirectory(external/glfw)
 
-# Pathfinder library.
-add_compile_definitions(PATHFINDER_USE_VULKAN)
-include_directories(external/pathfinder-cpp/include)
-add_subdirectory(external/pathfinder-cpp)
+include_directories(third_party/glm-0.9.9.8)
+add_subdirectory(third_party/glm-0.9.9.8)
 
 include_directories(third_party/harfbuzz-8.3.0/src)
 add_subdirectory(third_party/harfbuzz-8.3.0)
-
-include_directories(third_party/glm-0.9.9.8)
-add_subdirectory(third_party/glm-0.9.9.8)
 
 include_directories(third_party/GSL-4.0.0/include)
 add_subdirectory(third_party/GSL-4.0.0)
@@ -50,6 +46,11 @@ include_directories(third_party/stduuid-1.2.3)
 
 add_subdirectory(third_party/poly2tri)
 add_subdirectory(third_party/zlib)
+
+# Pathfinder has to go after other libraries. Have no clue why this is the case.
+add_compile_definitions(PATHFINDER_USE_VULKAN)
+include_directories(external/pathfinder-cpp/include)
+add_subdirectory(external/pathfinder-cpp)
 
 if (WIN32)
     # Fix "too many characters in constant" error when using CMake with MSVC.

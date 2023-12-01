@@ -2,11 +2,12 @@
 #define FLINT_WORLD_H
 
 #include "../common/geometry.h"
+#include "../render/mvp.h"
 #include "../render/subview.h"
 #include "../resources/image_texture.h"
+#include "../resources/surface.h"
+#include "../servers/render_server.h"
 #include "node.h"
-#include "resources/surface.h"
-#include "servers/render_server.h"
 
 using Pathfinder::ColorF;
 using Pathfinder::Vec2I;
