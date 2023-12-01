@@ -1,8 +1,7 @@
 #include "scene_tree.h"
 
-#include <pathfinder-cpp/include/pathfinder.h>
-
 #include "render/swap_chain.h"
+#include "servers/display_server.h"
 
 namespace Flint {
 

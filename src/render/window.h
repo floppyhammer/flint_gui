@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "../common/geometry.h"
-#include "../render/base.h"
+#include "base.h"
 
 namespace Flint {
 

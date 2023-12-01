@@ -1,12 +1,7 @@
 #ifndef FLINT_RESOURCE_STYLE_BOX_H
 #define FLINT_RESOURCE_STYLE_BOX_H
 
-#include <pathfinder.h>
-
 #include "../common/geometry.h"
-
-using Pathfinder::ColorU;
-using Pathfinder::Vec2F;
 
 namespace Flint {
 

@@ -12,9 +12,6 @@
 
 namespace Flint {
 
-using Pathfinder::load_file_as_bytes;
-using Pathfinder::load_file_as_string;
-
 inline void split_path(const std::string &str, std::string &file_directory) {
     size_t found = str.find_last_of("/\\");
 

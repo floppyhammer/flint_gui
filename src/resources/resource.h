@@ -6,6 +6,7 @@
 #include <string>
 
 namespace Flint {
+
 class Resource {
 public:
     Resource() = default;
@@ -19,6 +20,7 @@ public:
     // Name for debugging reason.
     std::string name{};
 };
+
 } // namespace Flint
 
 #endif // FLINT_RESOURCE_H

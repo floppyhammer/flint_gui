@@ -37,20 +37,16 @@ add_compile_definitions(PATHFINDER_USE_VULKAN)
 include_directories(external/pathfinder-cpp/include)
 add_subdirectory(external/pathfinder-cpp)
 
-include_directories(external/harfbuzz/src)
-add_subdirectory(external/harfbuzz)
+include_directories(third_party/harfbuzz-8.3.0/src)
+add_subdirectory(third_party/harfbuzz-8.3.0)
 
-include_directories(external/glm)
-add_subdirectory(external/glm)
+include_directories(third_party/glm-0.9.9.8)
+add_subdirectory(third_party/glm-0.9.9.8)
 
-include_directories(external/entt/src)
-add_subdirectory(external/entt)
+include_directories(third_party/GSL-4.0.0/include)
+add_subdirectory(third_party/GSL-4.0.0)
 
-include_directories(external/GSL/include)
-add_subdirectory(external/GSL)
-
-include_directories(external/stduuid/include)
-add_subdirectory(external/stduuid)
+include_directories(third_party/stduuid-1.2.3)
 
 add_subdirectory(third_party/poly2tri)
 add_subdirectory(third_party/zlib)

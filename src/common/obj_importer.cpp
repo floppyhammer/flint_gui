@@ -1,14 +1,13 @@
 #include "obj_importer.h"
 
 #include "../resources/resource_manager.h"
+#include "geometry.h"
 #include "load_file.h"
 #include "utils.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader/tiny_obj_loader.h>
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/hash.hpp>
 #include <unordered_map>
 
 namespace std {

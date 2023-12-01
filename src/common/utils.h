@@ -3,15 +3,10 @@
 
 #include <pathfinder.h>
 
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
-#include <memory>
-
 namespace Flint::Utils {
 
-using Pathfinder::Logger;
-using Pathfinder::Timestamp;
+typedef Pathfinder::Logger Logger;
+typedef Pathfinder::Timestamp Timestamp;
 
 } // namespace Flint::Utils
 
