@@ -2,6 +2,7 @@
 #define FLINT_RENDER_MESH_H
 
 #include "../servers/render_server.h"
+#include "../servers/display_server.h"
 
 namespace Flint {
 

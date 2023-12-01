@@ -1,10 +1,9 @@
 #include "world.h"
 
 #include "../common/utils.h"
-#include "../render/swap_chain.h"
+#include "../resources/default_resource.h"
 #include "2d/camera2d.h"
 #include "3d/camera3d.h"
-#include "resources/default_resource.h"
 
 namespace Flint {
 

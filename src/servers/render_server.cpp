@@ -3,6 +3,7 @@
 #include <stdexcept>
 
 #include "../common/load_file.h"
+#include "../render/mvp.h"
 #include "../resources/default_resource.h"
 #include "display_server.h"
 
@@ -739,8 +740,8 @@ void RenderServer::create_skybox_layouts() {
 void RenderServer::create_mesh3d_pipeline(VkRenderPass renderPass, VkPipeline &pipeline) {
     auto device = DisplayServer::get_singleton()->get_device();
 
-    auto vertShaderCode = load_file_as_bytes("../src/shaders/mesh3d_vert.spv");
-    auto fragShaderCode = load_file_as_bytes("../src/shaders/mesh3d_frag.spv");
+    auto vertShaderCode = Pathfinder::load_file_as_bytes("../src/shaders/mesh3d_vert.spv");
+    auto fragShaderCode = Pathfinder::load_file_as_bytes("../src/shaders/mesh3d_frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
@@ -864,8 +865,8 @@ void RenderServer::create_mesh3d_pipeline(VkRenderPass renderPass, VkPipeline &p
 void RenderServer::create_mesh2d_pipeline(VkRenderPass renderPass, VkPipeline &pipeline) {
     auto device = DisplayServer::get_singleton()->get_device();
 
-    auto vertShaderCode = load_file_as_bytes("../src/shaders/mesh2d_vert.spv");
-    auto fragShaderCode = load_file_as_bytes("../src/shaders/mesh2d_frag.spv");
+    auto vertShaderCode = Pathfinder::load_file_as_bytes("../src/shaders/mesh2d_vert.spv");
+    auto fragShaderCode = Pathfinder::load_file_as_bytes("../src/shaders/mesh2d_frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
@@ -999,8 +1000,8 @@ void RenderServer::create_mesh2d_pipeline(VkRenderPass renderPass, VkPipeline &p
 void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass, VkPipeline &pipeline) {
     auto device = DisplayServer::get_singleton()->get_device();
 
-    auto vertShaderCode = load_file_as_bytes("../src/shaders/skeleton_2d_vert.spv");
-    auto fragShaderCode = load_file_as_bytes("../src/shaders/skeleton_2d_frag.spv");
+    auto vertShaderCode = Pathfinder::load_file_as_bytes("../src/shaders/skeleton_2d_vert.spv");
+    auto fragShaderCode = Pathfinder::load_file_as_bytes("../src/shaders/skeleton_2d_frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);
@@ -1134,8 +1135,8 @@ void RenderServer::create_skeleton2d_mesh_pipeline(VkRenderPass renderPass, VkPi
 void RenderServer::create_skybox_pipeline(VkRenderPass renderPass, VkPipeline &pipeline) const {
     auto device = DisplayServer::get_singleton()->get_device();
 
-    auto vertShaderCode = load_file_as_bytes("../src/shaders/skybox_vert.spv");
-    auto fragShaderCode = load_file_as_bytes("../src/shaders/skybox_frag.spv");
+    auto vertShaderCode = Pathfinder::load_file_as_bytes("../src/shaders/skybox_vert.spv");
+    auto fragShaderCode = Pathfinder::load_file_as_bytes("../src/shaders/skybox_frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(device, vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(device, fragShaderCode);

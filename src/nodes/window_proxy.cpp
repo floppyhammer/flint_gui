@@ -1,5 +1,6 @@
 #include "window_proxy.h"
 
+#include "../servers/display_server.h"
 #include "../servers/vector_server.h"
 
 namespace Flint {

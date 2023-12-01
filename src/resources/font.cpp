@@ -98,7 +98,7 @@ Script get_text_script(const std::string &text) {
 }
 
 Font::Font(const std::string &path) : Resource(path) {
-    font_data = load_file_as_bytes(path.c_str());
+    font_data = Pathfinder::load_file_as_bytes(path.c_str());
 
     auto byte_size = font_data.size() * sizeof(unsigned char);
 

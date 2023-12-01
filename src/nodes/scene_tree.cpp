@@ -1,7 +1,7 @@
 #include "scene_tree.h"
 
-#include "render/swap_chain.h"
-#include "servers/display_server.h"
+#include "../render/swap_chain.h"
+#include "../servers/display_server.h"
 
 namespace Flint {
 
@@ -17,6 +17,7 @@ SceneTree::SceneTree(Vec2I main_window_size) {
     // Initialize the vector server.
     auto device = std::make_shared<Pathfinder::DeviceVk>(display_server->get_device(),
                                                          display_server->physicalDevice,
+                                                         display_server->graphicsQueue,
                                                          display_server->graphicsQueue,
                                                          display_server->command_pool);
     auto queue = std::make_shared<Pathfinder::QueueVk>(

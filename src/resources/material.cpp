@@ -1,6 +1,7 @@
 #include "material.h"
 
 #include "../render/swap_chain.h"
+#include "../servers/display_server.h"
 
 namespace Flint {
 Material2dDescSet::Material2dDescSet() {
@@ -43,7 +44,8 @@ void Material3dDescSet::createDescriptorPool() {
     poolInfo.pPoolSizes = poolSizes.data();
     poolInfo.maxSets = static_cast<uint32_t>(DisplayServer::get_singleton()->swapchain_image_count);
 
-    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptorPool) !=
+        VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor pool!");
     }
 }
@@ -53,7 +55,8 @@ void Material3dDescSet::createDescriptorSet() {
 
     auto &descriptorSetLayout = RenderServer::get_singleton()->mesh_descriptor_set_layout;
 
-    std::vector<VkDescriptorSetLayout> layouts(DisplayServer::get_singleton()->swapchain_image_count, descriptorSetLayout);
+    std::vector<VkDescriptorSetLayout> layouts(DisplayServer::get_singleton()->swapchain_image_count,
+                                               descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = descriptorPool;
@@ -118,7 +121,8 @@ void Material2dDescSet::createDescriptorPool() {
     poolInfo.pPoolSizes = poolSizes.data();
     poolInfo.maxSets = static_cast<uint32_t>(DisplayServer::get_singleton()->swapchain_image_count);
 
-    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptorPool) !=
+        VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor pool!");
     }
 }
@@ -128,7 +132,8 @@ void Material2dDescSet::createDescriptorSet() {
 
     auto &descriptorSetLayout = RenderServer::get_singleton()->blit_descriptor_set_layout;
 
-    std::vector<VkDescriptorSetLayout> layouts(DisplayServer::get_singleton()->swapchain_image_count, descriptorSetLayout);
+    std::vector<VkDescriptorSetLayout> layouts(DisplayServer::get_singleton()->swapchain_image_count,
+                                               descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = descriptorPool;
@@ -228,7 +233,8 @@ void MaterialSkyboxDescSet::createDescriptorPool() {
     poolInfo.pPoolSizes = poolSizes.data();
     poolInfo.maxSets = static_cast<uint32_t>(DisplayServer::get_singleton()->swapchain_image_count);
 
-    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+    if (vkCreateDescriptorPool(DisplayServer::get_singleton()->get_device(), &poolInfo, nullptr, &descriptorPool) !=
+        VK_SUCCESS) {
         throw std::runtime_error("Failed to create descriptor pool!");
     }
 }
@@ -238,7 +244,8 @@ void MaterialSkyboxDescSet::createDescriptorSet() {
 
     auto &descriptorSetLayout = RenderServer::get_singleton()->skybox_descriptor_set_layout;
 
-    std::vector<VkDescriptorSetLayout> layouts(DisplayServer::get_singleton()->swapchain_image_count, descriptorSetLayout);
+    std::vector<VkDescriptorSetLayout> layouts(DisplayServer::get_singleton()->swapchain_image_count,
+                                               descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = descriptorPool;

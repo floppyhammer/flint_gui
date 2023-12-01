@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include "../servers/display_server.h"
+
 namespace Flint {
 
 Subview::Subview(Vec2I view_size) {
