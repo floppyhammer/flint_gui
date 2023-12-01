@@ -1,9 +1,9 @@
-#ifndef FLINT_SUBVIEW_H
-#define FLINT_SUBVIEW_H
+#ifndef FLINT_RENDER_SUBVIEW_H
+#define FLINT_RENDER_SUBVIEW_H
 
 #include "../common/geometry.h"
 #include "../resources/image_texture.h"
-#include "servers/render_server.h"
+#include "../servers/render_server.h"
 
 namespace Flint {
 
@@ -54,4 +54,4 @@ private:
 
 } // namespace Flint
 
-#endif // FLINT_SUBVIEW_H
+#endif // FLINT_RENDER_SUBVIEW_H

@@ -1,5 +1,7 @@
 #include "vector_server.h"
 
+#include "render_server.h"
+
 using namespace Pathfinder;
 
 namespace Flint {

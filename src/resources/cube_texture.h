@@ -1,11 +1,9 @@
 #ifndef FLINT_CUBE_TEXTURE_H
 #define FLINT_CUBE_TEXTURE_H
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #include <memory>
 
+#include "../render/base.h"
 #include "../servers/render_server.h"
 #include "texture.h"
 

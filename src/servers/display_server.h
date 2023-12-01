@@ -1,15 +1,13 @@
 #ifndef FLINT_DISPLAY_SERVER_H
 #define FLINT_DISPLAY_SERVER_H
 
-#include "../common/geometry.h"
-
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #include <cstdint>
 #include <cstring>
 #include <optional>
 #include <vector>
+
+#include "../common/geometry.h"
+#include "../render/base.h"
 
 using Pathfinder::Vec2;
 using Pathfinder::Vec2F;

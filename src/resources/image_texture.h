@@ -1,12 +1,9 @@
 #ifndef FLINT_IMAGE_TEXTURE_H
 #define FLINT_IMAGE_TEXTURE_H
 
-#define GLFW_INCLUDE_VULKAN
-
 #include <memory>
 
-#include "GLFW/glfw3.h"
-#include "servers/render_server.h"
+#include "../render/base.h"
 #include "texture.h"
 
 namespace Flint {

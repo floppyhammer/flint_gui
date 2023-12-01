@@ -2,8 +2,6 @@
 #define FLINT_CAMERA3D_H
 
 #include "../../common/geometry.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "node3d.h"
 #include "render/subview.h"
 

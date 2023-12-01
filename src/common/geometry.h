@@ -3,11 +3,18 @@
 
 #include <pathfinder.h>
 
-using Pathfinder::ColorF;
-using Pathfinder::ColorU;
-using Pathfinder::Range;
-using Pathfinder::Transform2;
-using Pathfinder::Vec2F;
-using Pathfinder::Vec2I;
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+namespace Flint {
+
+typedef Pathfinder::ColorU ColorU;
+typedef Pathfinder::RectF RectF;
+typedef Pathfinder::Transform2 Transform2;
+typedef Pathfinder::Vec2F Vec2F;
+typedef Pathfinder::Vec2I Vec2I;
+
+} // namespace Flint
 
 #endif // FLINT_GEOMETRY_H

@@ -9,12 +9,6 @@
 #include "../resources/style_box.h"
 #include "../resources/vector_texture.h"
 
-using Pathfinder::ColorU;
-using Pathfinder::RectF;
-using Pathfinder::Transform2;
-using Pathfinder::Vec2F;
-using Pathfinder::Vec2I;
-
 namespace Flint {
 
 /**

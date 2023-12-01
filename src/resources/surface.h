@@ -6,12 +6,10 @@
 #include <utility>
 #include <vector>
 
+#include "../render/base.h"
 #include "../render/vertex.h"
 #include "../resources/mesh.h"
 #include "material.h"
-
-#define GLFW_INCLUDE_VULKAN
-#include "GLFW/glfw3.h"
 
 namespace Flint {
 

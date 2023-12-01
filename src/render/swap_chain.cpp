@@ -4,8 +4,8 @@
 #include <cstdint>
 #include <memory>
 
-#include "servers/display_server.h"
-#include "servers/render_server.h"
+#include "../servers/display_server.h"
+#include "../servers/render_server.h"
 
 namespace Flint {
 

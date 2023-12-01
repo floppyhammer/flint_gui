@@ -2,10 +2,6 @@
 
 #include <poly2tri/poly2tri.h>
 
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #include "../../common/geometry.h"
 #include "../../common/utils.h"
 #include "../../render/mvp.h"

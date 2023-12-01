@@ -1,16 +1,13 @@
 #ifndef FLINT_RENDER_SERVER_H
 #define FLINT_RENDER_SERVER_H
 
-#include "../render/mvp.h"
-#include "../render/window.h"
-
-#define GLFW_INCLUDE_VULKAN
 #include <array>
 #include <iostream>
 #include <optional>
 #include <vector>
 
-#include "glfw/include/GLFW/glfw3.h"
+#include "../common/geometry.h"
+#include "../render/base.h"
 
 namespace Flint {
 

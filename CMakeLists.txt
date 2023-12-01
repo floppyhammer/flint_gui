@@ -26,7 +26,7 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
         third_party/ttf2mesh/ttf2mesh.c)
 
 # Include external and third-party headers.
-include_directories(external third_party)
+include_directories(third_party)
 
 # GLFW library.
 include_directories(external/glfw/include)
@@ -43,10 +43,6 @@ add_subdirectory(external/harfbuzz)
 include_directories(external/glm)
 add_subdirectory(external/glm)
 
-add_subdirectory(third_party/poly2tri)
-
-add_subdirectory(third_party/zlib)
-
 include_directories(external/entt/src)
 add_subdirectory(external/entt)
 
@@ -55,6 +51,9 @@ add_subdirectory(external/GSL)
 
 include_directories(external/stduuid/include)
 add_subdirectory(external/stduuid)
+
+add_subdirectory(third_party/poly2tri)
+add_subdirectory(third_party/zlib)
 
 if (WIN32)
     # Fix "too many characters in constant" error when using CMake with MSVC.

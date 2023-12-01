@@ -6,9 +6,7 @@
 #include <vector>
 
 #include "../common/geometry.h"
-#include "../servers/display_server.h"
-
-using Pathfinder::Vec2I;
+#include "../render/base.h"
 
 namespace Flint {
 

@@ -1,14 +1,12 @@
 #ifndef FLINT_INPUT_SERVER_H
 #define FLINT_INPUT_SERVER_H
 
-#include "../common/geometry.h"
-#include "../render/window.h"
-
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #include <cstdint>
 #include <vector>
+
+#include "../common/geometry.h"
+#include "../render/base.h"
+#include "../render/window.h"
 
 using Pathfinder::Vec2;
 using Pathfinder::Vec2F;

@@ -3,6 +3,7 @@
 #include "../common/macros.h"
 #include "../common/utils.h"
 #include "../servers/display_server.h"
+#include "../servers/render_server.h"
 
 // Already defined in Pathfinder.
 // #define STB_IMAGE_IMPLEMENTATION

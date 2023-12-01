@@ -1,13 +1,10 @@
-#ifndef FLINT_MVP_H
-#define FLINT_MVP_H
-
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
+#ifndef FLINT_RENDER_MVP_H
+#define FLINT_RENDER_MVP_H
 
 #include <vector>
+
+#include "../common/geometry.h"
+#include "base.h"
 
 namespace Flint {
 
@@ -37,10 +34,7 @@ public:
     std::vector<VkBuffer> uniform_buffers;
     std::vector<VkDeviceMemory> uniform_buffers_memory;
 
-    /**
-     * Update buffer. Update buffer data simply by memory mapping.
-     * @param currentImage Current image, which has different meaning from `current frame`.
-     */
+    /// Update buffer. Update buffer data simply by memory mapping.
     void update_uniform_buffer(ModelViewProjection mvp);
 
 private:
@@ -55,4 +49,4 @@ private:
 
 } // namespace Flint
 
-#endif // FLINT_MVP_H
+#endif // FLINT_RENDER_MVP_H

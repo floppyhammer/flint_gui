@@ -1,11 +1,10 @@
 #include "render_server.h"
 
-#include <set>
 #include <stdexcept>
 
-#include "common/load_file.h"
+#include "../common/load_file.h"
+#include "../resources/default_resource.h"
 #include "display_server.h"
-#include "resources/default_resource.h"
 
 namespace Flint {
 
