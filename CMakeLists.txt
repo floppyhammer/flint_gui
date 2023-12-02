@@ -28,8 +28,6 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
 # Include external and third-party headers.
 include_directories(third_party)
 
-include_directories(third_party/fribidi third_party/fribidi/generated)
-
 include_directories(external/glfw/include)
 add_subdirectory(external/glfw)
 
@@ -48,7 +46,6 @@ add_subdirectory(third_party/poly2tri)
 add_subdirectory(third_party/zlib)
 
 # Pathfinder has to go after other libraries. Have no clue why this is the case.
-add_compile_definitions(PATHFINDER_USE_VULKAN)
 include_directories(external/pathfinder-cpp/include)
 add_subdirectory(external/pathfinder-cpp)
 
