@@ -8,13 +8,9 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "../common/geometry.h"
 #include "../common/utils.h"
 #include "resource.h"
-
-using Pathfinder::ColorU;
-using Pathfinder::RectF;
-using Pathfinder::RectI;
-using Pathfinder::Vec2F;
 
 namespace Flint {
 

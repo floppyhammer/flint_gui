@@ -9,9 +9,6 @@
 #include "../common/geometry.h"
 #include "../render/base.h"
 
-using Pathfinder::Vec2;
-using Pathfinder::Vec2F;
-
 namespace Flint {
 
 /// List of required validation layers.

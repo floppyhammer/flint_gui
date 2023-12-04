@@ -8,9 +8,6 @@
 #include "../render/base.h"
 #include "../render/window.h"
 
-using Pathfinder::Vec2;
-using Pathfinder::Vec2F;
-
 namespace Flint {
 
 enum class InputEventType {
