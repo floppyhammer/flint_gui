@@ -9,15 +9,14 @@
 #include <queue>
 #include <vector>
 
+#include "common/geometry.h"
 #include "nodes/scene_tree.h"
-#include "resources/image_texture.h"
-#include "resources/surface.h"
+#include "render/blit.h"
 
-using namespace Flint;
-
+namespace Flint {
 class App {
 public:
-    App(Vec2I window_size);
+    explicit App(Vec2I primary_window_size);
 
     ~App();
 
@@ -26,10 +25,13 @@ public:
     SceneTree* get_tree();
 
 private:
-    void cleanup();
-
-private:
     std::unique_ptr<SceneTree> tree;
+
+    std::shared_ptr<Pathfinder::Window> primary_window_;
+    std::shared_ptr<Pathfinder::SwapChain> primary_swap_chain_;
+    std::shared_ptr<Pathfinder::Texture> vector_target_;
 };
+
+} // namespace Flint
 
 #endif // FLINT_APP_H

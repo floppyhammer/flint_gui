@@ -12,6 +12,7 @@
 namespace Flint {
 
 typedef Pathfinder::ColorU ColorU;
+typedef Pathfinder::ColorF ColorF;
 typedef Pathfinder::RectF RectF;
 typedef Pathfinder::RectI RectI;
 typedef Pathfinder::Transform2 Transform2;

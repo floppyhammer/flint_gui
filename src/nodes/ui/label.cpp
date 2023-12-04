@@ -228,7 +228,7 @@ void Label::set_vertical_alignment(Alignment alignment) {
     consider_alignment();
 }
 
-Vec2<float> Label::calc_minimum_size() const {
+Vec2F Label::calc_minimum_size() const {
     auto min_size = get_text_size();
 
     // Label has a minimal height even when the text is empty.
@@ -237,8 +237,8 @@ Vec2<float> Label::calc_minimum_size() const {
     return min_size.max(minimum_size);
 }
 
-Vec2<float> Label::get_text_size() const {
-    return layout_box.is_valid() ? layout_box.size() : Vec2<float>(0);
+Vec2F Label::get_text_size() const {
+    return layout_box.is_valid() ? layout_box.size() : Vec2F(0);
 }
 
 std::vector<Glyph> &Label::get_glyphs() {

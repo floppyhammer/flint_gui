@@ -7,15 +7,13 @@
 #include "../common/utils.h"
 #include "../servers/engine.h"
 #include "../servers/input_server.h"
-#include "../servers/render_server.h"
 
 namespace Flint {
 
 enum class NodeType {
     // General.
     Node = 0,
-    World,
-    UiLayer,
+    Window,
 
     // UI.
     NodeUi,
@@ -25,8 +23,7 @@ enum class NodeType {
     HStackContainer,
     VStackContainer,
     ScrollContainer,
-    Window,
-    Popup,
+
     TabContainer,
     Button,
     Label,
@@ -37,29 +34,18 @@ enum class NodeType {
     ProgressBar,
     SpinBox,
 
-    // 2D.
-    Node2d,
-    Sprite2d,
-    Skeleton2d,
-    Camera2d,
-
-    // 3D.
-    Node3d,
-    Sprite3d,
-    Model,
-    Skybox,
-    Text3d,
-    Camera3d,
-
     Max,
 };
 
-class World;
-class WindowProxy;
+class SceneTree;
 
 class Node {
+    friend class SceneTree;
+
 public:
     std::string name;
+
+    ~Node() = default;
 
 public:
     virtual void propagate_input(InputEvent &event);
@@ -69,7 +55,7 @@ public:
     virtual void propagate_notify(Signal signal);
 
     // Override this to intercept the propagation of rendering operations.
-    virtual void propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer);
+    virtual void propagate_draw();
 
     virtual void propagate_cleanup();
 
@@ -79,21 +65,11 @@ public:
 
     virtual void notify(Signal signal);
 
-    virtual void draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer);
+    virtual void draw();
 
     void add_child(const std::shared_ptr<Node> &new_child);
 
     NodeType get_node_type() const;
-
-    /**
-     * Get the viewport this node belongs to.
-     * @return A pointer to the viewport.
-     */
-    World *get_world();
-
-    WindowProxy *get_window();
-
-    uint32_t get_current_image();
 
     void set_parent(Node *node);
 
@@ -105,9 +81,9 @@ public:
 
     void remove_child(size_t index);
 
-    NodeType extended_from_which_base_node() const;
-
-    bool is_ui_node() const;
+    virtual bool is_ui_node() const {
+        return false;
+    }
 
     std::string get_node_path() const;
 
@@ -126,6 +102,8 @@ public:
 
     void enable_visual_debug(bool enabled);
 
+    SceneTree *get_tree() const;
+
 protected:
     NodeType type = NodeType::Node;
 
@@ -136,6 +114,8 @@ protected:
     // Don't use a shared pointer as it causes circular references.
     // Also, we must initialize it to null.
     Node *parent{};
+
+    SceneTree *tree_;
 
     // Called when subtree structure changes.
     std::vector<std::function<void()>> subtree_changed_callbacks;

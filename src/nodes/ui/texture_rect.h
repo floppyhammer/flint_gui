@@ -3,8 +3,6 @@
 
 #include <memory>
 
-#include "../../resources/surface.h"
-#include "../../resources/texture.h"
 #include "node_ui.h"
 
 namespace Flint {
@@ -16,11 +14,11 @@ class TextureRect : public NodeUi {
 public:
     TextureRect();
 
-    void set_texture(const std::shared_ptr<Texture> &p_texture);
+    void set_texture(const std::shared_ptr<Image> &p_texture);
 
-    [[nodiscard]] std::shared_ptr<Texture> get_texture() const;
+    [[nodiscard]] std::shared_ptr<Image> get_texture() const;
 
-    virtual Vec2F calc_minimum_size() const override;
+    Vec2F calc_minimum_size() const override;
 
     enum class StretchMode {
         Scale,        // Scale it to the TextureRect size.
@@ -42,7 +40,7 @@ private:
 
     StretchMode stretch_mode = StretchMode::Scale;
 
-    std::shared_ptr<Texture> texture;
+    std::shared_ptr<Image> texture;
 };
 
 } // namespace Flint

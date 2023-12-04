@@ -2,7 +2,9 @@
 
 #include "../../common/geometry.h"
 #include "../../resources/default_resource.h"
-#include "../../resources/vector_texture.h"
+#include "../../resources/vector_image.h"
+
+#include <optional>
 
 namespace Flint {
 
@@ -151,7 +153,7 @@ void Button::draw() {
         vector_server->draw_style_box(active_style_box.value(), global_position, size);
     }
 
-    margin_container->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
+    margin_container->propagate_draw();
 
     NodeUi::draw();
 }
@@ -190,7 +192,7 @@ void Button::set_text(const std::string &text) {
     label->set_text(text);
 }
 
-void Button::set_icon(const std::shared_ptr<Texture> &p_icon) {
+void Button::set_icon(const std::shared_ptr<Image> &p_icon) {
     icon_rect->set_texture(p_icon);
 }
 

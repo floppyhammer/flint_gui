@@ -5,9 +5,9 @@
 
 #include "../common/geometry.h"
 #include "../resources/font.h"
-#include "../resources/image_texture.h"
+#include "../resources/raster_image.h"
 #include "../resources/style_box.h"
-#include "../resources/vector_texture.h"
+#include "../resources/vector_image.h"
 
 namespace Flint {
 
@@ -28,7 +28,7 @@ public:
               const std::shared_ptr<Pathfinder::Queue> &queue,
               Pathfinder::RenderLevel level);
 
-    void set_dst_texture(const std::shared_ptr<ImageTexture> &texture);
+    void set_dst_texture(const std::shared_ptr<Pathfinder::Texture> &texture);
 
     void cleanup();
 
@@ -42,9 +42,9 @@ public:
 
     void draw_path(VectorPath &vector_path, Transform2 transform);
 
-    void draw_image_texture(ImageTexture &texture, Transform2 transform);
+    void draw_raster_image(RasterImage &image, Transform2 transform);
 
-    void draw_vector_texture(VectorTexture &texture, Transform2 transform);
+    void draw_vector_image(VectorImage &image, Transform2 transform);
 
     void draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size);
 

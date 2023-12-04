@@ -4,11 +4,8 @@
 #include <vector>
 
 #include "../../common/geometry.h"
-#include "../../render/mvp.h"
 #include "../../resources/style_box.h"
-#include "../../resources/surface.h"
 #include "../../servers/input_server.h"
-#include "../../servers/render_server.h"
 #include "../../servers/vector_server.h"
 #include "../node.h"
 
@@ -82,11 +79,15 @@ public:
 
     virtual Vec2F calc_minimum_size() const;
 
+    bool is_ui_node() const override {
+        return true;
+    }
+
     Vec2F get_global_position() const;
 
     virtual void draw();
 
-    void propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) override;
+    void propagate_draw() override;
 
     void set_mouse_filter(MouseFilter filter);
 
@@ -125,15 +126,15 @@ public:
 protected:
     Vec2F position{0};
     Vec2F size{128};
-    Vec2<float> scale{1};
-    Vec2<float> pivot_offset{0}; // Top-left as the default pivot.
+    Vec2F scale{1};
+    Vec2F pivot_offset{0}; // Top-left as the default pivot.
     float rotation = 0;
 
     bool focused = false;
 
     bool is_pressed_inside = false;
 
-    Vec2<float> minimum_size{0};
+    Vec2F minimum_size{0};
 
     Vec2F local_mouse_position;
 

@@ -1,9 +1,7 @@
 #include "node_ui.h"
 
 #include "../../common/geometry.h"
-#include "../../render/swap_chain.h"
 #include "../../resources/default_resource.h"
-#include "../world.h"
 
 using Pathfinder::Rect;
 
@@ -22,7 +20,7 @@ Vec2F NodeUi::calc_minimum_size() const {
     return minimum_size;
 }
 
-void NodeUi::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
+void NodeUi::propagate_draw() {
     if (!visible) {
         return;
     }
@@ -30,7 +28,7 @@ void NodeUi::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer
     draw();
 
     for (auto &child : children) {
-        child->propagate_draw(render_pass, cmd_buffer);
+        child->propagate_draw();
     }
 }
 
@@ -293,10 +291,6 @@ void NodeUi::get_anchor_flag() {
 }
 
 void NodeUi::when_window_size_changed(Vec2I new_size) {
-    if (parent->get_node_type() != NodeType::UiLayer) {
-        return;
-    }
-
     switch (anchor_mode) {
         case AnchorFlag::FullRect: {
             size = new_size.to_f32();

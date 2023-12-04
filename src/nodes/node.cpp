@@ -2,10 +2,6 @@
 
 #include <string>
 
-#include "../render/swap_chain.h"
-#include "window_proxy.h"
-#include "world.h"
-
 namespace Flint {
 
 void Node::propagate_update(double dt) {
@@ -16,11 +12,11 @@ void Node::propagate_update(double dt) {
     }
 }
 
-void Node::propagate_draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
-    draw(render_pass, cmd_buffer);
+void Node::propagate_draw() {
+    draw();
 
     for (auto &child : children) {
-        child->propagate_draw(render_pass, cmd_buffer);
+        child->propagate_draw();
     }
 }
 
@@ -57,23 +53,7 @@ void Node::update(double delta) {
 void Node::notify(Signal signal) {
 }
 
-void Node::draw(VkRenderPass render_pass, VkCommandBuffer cmd_buffer) {
-}
-
-World *Node::get_world() {
-    if (parent == nullptr) {
-        return nullptr;
-    }
-
-    return parent->type == NodeType::World ? (World *)parent : parent->get_world();
-}
-
-WindowProxy *Node::get_window() {
-    if (parent == nullptr) {
-        return nullptr;
-    }
-
-    return parent->type == NodeType::Window ? (WindowProxy *)parent : parent->get_window();
+void Node::draw() {
 }
 
 void Node::set_parent(Node *node) {
@@ -91,27 +71,9 @@ std::vector<std::shared_ptr<Node>> Node::get_children() {
 void Node::add_child(const std::shared_ptr<Node> &new_child) {
     // Set self as the parent of the new node.
     new_child->parent = this;
-
-    //        if (p_child->name.empty()) {
-    //            auto node_type_name = NodeTypeName[(uint32_t) p_child->type];
-    //
-    //            uint32_t same_type_child_count = 0;
-    //            for (auto &c: children) {
-    //                if (c->type == p_child->type) {
-    //                    same_type_child_count++;
-    //                }
-    //            }
-    //
-    //            p_child->name = node_type_name + std::to_string(children.size());
-    //        }
+    new_child->tree_ = tree_;
 
     children.push_back(new_child);
-
-    if (new_child->get_node_type() == NodeType::Camera2d) {
-        get_world()->add_camera2d((Camera2d *)new_child.get());
-    } else if (new_child->get_node_type() == NodeType::Camera3d) {
-        get_world()->add_camera3d((Camera3d *)new_child.get());
-    }
 }
 
 std::shared_ptr<Node> Node::get_child(size_t index) {
@@ -123,12 +85,10 @@ std::shared_ptr<Node> Node::get_child(size_t index) {
 }
 
 void Node::remove_child(size_t index) {
-    if (index < 0 || index >= children.size()) return;
+    if (index < 0 || index >= children.size()) {
+        return;
+    }
     children.erase(children.begin() + index);
-}
-
-bool Node::is_ui_node() const {
-    return type >= NodeType::NodeUi && type < NodeType::Node2d;
 }
 
 void Node::set_visibility(bool _visible) {
@@ -147,27 +107,14 @@ bool Node::get_global_visibility() const {
     }
 }
 
-NodeType Node::extended_from_which_base_node() const {
-    if (type < NodeType::NodeUi)
-        return NodeType::Node;
-    else if (type < NodeType::Node2d)
-        return NodeType::NodeUi;
-    else if (type < NodeType::Node3d)
-        return NodeType::Node2d;
-    else if (type < NodeType::Max)
-        return NodeType::Node3d;
-    else
-        return NodeType::Max;
-}
-
 std::string Node::get_node_path() const {
     std::string type_name = ""; // NodeTypeName[static_cast<unsigned __int64>(type)];
 
     if (parent) {
         return parent->get_node_path() + "/" + type_name;
-    } else {
-        return "/" + type_name;
     }
+
+    return "/" + type_name;
 }
 
 void Node::when_subtree_changed() {
@@ -195,15 +142,8 @@ NodeType Node::get_node_type() const {
     return type;
 }
 
-uint32_t Node::get_current_image() {
-    WindowProxy *window = get_window();
-    if (!window) {
-        abort();
-    }
-
-    uint32_t current_image = window->swapchain->currentImage;
-
-    return current_image;
+SceneTree *Node::get_tree() const {
+    return tree_;
 }
 
 } // namespace Flint

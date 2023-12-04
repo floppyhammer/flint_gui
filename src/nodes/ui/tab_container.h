@@ -1,6 +1,8 @@
 #ifndef FLINT_TAB_CONTAINER_H
 #define FLINT_TAB_CONTAINER_H
 
+#include <optional>
+
 #include "button.h"
 #include "container.h"
 

@@ -39,7 +39,7 @@ public:
 
     void set_text(const std::string &text);
 
-    void set_icon(const std::shared_ptr<Texture> &_icon);
+    void set_icon(const std::shared_ptr<Image> &_icon);
 
     /// The icon will expand until it's height matches that of the button.
     void set_expand_icon(bool enable);

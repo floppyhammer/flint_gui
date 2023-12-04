@@ -3,11 +3,12 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 
 #include "../../common/geometry.h"
 #include "../../resources/font.h"
 #include "../../resources/style_box.h"
-#include "../../resources/vector_texture.h"
+#include "../../resources/vector_image.h"
 #include "button.h"
 #include "node_ui.h"
 #include "stack_container.h"
@@ -36,12 +37,11 @@ public:
 
     void input(InputEvent &event, Vec2F global_position);
 
-    void propagate_draw(
-        float folding_width, uint32_t depth, float &offset_y, Vec2F global_position);
+    void propagate_draw(float folding_width, uint32_t depth, float &offset_y, Vec2F global_position);
 
     void set_text(const std::string &text);
 
-    void set_icon(const std::shared_ptr<Texture> &texture);
+    void set_icon(const std::shared_ptr<Image> &image);
 
 private:
     bool collapsed = false;
@@ -51,7 +51,7 @@ private:
     Vec2F position;
 
     std::shared_ptr<Button> collapse_button;
-    std::shared_ptr<VectorTexture> collapsed_tex, expanded_tex;
+    std::shared_ptr<VectorImage> collapsed_tex, expanded_tex;
 
     std::shared_ptr<TextureRect> icon;
 

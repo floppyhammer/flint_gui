@@ -1,4 +1,4 @@
-# Flint
+# flint_gui
 
 This is an experimental vector-based GUI framework.
 
@@ -6,11 +6,11 @@ This is an experimental vector-based GUI framework.
 
 Features:
 
-* Node-based scene manager
-* Vulkan backend
+* Node-based scene management
+* Vulkan/OpenGL backend
 * High quality antialiasing
 * Multiple window support
-* Cross-platform (Windows, Linux)
+* Cross-platform (Windows, Linux, macOS)
 * I18n support
 
 The development work has been mostly done on Windows, but it should be easy to make

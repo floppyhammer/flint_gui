@@ -6,9 +6,10 @@
 
 #include "../common/geometry.h"
 #include "../render/base.h"
-#include "../render/window.h"
 
 namespace Flint {
+
+class Window;
 
 enum class InputEventType {
     MouseButton = 0,
@@ -102,7 +103,7 @@ public:
 
     void initialize_window_callbacks(GLFWwindow *window);
 
-    void collect_events();
+    void clear_events();
 
     Vec2F cursor_position;
     Vec2F last_cursor_position;

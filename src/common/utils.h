@@ -3,11 +3,11 @@
 
 #include <pathfinder.h>
 
-namespace Flint::Utils {
+namespace Flint {
 
 typedef Pathfinder::Logger Logger;
 typedef Pathfinder::Timestamp Timestamp;
 
-} // namespace Flint::Utils
+} // namespace Flint
 
 #endif // FLINT_UTILS_H

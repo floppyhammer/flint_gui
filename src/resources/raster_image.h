@@ -1,16 +1,20 @@
 #ifndef FLINT_RASTER_IMAGE_H
 #define FLINT_RASTER_IMAGE_H
 
-#include <cstdint>
-#include <vector>
+#include <memory>
+
+#include "../render/base.h"
+#include "image.h"
 
 namespace Flint {
 
-/// CPU-only image data.
-class RasterImage {
-    uint32_t width;
-    uint32_t height;
-    std::vector<uint32_t> data;
+class RasterImage final : public Image {
+public:
+    RasterImage();
+
+    explicit RasterImage(const std::string &path);
+
+    std::shared_ptr<Pathfinder::Image> image_data;
 };
 
 } // namespace Flint

@@ -6,9 +6,6 @@
 
 using namespace Flint;
 
-using Pathfinder::Vec2;
-using Pathfinder::Vec3;
-
 const uint32_t WINDOW_WIDTH = 640;
 const uint32_t WINDOW_HEIGHT = 480;
 

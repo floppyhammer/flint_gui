@@ -1,16 +1,12 @@
-#ifndef FLINT_VECTOR_TEXTURE_H
-#define FLINT_VECTOR_TEXTURE_H
+#ifndef FLINT_VECTOR_IMAGE_H
+#define FLINT_VECTOR_IMAGE_H
 
 #include <pathfinder.h>
 
 #include <memory>
 
 #include "../common/geometry.h"
-#include "texture.h"
-
-using Pathfinder::ColorU;
-using Pathfinder::Transform2;
-using Pathfinder::Vec2;
+#include "image.h"
 
 namespace Flint {
 
@@ -25,15 +21,15 @@ struct VectorPath {
 };
 
 /// A SVG analogy.
-class VectorTexture : public Texture {
+class VectorImage : public Image {
 public:
-    explicit VectorTexture(Vec2I _size);
+    explicit VectorImage(Vec2I _size);
 
     /// Create from a SVG file.
-    explicit VectorTexture(const std::string &path);
+    explicit VectorImage(const std::string &path);
 
     /// Create empty with a specific size.
-    static std::shared_ptr<VectorTexture> from_empty(Vec2I _size);
+    static std::shared_ptr<VectorImage> from_empty(Vec2I _size);
 
     void add_path(const VectorPath &new_path);
 
@@ -49,4 +45,4 @@ protected:
 
 } // namespace Flint
 
-#endif // FLINT_VECTOR_TEXTURE_H
+#endif

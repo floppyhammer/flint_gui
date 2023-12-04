@@ -3,7 +3,6 @@
 #include <string>
 
 #include "../../common/utils.h"
-#include "../window_proxy.h"
 
 namespace Flint {
 

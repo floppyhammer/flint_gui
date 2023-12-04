@@ -2,6 +2,7 @@
 #define FLINT_PROGRESS_BAR_H
 
 #include <functional>
+#include <optional>
 
 #include "../../resources/style_box.h"
 #include "label.h"
@@ -13,7 +14,7 @@ class ProgressBar : public NodeUi {
 public:
     ProgressBar();
 
-    virtual void custom_update(double dt) {};
+    virtual void custom_update(double dt){};
 
     void update(double dt) override;
 

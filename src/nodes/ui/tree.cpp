@@ -17,18 +17,18 @@ Tree::Tree() {
     theme_bg_focused = std::make_optional(panel);
 
     auto root_ = create_item(nullptr, "Node");
-    root->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Node.svg"));
+    root->set_icon(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Node.svg"));
     auto child_ui = create_item(root_, "NodeUi");
-    child_ui->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Control.svg"));
+    child_ui->set_icon(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Control.svg"));
     auto child_label = create_item(child_ui, "Label");
-    child_label->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Label.svg"));
+    child_label->set_icon(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Label.svg"));
     auto child_text_edit = create_item(child_ui, "TextEdit");
     child_text_edit->set_icon(
-        ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_LineEdit.svg"));
+        ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_LineEdit.svg"));
     auto child_node_2d = create_item(root_, "Node2d");
-    child_node_2d->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Node2D.svg"));
+    child_node_2d->set_icon(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Node2D.svg"));
     auto child_node_3d = create_item(root_, "Node3d");
-    child_node_3d->set_icon(ResourceManager::get_singleton()->load<VectorTexture>("../assets/icons/Node_Node3D.svg"));
+    child_node_3d->set_icon(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Node3D.svg"));
 }
 
 void Tree::update(double delta) {
@@ -86,8 +86,8 @@ TreeItem::TreeItem() {
     icon->set_minimum_size({24, 24});
     icon->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
 
-    collapsed_tex = std::make_shared<VectorTexture>("../assets/icons/ArrowRight.svg");
-    expanded_tex = std::make_shared<VectorTexture>("../assets/icons/ArrowDown.svg");
+    collapsed_tex = std::make_shared<VectorImage>("../assets/icons/ArrowRight.svg");
+    expanded_tex = std::make_shared<VectorImage>("../assets/icons/ArrowDown.svg");
 
     collapse_button = std::make_shared<Button>();
     collapse_button->set_icon(expanded_tex);
@@ -131,7 +131,7 @@ std::shared_ptr<TreeItem> TreeItem::get_child(uint32_t idx) {
     if (idx < children.size()) {
         return children[idx];
     } else {
-        Utils::Logger::error("Invalid child index!", "TreeItem");
+        Logger::error("Invalid child index!", "TreeItem");
         return nullptr;
     }
 }
@@ -195,7 +195,7 @@ void TreeItem::propagate_draw(float folding_width, uint32_t depth, float &offset
     container->set_position(Vec2F(offset_x, offset_y) + global_position);
     container->set_size({item_height, item_height});
     container->propagate_update(0);
-    container->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
+    container->propagate_draw();
 
     offset_y += item_height;
 
@@ -217,7 +217,7 @@ void TreeItem::input(InputEvent &event, Vec2F global_position) {
             if (item_global_rect.contains_point(button_event.position)) {
                 selected = true;
                 tree->selected_item = this;
-                Utils::Logger::verbose("Item selected: " + label->get_text(), "Tree");
+                Logger::verbose("Item selected: " + label->get_text(), "Tree");
             }
         }
     }
@@ -227,7 +227,7 @@ void TreeItem::set_text(const std::string &text) {
     label->set_text(text);
 }
 
-void TreeItem::set_icon(const std::shared_ptr<Texture> &texture) {
+void TreeItem::set_icon(const std::shared_ptr<Image> &texture) {
     icon->set_texture(texture);
 }
 

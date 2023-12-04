@@ -1,13 +1,10 @@
 cmake_minimum_required(VERSION 3.16.1)
 
-project(flint)
+project(flint_gui)
 
 # Has to be 17 or above.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
-
-# Enable Flint's debug mode, which includes visual indicators.
-add_compile_definitions(FLINT_DEBUG)
 
 # More generally, you are using find_package and then later you're using add_subdirectory
 # to try to incorporate these external projects. That's not how it works. find_package will
@@ -22,7 +19,7 @@ include_directories(${Vulkan_INCLUDE_DIRS})
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
         src/*.cpp
         third_party/tinyfiledialogs/*.c
-#        third_party/fribidi/*.c
+        #        third_party/fribidi/*.c
         third_party/ttf2mesh/ttf2mesh.c)
 
 # Include external and third-party headers.
@@ -72,12 +69,10 @@ if (OFF)
     add_compile_definitions(FRIBIDI_BUILD)
 endif ()
 
-add_library(flint ${SOURCE_FILES})
+add_library(flint_gui ${SOURCE_FILES})
 
 # Add examples.
 add_subdirectory(examples/file_selection)
-add_subdirectory(examples/2d_skeleton)
-add_subdirectory(examples/3d_model_viewer)
 add_subdirectory(examples/container_layout)
 add_subdirectory(examples/texture_rect)
 add_subdirectory(examples/scrolling)

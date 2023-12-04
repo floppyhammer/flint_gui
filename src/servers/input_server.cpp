@@ -3,6 +3,8 @@
 #include <codecvt>
 #include <locale>
 
+#include "../nodes/sub_window.h"
+
 namespace Flint {
 
 std::string cpp11_codepoint_to_utf8(char32_t codepoint) {
@@ -68,7 +70,7 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
         input_event.type = InputEventType::MouseMotion;
         input_event.window = window;
         input_event.args.mouse_motion.position = {(float)x_pos, (float)y_pos};
-        auto input_server = InputServer::get_singleton();
+        auto input_server = get_singleton();
         input_server->last_cursor_position = input_server->cursor_position;
         input_server->cursor_position = {(float)x_pos, (float)y_pos};
         input_event.args.mouse_motion.relative = input_server->cursor_position - input_server->last_cursor_position;
@@ -82,7 +84,7 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
         input_event.window = window;
         input_event.args.mouse_button.button = button;
         input_event.args.mouse_button.pressed = action == GLFW_PRESS;
-        auto input_server = InputServer::get_singleton();
+        auto input_server = get_singleton();
         input_event.args.mouse_button.position = input_server->cursor_position;
         input_server->input_queue.push_back(input_event);
     };
@@ -95,13 +97,13 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
         input_event.args.mouse_scroll.x_delta = x_offset;
         input_event.args.mouse_scroll.y_delta = y_offset;
 
-        auto input_server = InputServer::get_singleton();
+        auto input_server = get_singleton();
         input_server->input_queue.push_back(input_event);
     };
     glfwSetScrollCallback(window, cursor_scroll_callback);
 
     auto key_callback = [](GLFWwindow *window, int key, int scancode, int action, int mods) {
-        auto input_server = InputServer::get_singleton();
+        auto input_server = get_singleton();
 
         InputEvent input_event{};
         input_event.type = InputEventType::Key;
@@ -139,17 +141,15 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
         input_event.type = InputEventType::Text;
         input_event.window = window;
         input_event.args.text.codepoint = codepoint;
-        auto input_server = InputServer::get_singleton();
+        auto input_server = get_singleton();
         input_server->input_queue.push_back(input_event);
     };
 
     glfwSetCharCallback(window, character_callback);
 }
 
-void InputServer::collect_events() {
+void InputServer::clear_events() {
     input_queue.clear();
-
-    glfwPollEvents();
 }
 
 void InputServer::set_cursor(Window *window, CursorShape shape) {
@@ -182,19 +182,19 @@ void InputServer::set_cursor(Window *window, CursorShape shape) {
         } break;
     }
 
-    glfwSetCursor(window->glfw_window, current_cursor);
+    // glfwSetCursor(window->glfw_window, current_cursor);
 }
 
 void InputServer::set_cursor_captured(Window *window, bool captured) {
-    glfwSetInputMode(window->glfw_window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+    // glfwSetInputMode(window->glfw_window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }
 
 void InputServer::hide_cursor(Window *window) {
-    glfwSetInputMode(window->glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    // glfwSetInputMode(window->glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void InputServer::restore_cursor(Window *window) {
-    glfwSetInputMode(window->glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    // glfwSetInputMode(window->glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 } // namespace Flint

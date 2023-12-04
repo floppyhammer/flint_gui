@@ -5,7 +5,7 @@
 namespace Flint {
 
 std::string FileDialog::show() {
-    Utils::Logger::info("File dialog", "FileDialog");
+    Logger::info("File dialog", "FileDialog");
 
     // In case of multiple files, the separator is `|`.
     // Returns NULL on cancel.
@@ -17,7 +17,7 @@ std::string FileDialog::show() {
                                       0);      // 0
 
     if (path) {
-        Utils::Logger::info("File dialog selected: " + std::string(path), "FileDialog");
+        Logger::info("File dialog selected: " + std::string(path), "FileDialog");
         return path;
     }
 

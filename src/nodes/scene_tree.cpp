@@ -1,52 +1,16 @@
 #include "scene_tree.h"
 
-#include "../render/swap_chain.h"
-#include "../servers/display_server.h"
-
 namespace Flint {
 
-SceneTree::SceneTree(Vec2I main_window_size) {
-    auto display_server = DisplayServer::get_singleton();
-
-    root = std::make_shared<WindowProxy>(main_window_size, false);
-    root->name = "Main Window";
-
-    // Initialize the render server after creating the first window (surface).
-    auto render_server = RenderServer::get_singleton();
-
-    // Initialize the vector server.
-    auto device = std::make_shared<Pathfinder::DeviceVk>(display_server->get_device(),
-                                                         display_server->physicalDevice,
-                                                         display_server->graphicsQueue,
-                                                         display_server->graphicsQueue,
-                                                         display_server->command_pool);
-    auto queue = std::make_shared<Pathfinder::QueueVk>(
-        display_server->get_device(), display_server->graphicsQueue, display_server->graphicsQueue);
-    auto vector_server = VectorServer::get_singleton();
-    vector_server->init(main_window_size, device, queue, Pathfinder::RenderLevel::Dx9);
+SceneTree::SceneTree() {
+    // A default root.
+    root = std::make_shared<Node>();
+    root->tree_ = this;
 }
 
 void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
-    switch (new_scene->extended_from_which_base_node()) {
-        case NodeType::Node:
-        case NodeType::Node3d: {
-            auto world = std::make_shared<World>(false);
-            world->add_child(new_scene);
-            root->add_child(world);
-        } break;
-        case NodeType::Node2d: {
-            auto world = std::make_shared<World>(true);
-            world->add_child(new_scene);
-            root->add_child(world);
-        } break;
-        case NodeType::NodeUi: {
-            auto ui_layer = std::make_shared<UiLayer>();
-            ui_layer->add_child(new_scene);
-            root->add_child(ui_layer);
-        } break;
-        default:
-            abort();
-    }
+    root = new_scene;
+    root->tree_ = this;
 }
 
 void SceneTree::process(double dt) const {
@@ -60,15 +24,15 @@ void SceneTree::process(double dt) const {
 
     root->propagate_update(dt);
 
-    root->propagate_draw(VK_NULL_HANDLE, VK_NULL_HANDLE);
+    root->propagate_draw();
 }
 
 void SceneTree::when_window_size_changed(Vec2I new_size) const {
     for (auto& child : root->get_children()) {
-        if (child->get_node_type() == NodeType::UiLayer) {
-            auto cast_child = dynamic_cast<UiLayer*>(child.get());
-            cast_child->when_window_size_changed(new_size);
-        }
+        // if (child->get_node_type() == NodeType::UiLayer) {
+        //     auto cast_child = dynamic_cast<UiLayer*>(child.get());
+        //     cast_child->when_window_size_changed(new_size);
+        // }
     }
 }
 

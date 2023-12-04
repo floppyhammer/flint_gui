@@ -3,12 +3,14 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 
 #include "../../common/geometry.h"
 #include "../../resources/style_box.h"
 #include "label.h"
 
 namespace Flint {
+
 /**
  * Single-Line text input field.
  */
@@ -63,6 +65,7 @@ private:
     std::optional<StyleBox> theme_focused;
     std::optional<StyleBox> theme_uneditable;
 };
+
 } // namespace Flint
 
 #endif // FLINT_TEXT_EDIT_H

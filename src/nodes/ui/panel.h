@@ -3,11 +3,12 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 
 #include "../../common/geometry.h"
 #include "../../resources/font.h"
 #include "../../resources/style_box.h"
-#include "../../resources/vector_texture.h"
+#include "../../resources/vector_image.h"
 #include "button.h"
 #include "label.h"
 #include "node_ui.h"

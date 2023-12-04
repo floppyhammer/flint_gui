@@ -3,7 +3,6 @@
 #include <string>
 
 #include "../../common/utils.h"
-#include "../window_proxy.h"
 
 namespace Flint {
 
@@ -83,7 +82,7 @@ void TextEdit::input(InputEvent &event) {
                 current_caret_index = calculate_caret_index(get_local_mouse_position());
                 caret_blink_timer = 0;
 
-                Utils::Logger::verbose("Caret position: current - " + std::to_string(current_caret_index) + ", selected - " +
+                Logger::verbose("Caret position: current - " + std::to_string(current_caret_index) + ", selected - " +
                                     std::to_string(selected_caret_index),
                                 "TextEdit");
             }
@@ -258,11 +257,11 @@ void TextEdit::set_editable(bool new_value) {
 }
 
 void TextEdit::cursor_entered() {
-    InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::IBeam);
+    // InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::IBeam);
 }
 
 void TextEdit::cursor_exited() {
-    InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::Arrow);
+    // InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::Arrow);
 }
 
 void TextEdit::delete_selection() {

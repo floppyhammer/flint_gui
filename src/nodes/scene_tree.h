@@ -1,12 +1,6 @@
 #ifndef FLINT_SCENE_TREE_H
 #define FLINT_SCENE_TREE_H
 
-#include "2d/camera2d.h"
-#include "2d/skeleton2d.h"
-#include "2d/sprite2d.h"
-#include "3d/camera3d.h"
-#include "3d/model.h"
-#include "3d/skybox.h"
 #include "file_dialog.h"
 #include "node.h"
 #include "ui/button.h"
@@ -21,16 +15,13 @@
 #include "ui/text_edit.h"
 #include "ui/texture_rect.h"
 #include "ui/tree.h"
-#include "ui_layer.h"
-#include "window_proxy.h"
-#include "world.h"
 
 namespace Flint {
 
 /// Processing order: Input -> Update -> Draw.
 class SceneTree {
 public:
-    explicit SceneTree(Vec2I main_window_size);
+    explicit SceneTree();
 
     void process(double dt) const;
 
@@ -43,6 +34,8 @@ public:
     bool has_quited() const;
 
 private:
+    std::shared_ptr<Window> primary_window;
+
     std::shared_ptr<Node> root;
 
     bool quited = false;

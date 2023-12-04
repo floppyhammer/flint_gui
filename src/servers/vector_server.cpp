@@ -1,9 +1,5 @@
 #include "vector_server.h"
 
-#include "render_server.h"
-
-using namespace Pathfinder;
-
 namespace Flint {
 
 void VectorServer::init(Pathfinder::Vec2I size,
@@ -17,38 +13,13 @@ void VectorServer::cleanup() {
     canvas.reset();
 }
 
-void VectorServer::set_dst_texture(const std::shared_ptr<ImageTexture> &texture) {
-    auto pathfinder_texture =
-        Pathfinder::TextureVk::from_wrapping({texture->get_size(), Pathfinder::TextureFormat::Rgba8Unorm},
-                                             texture->image,
-                                             texture->imageMemory,
-                                             texture->imageView,
-                                             Pathfinder::TextureLayout::ShaderReadOnly);
-
-    canvas->set_dst_texture(pathfinder_texture);
+void VectorServer::set_dst_texture(const std::shared_ptr<Pathfinder::Texture> &texture) {
+    canvas->set_dst_texture(texture);
 }
 
 void VectorServer::submit_and_clear() {
     canvas->draw(true);
-
-    // TODO: clear the dst texture every frame even when there's nothing to draw on the canvas.
-    // Get the dst texture.
-    auto texture_vk = static_cast<Pathfinder::TextureVk *>(canvas->get_dst_texture().get());
-
-    auto cmd_buffer = RenderServer::get_singleton()->beginSingleTimeCommands();
-
-    // Transition the dst texture to ShaderReadOnly layout, so we can use it as a sampler.
-    // Its layout may be Undefined or ColorAttachment.
-    RenderServer::transitionImageLayout(cmd_buffer,
-                                        texture_vk->get_image(),
-                                        Pathfinder::to_vk_texture_format(texture_vk->get_format()),
-                                        Pathfinder::to_vk_layout(texture_vk->get_layout()),
-                                        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-                                        1,
-                                        1);
-    texture_vk->set_layout(Pathfinder::TextureLayout::ShaderReadOnly);
-
-    RenderServer::get_singleton()->endSingleTimeCommands(cmd_buffer);
+    canvas->take_scene();
 }
 
 std::shared_ptr<Pathfinder::Canvas> VectorServer::get_canvas() const {
@@ -119,25 +90,25 @@ void VectorServer::draw_path(VectorPath &vector_path, Transform2 transform) {
     canvas->restore_state();
 }
 
-void VectorServer::draw_image_texture(ImageTexture &texture, Transform2 transform) {
+void VectorServer::draw_raster_image(RasterImage &image, Transform2 transform) {
     canvas->save_state();
 
     canvas->set_transform(global_transform_offset * transform);
 
-    auto image = texture.image_data;
+    auto image_data = image.image_data;
 
-    canvas->draw_image(image, RectF({}, Vec2F() + image->size.to_f32()));
+    canvas->draw_image(image_data, RectF({}, Vec2F() + image_data->size.to_f32()));
 
     canvas->restore_state();
 }
 
-void VectorServer::draw_vector_texture(VectorTexture &texture, Transform2 transform) {
-    for (auto &path : texture.get_paths()) {
+void VectorServer::draw_vector_image(VectorImage &image, Transform2 transform) {
+    for (auto &path : image.get_paths()) {
         draw_path(path, transform);
     }
 
-    if (texture.get_svg_scene()) {
-        canvas->get_scene()->append_scene(*texture.get_svg_scene()->get_scene(), global_transform_offset * transform);
+    if (image.get_svg_scene()) {
+        canvas->get_scene()->append_scene(*image.get_svg_scene()->get_scene(), global_transform_offset * transform);
     }
 }
 
@@ -193,10 +164,10 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
 
     // Text clip.
     if (clip_box.is_valid()) {
-        auto clip_path = Path2d();
+        auto clip_path = Pathfinder::Path2d();
         clip_path.add_rect(clip_box, 0);
         canvas->set_transform(global_transform_offset * transform);
-        canvas->clip_path(clip_path, FillRule::Winding);
+        canvas->clip_path(clip_path, Pathfinder::FillRule::Winding);
     }
 
     auto skew_xform = Transform2::from_scale({1, 1});
@@ -216,9 +187,9 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         canvas->set_transform(global_transform_offset * Transform2::from_translation(p) * transform * skew_xform);
 
         // Add stroke if needed.
-        canvas->set_stroke_paint(Paint::from_color(text_style.stroke_color));
+        canvas->set_stroke_paint(Pathfinder::Paint::from_color(text_style.stroke_color));
         canvas->set_line_width(text_style.stroke_width);
-        canvas->set_line_join(LineJoin::Round);
+        canvas->set_line_join(Pathfinder::LineJoin::Round);
         canvas->stroke_path(g.path);
     }
 
@@ -234,14 +205,14 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
             canvas->set_transform(glyph_global_transform * skew_xform);
 
             // Add fill.
-            canvas->set_fill_paint(Paint::from_color(text_style.color));
-            canvas->fill_path(g.path, FillRule::Winding);
+            canvas->set_fill_paint(Pathfinder::Paint::from_color(text_style.color));
+            canvas->fill_path(g.path, Pathfinder::FillRule::Winding);
 
             // Use stroke to make a pseudo bold effect.
             if (text_style.bold) {
-                canvas->set_stroke_paint(Paint::from_color(text_style.color));
+                canvas->set_stroke_paint(Pathfinder::Paint::from_color(text_style.color));
                 canvas->set_line_width(1);
-                canvas->set_line_join(LineJoin::Bevel);
+                canvas->set_line_join(Pathfinder::LineJoin::Bevel);
                 canvas->stroke_path(g.path);
             }
         } else {
@@ -262,19 +233,19 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
 
             // Add box.
             // --------------------------------
-            Path2d layout_path;
+            Pathfinder::Path2d layout_path;
             layout_path.add_rect(g.box);
 
-            canvas->set_stroke_paint(Paint::from_color(ColorU::green()));
+            canvas->set_stroke_paint(Pathfinder::Paint::from_color(ColorU::green()));
             canvas->stroke_path(layout_path);
             // --------------------------------
 
             // Add bbox.
             // --------------------------------
-            Path2d bbox_path;
+            Pathfinder::Path2d bbox_path;
             bbox_path.add_rect(g.bbox);
 
-            canvas->set_stroke_paint(Paint::from_color(ColorU::red()));
+            canvas->set_stroke_paint(Pathfinder::Paint::from_color(ColorU::red()));
             canvas->stroke_path(bbox_path);
             // --------------------------------
         }

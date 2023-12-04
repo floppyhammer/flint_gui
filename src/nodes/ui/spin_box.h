@@ -2,6 +2,7 @@
 #define FLINT_SPIN_BOX_H
 
 #include <functional>
+#include <optional>
 
 #include "../../resources/style_box.h"
 #include "button.h"
@@ -11,6 +12,7 @@
 #include "texture_rect.h"
 
 namespace Flint {
+
 /**
  * Numerical input field.
  */
@@ -73,6 +75,7 @@ protected:
 
     void when_value_changed();
 };
+
 } // namespace Flint
 
 #endif // FLINT_SPIN_BOX_H

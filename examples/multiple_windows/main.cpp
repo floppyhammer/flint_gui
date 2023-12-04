@@ -3,11 +3,9 @@
 #include <stdexcept>
 
 #include "app.h"
+#include "nodes/sub_window.h"
 
 using namespace Flint;
-
-using Pathfinder::Vec2;
-using Pathfinder::Vec3;
 
 const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
@@ -30,12 +28,8 @@ int main() {
 
         node_ui->add_child(container);
 
-        auto another_window = std::make_shared<WindowProxy>(Vec2I{400, 300}, false);
+        auto another_window = std::make_shared<SubWindow>(Vec2I{400, 300});
         node_ui->add_child(another_window);
-
-        auto another_ui_layer = std::make_shared<UiLayer>();
-        another_ui_layer->add_child(std::make_shared<Label>("This is another window"));
-        another_window->add_child(another_ui_layer);
 
         auto callback1 = [another_window] { another_window->set_visibility(true); };
         open_window_button->connect_signal("pressed", callback1);

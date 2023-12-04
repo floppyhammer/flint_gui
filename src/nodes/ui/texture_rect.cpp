@@ -3,12 +3,8 @@
 #include <memory>
 
 #include "../../common/utils.h"
-#include "../../render/swap_chain.h"
 #include "../../resources/default_resource.h"
-#include "../../resources/image_texture.h"
-#include "../../resources/vector_texture.h"
 #include "../../servers/engine.h"
-#include "../world.h"
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include "glm/glm.hpp"
@@ -20,18 +16,12 @@ TextureRect::TextureRect() {
     type = NodeType::TextureRect;
 }
 
-void TextureRect::set_texture(const std::shared_ptr<Texture> &new_texture) {
+void TextureRect::set_texture(const std::shared_ptr<Image> &new_image) {
     // Texture can be null.
-    texture = new_texture;
-
-    //    if (texture->get_type() == TextureType::IMAGE) {
-    //        mesh = DefaultResource::get_singleton()->new_default_mesh_2d();
-    //        auto image_texture = dynamic_cast<ImageTexture *>(texture.get());
-    //        mesh->surface->get_material()->set_texture(image_texture);
-    //    }
+    texture = new_image;
 }
 
-std::shared_ptr<Texture> TextureRect::get_texture() const {
+std::shared_ptr<Image> TextureRect::get_texture() const {
     return texture;
 }
 
@@ -45,7 +35,7 @@ void TextureRect::draw() {
 
         auto texture_size = texture->get_size().to_f32();
 
-        Pathfinder::Transform2 transform;
+        Transform2 transform;
 
         switch (stretch_mode) {
             case StretchMode::KeepCentered: {
@@ -55,7 +45,7 @@ void TextureRect::draw() {
             } break;
             case StretchMode::Scale: {
                 if (texture_size.area() == 0) {
-                    Utils::Logger::error("Vector texture size is invalid!", "TextureRect");
+                    Logger::error("Vector texture size is invalid!", "TextureRect");
                     return;
                 }
                 auto scale = size / texture_size;
@@ -65,7 +55,7 @@ void TextureRect::draw() {
             case StretchMode::KeepAspect:
             case StretchMode::KeepAspectCentered: {
                 if (texture_size.area() == 0) {
-                    Utils::Logger::error("Vector texture size is invalid!", "TextureRect");
+                    Logger::error("Vector texture size is invalid!", "TextureRect");
                     return;
                 }
 
@@ -95,15 +85,12 @@ void TextureRect::draw() {
 
         auto vector_server = VectorServer::get_singleton();
 
-        // Image texture.
-        if (texture->get_type() == TextureType::Image) {
-            auto image_texture = static_cast<ImageTexture *>(texture.get());
-            vector_server->draw_image_texture(*image_texture, transform);
-        }
-        // Vector texture.
-        else {
-            auto vector_texture = static_cast<VectorTexture *>(texture.get());
-            vector_server->draw_vector_texture(*vector_texture, transform);
+        if (texture->get_type() == ImageType::Raster) {
+            auto raster_image = static_cast<RasterImage *>(texture.get());
+            vector_server->draw_raster_image(*raster_image, transform);
+        } else {
+            auto vector_image = static_cast<VectorImage *>(texture.get());
+            vector_server->draw_vector_image(*vector_image, transform);
         }
     }
 
