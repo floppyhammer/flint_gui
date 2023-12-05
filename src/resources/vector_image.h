@@ -1,7 +1,7 @@
 #ifndef FLINT_VECTOR_IMAGE_H
 #define FLINT_VECTOR_IMAGE_H
 
-#include <pathfinder.h>
+#include <pathfinder/prelude.h>
 
 #include <memory>
 

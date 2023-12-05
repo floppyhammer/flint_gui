@@ -2,7 +2,7 @@
 #define FLINT_FONT_H
 
 #include <hb.h>
-#include <pathfinder.h>
+#include <pathfinder/prelude.h>
 #include <stb/stb_truetype.h>
 
 #include <cstdio>

@@ -1,7 +1,7 @@
 #ifndef FLINT_RENDER_SERVER_H
 #define FLINT_RENDER_SERVER_H
 
-#include <pathfinder.h>
+#include <pathfinder/prelude.h>
 #include "../render/blit.h"
 
 namespace Flint {

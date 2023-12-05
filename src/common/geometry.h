@@ -1,7 +1,7 @@
 #ifndef FLINT_GEOMETRY_H
 #define FLINT_GEOMETRY_H
 
-#include <pathfinder.h>
+#include <pathfinder/prelude.h>
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

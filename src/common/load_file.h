@@ -1,7 +1,7 @@
 #ifndef FLINT_LOAD_FILE_H
 #define FLINT_LOAD_FILE_H
 
-#include <pathfinder.h>
+#include <pathfinder/prelude.h>
 
 #include <fstream>
 #include <iostream>

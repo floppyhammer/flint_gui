@@ -1,7 +1,5 @@
 #include "blit.h"
 
-#include <pathfinder.h>
-
 #ifdef PATHFINDER_USE_VULKAN
     #include "../shaders/generated/blit_frag_spv.h"
     #include "../src/shaders/generated/blit_vert_spv.h"

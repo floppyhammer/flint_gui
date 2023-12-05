@@ -1,7 +1,7 @@
 #ifndef PATHFINDER_DEMO_TEXTURE_RECT_H
 #define PATHFINDER_DEMO_TEXTURE_RECT_H
 
-#include <pathfinder.h>
+#include <pathfinder/prelude.h>
 
 #include <memory>
 

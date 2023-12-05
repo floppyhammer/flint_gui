@@ -43,7 +43,7 @@ add_subdirectory(third_party/poly2tri)
 add_subdirectory(third_party/zlib)
 
 # Pathfinder has to go after other libraries. Have no clue why this is the case.
-include_directories(external/pathfinder-cpp/include)
+include_directories(external/pathfinder-cpp)
 add_subdirectory(external/pathfinder-cpp)
 
 if (WIN32)

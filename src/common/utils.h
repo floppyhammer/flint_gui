@@ -1,7 +1,7 @@
 #ifndef FLINT_UTILS_H
 #define FLINT_UTILS_H
 
-#include <pathfinder.h>
+#include <pathfinder/prelude.h>
 
 namespace Flint {
 
