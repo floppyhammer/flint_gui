@@ -6,6 +6,8 @@ project(flint_gui)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
+option(FLINT_GUI_VULKAN "Use Vulkan instead of OpenGL" OFF)
+
 # More generally, you are using find_package and then later you're using add_subdirectory
 # to try to incorporate these external projects. That's not how it works. find_package will
 # look for a pre-existing binary of the package, while add_subdirectory isn't designed to
@@ -28,6 +30,14 @@ include_directories(third_party)
 include_directories(external/glfw/include)
 add_subdirectory(external/glfw)
 
+if (FLINT_GUI_VULKAN)
+    set(PATHFINDER_VULKAN_SUPPORT ON CACHE BOOL "" FORCE)
+else ()
+    set(PATHFINDER_VULKAN_SUPPORT OFF CACHE BOOL "" FORCE)
+endif ()
+include_directories(external/pathfinder-cpp)
+add_subdirectory(external/pathfinder-cpp)
+
 include_directories(third_party/glm-0.9.9.8)
 add_subdirectory(third_party/glm-0.9.9.8)
 
@@ -41,10 +51,6 @@ include_directories(third_party/stduuid-1.2.3)
 
 add_subdirectory(third_party/poly2tri)
 add_subdirectory(third_party/zlib)
-
-# Pathfinder has to go after other libraries. Have no clue why this is the case.
-include_directories(external/pathfinder-cpp)
-add_subdirectory(external/pathfinder-cpp)
 
 if (WIN32)
     # Fix "too many characters in constant" error when using CMake with MSVC.
