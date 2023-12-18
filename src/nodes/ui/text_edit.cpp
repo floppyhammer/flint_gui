@@ -189,7 +189,7 @@ void TextEdit::draw() {
 
     // Draw blinking caret.
     if (focused && editable) {
-        theme_caret.color.a = 255.0f * std::ceil(std::sin(caret_blink_timer * 5.0f));
+        theme_caret.color.a_ = 255.0f * std::ceil(std::sin(caret_blink_timer * 5.0f));
 
         float current_glyph_right_edge = 0;
         if (current_caret_index > -1 && current_caret_index < label->get_glyphs().size()) {
