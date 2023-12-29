@@ -141,6 +141,9 @@ void Label::set_font(std::shared_ptr<Font> new_font) {
 }
 
 void Label::consider_alignment() {
+    // Make sure size has the correct value before using it.
+    size = calc_minimum_size();
+
     alignment_shift = Vec2F(0);
 
     switch (horizontal_alignment) {
