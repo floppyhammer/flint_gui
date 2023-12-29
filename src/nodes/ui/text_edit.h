@@ -11,6 +11,8 @@
 
 namespace Flint {
 
+class MarginContainer;
+
 /**
  * Single-Line text input field.
  */
@@ -40,13 +42,15 @@ private:
     bool editable = true;
     bool single_line = false;
 
-    int32_t selected_caret_index = -1;
+    /// -1 means the caret is at the begining (before the first glyph if there's any).
     int32_t current_caret_index = -1;
+    int32_t selected_text_caret_index_begin = -1;
     Vec2F caret_position;
 
     StyleLine theme_caret;
     StyleBox theme_selection_box;
 
+    std::shared_ptr<MarginContainer> margin_container;
     std::shared_ptr<Label> label;
 
     float caret_blink_timer = 0;

@@ -249,7 +249,27 @@ std::shared_ptr<Font> Label::get_font() const {
     return font;
 }
 
-float Label::get_position_by_glyph(uint32_t glyph_index) {
+float Label::get_glyph_right_edge_position(int32_t glyph_index) {
+    if (glyph_index < 0) {
+        return 0;
+    }
+
+    float pos = 0;
+
+    assert(glyph_index < glyphs.size() && "Out of bounds glyph index!");
+
+    for (int i = 0; i <= glyph_index; i++) {
+        pos += glyphs[i].x_advance;
+    }
+
+    return pos;
+}
+
+float Label::get_glyph_left_edge_position(int32_t glyph_index) {
+    if (glyph_index < 0) {
+        return 0;
+    }
+
     float pos = 0;
 
     for (int i = 0; i < glyph_index; i++) {

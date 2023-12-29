@@ -57,7 +57,9 @@ public:
 
     std::shared_ptr<Font> get_font() const;
 
-    float get_position_by_glyph(uint32_t glyph_index);
+    float get_glyph_left_edge_position(int32_t glyph_index);
+
+    float get_glyph_right_edge_position(int32_t glyph_index);
 
     /// Get the caret position of a given codepoint index.
     float get_position_by_codepoint(uint32_t codepoint_index);

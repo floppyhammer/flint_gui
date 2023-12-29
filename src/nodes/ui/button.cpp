@@ -1,10 +1,10 @@
 #include "button.h"
 
+#include <optional>
+
 #include "../../common/geometry.h"
 #include "../../resources/default_resource.h"
 #include "../../resources/vector_image.h"
-
-#include <optional>
 
 namespace Flint {
 
@@ -32,10 +32,10 @@ Button::Button() {
     hstack_container = std::make_shared<HStackContainer>();
     hstack_container->add_child(icon_rect);
     hstack_container->add_child(label);
-    hstack_container->set_separation(0);
+    hstack_container->set_separation(2);
 
     margin_container = std::make_shared<MarginContainer>();
-    margin_container->set_margin_all(0);
+    margin_container->set_margin_all(4);
     margin_container->add_child(hstack_container);
     margin_container->set_parent(this);
     margin_container->set_size(size);
@@ -158,8 +158,8 @@ void Button::draw() {
     NodeUi::draw();
 }
 
-void Button::set_position(Vec2F p_position) {
-    position = p_position;
+void Button::set_position(Vec2F new_position) {
+    position = new_position;
 }
 
 void Button::set_size(Vec2F p_size) {

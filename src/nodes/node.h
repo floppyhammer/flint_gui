@@ -45,7 +45,7 @@ class Node {
 public:
     std::string name;
 
-    ~Node() = default;
+    virtual ~Node() = default;
 
 public:
     virtual void propagate_input(InputEvent &event);
