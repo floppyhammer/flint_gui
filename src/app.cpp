@@ -21,7 +21,7 @@ App::App(Vec2I primary_window_size) {
 
     // Create the main window.
     render_server->window_builder_ = Pathfinder::WindowBuilder::new_impl(primary_window_size);
-    primary_window_ = render_server->window_builder_->get_main_window();
+    primary_window_ = render_server->window_builder_->get_primary_window();
 
     auto input_server = InputServer::get_singleton();
     input_server->initialize_window_callbacks((GLFWwindow*)primary_window_->get_raw_handle());
@@ -31,7 +31,7 @@ App::App(Vec2I primary_window_size) {
     render_server->queue_ = render_server->window_builder_->create_queue();
 
     // Create swap chains for windows.
-    primary_swap_chain_ = primary_window_->create_swap_chain(render_server->device_);
+    primary_swap_chain_ = primary_window_->get_swap_chain(render_server->device_);
 
     auto vector_server = VectorServer::get_singleton();
     vector_server->init(

@@ -56,12 +56,12 @@ if (WIN32)
     # Fix "too many characters in constant" error when using CMake with MSVC.
     string(APPEND CMAKE_CXX_FLAGS " /utf-8")
 
-    set(LINKING_LIBS glfw Vulkan::Vulkan pathfinder poly2tri harfbuzz icu zlib)
+    set(LINKING_LIBS glfw pathfinder Vulkan::Vulkan poly2tri harfbuzz icu zlib)
 else ()
     # icu4c.
     find_package(ICU 70.0 COMPONENTS uc i18n REQUIRED)
 
-    set(LINKING_LIBS glfw Vulkan::Vulkan pathfinder poly2tri harfbuzz ICU::uc ICU::i18n zlib)
+    set(LINKING_LIBS glfw pathfinder Vulkan::Vulkan poly2tri harfbuzz ICU::uc ICU::i18n zlib)
 endif ()
 
 if (OFF)

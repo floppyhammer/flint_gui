@@ -17,7 +17,7 @@ SubWindow::SubWindow(Vec2I size) {
     auto input_server = InputServer::get_singleton();
     input_server->initialize_window_callbacks((GLFWwindow *)window_->get_raw_handle());
 
-    swap_chain_ = window_->create_swap_chain(render_server->device_);
+    swap_chain_ = window_->get_swap_chain(render_server->device_);
 
     vector_target_ =
         render_server->device_->create_texture({size_, Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
