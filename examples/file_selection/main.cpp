@@ -18,6 +18,12 @@ int main() {
         panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         panel->set_anchor_flag(AnchorFlag::FullRect);
         app.get_tree()->replace_scene(panel);
+        {
+            StyleBox new_theme;
+            new_theme.bg_color = ColorU(27, 27, 27, 255);
+            new_theme.corner_radius = 0;
+            panel->set_theme_panel(new_theme);
+        }
 
         auto margin_container = std::make_shared<MarginContainer>();
         margin_container->set_position({0, 0});

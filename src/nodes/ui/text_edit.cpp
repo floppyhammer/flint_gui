@@ -88,7 +88,7 @@ void TextEdit::input(InputEvent &event) {
                 current_caret_index = calculate_caret_index(get_local_mouse_position());
                 caret_blink_timer = 0;
 
-                Logger::verbose("Caret position: current - " + std::to_string(current_caret_index) + ", selected - " +
+                Logger::verbose("Caret position: current " + std::to_string(current_caret_index) + ", selected " +
                                     std::to_string(selected_text_caret_index_begin),
                                 "TextEdit");
             }
@@ -117,13 +117,15 @@ void TextEdit::input(InputEvent &event) {
         case InputEventType::Key: {
             auto key_args = event.args.key;
 
-            if (key_args.key == KeyCode::Backspace && current_caret_index > -1) {
+            if (key_args.key == KeyCode::Backspace) {
                 if (key_args.pressed || key_args.repeated) {
                     if (selected_text_caret_index_begin != current_caret_index) {
                         delete_selection();
                     } else {
                         if (editable) {
-                            label->remove_text(current_caret_index, 1);
+                            if (current_caret_index > -1) {
+                                label->remove_text(current_caret_index, 1);
+                            }
                         }
 
                         current_caret_index--;
@@ -148,6 +150,10 @@ void TextEdit::input(InputEvent &event) {
         default:
             break;
     }
+
+    // Clamp.
+    current_caret_index = std::max(current_caret_index, -1);
+    selected_text_caret_index_begin = std::max(selected_text_caret_index_begin, -1);
 
     if (consume_flag) {
         event.consume();
@@ -197,15 +203,15 @@ void TextEdit::draw() {
     if (focused && editable) {
         theme_caret.color.a_ = 255.0f * std::ceil(std::sin(caret_blink_timer * 5.0f));
 
-        float current_glyph_right_edge = 0;
-        if (current_caret_index > -1 && current_caret_index < label->get_glyphs().size()) {
-            current_glyph_right_edge = label->get_glyph_right_edge_position(current_caret_index);
+        float current_codepoint_right_edge = 0;
+        if (current_caret_index > -1 && current_caret_index < label->get_text_u32().size()) {
+            current_codepoint_right_edge = label->get_codepoint_right_edge_position(current_caret_index);
         }
         if (current_caret_index == -1) {
-            current_glyph_right_edge = label->get_glyph_right_edge_position(current_caret_index);
+            current_codepoint_right_edge = label->get_codepoint_left_edge_position(0);
         }
 
-        auto start = label->get_global_position() + Vec2F(current_glyph_right_edge, 3);
+        auto start = label->get_global_position() + Vec2F(current_codepoint_right_edge, 3);
         auto end = start + Vec2F(0, label->get_font()->get_size() - 6);
         vector_server->draw_style_line(theme_caret, start, end);
     }
@@ -237,11 +243,7 @@ int32_t TextEdit::calculate_caret_index(Vec2F local_cursor_position) {
     }
 
     if (codepoints.empty()) {
-        float first_codepoint_center =
-            label->get_codepoint_left_edge_position(0) + label->get_codepoint_right_edge_position(0);
-        if (local_cursor_position.x < first_codepoint_center) {
-            return -1;
-        }
+        return -1;
     }
 
     // Caret at the beginning of the text, i.e. before the first glyph.
@@ -257,7 +259,7 @@ Vec2F TextEdit::calculate_caret_position(int32_t target_caret_index) {
     auto closest_distance = std::numeric_limits<float>::max();
 
     if (target_caret_index > -1) {
-        return {label->get_glyph_right_edge_position(target_caret_index), 0};
+        return {label->get_codepoint_right_edge_position(target_caret_index), 0};
     } else {
         return {0, 0};
     }

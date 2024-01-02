@@ -44,6 +44,8 @@ void Label::insert_text(uint32_t codepint_position, const std::string &new_text)
         return;
     }
 
+    assert(codepint_position <= text_u32_.size() && "Codepoint index is out of bounds!");
+
     std::u32string new_text_u32;
     from_utf8(new_text, new_text_u32);
 
@@ -54,9 +56,7 @@ void Label::insert_text(uint32_t codepint_position, const std::string &new_text)
 }
 
 void Label::remove_text(uint32_t codepint_position, uint32_t count) {
-    if (codepint_position == -1) {
-        return;
-    }
+    assert((codepint_position + count) <= text_u32_.size() && "Codepoint index is out of bounds!");
 
     text_u32_.erase(codepint_position, count);
     text_ = to_utf8(text_u32_);
@@ -261,9 +261,7 @@ std::shared_ptr<Font> Label::get_font() const {
 }
 
 float Label::get_glyph_right_edge_position(int32_t glyph_index) {
-    if (glyph_index < 0) {
-        return 0;
-    }
+    assert(glyph_index >= 0 && "Invalid glyph index!");
 
     float pos = 0;
 
@@ -277,9 +275,7 @@ float Label::get_glyph_right_edge_position(int32_t glyph_index) {
 }
 
 float Label::get_glyph_left_edge_position(int32_t glyph_index) {
-    if (glyph_index < 0) {
-        return 0;
-    }
+    assert(glyph_index >= 0 && "Invalid glyph index!");
 
     float pos = 0;
 
@@ -291,9 +287,7 @@ float Label::get_glyph_left_edge_position(int32_t glyph_index) {
 }
 
 float Label::get_codepoint_left_edge_position(int32_t codepoint_index) {
-    if (codepoint_index < 0) {
-        return 0;
-    }
+    assert(codepoint_index >= 0 && "Invalid codepoint index!");
 
     float pos = 0;
 
@@ -303,7 +297,6 @@ float Label::get_codepoint_left_edge_position(int32_t codepoint_index) {
         if (current_codepoint == codepoint_index) {
             return pos;
         }
-
         const auto &glyph = glyphs_[i];
         int32_t glyph_codepoint_count = glyph.codepoints.size();
 
@@ -314,14 +307,11 @@ float Label::get_codepoint_left_edge_position(int32_t codepoint_index) {
         }
     }
 
-    assert(false && "Should not happen!");
     return 0;
 }
 
 float Label::get_codepoint_right_edge_position(int32_t codepoint_index) {
-    if (codepoint_index < 0) {
-        return 0;
-    }
+    assert(codepoint_index >= 0 && "Invalid codepoint index!");
 
     float pos = 0;
 
@@ -342,7 +332,6 @@ float Label::get_codepoint_right_edge_position(int32_t codepoint_index) {
         }
     }
 
-    assert(false && "Should not happen!");
     return 0;
 }
 
