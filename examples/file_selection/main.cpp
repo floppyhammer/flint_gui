@@ -30,7 +30,8 @@ int main() {
         vstack_container->set_separation(16);
         margin_container->add_child(vstack_container);
 
-        auto label = std::make_shared<Label>("File path:");
+        auto label = std::make_shared<Label>();
+        label->set_text("File path:");
         vstack_container->add_child(label);
 
         auto hstack_container = std::make_shared<HStackContainer>();

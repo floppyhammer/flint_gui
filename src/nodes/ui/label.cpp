@@ -14,15 +14,13 @@ enum class Bidi {
     RightToLeft,
 };
 
-Label::Label(const std::string &_text) {
+Label::Label() {
     type = NodeType::Label;
 
     debug_size_box.border_color = ColorU::red();
 
     font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/Arial Unicode MS Font.ttf");
     emoji_font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/EmojiOneColor.otf");
-
-    set_text(_text);
 
     text_style.color = {163, 163, 163, 255};
 
@@ -31,45 +29,55 @@ Label::Label(const std::string &_text) {
 
 void Label::set_text(const std::string &new_text) {
     // Only update glyphs when text has changed.
-    if (text == new_text || font == nullptr) {
+    if (text_ == new_text || font == nullptr) {
         return;
     }
 
-    text = new_text;
+    text_ = new_text;
+    from_utf8(text_, text_u32_);
 
     need_to_remeasure = true;
 }
 
-void Label::insert_text(uint32_t position, const std::string &new_text) {
+void Label::insert_text(uint32_t codepint_position, const std::string &new_text) {
     if (new_text.empty()) {
         return;
     }
 
-    text.insert(position, new_text);
+    std::u32string new_text_u32;
+    from_utf8(new_text, new_text_u32);
+
+    text_u32_.insert(codepint_position, new_text_u32);
+    text_ = to_utf8(text_u32_);
 
     need_to_remeasure = true;
 }
 
-void Label::remove_text(uint32_t position, uint32_t count) {
-    if (position == -1) {
+void Label::remove_text(uint32_t codepint_position, uint32_t count) {
+    if (codepint_position == -1) {
         return;
     }
 
-    text.erase(position, count);
+    text_u32_.erase(codepint_position, count);
+    text_ = to_utf8(text_u32_);
 
     need_to_remeasure = true;
 }
 
 std::string Label::get_text() const {
-    return text;
+    return text_;
 }
 
-void Label::set_size(Vec2F p_size) {
-    if (size == p_size) {
+std::u32string Label::get_text_u32() const {
+    return text_u32_;
+}
+
+void Label::set_size(Vec2F new_size) {
+    if (size == new_size) {
         return;
     }
 
-    size = p_size;
+    size = new_size;
     consider_alignment();
 }
 
@@ -78,10 +86,10 @@ void Label::measure() {
     int ascent = font->get_ascent();
     int descent = font->get_descent();
 
-    font->get_glyphs(text, glyphs, para_ranges);
+    font->get_glyphs(text_, glyphs_, para_ranges);
 
     // Add emoji data.
-    for (auto &glyph : glyphs) {
+    for (auto &glyph : glyphs_) {
         if (glyph.codepoints.size() == 1) {
             uint16_t glyph_index = emoji_font->find_glyph_index_by_codepoint(glyph.codepoints.front());
             glyph.svg = emoji_font->get_glyph_svg(glyph_index);
@@ -109,7 +117,7 @@ void Label::measure() {
     // Build layout.
     for (auto &range : para_ranges) {
         for (int i = range.start; i < range.end; i++) {
-            const auto &g = glyphs[i];
+            const auto &g = glyphs_[i];
 
             // The glyph's layout box in the text's local coordinates.
             // The origin is the top-left corner of the text box.
@@ -206,7 +214,7 @@ void Label::draw() {
     //        clip_box = {{}, calc_minimum_size()};
     //    }
 
-    vector_server->draw_glyphs(glyphs, glyph_positions, text_style, translation, clip_box);
+    vector_server->draw_glyphs(glyphs_, glyph_positions, text_style, translation, clip_box);
 
     NodeUi::draw();
 }
@@ -245,7 +253,7 @@ Vec2F Label::get_text_size() const {
 }
 
 std::vector<Glyph> &Label::get_glyphs() {
-    return glyphs;
+    return glyphs_;
 }
 
 std::shared_ptr<Font> Label::get_font() const {
@@ -259,10 +267,10 @@ float Label::get_glyph_right_edge_position(int32_t glyph_index) {
 
     float pos = 0;
 
-    assert(glyph_index < glyphs.size() && "Out of bounds glyph index!");
+    assert(glyph_index < glyphs_.size() && "Out of bounds glyph index!");
 
     for (int i = 0; i <= glyph_index; i++) {
-        pos += glyphs[i].x_advance;
+        pos += glyphs_[i].x_advance;
     }
 
     return pos;
@@ -276,10 +284,66 @@ float Label::get_glyph_left_edge_position(int32_t glyph_index) {
     float pos = 0;
 
     for (int i = 0; i < glyph_index; i++) {
-        pos += glyphs[i].x_advance;
+        pos += glyphs_[i].x_advance;
     }
 
     return pos;
+}
+
+float Label::get_codepoint_left_edge_position(int32_t codepoint_index) {
+    if (codepoint_index < 0) {
+        return 0;
+    }
+
+    float pos = 0;
+
+    int32_t current_codepoint = 0;
+
+    for (int i = 0; i < glyphs_.size(); i++) {
+        if (current_codepoint == codepoint_index) {
+            return pos;
+        }
+
+        const auto &glyph = glyphs_[i];
+        int32_t glyph_codepoint_count = glyph.codepoints.size();
+
+        for (int j = 0; j < glyph_codepoint_count; j++) {
+            pos += glyph.x_advance / glyph_codepoint_count;
+
+            current_codepoint++;
+        }
+    }
+
+    assert(false && "Should not happen!");
+    return 0;
+}
+
+float Label::get_codepoint_right_edge_position(int32_t codepoint_index) {
+    if (codepoint_index < 0) {
+        return 0;
+    }
+
+    float pos = 0;
+
+    int32_t current_codepoint = 0;
+
+    for (int i = 0; i < glyphs_.size(); i++) {
+        const auto &glyph = glyphs_[i];
+        int32_t glyph_codepoint_count = glyph.codepoints.size();
+
+        for (int j = 0; j < glyph_codepoint_count; j++) {
+            pos += glyph.x_advance / (float)glyph_codepoint_count;
+
+            if (current_codepoint == codepoint_index) {
+                return pos;
+            }
+
+            current_codepoint++;
+        }
+    }
+
+    assert(false && "Should not happen!");
+    return 0;
 }
 
 float Label::get_position_by_codepoint(uint32_t codepoint_index) {
@@ -289,6 +353,7 @@ float Label::get_position_by_codepoint(uint32_t codepoint_index) {
 
     return pos;
 }
+
 uint32_t Label::get_codepoint_by_position(Vec2F position) {
     return 0;
 }

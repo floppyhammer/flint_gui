@@ -80,7 +80,7 @@ float Tree::get_item_height() {
 }
 
 TreeItem::TreeItem() {
-    label = std::make_shared<Label>("");
+    label = std::make_shared<Label>();
 
     icon = std::make_shared<TextureRect>();
     icon->set_minimum_size({24, 24});

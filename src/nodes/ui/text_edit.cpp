@@ -10,7 +10,7 @@ namespace Flint {
 TextEdit::TextEdit() {
     type = NodeType::TextEdit;
 
-    label = std::make_shared<Label>("");
+    label = std::make_shared<Label>();
     label->set_vertical_alignment(Alignment::Center);
 
     margin_container = std::make_shared<MarginContainer>();
@@ -49,7 +49,7 @@ void TextEdit::input(InputEvent &event) {
     // Handle mouse input propagation.
     bool consume_flag = false;
 
-    int32_t glyph_count = label->get_glyphs().size();
+    int32_t codepoint_count = label->get_text_u32().size();
 
     auto global_position = get_global_position();
 
@@ -98,7 +98,7 @@ void TextEdit::input(InputEvent &event) {
                 break;
             }
 
-            if (current_caret_index < (int32_t)glyph_count) {
+            if (current_caret_index < codepoint_count) {
                 if (selected_text_caret_index_begin != current_caret_index) {
                     delete_selection();
                 }
@@ -138,7 +138,7 @@ void TextEdit::input(InputEvent &event) {
                     current_caret_index--;
                     selected_text_caret_index_begin--;
                     caret_blink_timer = 0;
-                } else if (key_args.key == KeyCode::Right && current_caret_index < glyph_count - 1) {
+                } else if (key_args.key == KeyCode::Right && current_caret_index < codepoint_count - 1) {
                     current_caret_index++;
                     selected_text_caret_index_begin++;
                     caret_blink_timer = 0;
@@ -220,35 +220,36 @@ Vec2F TextEdit::calc_minimum_size() const {
 }
 
 int32_t TextEdit::calculate_caret_index(Vec2F local_cursor_position) {
-    auto closest_glyph_index = -1;
+    auto closest_codepoint_index = -1;
     auto closest_distance = std::numeric_limits<float>::max();
-    auto &glyphs = label->get_glyphs();
+    const auto &codepoints = label->get_text_u32();
 
-    for (int i = 0; i < glyphs.size(); i++) {
-        float glyph_right_edge = label->get_glyph_right_edge_position(i);
+    for (int i = 0; i < codepoints.size(); i++) {
+        float codepoint_right_edge = label->get_codepoint_right_edge_position(i);
 
         // Mouse position to the right boundary of the glyph.
-        auto distance = abs(local_cursor_position.x - glyph_right_edge);
+        auto distance = abs(local_cursor_position.x - codepoint_right_edge);
 
         if (distance < closest_distance) {
             closest_distance = distance;
-            closest_glyph_index = i;
+            closest_codepoint_index = i;
         }
     }
 
-    if (glyphs.empty()) {
-        float first_glyph_center = label->get_glyph_left_edge_position(0) + label->get_glyph_right_edge_position(0);
-        if (local_cursor_position.x < first_glyph_center) {
+    if (codepoints.empty()) {
+        float first_codepoint_center =
+            label->get_codepoint_left_edge_position(0) + label->get_codepoint_right_edge_position(0);
+        if (local_cursor_position.x < first_codepoint_center) {
             return -1;
         }
     }
 
     // Caret at the beginning of the text, i.e. before the first glyph.
     if (abs(local_cursor_position.x) < closest_distance) {
-        closest_glyph_index = -1;
+        closest_codepoint_index = -1;
     }
 
-    return closest_glyph_index;
+    return closest_codepoint_index;
 }
 
 Vec2F TextEdit::calculate_caret_position(int32_t target_caret_index) {

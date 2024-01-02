@@ -18,7 +18,8 @@ ProgressBar::ProgressBar() {
     theme_fg->border_width = 2;
 
     // Don't add the label as a child since it's not a normal node but part of the button.
-    label = std::make_shared<Label>("%");
+    label = std::make_shared<Label>();
+    label->set_text("%");
     label->set_mouse_filter(MouseFilter::Ignore);
     label->set_horizontal_alignment(Alignment::Center);
     label->set_vertical_alignment(Alignment::Center);

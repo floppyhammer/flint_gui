@@ -42,7 +42,8 @@ private:
     bool editable = true;
     bool single_line = false;
 
-    /// -1 means the caret is at the begining (before the first glyph if there's any).
+    /// The codepoint which the caret currently targets to. (Codepoint, not glyph!)
+    /// -1 means the caret is at the begining (before the first codepoint if there's any).
     int32_t current_caret_index = -1;
     int32_t selected_text_caret_index_begin = -1;
     Vec2F caret_position;

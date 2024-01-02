@@ -22,20 +22,22 @@ enum class Alignment {
 
 class Label : public NodeUi {
 public:
-    Label(const std::string &_text);
+    Label();
 
     /**
      * Set text context.
      * @note See https://www.freetype.org/freetype2/docs/glyphs/glyphs-3.html for glyph conventions.
-     * @param p_text Text string.
+     * @param new_text Text string.
      */
     void set_text(const std::string &new_text);
 
     std::string get_text() const;
 
-    void insert_text(uint32_t position, const std::string &new_text);
+    std::u32string get_text_u32() const;
 
-    void remove_text(uint32_t position, uint32_t count);
+    void insert_text(uint32_t codepint_position, const std::string &new_text);
+
+    void remove_text(uint32_t codepint_position, uint32_t count);
 
     void set_size(Vec2F new_size) override;
 
@@ -61,6 +63,10 @@ public:
 
     float get_glyph_right_edge_position(int32_t glyph_index);
 
+    float get_codepoint_left_edge_position(int32_t codepoint_index);
+
+    float get_codepoint_right_edge_position(int32_t codepoint_index);
+
     /// Get the caret position of a given codepoint index.
     float get_position_by_codepoint(uint32_t codepoint_index);
 
@@ -78,7 +84,12 @@ private:
     Vec2F get_text_size() const;
 
 private:
-    std::string text;
+    // Raw text.
+    std::string text_;
+    // Codepoint separated text.
+    std::u32string text_u32_;
+
+    /// text_u32_ is more related to navigation, glyphs_ is more about rendering.
 
     std::shared_ptr<Font> font, emoji_font;
 
@@ -86,10 +97,10 @@ private:
 
     bool autowrap = false;
 
-    // Layout-independent.
-    std::vector<Glyph> glyphs;
+    // Layout-independent. Glyph count will not necessarily be the same as the character count.
+    std::vector<Glyph> glyphs_;
 
-    // Layout-dependent.
+    // Layout-dependent. Ranges for glyphs, not for characters.
     std::vector<Pathfinder::Range> para_ranges;
     std::vector<Pathfinder::Range> line_ranges;
 
