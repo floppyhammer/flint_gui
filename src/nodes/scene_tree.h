@@ -16,6 +16,10 @@
 #include "ui/texture_rect.h"
 #include "ui/tree.h"
 
+namespace Pathfinder {
+class Window;
+}
+
 namespace Flint {
 
 /// Processing order: Input -> Update -> Draw.
@@ -34,7 +38,7 @@ public:
     bool has_quited() const;
 
 private:
-    std::shared_ptr<Window> primary_window;
+    std::shared_ptr<Pathfinder::Window> primary_window;
 
     std::shared_ptr<Node> root;
 

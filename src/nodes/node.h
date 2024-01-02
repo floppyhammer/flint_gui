@@ -93,6 +93,8 @@ public:
 
     bool get_global_visibility() const;
 
+    Pathfinder::Window* get_window() const;
+
     /**
      * Called when the sub-tree structure of this node changed.
      */

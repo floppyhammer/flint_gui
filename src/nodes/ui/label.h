@@ -39,6 +39,8 @@ public:
 
     void remove_text(uint32_t codepint_position, uint32_t count);
 
+    std::string get_sub_text(uint32_t codepint_position, uint32_t count) const;
+
     void set_size(Vec2F new_size) override;
 
     void set_font(std::shared_ptr<Font> new_font);

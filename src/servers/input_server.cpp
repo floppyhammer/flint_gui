@@ -1,5 +1,7 @@
 #include "input_server.h"
 
+#include <pathfinder/prelude.h>
+
 #include <codecvt>
 #include <locale>
 
@@ -108,28 +110,48 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
         InputEvent input_event{};
         input_event.type = InputEventType::Key;
         input_event.window = window;
-        input_event.args.key.pressed = action == GLFW_PRESS;
-        input_event.args.key.repeated = action == GLFW_REPEAT;
+
+        auto &key_args = input_event.args.key;
+        key_args.pressed = action == GLFW_PRESS;
+        key_args.repeated = action == GLFW_REPEAT;
 
         switch (key) {
             case GLFW_KEY_BACKSPACE: {
-                input_event.args.key.key = KeyCode::Backspace;
+                key_args.key = KeyCode::Backspace;
             } break;
             case GLFW_KEY_LEFT: {
-                input_event.args.key.key = KeyCode::Left;
+                key_args.key = KeyCode::Left;
             } break;
             case GLFW_KEY_RIGHT: {
-                input_event.args.key.key = KeyCode::Right;
+                key_args.key = KeyCode::Right;
             } break;
             case GLFW_KEY_UP: {
-                input_event.args.key.key = KeyCode::Up;
+                key_args.key = KeyCode::Up;
             } break;
             case GLFW_KEY_DOWN: {
-                input_event.args.key.key = KeyCode::Down;
+                key_args.key = KeyCode::Down;
+            } break;
+            case GLFW_KEY_LEFT_CONTROL: {
+                key_args.key = KeyCode::LeftControl;
+            } break;
+            case GLFW_KEY_C: {
+                key_args.key = KeyCode::C;
+            } break;
+            case GLFW_KEY_V: {
+                key_args.key = KeyCode::V;
+            } break;
+            case GLFW_KEY_X: {
+                key_args.key = KeyCode::X;
             } break;
             default: {
-                input_event.args.key.key = KeyCode::Unknown;
+                key_args.key = KeyCode::Unknown;
             }
+        }
+
+        if (key_args.pressed) {
+            input_server->keys_pressed.insert(key_args.key);
+        } else {
+            input_server->keys_pressed.erase(key_args.key);
         }
 
         input_server->input_queue.push_back(input_event);
@@ -152,7 +174,16 @@ void InputServer::clear_events() {
     input_queue.clear();
 }
 
-void InputServer::set_cursor(Window *window, CursorShape shape) {
+std::string InputServer::get_clipboard(Pathfinder::Window *window) {
+    auto chars = glfwGetClipboardString((GLFWwindow *)window->get_raw_handle());
+    return std::string(chars);
+}
+
+void InputServer::set_clipboard(Pathfinder::Window *window, std::string text) {
+    glfwSetClipboardString((GLFWwindow *)window->get_raw_handle(), text.c_str());
+}
+
+void InputServer::set_cursor(Pathfinder::Window *window, CursorShape shape) {
     GLFWcursor *current_cursor{};
 
     switch (shape) {
@@ -182,19 +213,24 @@ void InputServer::set_cursor(Window *window, CursorShape shape) {
         } break;
     }
 
-    // glfwSetCursor(window->glfw_window, current_cursor);
+    glfwSetCursor((GLFWwindow *)window->get_raw_handle(), current_cursor);
 }
 
-void InputServer::set_cursor_captured(Window *window, bool captured) {
-    // glfwSetInputMode(window->glfw_window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+bool InputServer::is_key_pressed(KeyCode code) const {
+    return keys_pressed.find(code) != keys_pressed.end();
 }
 
-void InputServer::hide_cursor(Window *window) {
-    // glfwSetInputMode(window->glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+void InputServer::set_cursor_captured(Pathfinder::Window *window, bool captured) {
+    glfwSetInputMode(
+        (GLFWwindow *)window->get_raw_handle(), GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }
 
-void InputServer::restore_cursor(Window *window) {
-    // glfwSetInputMode(window->glfw_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+void InputServer::hide_cursor(Pathfinder::Window *window) {
+    glfwSetInputMode((GLFWwindow *)window->get_raw_handle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+}
+
+void InputServer::restore_cursor(Pathfinder::Window *window) {
+    glfwSetInputMode((GLFWwindow *)window->get_raw_handle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 } // namespace Flint

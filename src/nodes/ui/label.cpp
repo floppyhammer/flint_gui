@@ -64,6 +64,15 @@ void Label::remove_text(uint32_t codepint_position, uint32_t count) {
     need_to_remeasure = true;
 }
 
+std::string Label::get_sub_text(uint32_t codepint_position, uint32_t count) const {
+    assert((codepint_position + count) <= text_u32_.size() && "Codepoint index is out of bounds!");
+
+    auto subtext_u32 = text_u32_.substr(codepint_position, count);
+    auto subtext = to_utf8(subtext_u32);
+
+    return subtext;
+}
+
 std::string Label::get_text() const {
     return text_;
 }

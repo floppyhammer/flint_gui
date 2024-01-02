@@ -43,9 +43,10 @@ private:
     bool single_line = false;
 
     /// The codepoint which the caret currently targets to. (Codepoint, not glyph!)
-    /// -1 means the caret is at the begining (before the first codepoint if there's any).
-    int32_t current_caret_index = -1;
-    int32_t selected_text_caret_index_begin = -1;
+    /// 0 means the caret is at the begining (before the first codepoint if there's any).
+    /// codepoints.size() means the caret is at the end (after the last codepoint if there's any).
+    uint32_t current_caret_index = 0;
+    uint32_t selection_start_index = 0;
     Vec2F caret_position;
 
     StyleLine theme_caret;
@@ -62,7 +63,8 @@ private:
 
     void cursor_exited() override;
 
-    int32_t calculate_caret_index(Vec2F local_cursor_position);
+    /// We have to pass the cursor position local to the label (the label is a child of a margin container).
+    uint32_t calculate_caret_index(Vec2F local_cursor_position_to_label);
 
     Vec2F calculate_caret_position(int32_t caret_index);
 

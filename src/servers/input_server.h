@@ -1,15 +1,19 @@
 #ifndef FLINT_INPUT_SERVER_H
 #define FLINT_INPUT_SERVER_H
 
+#include <pathfinder/prelude.h>
+
 #include <cstdint>
 #include <vector>
 
 #include "../common/geometry.h"
 #include "../render/base.h"
 
-namespace Flint {
-
+namespace Pathfinder {
 class Window;
+}
+
+namespace Flint {
 
 enum class InputEventType {
     MouseButton = 0,
@@ -21,7 +25,11 @@ enum class InputEventType {
 };
 
 enum class KeyCode {
-    Unknown,
+    Unknown = 0,
+    LeftControl,
+    C,
+    V,
+    X,
     Backspace,
     Left,
     Right,
@@ -105,22 +113,29 @@ public:
 
     void clear_events();
 
+    std::string get_clipboard(Pathfinder::Window *window);
+    void set_clipboard(Pathfinder::Window *window, std::string text);
+
     Vec2F cursor_position;
     Vec2F last_cursor_position;
 
     std::vector<InputEvent> input_queue;
 
-    void set_cursor_captured(Window *window, bool captured);
+    void set_cursor_captured(Pathfinder::Window *window, bool captured);
 
-    void hide_cursor(Window *window);
+    void hide_cursor(Pathfinder::Window *window);
 
-    void restore_cursor(Window *window);
+    void restore_cursor(Pathfinder::Window *window);
 
-    void set_cursor(Window *window, CursorShape shape);
+    void set_cursor(Pathfinder::Window *window, CursorShape shape);
+
+    bool is_key_pressed(KeyCode code) const;
 
 private:
     GLFWcursor *arrow_cursor, *ibeam_cursor, *crosshair_cursor, *hand_cursor, *resize_cursor_h, *resize_cursor_v;
     GLFWcursor *resize_tlbr_cursor, *resize_trbl_cursor;
+
+    std::set<KeyCode> keys_pressed;
 };
 
 } // namespace Flint

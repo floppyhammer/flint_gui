@@ -1,6 +1,10 @@
 #include "node.h"
 
+#include <servers/render_server.h>
+
 #include <string>
+
+#include "sub_window.h"
 
 namespace Flint {
 
@@ -105,6 +109,19 @@ bool Node::get_global_visibility() const {
     } else {
         return get_visibility();
     }
+}
+
+Pathfinder::Window *Node::get_window() const {
+    if (type == NodeType::Window) {
+        auto sub_window_node = (SubWindow *)this;
+        return sub_window_node->get_window();
+    }
+
+    if (parent) {
+        return parent->get_window();
+    }
+
+    return RenderServer::get_singleton()->window_builder_->get_primary_window().get();
 }
 
 std::string Node::get_node_path() const {
