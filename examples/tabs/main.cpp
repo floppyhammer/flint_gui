@@ -15,15 +15,19 @@ int main() {
     {
         auto node_ui = std::make_shared<NodeUi>();
         app.get_tree()->replace_scene(node_ui);
+        node_ui->set_anchor_flag(AnchorFlag::FullRect);
 
         auto tab_container = std::make_shared<TabContainer>();
         tab_container->set_position({200, 200});
         tab_container->name = "TabContainer";
+        tab_container->set_anchor_flag(AnchorFlag::FullRect);
         node_ui->add_child(tab_container);
 
         for (int i = 0; i < 3; i++) {
             auto panel = std::make_shared<Panel>();
-            tab_container->add_child(std::make_shared<Label>("Label" + std::to_string(i)));
+            auto label = std::make_shared<Label>();
+            label->set_text("Label" + std::to_string(i));
+            tab_container->add_child(label);
         }
 
         tab_container->set_current_tab(0);
