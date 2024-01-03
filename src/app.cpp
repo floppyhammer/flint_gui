@@ -38,6 +38,7 @@ App::App(Vec2I primary_window_size) {
         primary_window_->get_size(), render_server->device_, render_server->queue_, Pathfinder::RenderLevel::Dx9);
 
     tree = std::make_unique<SceneTree>();
+    tree->primary_window = primary_window_;
 
     {
         render_server->blit_ = std::make_shared<Blit>(
@@ -65,6 +66,12 @@ void App::main_loop() {
         InputServer::get_singleton()->clear_events();
 
         primary_window_->poll_events();
+
+        if (primary_window_->get_resize_flag()) {
+            vector_target_ = RenderServer::get_singleton()->device_->create_texture(
+                {primary_window_->get_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
+            VectorServer::get_singleton()->get_canvas()->set_size(primary_window_->get_size());
+        }
 
         // Acquire next swap chain image.
         if (!primary_swap_chain_->acquire_image()) {

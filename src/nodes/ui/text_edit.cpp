@@ -51,8 +51,6 @@ std::string TextEdit::get_text() const {
 }
 
 void TextEdit::input(InputEvent &event) {
-    NodeUi::input(event);
-
     auto input_server = InputServer::get_singleton();
 
     auto window = get_window();
@@ -183,6 +181,8 @@ void TextEdit::input(InputEvent &event) {
         default:
             break;
     }
+
+    NodeUi::input(event);
 
     if (consume_flag) {
         event.consume();

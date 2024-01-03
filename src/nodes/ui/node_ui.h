@@ -121,7 +121,7 @@ public:
 
     void get_anchor_flag();
 
-    void when_window_size_changed(Vec2I new_size);
+    void when_parent_size_changed(Vec2F new_size) override;
 
     void when_cursor_entered();
 
@@ -144,11 +144,11 @@ protected:
 
     AnchorFlag anchor_mode = AnchorFlag::Max;
 
+    bool is_cursor_inside = false;
+
     void update(double dt) override;
 
     void input(InputEvent &input_event) override;
-
-    bool is_cursor_inside = false;
 
     void cursor_entered();
 
@@ -161,6 +161,7 @@ protected:
 
     std::vector<std::function<void()>> callbacks_cursor_entered;
     std::vector<std::function<void()>> callbacks_cursor_exited;
+    std::vector<std::function<void(Vec2F size)>> callbacks_parent_size_changed;
 };
 
 } // namespace Flint

@@ -134,6 +134,12 @@ std::string Node::get_node_path() const {
     return "/" + type_name;
 }
 
+void Node::when_parent_size_changed(Vec2F new_size) {
+    for (auto &child : children) {
+        child->when_parent_size_changed(new_size);
+    }
+}
+
 void Node::when_subtree_changed() {
     for (auto &callback : subtree_changed_callbacks) {
         callback();

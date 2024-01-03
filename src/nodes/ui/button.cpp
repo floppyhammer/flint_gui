@@ -40,6 +40,12 @@ Button::Button() {
     margin_container->add_child(hstack_container);
     margin_container->set_parent(this);
     margin_container->set_size(size);
+
+    callbacks_cursor_entered.emplace_back(
+        [this] { InputServer::get_singleton()->set_cursor(this->get_window(), CursorShape::Hand); });
+
+    callbacks_cursor_exited.emplace_back(
+        [this] { InputServer::get_singleton()->set_cursor(this->get_window(), CursorShape::Arrow); });
 }
 
 Vec2F Button::calc_minimum_size() const {
@@ -115,11 +121,11 @@ void Button::input(InputEvent &event) {
         }
     }
 
+    NodeUi::input(event);
+
     if (consume_flag) {
         event.consume();
     }
-
-    NodeUi::input(event);
 }
 
 void Button::update(double dt) {

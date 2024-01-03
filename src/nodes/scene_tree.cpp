@@ -13,9 +13,14 @@ void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
     root->tree_ = this;
 }
 
-void SceneTree::process(double dt) const {
+void SceneTree::process(double dt) {
     if (root == nullptr) {
         return;
+    }
+
+    if (primary_window && old_primary_window_size != primary_window->get_size()) {
+        old_primary_window_size = primary_window->get_size();
+        when_primary_window_size_changed(old_primary_window_size);
     }
 
     for (auto& event : InputServer::get_singleton()->input_queue) {
@@ -27,13 +32,8 @@ void SceneTree::process(double dt) const {
     root->propagate_draw();
 }
 
-void SceneTree::when_window_size_changed(Vec2I new_size) const {
-    for (auto& child : root->get_children()) {
-        // if (child->get_node_type() == NodeType::UiLayer) {
-        //     auto cast_child = dynamic_cast<UiLayer*>(child.get());
-        //     cast_child->when_window_size_changed(new_size);
-        // }
-    }
+void SceneTree::when_primary_window_size_changed(Vec2I new_size) const {
+    root->when_parent_size_changed(new_size.to_f32());
 }
 
 void SceneTree::quit() {

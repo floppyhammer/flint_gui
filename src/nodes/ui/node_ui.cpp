@@ -296,7 +296,7 @@ void NodeUi::get_anchor_flag() {
     anchor_mode;
 }
 
-void NodeUi::when_window_size_changed(Vec2I new_size) {
+void NodeUi::when_parent_size_changed(Vec2F new_size) {
     switch (anchor_mode) {
         case AnchorFlag::FullRect: {
             size = new_size.to_f32();
@@ -339,6 +339,13 @@ void NodeUi::when_window_size_changed(Vec2I new_size) {
         case AnchorFlag::Max:
         default:
             break;
+    }
+
+    for (auto &child : children) {
+        if (child->get_node_type() == NodeType::NodeUi) {
+            auto cast_child = dynamic_cast<NodeUi *>(child.get());
+            cast_child->when_parent_size_changed(size);
+        }
     }
 }
 

@@ -95,6 +95,8 @@ public:
 
     Pathfinder::Window* get_window() const;
 
+    virtual void when_parent_size_changed(Vec2F new_size);
+
     /**
      * Called when the sub-tree structure of this node changed.
      */

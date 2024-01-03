@@ -24,14 +24,16 @@ namespace Flint {
 
 /// Processing order: Input -> Update -> Draw.
 class SceneTree {
+    friend class App;
+
 public:
     explicit SceneTree();
 
-    void process(double dt) const;
+    void process(double dt);
 
     void replace_scene(const std::shared_ptr<Node>& new_scene);
 
-    void when_window_size_changed(Vec2I new_size) const;
+    void when_primary_window_size_changed(Vec2I new_size) const;
 
     void quit();
 
@@ -39,6 +41,7 @@ public:
 
 private:
     std::shared_ptr<Pathfinder::Window> primary_window;
+    Vec2I old_primary_window_size;
 
     std::shared_ptr<Node> root;
 
