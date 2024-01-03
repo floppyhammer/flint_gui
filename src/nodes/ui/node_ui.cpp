@@ -50,7 +50,7 @@ void NodeUi::update(double dt) {
 }
 
 void NodeUi::input(InputEvent &event) {
-    if (mouse_filter != MouseFilter::Stop) {
+    if (mouse_filter == MouseFilter::Ignore) {
         return;
     }
 
@@ -272,9 +272,15 @@ void NodeUi::apply_anchor() {
 }
 
 void NodeUi::cursor_entered() {
+    for (auto &callback : callbacks_cursor_entered) {
+        callback();
+    }
 }
 
 void NodeUi::cursor_exited() {
+    for (auto &callback : callbacks_cursor_exited) {
+        callback();
+    }
 }
 
 void NodeUi::set_anchor_flag(AnchorFlag anchor_flag) {

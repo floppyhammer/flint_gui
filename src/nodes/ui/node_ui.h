@@ -123,6 +123,10 @@ public:
 
     void when_window_size_changed(Vec2I new_size);
 
+    void when_cursor_entered();
+
+    void when_cursor_exited();
+
 protected:
     Vec2F position{0};
     Vec2F size{128};
@@ -146,14 +150,17 @@ protected:
 
     bool is_cursor_inside = false;
 
-    virtual void cursor_entered();
+    void cursor_entered();
 
-    virtual void cursor_exited();
+    void cursor_exited();
 
     /// Visualize the node's size.
     StyleBox debug_size_box;
 
     MouseFilter mouse_filter = MouseFilter::Stop;
+
+    std::vector<std::function<void()>> callbacks_cursor_entered;
+    std::vector<std::function<void()>> callbacks_cursor_exited;
 };
 
 } // namespace Flint

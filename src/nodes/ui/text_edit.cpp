@@ -34,6 +34,12 @@ TextEdit::TextEdit() {
     theme_selection_box.corner_radius = 0;
 
     set_text("Enter text");
+
+    callbacks_cursor_entered.emplace_back(
+        [this] { InputServer::get_singleton()->set_cursor(this->get_window(), CursorShape::IBeam); });
+
+    callbacks_cursor_exited.emplace_back(
+        [this] { InputServer::get_singleton()->set_cursor(this->get_window(), CursorShape::Arrow); });
 }
 
 void TextEdit::set_text(const std::string &new_text) {
@@ -48,6 +54,8 @@ void TextEdit::input(InputEvent &event) {
     NodeUi::input(event);
 
     auto input_server = InputServer::get_singleton();
+
+    auto window = get_window();
 
     // Handle mouse input propagation.
     bool consume_flag = false;
@@ -293,14 +301,6 @@ void TextEdit::release_focus() {
 
 void TextEdit::set_editable(bool new_value) {
     editable = new_value;
-}
-
-void TextEdit::cursor_entered() {
-    // InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::IBeam);
-}
-
-void TextEdit::cursor_exited() {
-    // InputServer::get_singleton()->set_cursor(get_window()->get_real().get(), CursorShape::Arrow);
 }
 
 void TextEdit::delete_selection() {
