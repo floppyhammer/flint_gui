@@ -27,16 +27,16 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
 # Include external and third-party headers.
 include_directories(third_party)
 
-include_directories(external/glfw/include)
-add_subdirectory(external/glfw)
+include_directories(third_party/glfw/include)
+add_subdirectory(third_party/glfw)
 
 if (FLINT_GUI_VULKAN)
     set(PATHFINDER_VULKAN_SUPPORT ON CACHE BOOL "" FORCE)
 else ()
     set(PATHFINDER_VULKAN_SUPPORT OFF CACHE BOOL "" FORCE)
 endif ()
-include_directories(external/pathfinder-cpp)
-add_subdirectory(external/pathfinder-cpp)
+include_directories(third_party/pathfinder-cpp)
+add_subdirectory(third_party/pathfinder-cpp)
 
 include_directories(third_party/glm-0.9.9.8)
 add_subdirectory(third_party/glm-0.9.9.8)
