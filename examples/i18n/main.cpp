@@ -28,20 +28,7 @@ int main() {
         vstack_container->set_separation(16);
         margin_container->add_child(vstack_container);
 
-        std::string text = "";
-        text += "👍😁😂\n";                      // Emoji
-        text += "你好世界！\n";                  // Chinese
-        text += "こんにちは世界！\n";            // Japanese
-        text += "مرحبا بالعالم!\n";              // Arabic
-        text += "ওহে বিশ্ব!\n";                   // Bengali
-        text += "สวัสดีชาวโลก!\n";                 // Thai
-        text += "سلام دنیا!\n";                  // Persian
-        text += "नमस्ते दुनिया!\n";                 // Hindi
-        text += "Chào thế giới!\n";              // Vietnamese
-        text += "שלום עולם!\n\n\n";              // Hebrew
-        text += "Hello123!مرحبا٠١٢!你好123！\n"; // Mixed languages.
-
-        auto label = std::make_shared<Label>(text);
+        auto label = std::make_shared<Label>();
         label->set_text_style(TextStyle{
             ColorU::white(),
             ColorU::red(),
@@ -52,6 +39,20 @@ int main() {
         });
         label->enable_visual_debug(true);
         vstack_container->add_child(label);
+
+        std::string text = "";
+        text += "👍😁😂\n";                   // Emoji
+        text += "你好世界！\n";                    // Chinese
+        text += "こんにちは世界！\n";                 // Japanese
+        text += "مرحبا بالعالم!\n";           // Arabic
+        text += "ওহে বিশ্ব!\n";               // Bengali
+        text += "สวัสดีชาวโลก!\n";            // Thai
+        text += "سلام دنیا!\n";               // Persian
+        text += "नमस्ते दुनिया!\n";           // Hindi
+        text += "Chào thế giới!\n";           // Vietnamese
+        text += "שלום עולם!\n\n\n";           // Hebrew
+        text += "Hello123!مرحبا٠١٢!你好123！\n"; // Mixed languages.
+        label->set_text(text);
     }
 
     app.main_loop();
