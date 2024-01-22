@@ -2,7 +2,6 @@
 #define FLINT_FILE_DIALOG_H
 
 #include "node.h"
-#include "tinyfiledialogs/tinyfiledialogs.h"
 
 namespace Flint {
 

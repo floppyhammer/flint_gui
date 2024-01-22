@@ -1,11 +1,12 @@
 #include "file_dialog.h"
 
 #include "../common/utils.h"
+#include "tinyfiledialogs/tinyfiledialogs.h"
 
 namespace Flint {
 
 std::string FileDialog::show() {
-    Logger::info("File dialog", "FileDialog");
+    Logger::info("Show file dialog", "FileDialog");
 
     // In case of multiple files, the separator is `|`.
     // Returns NULL on cancel.
@@ -17,7 +18,7 @@ std::string FileDialog::show() {
                                       0);      // 0
 
     if (path) {
-        Logger::info("File dialog selected: " + std::string(path), "FileDialog");
+        Logger::info("Selected path: " + std::string(path), "FileDialog");
         return path;
     }
 

@@ -1,6 +1,5 @@
 #include "raster_image.h"
 
-#include "../common/macros.h"
 #include "../common/utils.h"
 
 // Already defined in Pathfinder.
