@@ -17,22 +17,27 @@ enum class NodeType {
 
     // UI.
     NodeUi,
+
     Container,
     CenterContainer,
     MarginContainer,
     HStackContainer,
     VStackContainer,
     ScrollContainer,
-
     TabContainer,
+
     Button,
+    MenuButton, // todo
+    OptionButton, // todo
+    CheckButton, // todo
+    RadioButton, // todo
     Label,
     TextEdit,
+    SpinBox,
     Panel,
     TextureRect,
     Tree,
     ProgressBar,
-    SpinBox,
 
     Max,
 };
