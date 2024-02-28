@@ -70,7 +70,6 @@ protected:
     std::vector<std::function<void()>> down_callbacks;
     std::vector<std::function<void()>> up_callbacks;
 
-protected:
     void when_pressed();
 };
 

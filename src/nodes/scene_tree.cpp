@@ -29,7 +29,11 @@ void SceneTree::process(double dt) {
 
     root->propagate_update(dt);
 
+    // Collect draw commands.
     root->propagate_draw();
+
+    // Actual drawing.
+
 }
 
 void SceneTree::when_primary_window_size_changed(Vec2I new_size) const {

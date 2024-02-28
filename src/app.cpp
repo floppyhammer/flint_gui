@@ -73,46 +73,49 @@ void App::main_loop() {
             VectorServer::get_singleton()->get_canvas()->set_size(primary_window_->get_size());
         }
 
-        // Acquire next swap chain image.
-        if (!primary_swap_chain_->acquire_image()) {
-            continue;
-        }
-
         // Engine processing.
         Engine::get_singleton()->tick();
 
         // Get frame time.
         auto dt = Engine::get_singleton()->get_delta();
 
-        auto vector_server = VectorServer::get_singleton();
-        vector_server->set_dst_texture(vector_target_);
-
-        auto render_server = RenderServer::get_singleton();
-
         // Update the scene tree.
         tree->process(dt);
 
-        vector_server->submit_and_clear();
-
-        auto encoder = render_server->device_->create_command_encoder("Main encoder");
-
-        auto framebuffer = primary_swap_chain_->get_framebuffer();
-
-        // Swap chain render pass.
+        // Drawing process for the primary window;
         {
-            encoder->begin_render_pass(primary_swap_chain_->get_render_pass(), framebuffer, ColorF(0.2, 0.2, 0.2, 1.0));
+            // Acquire next swap chain image.
+            if (!primary_swap_chain_->acquire_image()) {
+                continue;
+            }
 
-            render_server->blit_->set_texture(vector_target_);
+            auto vector_server = VectorServer::get_singleton();
+            vector_server->set_dst_texture(vector_target_);
 
-            // Draw canvas to screen.
-            render_server->blit_->draw(encoder, framebuffer->get_size());
+            auto render_server = RenderServer::get_singleton();
+            vector_server->submit_and_clear();
 
-            encoder->end_render_pass();
+            auto encoder = render_server->device_->create_command_encoder("Main encoder");
+
+            auto surface_texture = primary_swap_chain_->get_surface_texture();
+
+            // Swap chain render pass.
+            {
+                encoder->begin_render_pass(
+                    primary_swap_chain_->get_render_pass(), surface_texture, ColorF(0.2, 0.2, 0.2, 1.0));
+
+                render_server->blit_->set_texture(vector_target_);
+
+                // Draw canvas to screen.
+                render_server->blit_->draw(encoder, primary_swap_chain_->size_);
+
+                encoder->end_render_pass();
+            }
+
+            render_server->queue_->submit(encoder, primary_swap_chain_);
+
+            primary_swap_chain_->present();
         }
-
-        render_server->queue_->submit(encoder, primary_swap_chain_);
-
-        primary_swap_chain_->present();
     }
 }
 

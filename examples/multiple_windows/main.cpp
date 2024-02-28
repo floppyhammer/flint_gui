@@ -28,13 +28,17 @@ int main() {
 
         node_ui->add_child(container);
 
-        auto another_window = std::make_shared<SubWindow>(Vec2I{400, 300});
-        node_ui->add_child(another_window);
+        auto sub_window = std::make_shared<SubWindow>(Vec2I{400, 300});
+        node_ui->add_child(sub_window);
 
-        auto callback1 = [another_window] { another_window->set_visibility(true); };
+        auto label = std::make_shared<Label>();
+        label->set_text("This is a sub-window.");
+        sub_window->add_child(label);
+
+        auto callback1 = [sub_window] { sub_window->set_visibility(true); };
         open_window_button->connect_signal("pressed", callback1);
 
-        auto callback2 = [another_window] { another_window->set_visibility(false); };
+        auto callback2 = [sub_window] { sub_window->set_visibility(false); };
         close_window_button->connect_signal("pressed", callback2);
     }
 

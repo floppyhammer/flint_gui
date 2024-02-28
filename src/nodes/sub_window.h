@@ -6,11 +6,12 @@
 
 namespace Flint {
 
+/// A sub-window besides the primary window.
 class SubWindow : public Node {
     friend class SceneTree;
 
 public:
-    explicit SubWindow(Vec2I _size);
+    explicit SubWindow(Vec2I size);
 
     void propagate_input(InputEvent &event) override;
 
@@ -20,9 +21,9 @@ public:
 
     Vec2I get_size() const;
 
-    void set_visibility(bool _visible) override;
+    void set_visibility(bool visible) override;
 
-private:
+protected:
     Vec2I size_;
 
     std::shared_ptr<Pathfinder::Window> window_;

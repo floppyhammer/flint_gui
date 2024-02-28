@@ -82,24 +82,28 @@ void SubWindow::propagate_draw() {
     auto vector_server = VectorServer::get_singleton();
     vector_server->set_dst_texture(vector_target_);
 
+    auto previous_scene = vector_server->get_canvas()->take_scene();
+
     for (auto &child : children) {
         child->propagate_draw();
     }
 
     vector_server->submit_and_clear();
 
+    vector_server->get_canvas()->set_scene(previous_scene);
+
     auto encoder = render_server->device_->create_command_encoder("Main encoder");
 
-    auto framebuffer = swap_chain_->get_framebuffer();
+    auto surface_texture = swap_chain_->get_surface_texture();
 
     // Swap chain render pass.
     {
-        encoder->begin_render_pass(swap_chain_->get_render_pass(), framebuffer, ColorF(0.2, 0.2, 0.2, 1.0));
+        encoder->begin_render_pass(swap_chain_->get_render_pass(), surface_texture, ColorF(0.2, 0.2, 0.2, 1.0));
 
         render_server->blit_->set_texture(vector_target_);
 
         // Draw canvas to screen.
-        render_server->blit_->draw(encoder, framebuffer->get_size());
+        render_server->blit_->draw(encoder, swap_chain_->size_);
 
         encoder->end_render_pass();
     }

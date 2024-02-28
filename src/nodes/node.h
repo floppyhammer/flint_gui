@@ -27,10 +27,10 @@ enum class NodeType {
     TabContainer,
 
     Button,
-    MenuButton, // todo
+    MenuButton,   // todo
     OptionButton, // todo
-    CheckButton, // todo
-    RadioButton, // todo
+    CheckButton,  // todo
+    RadioButton,  // todo
     Label,
     TextEdit,
     SpinBox,
@@ -98,7 +98,7 @@ public:
 
     bool get_global_visibility() const;
 
-    Pathfinder::Window* get_window() const;
+    Pathfinder::Window *get_window() const;
 
     virtual void when_parent_size_changed(Vec2F new_size);
 
