@@ -55,6 +55,10 @@ Vec2F Button::calc_minimum_size() const {
 }
 
 void Button::input(InputEvent &event) {
+    if (!is_event_relevant(event)) {
+        return;
+    }
+
     auto global_position = get_global_position();
 
     bool consume_flag = false;
@@ -135,7 +139,7 @@ void Button::update(double dt) {
 }
 
 void Button::draw() {
-    if (!visible) {
+    if (!visible_) {
         return;
     }
 

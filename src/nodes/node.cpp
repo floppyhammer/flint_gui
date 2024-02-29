@@ -95,12 +95,12 @@ void Node::remove_child(size_t index) {
     children.erase(children.begin() + index);
 }
 
-void Node::set_visibility(bool _visible) {
-    visible = _visible;
+void Node::set_visibility(bool visible) {
+    visible_ = visible;
 }
 
 bool Node::get_visibility() const {
-    return visible;
+    return visible_;
 }
 
 bool Node::get_global_visibility() const {
@@ -114,7 +114,7 @@ bool Node::get_global_visibility() const {
 Pathfinder::Window *Node::get_window() const {
     if (type == NodeType::Window) {
         auto sub_window_node = (SubWindow *)this;
-        return sub_window_node->get_window();
+        return sub_window_node->get_raw_window().get();
     }
 
     if (parent) {

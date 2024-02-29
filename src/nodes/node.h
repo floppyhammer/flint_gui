@@ -44,6 +44,7 @@ enum class NodeType {
 
 class SceneTree;
 
+/// Position-independent, window-independent base node.
 class Node {
     friend class SceneTree;
 
@@ -92,7 +93,7 @@ public:
 
     std::string get_node_path() const;
 
-    virtual void set_visibility(bool _visible);
+    virtual void set_visibility(bool visible);
 
     bool get_visibility() const;
 
@@ -116,7 +117,7 @@ public:
 protected:
     NodeType type = NodeType::Node;
 
-    bool visible = true;
+    bool visible_ = true;
 
     std::vector<std::shared_ptr<Node>> children;
 

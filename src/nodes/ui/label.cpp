@@ -202,7 +202,7 @@ void Label::set_text_style(TextStyle _text_style) {
 }
 
 void Label::draw() {
-    if (!visible) {
+    if (!visible_) {
         return;
     }
 

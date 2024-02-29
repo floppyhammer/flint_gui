@@ -24,7 +24,7 @@ App::App(Vec2I primary_window_size) {
     primary_window_ = render_server->window_builder_->get_primary_window();
 
     auto input_server = InputServer::get_singleton();
-    input_server->initialize_window_callbacks((GLFWwindow*)primary_window_->get_raw_handle());
+    input_server->initialize_window_callbacks((GLFWwindow*)primary_window_->get_glfw_handle());
 
     // Create device and queue.
     render_server->device_ = render_server->window_builder_->request_device();
@@ -65,7 +65,7 @@ void App::main_loop() {
     while (!primary_window_->should_close()) {
         InputServer::get_singleton()->clear_events();
 
-        primary_window_->poll_events();
+        RenderServer::get_singleton()->window_builder_->poll_events();
 
         if (primary_window_->get_resize_flag()) {
             vector_target_ = RenderServer::get_singleton()->device_->create_texture(
@@ -104,10 +104,12 @@ void App::main_loop() {
                 encoder->begin_render_pass(
                     primary_swap_chain_->get_render_pass(), surface_texture, ColorF(0.2, 0.2, 0.2, 1.0));
 
+                encoder->set_viewport({{0, 0}, primary_window_->get_size()});
+
                 render_server->blit_->set_texture(vector_target_);
 
                 // Draw canvas to screen.
-                render_server->blit_->draw(encoder, primary_swap_chain_->size_);
+                render_server->blit_->draw(encoder, primary_window_->get_size());
 
                 encoder->end_render_pass();
             }

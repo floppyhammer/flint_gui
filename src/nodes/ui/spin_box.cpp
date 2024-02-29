@@ -122,7 +122,7 @@ void SpinBox::update(double dt) {
 }
 
 void SpinBox::draw() {
-    if (!visible) {
+    if (!visible_) {
         return;
     }
 

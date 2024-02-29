@@ -21,7 +21,7 @@ Vec2F NodeUi::calc_minimum_size() const {
 }
 
 void NodeUi::propagate_draw() {
-    if (!visible) {
+    if (!visible_) {
         return;
     }
 
@@ -50,6 +50,10 @@ void NodeUi::update(double dt) {
 }
 
 void NodeUi::input(InputEvent &event) {
+    if (!is_event_relevant(event)) {
+        return;
+    }
+
     if (mouse_filter == MouseFilter::Ignore) {
         return;
     }
@@ -283,6 +287,10 @@ void NodeUi::cursor_exited() {
     }
 }
 
+bool NodeUi::is_event_relevant(const InputEvent &event) const {
+    return event.window == get_window()->get_glfw_handle();
+}
+
 void NodeUi::set_anchor_flag(AnchorFlag anchor_flag) {
     if (anchor_flag == anchor_mode) {
         return;
@@ -291,9 +299,8 @@ void NodeUi::set_anchor_flag(AnchorFlag anchor_flag) {
     anchor_mode = anchor_flag;
 }
 
-void NodeUi::get_anchor_flag() {
-    return;
-    anchor_mode;
+AnchorFlag NodeUi::get_anchor_flag() const {
+    return anchor_mode;
 }
 
 void NodeUi::when_parent_size_changed(Vec2F new_size) {

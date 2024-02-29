@@ -23,6 +23,10 @@ public:
 
     void set_visibility(bool visible) override;
 
+    std::shared_ptr<Pathfinder::Window> get_raw_window() const {
+        return window_;
+    }
+
 protected:
     Vec2I size_;
 

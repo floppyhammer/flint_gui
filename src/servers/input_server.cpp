@@ -175,12 +175,12 @@ void InputServer::clear_events() {
 }
 
 std::string InputServer::get_clipboard(Pathfinder::Window *window) {
-    auto chars = glfwGetClipboardString((GLFWwindow *)window->get_raw_handle());
+    auto chars = glfwGetClipboardString((GLFWwindow *)window->get_glfw_handle());
     return std::string(chars);
 }
 
 void InputServer::set_clipboard(Pathfinder::Window *window, std::string text) {
-    glfwSetClipboardString((GLFWwindow *)window->get_raw_handle(), text.c_str());
+    glfwSetClipboardString((GLFWwindow *)window->get_glfw_handle(), text.c_str());
 }
 
 void InputServer::set_cursor(Pathfinder::Window *window, CursorShape shape) {
@@ -213,7 +213,7 @@ void InputServer::set_cursor(Pathfinder::Window *window, CursorShape shape) {
         } break;
     }
 
-    glfwSetCursor((GLFWwindow *)window->get_raw_handle(), current_cursor);
+    glfwSetCursor((GLFWwindow *)window->get_glfw_handle(), current_cursor);
 }
 
 bool InputServer::is_key_pressed(KeyCode code) const {
@@ -222,15 +222,15 @@ bool InputServer::is_key_pressed(KeyCode code) const {
 
 void InputServer::set_cursor_captured(Pathfinder::Window *window, bool captured) {
     glfwSetInputMode(
-        (GLFWwindow *)window->get_raw_handle(), GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+        (GLFWwindow *)window->get_glfw_handle(), GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }
 
 void InputServer::hide_cursor(Pathfinder::Window *window) {
-    glfwSetInputMode((GLFWwindow *)window->get_raw_handle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode((GLFWwindow *)window->get_glfw_handle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void InputServer::restore_cursor(Pathfinder::Window *window) {
-    glfwSetInputMode((GLFWwindow *)window->get_raw_handle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glfwSetInputMode((GLFWwindow *)window->get_glfw_handle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 } // namespace Flint
