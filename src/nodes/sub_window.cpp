@@ -54,8 +54,10 @@ void SubWindow::propagate_update(double dt) {
     // }
 
     // Closing a window just hides it.
-    if (window_->should_close() && visible_) {
-        set_visibility(false);
+    if (window_->should_close() || !visible_) {
+        window_->hide();
+    } else {
+        window_->show();
     }
 
     if (!visible_) {
@@ -127,8 +129,6 @@ void SubWindow::set_visibility(bool visible) {
     if (visible_ == visible) {
         return;
     }
-
-    visible_ ? window_->hide() : window_->show();
 
     visible_ = visible;
 }

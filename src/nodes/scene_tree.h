@@ -4,6 +4,7 @@
 #include "file_dialog.h"
 #include "node.h"
 #include "ui/button.h"
+#include "ui/check_button.h"
 #include "ui/label.h"
 #include "ui/margin_container.h"
 #include "ui/panel.h"

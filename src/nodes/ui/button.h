@@ -42,7 +42,7 @@ public:
     void set_icon(const std::shared_ptr<Image> &_icon);
 
     /// The icon will expand until it's height matches that of the button.
-    void set_expand_icon(bool enable);
+    void set_icon_expand(bool enable);
 
     void set_toggle_mode(bool enable);
 
@@ -56,7 +56,7 @@ protected:
 
     bool toggle_mode = false;
 
-    bool expand_icon = false;
+    bool icon_expand_ = false;
 
     /// Button[HStackContainer[TextureRect, Label]]
     std::shared_ptr<MarginContainer> margin_container;
@@ -66,11 +66,14 @@ protected:
 
     // Callbacks.
     std::vector<std::function<void()>> pressed_callbacks;
+    std::vector<std::function<void(bool pressed)>> toggled_callbacks;
     std::vector<std::function<void()>> hovered_callbacks;
     std::vector<std::function<void()>> down_callbacks;
     std::vector<std::function<void()>> up_callbacks;
 
     void when_pressed();
+
+    void when_toggled(bool pressed);
 };
 
 class ButtonGroup {

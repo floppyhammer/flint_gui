@@ -113,9 +113,15 @@ void Button::input(InputEvent &event) {
                     if (args.pressed) {
                         pressed_inside = true;
                     } else {
-                        if (pressed_inside && !pressed) {
-                            pressed = true;
-                            when_pressed();
+                        if (pressed_inside) {
+                            if (pressed) {
+                                pressed = false;
+                            } else {
+                                pressed = true;
+                                when_pressed();
+                            }
+
+                            when_toggled(pressed);
                         }
                     }
                 }
@@ -191,6 +197,12 @@ void Button::when_pressed() {
     }
 }
 
+void Button::when_toggled(bool pressed) {
+    for (auto &callback : toggled_callbacks) {
+        callback(pressed);
+    }
+}
+
 void Button::connect_signal(const std::string &signal, const std::function<void()> &callback) {
     NodeUi::connect_signal(signal, callback);
 
@@ -207,7 +219,7 @@ void Button::set_icon(const std::shared_ptr<Image> &p_icon) {
     icon_rect->set_texture(p_icon);
 }
 
-void Button::set_expand_icon(bool enable) {
+void Button::set_icon_expand(bool enable) {
     if (enable) {
         icon_rect->container_sizing.expand_h = true;
         icon_rect->container_sizing.flag_h = ContainerSizingFlag::Fill;

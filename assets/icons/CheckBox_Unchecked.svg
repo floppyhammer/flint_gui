@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 0.48 0.48"
+   version="1.1"
+   id="svg394"
+   sodipodi:docname="checkbox-checked-svgrepo-com.svg"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs398" />
+  <sodipodi:namedview
+     id="namedview396"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     showgrid="false"
+     inkscape:zoom="22.66"
+     inkscape:cx="16.218005"
+     inkscape:cy="13.305384"
+     inkscape:window-width="1723"
+     inkscape:window-height="1368"
+     inkscape:window-x="10"
+     inkscape:window-y="193"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="ic_fluent_checkbox_checked_24_regular" />
+  <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+  <title
+     id="title387">ic_fluent_checkbox_checked_24_regular</title>
+  <desc
+     id="desc389">Created with Sketch.</desc>
+  <g
+     id="🔍-Product-Icons"
+     stroke="none"
+     stroke-width="1"
+     fill="none"
+     fill-rule="evenodd"
+     transform="matrix(0.0208885,0,0,0.0208885,-0.00838483,-0.01500442)"
+     style="stroke-width:1.43619695;stroke-dasharray:none">
+    <g
+       id="ic_fluent_checkbox_checked_24_regular"
+       fill="#212121"
+       fill-rule="nonzero"
+       style="stroke-width:1.43619695;stroke-dasharray:none;fill:#ffffff;fill-opacity:1">
+      <path
+         d="M 18.25,3 C 19.768783,3 21,4.2312169 21,5.75 v 12.5 C 21,19.768783 19.768783,21 18.25,21 H 5.75 C 4.2312169,21 3,19.768783 3,18.25 V 5.75 C 3,4.2312169 4.2312169,3 5.75,3 Z m 0,1.5 H 5.75 C 5.0596441,4.5 4.5,5.0596441 4.5,5.75 v 12.5 c 0,0.690356 0.5596441,1.25 1.25,1.25 h 12.5 c 0.690356,0 1.25,-0.559644 1.25,-1.25 V 5.75 C 19.5,5.0596441 18.940356,4.5 18.25,4.5 Z"
+         id="🎨Color"
+         style="fill:#ffffff;fill-opacity:1;stroke-width:1.4362;stroke-dasharray:none"
+         sodipodi:nodetypes="ssssssssssssssssss" />
+    </g>
+  </g>
+  <metadata
+     id="metadata571">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title>ic_fluent_checkbox_checked_24_regular</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+</svg>
