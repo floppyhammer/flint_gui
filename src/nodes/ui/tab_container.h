@@ -18,7 +18,7 @@ public:
 
     Vec2F calc_minimum_size() const override;
 
-    void set_current_tab(int32_t tab);
+    void set_current_tab(int32_t index);
 
     void draw() override;
 

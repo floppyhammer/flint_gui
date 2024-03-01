@@ -26,14 +26,24 @@ int main() {
         vstack_container->set_position({100, 100});
         node_ui->add_child(vstack_container);
 
-        // auto button = std::make_shared<Button>();
-        // button->set_text("button");
-        // button->container_sizing.flag_h = ContainerSizingFlag::Fill;
-        // vstack_container->add_child(button);
+        {
+            auto button = std::make_shared<Button>();
+            button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
+            vstack_container->add_child(button);
+        }
 
-        auto check_button = std::make_shared<CheckButton>();
-        check_button->container_sizing.flag_h = ContainerSizingFlag::Fill;
-        vstack_container->add_child(check_button);
+        {
+            auto button = std::make_shared<Button>();
+            button->set_icon(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Button.svg"));
+            button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
+            vstack_container->add_child(button);
+        }
+
+        {
+            auto check_button = std::make_shared<CheckButton>();
+            check_button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
+            vstack_container->add_child(check_button);
+        }
 
         vstack_container->set_size({800, 100});
     }

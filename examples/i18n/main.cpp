@@ -51,7 +51,7 @@ int main() {
         text += "नमस्ते दुनिया!\n";           // Hindi
         text += "Chào thế giới!\n";           // Vietnamese
         text += "שלום עולם!\n\n\n";           // Hebrew
-        text += "Hello123!مرحبا٠١٢!你好123！\n"; // Mixed languages.
+        text += "Hello123!مرحبا٠١٢!你好123！\n"; // Mixed languages
         label->set_text(text);
     }
 

@@ -17,57 +17,55 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto panel = std::make_shared<Panel>();
-        panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
-        panel->set_anchor_flag(AnchorFlag::FullRect);
-        app.get_tree()->replace_scene(panel);
-
         auto vstack_container = std::make_shared<VStackContainer>();
-        vstack_container->set_anchor_flag(AnchorFlag::FullRect);
-        vstack_container->set_separation(16);
-        panel->add_child(vstack_container);
+        app.get_tree()->replace_scene(vstack_container);
+        vstack_container->set_anchor_flag(AnchorFlag::Center);
+        vstack_container->set_separation(8);
 
         {
-            auto label = std::make_shared<Label>("Hello");
+            auto label = std::make_shared<Label>();
+            label->set_minimum_size({256, 64});
             label->set_horizontal_alignment(Alignment::Begin);
             label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
         {
-            auto label = std::make_shared<Label>("Hello");
+            auto label = std::make_shared<Label>();
+            label->set_minimum_size({256, 64});
             label->set_horizontal_alignment(Alignment::Center);
             label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
         {
-            auto label = std::make_shared<Label>("Hello");
+            auto label = std::make_shared<Label>();
+            label->set_minimum_size({256, 64});
             label->set_horizontal_alignment(Alignment::End);
             label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
         {
-            auto label = std::make_shared<Label>("Hello");
+            auto label = std::make_shared<Label>();
             label->set_vertical_alignment(Alignment::Begin);
-            label->set_minimum_size(Vec2F(0, 64));
+            label->set_minimum_size({256, 64});
             label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
         {
-            auto label = std::make_shared<Label>("Hello");
+            auto label = std::make_shared<Label>();
             label->set_vertical_alignment(Alignment::Center);
-            label->set_minimum_size(Vec2F(0, 64));
+            label->set_minimum_size({256, 64});
             label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
         {
-            auto label = std::make_shared<Label>("Hello");
+            auto label = std::make_shared<Label>();
             label->set_vertical_alignment(Alignment::End);
-            label->set_minimum_size(Vec2F(0, 64));
+            label->set_minimum_size({256, 64});
             label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }

@@ -157,6 +157,11 @@ void Button::draw() {
     std::optional<StyleBox> active_style_box;
     if (pressed) {
         active_style_box = theme_pressed;
+
+        // When toggled, hovering the button should show the hover effect.
+        if (toggle_mode && hovered) {
+            active_style_box = theme_hovered;
+        }
     } else if (hovered) {
         active_style_box = theme_hovered;
     } else {

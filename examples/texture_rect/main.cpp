@@ -16,19 +16,19 @@ int main() {
         auto node_ui = std::make_shared<NodeUi>();
         app.get_tree()->replace_scene(node_ui);
 
-        auto image_texture = ResourceManager::get_singleton()->load<RasterImage>("../assets/duck.png");
-        auto vector_texture = ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Button.svg");
+        auto raste_image = ResourceManager::get_singleton()->load<RasterImage>("../assets/duck.png");
+        auto vector_image = ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Button.svg");
 
         for (int i = 0; i < 6; i++) {
             auto texture_rect_svg = std::make_shared<TextureRect>();
             texture_rect_svg->set_position({400.0f, i * 100.0f});
             texture_rect_svg->set_size({200, 100});
-            texture_rect_svg->set_texture(vector_texture);
+            texture_rect_svg->set_texture(raste_image);
             texture_rect_svg->enable_visual_debug(true);
             node_ui->add_child(texture_rect_svg);
 
             auto texture_rect_image = std::make_shared<TextureRect>();
-            texture_rect_image->set_texture(image_texture);
+            texture_rect_image->set_texture(vector_image);
             texture_rect_image->set_position({0.0f, i * 100.0f});
             texture_rect_image->enable_visual_debug(true);
             texture_rect_image->set_size({200, 100});

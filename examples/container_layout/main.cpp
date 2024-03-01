@@ -28,7 +28,6 @@ int main() {
 
         for (int _ = 0; _ < 4; _++) {
             auto button = std::make_shared<Button>();
-            button->set_text("button");
             hbox_container->add_child(button);
 
             if (_ == 0) {
@@ -57,7 +56,6 @@ int main() {
 
         for (int _ = 0; _ < 4; _++) {
             auto button = std::make_shared<Button>();
-            button->set_text("button");
             vbox_container->add_child(button);
 
             if (_ == 0) {

@@ -96,8 +96,8 @@ Vec2F TabContainer::calc_minimum_size() const {
     return min_size.max(minimum_size);
 }
 
-void TabContainer::set_current_tab(int32_t tab) {
-    current_tab = tab;
+void TabContainer::set_current_tab(int32_t index) {
+    current_tab = index;
 }
 
 void TabContainer::draw() {

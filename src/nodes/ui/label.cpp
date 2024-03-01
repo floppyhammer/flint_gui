@@ -19,6 +19,8 @@ Label::Label() {
 
     debug_size_box.border_color = ColorU::red();
 
+    text_ = "Label";
+
     font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/Arial Unicode MS Font.ttf");
     emoji_font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/EmojiOneColor.otf");
 

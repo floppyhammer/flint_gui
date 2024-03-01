@@ -28,7 +28,6 @@ int main() {
         auto scroll_content = std::make_shared<Tree>();
         scroll_content->set_size({400, 800});
         scroll_container->add_child(scroll_content);
-        // ----------------------------------------------------
     }
 
     app.main_loop();
