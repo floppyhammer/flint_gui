@@ -23,12 +23,10 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto node_ui = std::make_shared<NodeUi>();
-        app.get_tree()->replace_scene(node_ui);
+        auto root = app.get_tree()->get_root();
 
         auto vstack_container = std::make_shared<VStackContainer>();
-        vstack_container->enable_visual_debug(true);
-        node_ui->add_child(vstack_container);
+        root->add_child(vstack_container);
 
         for (int i = 0; i < 5; i++) {
             auto progress_bar = std::make_shared<MyProgressBar>();

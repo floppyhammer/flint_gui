@@ -4,7 +4,10 @@ namespace Flint {
 
 SceneTree::SceneTree() {
     // A default root.
-    root = std::make_shared<Node>();
+    auto node_ui = std::make_shared<NodeUi>();
+    node_ui->set_anchor_flag(AnchorFlag::FullRect);
+
+    root = node_ui;
     root->tree_ = this;
 }
 
@@ -33,11 +36,14 @@ void SceneTree::process(double dt) {
     root->propagate_draw();
 
     // Actual drawing.
-
 }
 
 void SceneTree::when_primary_window_size_changed(Vec2I new_size) const {
     root->when_parent_size_changed(new_size.to_f32());
+}
+
+std::shared_ptr<Node> SceneTree::get_root() const {
+    return root;
 }
 
 void SceneTree::quit() {

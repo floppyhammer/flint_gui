@@ -13,8 +13,7 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto node_ui = std::make_shared<NodeUi>();
-        app.get_tree()->replace_scene(node_ui);
+        auto root = app.get_tree()->get_root();
 
         auto raste_image = ResourceManager::get_singleton()->load<RasterImage>("../assets/duck.png");
         auto vector_image = ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Button.svg");
@@ -25,14 +24,14 @@ int main() {
             texture_rect_svg->set_size({200, 100});
             texture_rect_svg->set_texture(raste_image);
             texture_rect_svg->enable_visual_debug(true);
-            node_ui->add_child(texture_rect_svg);
+            root->add_child(texture_rect_svg);
 
             auto texture_rect_image = std::make_shared<TextureRect>();
             texture_rect_image->set_texture(vector_image);
             texture_rect_image->set_position({0.0f, i * 100.0f});
             texture_rect_image->enable_visual_debug(true);
             texture_rect_image->set_size({200, 100});
-            node_ui->add_child(texture_rect_image);
+            root->add_child(texture_rect_image);
 
             if (i == 0) {
                 texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::Keep);

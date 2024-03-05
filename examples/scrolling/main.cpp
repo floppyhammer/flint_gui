@@ -13,13 +13,12 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto node_ui = std::make_shared<NodeUi>();
-        app.get_tree()->replace_scene(node_ui);
+        auto root = app.get_tree()->get_root();
 
         auto panel = std::make_shared<Panel>();
         panel->set_position({200, 200});
         panel->set_size({400, 300});
-        node_ui->add_child(panel);
+        root->add_child(panel);
 
         auto scroll_container = std::make_shared<ScrollContainer>();
         scroll_container->set_size({400, 300});

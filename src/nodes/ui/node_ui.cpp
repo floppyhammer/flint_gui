@@ -12,7 +12,7 @@ NodeUi::NodeUi() {
 
     debug_size_box.bg_color = ColorU();
     debug_size_box.border_color = ColorU::red();
-    debug_size_box.border_width = 0;
+    debug_size_box.border_width = 1;
     debug_size_box.corner_radius = 0;
 }
 
@@ -33,19 +33,15 @@ void NodeUi::propagate_draw() {
 }
 
 void NodeUi::draw() {
+#ifdef FLINT_GUI_DEBUG
     if (size.x > 0 && size.y > 0) {
         auto vector_server = VectorServer::get_singleton();
         vector_server->draw_style_box(debug_size_box, get_global_position(), size);
     }
+#endif
 }
 
 void NodeUi::update(double dt) {
-    if (visual_debug) {
-        debug_size_box.border_width = 1;
-    } else {
-        debug_size_box.border_width = 0;
-    }
-
     apply_anchor();
 }
 

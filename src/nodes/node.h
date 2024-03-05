@@ -110,8 +110,6 @@ public:
 
     virtual void connect_signal(const std::string &signal, const std::function<void()> &callback);
 
-    void enable_visual_debug(bool enabled);
-
     SceneTree *get_tree() const;
 
 protected:
@@ -129,8 +127,6 @@ protected:
 
     // Called when subtree structure changes.
     std::vector<std::function<void()>> subtree_changed_callbacks;
-
-    bool visual_debug = false;
 };
 
 } // namespace Flint

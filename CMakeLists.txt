@@ -77,14 +77,16 @@ endif ()
 
 add_library(flint_gui ${SOURCE_FILES})
 
+add_compile_definitions(FLINT_GUI_DEBUG)
+
 # Add examples.
 add_subdirectory(examples/file_selection)
 add_subdirectory(examples/container_layout)
 add_subdirectory(examples/texture_rect)
 add_subdirectory(examples/scrolling)
-add_subdirectory(examples/tabs)
-add_subdirectory(examples/progress_bars)
+add_subdirectory(examples/tab)
+add_subdirectory(examples/progress_bar)
 add_subdirectory(examples/i18n)
 add_subdirectory(examples/label_alignment)
-add_subdirectory(examples/multiple_windows)
-add_subdirectory(examples/buttons)
+add_subdirectory(examples/multiple_window)
+add_subdirectory(examples/button)

@@ -17,12 +17,14 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
+        auto root = app.get_tree()->get_root();
+
         auto margin_container = std::make_shared<MarginContainer>();
         margin_container->set_position({0, 0});
         margin_container->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         margin_container->set_margin_all(32);
         margin_container->set_anchor_flag(AnchorFlag::FullRect);
-        app.get_tree()->replace_scene(margin_container);
+        root->add_child(margin_container);
 
         auto vstack_container = std::make_shared<VStackContainer>();
         vstack_container->set_separation(16);
@@ -37,7 +39,6 @@ int main() {
             true,
             false,
         });
-        label->enable_visual_debug(true);
         vstack_container->add_child(label);
 
         std::string text = "";

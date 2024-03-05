@@ -17,8 +17,10 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
+        auto root = app.get_tree()->get_root();
+
         auto vstack_container = std::make_shared<VStackContainer>();
-        app.get_tree()->replace_scene(vstack_container);
+        root->add_child(vstack_container);
         vstack_container->set_anchor_flag(AnchorFlag::Center);
         vstack_container->set_separation(8);
 
@@ -26,7 +28,6 @@ int main() {
             auto label = std::make_shared<Label>();
             label->set_minimum_size({256, 64});
             label->set_horizontal_alignment(Alignment::Begin);
-            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
@@ -34,7 +35,6 @@ int main() {
             auto label = std::make_shared<Label>();
             label->set_minimum_size({256, 64});
             label->set_horizontal_alignment(Alignment::Center);
-            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
@@ -42,7 +42,6 @@ int main() {
             auto label = std::make_shared<Label>();
             label->set_minimum_size({256, 64});
             label->set_horizontal_alignment(Alignment::End);
-            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
@@ -50,7 +49,6 @@ int main() {
             auto label = std::make_shared<Label>();
             label->set_vertical_alignment(Alignment::Begin);
             label->set_minimum_size({256, 64});
-            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
@@ -58,7 +56,6 @@ int main() {
             auto label = std::make_shared<Label>();
             label->set_vertical_alignment(Alignment::Center);
             label->set_minimum_size({256, 64});
-            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
 
@@ -66,7 +63,6 @@ int main() {
             auto label = std::make_shared<Label>();
             label->set_vertical_alignment(Alignment::End);
             label->set_minimum_size({256, 64});
-            label->enable_visual_debug(true);
             vstack_container->add_child(label);
         }
     }

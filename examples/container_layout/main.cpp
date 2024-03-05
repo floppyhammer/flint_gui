@@ -17,14 +17,12 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto node_ui = std::make_shared<NodeUi>();
-        app.get_tree()->replace_scene(node_ui);
+        auto root = app.get_tree()->get_root();
 
         auto hbox_container = std::make_shared<HStackContainer>();
         hbox_container->set_separation(8);
-        hbox_container->enable_visual_debug(true);
         hbox_container->set_position({100, 100});
-        node_ui->add_child(hbox_container);
+        root->add_child(hbox_container);
 
         for (int _ = 0; _ < 4; _++) {
             auto button = std::make_shared<Button>();
@@ -51,8 +49,7 @@ int main() {
         auto vbox_container = std::make_shared<VStackContainer>();
         vbox_container->set_separation(8);
         vbox_container->set_position({100, 300});
-        vbox_container->enable_visual_debug(true);
-        node_ui->add_child(vbox_container);
+        root->add_child(vbox_container);
 
         for (int _ = 0; _ < 4; _++) {
             auto button = std::make_shared<Button>();

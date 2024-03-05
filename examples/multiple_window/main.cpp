@@ -15,8 +15,7 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto node_ui = std::make_shared<NodeUi>();
-        app.get_tree()->replace_scene(node_ui);
+        auto root = app.get_tree()->get_root();
 
         auto open_window_button = std::make_shared<Button>();
         open_window_button->set_text("Show window");
@@ -26,10 +25,10 @@ int main() {
         container->add_child(open_window_button);
         container->add_child(close_window_button);
 
-        node_ui->add_child(container);
+        root->add_child(container);
 
         auto sub_window = std::make_shared<SubWindow>(Vec2I{400, 300});
-        node_ui->add_child(sub_window);
+        root->add_child(sub_window);
 
         auto label = std::make_shared<Label>();
         label->set_text("This is a sub-window.");

@@ -14,10 +14,12 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
+        auto root = app.get_tree()->get_root();
+
         auto panel = std::make_shared<Panel>();
         panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         panel->set_anchor_flag(AnchorFlag::FullRect);
-        app.get_tree()->replace_scene(panel);
+        root->add_child(panel);
         {
             StyleBox new_theme;
             new_theme.bg_color = ColorU(27, 27, 27, 255);

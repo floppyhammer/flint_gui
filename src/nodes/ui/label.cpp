@@ -17,7 +17,7 @@ enum class Bidi {
 Label::Label() {
     type = NodeType::Label;
 
-    debug_size_box.border_color = ColorU::red();
+    debug_size_box.border_color = ColorU::blue();
 
     text_ = "Label";
 
