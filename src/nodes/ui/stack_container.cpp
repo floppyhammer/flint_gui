@@ -10,12 +10,11 @@ void StackContainer::adjust_layout() {
     auto path = get_node_path();
 
     Vec2F total_size;
-    std::vector<float> max_child_width;
     std::vector<NodeUi *> expanding_children;
 
     std::vector<std::pair<NodeUi *, Vec2F>> child_cache;
 
-    // In the first loop, we only do some statistics.
+    // In the first loop, we need do some calculation.
     for (auto &child : children) {
         // We only care about visible GUI nodes in a container.
         if (!child->get_visibility() || !child->is_ui_node()) {
@@ -30,12 +29,14 @@ void StackContainer::adjust_layout() {
 
         if (horizontal) {
             total_size.x += child_min_size.x + separation;
+            total_size.y = std::max(total_size.y, child_min_size.y);
 
             if (cast_child->container_sizing.expand_h) {
                 expanding_children.push_back(cast_child);
             }
         } else {
             total_size.y += child_min_size.y + separation;
+            total_size.x = std::max(total_size.x, child_min_size.x);
 
             if (cast_child->container_sizing.expand_v) {
                 expanding_children.push_back(cast_child);

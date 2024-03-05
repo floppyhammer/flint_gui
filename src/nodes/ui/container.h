@@ -11,8 +11,6 @@ namespace Flint {
  */
 class Container : public NodeUi {
 public:
-    Container();
-
     void set_size(Vec2F new_size) override;
 
     void update(double dt) override;
@@ -24,6 +22,9 @@ public:
     Vec2F calc_minimum_size() const override;
 
 protected:
+    // This class is not meant for direct use as a node.
+    Container();
+
     /**
      * One of the most important methods to containers.
      * Adjust its own size (but not position), adjust its children' sizes and positions.

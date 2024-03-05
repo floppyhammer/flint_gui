@@ -3,8 +3,9 @@
 namespace Flint {
 
 Container::Container() {
-    // This class is not meant for direct use as a node.
-    type = NodeType::Max;
+    type = NodeType::Container;
+
+    debug_size_box.border_color = ColorU::white();
 }
 
 void Container::adjust_layout() {
@@ -29,15 +30,16 @@ void Container::adjust_layout() {
 }
 
 Vec2F Container::calc_minimum_size() const {
-    Vec2F min_size;
+    Vec2F child_min_size;
     for (auto &child : children) {
         if (child->is_ui_node()) {
             auto cast_child = dynamic_cast<NodeUi *>(child.get());
-            min_size = cast_child->calc_minimum_size();
+            auto min_size = cast_child->calc_minimum_size();
+            child_min_size = child_min_size.max(min_size);
         }
     }
 
-    return minimum_size.max(min_size);
+    return minimum_size.max(child_min_size);
 }
 
 void Container::set_size(Vec2F new_size) {
