@@ -1,5 +1,7 @@
 #include "panel.h"
 
+#include <resources/default_resource.h>
+
 #include <string>
 
 #include "../../common/utils.h"
@@ -9,11 +11,9 @@ namespace Flint {
 Panel::Panel() {
     type = NodeType::Panel;
 
-    theme_panel_ = std::make_optional(StyleBox());
-    theme_panel_.value().bg_color = ColorU(27, 27, 27, 255);
-    theme_panel_.value().border_color = {75, 75, 75, 100};
-    theme_panel_.value().border_width = 3;
-    theme_panel_.value().corner_radius = 8;
+    auto default_theme = DefaultResource::get_singleton()->get_default_theme();
+
+    theme_panel_ = std::make_optional(default_theme->panel.styles["background"]);
 }
 
 void Panel::set_theme_panel(StyleBox style_box) {

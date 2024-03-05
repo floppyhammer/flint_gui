@@ -7,17 +7,19 @@ namespace Flint {
 ScrollContainer::ScrollContainer() {
     type = NodeType::ScrollContainer;
 
-    theme_scroll_bar.bg_color = ColorU::transparent_black();
-    theme_scroll_bar.corner_radius = 0;
+    theme_scroll_bar.bg_color = ColorU(100, 100, 100, 50);
+    theme_scroll_bar.corner_radius = 4;
 
     theme_scroll_grabber.bg_color = ColorU(163, 163, 163, 255);
     theme_scroll_grabber.corner_radius = 4;
 }
 
 void ScrollContainer::adjust_layout() {
-    if (children.empty()) {
-        return;
-    }
+    // Do nothing.
+}
+
+Vec2F ScrollContainer::calc_minimum_size() const {
+    return minimum_size;
 }
 
 void ScrollContainer::input(InputEvent &event) {
@@ -78,12 +80,6 @@ void ScrollContainer::update(double dt) {
     NodeUi::update(dt);
 }
 
-Vec2F ScrollContainer::calc_minimum_size() const {
-    Vec2F min_size;
-
-    return min_size.max(minimum_size);
-}
-
 void ScrollContainer::draw() {
     if (children.empty() || !children.front()->is_ui_node()) {
         return;
@@ -97,13 +93,13 @@ void ScrollContainer::draw() {
     auto global_pos = get_global_position();
     auto size = get_size();
 
-    auto scroll_bar_pos = Vec2F(size.x - 16, 0) + global_pos;
-    auto scroll_bar_size = Vec2F(16, size.y);
+    auto scroll_bar_pos = Vec2F(size.x - 8, 0) + global_pos;
+    auto scroll_bar_size = Vec2F(8, size.y);
 
     vector_server->draw_style_box(theme_scroll_bar, scroll_bar_pos, scroll_bar_size);
 
-    auto grabber_pos = Vec2F(size.x - 16, vscroll) + global_pos;
-    auto grabber_size = Vec2F(16, size.y / content->get_size().y * size.y);
+    auto grabber_pos = Vec2F(size.x - 8, vscroll) + global_pos;
+    auto grabber_size = Vec2F(8, size.y / content->get_size().y * size.y);
 
     vector_server->draw_style_box(theme_scroll_grabber, grabber_pos, grabber_size);
 

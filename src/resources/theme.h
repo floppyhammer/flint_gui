@@ -7,32 +7,39 @@ namespace Flint {
 class Theme {
 public:
     Theme() {
-        button.colors["text"] = ColorU(27, 27, 27, 255);
+        button.colors["text"] = ColorU(206, 206, 206, 255);
 
         {
             auto style_box = StyleBox();
-            style_box.bg_color = ColorU(27, 27, 27, 255);
-            style_box.border_color = ColorU(100, 100, 100, 255);
+            style_box.bg_color = ColorU(32, 32, 32, 255);
             style_box.border_width = 2;
             button.styles["normal"] = style_box;
         }
 
         {
             auto style_box = StyleBox();
-            style_box.border_color = ColorU(163, 163, 163, 255);
+            style_box.bg_color = ColorU(41, 41, 41, 255);
             style_box.border_width = 2;
             button.styles["hovered"] = style_box;
         }
 
         {
             auto style_box = StyleBox();
-            style_box.bg_color = ColorU(70, 70, 70, 255);
-            style_box.border_color = ColorU(163, 163, 163, 255);
+            style_box.bg_color = ColorU(45, 45, 45, 255);
             style_box.border_width = 2;
             button.styles["pressed"] = style_box;
         }
 
         label.styles["background"] = StyleBox::from_empty();
+
+        {
+            auto style_box = StyleBox();
+            style_box.bg_color = ColorU(32, 32, 32, 255);
+            style_box.border_color = {75, 75, 75, 100};
+            style_box.border_width = 2;
+            style_box.corner_radius = 8;
+            panel.styles["background"] = style_box;
+        }
     }
 
     struct {
@@ -46,6 +53,11 @@ public:
         std::map<std::string, ColorU> colors;
         std::map<std::string, StyleBox> styles;
     } label;
+
+    struct {
+        std::map<std::string, ColorU> colors;
+        std::map<std::string, StyleBox> styles;
+    } panel;
 };
 
 } // namespace Flint

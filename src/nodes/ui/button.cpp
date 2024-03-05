@@ -11,11 +11,13 @@ namespace Flint {
 Button::Button() {
     type = NodeType::Button;
 
-    theme_normal = DefaultResource::get_singleton()->get_default_theme()->button.styles["normal"];
+    auto default_theme = DefaultResource::get_singleton()->get_default_theme();
 
-    theme_hovered = DefaultResource::get_singleton()->get_default_theme()->button.styles["hovered"];
+    theme_normal = default_theme->button.styles["normal"];
 
-    theme_pressed = DefaultResource::get_singleton()->get_default_theme()->button.styles["pressed"];
+    theme_hovered = default_theme->button.styles["hovered"];
+
+    theme_pressed = default_theme->button.styles["pressed"];
 
     debug_size_box.border_color = ColorU::green();
 
@@ -25,6 +27,7 @@ Button::Button() {
     label->set_mouse_filter(MouseFilter::Ignore);
     label->set_horizontal_alignment(Alignment::Center);
     label->set_vertical_alignment(Alignment::Center);
+    label->set_text_style(TextStyle{default_theme->button.colors["text"]});
     label->theme_background = StyleBox::from_empty();
 
     icon_rect = std::make_shared<TextureRect>();

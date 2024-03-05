@@ -5,7 +5,7 @@
    viewBox="0 0 0.48 0.48"
    version="1.1"
    id="svg394"
-   sodipodi:docname="checkbox-checked-svgrepo-com.svg"
+   sodipodi:docname="CheckBox_Unchecked.svg"
    inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -26,13 +26,13 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#505050"
      showgrid="false"
-     inkscape:zoom="22.66"
-     inkscape:cx="16.218005"
-     inkscape:cy="13.305384"
+     inkscape:zoom="32.046079"
+     inkscape:cx="5.7885396"
+     inkscape:cy="9.7515829"
      inkscape:window-width="1723"
      inkscape:window-height="1368"
-     inkscape:window-x="10"
-     inkscape:window-y="193"
+     inkscape:window-x="183"
+     inkscape:window-y="187"
      inkscape:window-maximized="0"
      inkscape:current-layer="ic_fluent_checkbox_checked_24_regular" />
   <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
@@ -52,7 +52,8 @@
        id="ic_fluent_checkbox_checked_24_regular"
        fill="#212121"
        fill-rule="nonzero"
-       style="stroke-width:1.43619695;stroke-dasharray:none;fill:#ffffff;fill-opacity:1">
+       style="fill:#ffffff;fill-opacity:1;stroke-width:1.4362;stroke-dasharray:none"
+       transform="matrix(1.1070619,0,0,1.1070619,-1.3071514,-1.0830683)">
       <path
          d="M 18.25,3 C 19.768783,3 21,4.2312169 21,5.75 v 12.5 C 21,19.768783 19.768783,21 18.25,21 H 5.75 C 4.2312169,21 3,19.768783 3,18.25 V 5.75 C 3,4.2312169 4.2312169,3 5.75,3 Z m 0,1.5 H 5.75 C 5.0596441,4.5 4.5,5.0596441 4.5,5.75 v 12.5 c 0,0.690356 0.5596441,1.25 1.25,1.25 h 12.5 c 0.690356,0 1.25,-0.559644 1.25,-1.25 V 5.75 C 19.5,5.0596441 18.940356,4.5 18.25,4.5 Z"
          id="🎨Color"

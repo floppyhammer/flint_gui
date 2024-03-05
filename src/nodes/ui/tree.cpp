@@ -15,20 +15,6 @@ Tree::Tree() {
     theme_bg = std::make_optional(panel);
     panel.border_width = 2;
     theme_bg_focused = std::make_optional(panel);
-
-    auto root_ = create_item(nullptr, "Node");
-    root->set_icon(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Node.svg"));
-    auto child_ui = create_item(root_, "NodeUi");
-    child_ui->set_icon(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Control.svg"));
-    auto child_label = create_item(child_ui, "Label");
-    child_label->set_icon(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Label.svg"));
-    auto child_text_edit = create_item(child_ui, "TextEdit");
-    child_text_edit->set_icon(
-        ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_LineEdit.svg"));
-    auto child_node_2d = create_item(root_, "Node2d");
-    child_node_2d->set_icon(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Node2D.svg"));
-    auto child_node_3d = create_item(root_, "Node3d");
-    child_node_3d->set_icon(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Node3D.svg"));
 }
 
 void Tree::update(double delta) {

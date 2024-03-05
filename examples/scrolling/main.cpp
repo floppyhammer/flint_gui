@@ -21,12 +21,20 @@ int main() {
         root->add_child(panel);
 
         auto scroll_container = std::make_shared<ScrollContainer>();
-        scroll_container->set_size({400, 300});
+        scroll_container->set_anchor_flag(AnchorFlag::FullRect);
+
         panel->add_child(scroll_container);
 
-        auto scroll_content = std::make_shared<Tree>();
-        scroll_content->set_size({400, 800});
-        scroll_container->add_child(scroll_content);
+        auto vstack_container = std::make_shared<VStackContainer>();
+        vstack_container->set_separation(8);
+        vstack_container->set_minimum_size({500, 500});
+        scroll_container->add_child(vstack_container);
+
+        for (int i = 0; i < 20; i++) {
+            auto button = std::make_shared<Button>();
+            button->container_sizing.flag_h = ContainerSizingFlag::Fill;
+            vstack_container->add_child(button);
+        }
     }
 
     app.main_loop();
