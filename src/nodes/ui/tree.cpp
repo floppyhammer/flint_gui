@@ -7,7 +7,7 @@
 namespace Flint {
 
 Tree::Tree() {
-    type = NodeType::Panel;
+    type = NodeType::Tree;
 
     auto panel = StyleBox();
     panel.bg_color = ColorU(0, 0, 0, 0);

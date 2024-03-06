@@ -31,6 +31,7 @@ enum class NodeType {
     OptionButton, // todo
     CheckButton,  // todo
     RadioButton,  // todo
+
     Label,
     TextEdit,
     SpinBox,
@@ -38,6 +39,7 @@ enum class NodeType {
     TextureRect,
     Tree,
     ProgressBar,
+    PopupMenu,
 
     Max,
 };

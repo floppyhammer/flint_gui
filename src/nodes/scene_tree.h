@@ -8,6 +8,7 @@
 #include "ui/label.h"
 #include "ui/margin_container.h"
 #include "ui/panel.h"
+#include "ui/popup_menu.h"
 #include "ui/progress_bar.h"
 #include "ui/scroll_container.h"
 #include "ui/spin_box.h"
