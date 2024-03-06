@@ -14,8 +14,6 @@ class ProgressBar : public NodeUi {
 public:
     ProgressBar();
 
-    virtual void custom_update(double dt){};
-
     void update(double dt) override;
 
     void draw() override;

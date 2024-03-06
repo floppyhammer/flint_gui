@@ -55,7 +55,6 @@ public:
 
     virtual ~Node() = default;
 
-public:
     virtual void propagate_input(InputEvent &event);
 
     virtual void propagate_update(double delta);
@@ -69,11 +68,17 @@ public:
 
     virtual void input(InputEvent &event);
 
-    virtual void update(double delta);
+    virtual void update(double dt);
 
     virtual void notify(Signal signal);
 
     virtual void draw();
+
+    virtual void custom_update(double dt) {
+    }
+
+    virtual void custom_input(InputEvent &event) {
+    }
 
     void add_child(const std::shared_ptr<Node> &new_child);
 

@@ -49,9 +49,11 @@ void Node::propagate_cleanup() {
 }
 
 void Node::input(InputEvent &event) {
+    custom_input(event);
 }
 
-void Node::update(double delta) {
+void Node::update(double dt) {
+    custom_update(dt);
 }
 
 void Node::notify(Signal signal) {

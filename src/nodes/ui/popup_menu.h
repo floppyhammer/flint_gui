@@ -37,6 +37,9 @@ public:
 private:
     bool hovered = false;
 
+    // Expanded sub menu.
+    bool expanded = false;
+
     // Local position in the menu.
     Vec2F position;
     Vec2F size;

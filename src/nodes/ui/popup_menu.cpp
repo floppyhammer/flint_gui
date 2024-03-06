@@ -86,6 +86,10 @@ PopupMenu::PopupMenu() {
 }
 
 void PopupMenu::update(double delta) {
+    if (!visible_) {
+        return;
+    }
+
     auto global_position = get_global_position();
 
     float offset_y = 0;
@@ -101,6 +105,10 @@ void PopupMenu::update(double delta) {
 }
 
 void PopupMenu::draw() {
+    if (!visible_) {
+        return;
+    }
+
     NodeUi::draw();
 
     auto vector_server = VectorServer::get_singleton();
@@ -115,6 +123,10 @@ void PopupMenu::draw() {
 }
 
 void PopupMenu::input(InputEvent &event) {
+    if (!visible_) {
+        return;
+    }
+
     auto global_position = get_global_position();
 
     bool consume_flag = false;

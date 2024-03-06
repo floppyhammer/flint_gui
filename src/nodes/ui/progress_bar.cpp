@@ -36,8 +36,6 @@ Vec2F ProgressBar::calc_minimum_size() const {
 
 void ProgressBar::update(double dt) {
     NodeUi::update(dt);
-
-    custom_update(dt);
 }
 
 void ProgressBar::draw() {

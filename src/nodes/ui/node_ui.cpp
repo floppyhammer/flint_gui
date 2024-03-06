@@ -43,6 +43,8 @@ void NodeUi::draw() {
 
 void NodeUi::update(double dt) {
     apply_anchor();
+
+    Node::update(dt);
 }
 
 void NodeUi::input(InputEvent &event) {
@@ -100,6 +102,8 @@ void NodeUi::input(InputEvent &event) {
     if (consume_flag) {
         event.consume();
     }
+
+    Node::input(event);
 }
 
 Vec2F NodeUi::get_global_position() const {
