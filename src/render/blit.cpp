@@ -21,18 +21,16 @@ Blit::Blit(const std::shared_ptr<Device> &_device,
     // Set up vertex data (and buffer(s)) and configure vertex attributes.
     float vertices[] = {
         // Positions, UVs.
-        0.0, 0.0, 0.0, 0.0, // 0
-        1.0, 0.0, 1.0, 0.0, // 1
-        1.0, 1.0, 1.0, 1.0, // 2
-        0.0, 0.0, 0.0, 0.0, // 3
-        1.0, 1.0, 1.0, 1.0, // 4
-        0.0, 1.0, 0.0, 1.0  // 5
+        -1.0, -1.0,  0.0, 0.0, // 0
+        1.0,  -1.0,  1.0, 0.0, // 1
+        1.0,  1.0,   1.0, 1.0, // 2
+        -1.0, -1.00, 0.0, 0.0, // 3
+        1.0,  1.0,   1.0, 1.0, // 4
+        -1.0, 1.0,   0.0, 1.0  // 5
     };
 
     vertex_buffer = device->create_buffer({BufferType::Vertex, sizeof(vertices), MemoryProperty::DeviceLocal},
                                           "Blit vertex buffer");
-    uniform_buffer = device->create_buffer(
-        {BufferType::Uniform, 16 * sizeof(float), MemoryProperty::HostVisibleAndCoherent}, "Blit uniform buffer");
 
     sampler = device->create_sampler(SamplerDescriptor{});
 
@@ -62,8 +60,7 @@ Blit::Blit(const std::shared_ptr<Device> &_device,
 
         descriptor_set = device->create_descriptor_set();
         descriptor_set->add_or_update({
-            Descriptor::uniform(0, ShaderStage::Vertex, "bUniform", uniform_buffer),
-            Descriptor::sampled(1, ShaderStage::Fragment, "uTexture"),
+            Descriptor::sampled(0, ShaderStage::Fragment, "uTexture"),
         });
 
         pipeline = device->create_render_pipeline(device->create_shader_module(vert_source, ShaderStage::Vertex),
@@ -80,27 +77,11 @@ void Blit::set_texture(const std::shared_ptr<Texture> &new_texture) {
     texture = new_texture;
 
     descriptor_set->add_or_update({
-        Descriptor::sampled(1, ShaderStage::Fragment, "uTexture", texture, sampler),
+        Descriptor::sampled(0, ShaderStage::Fragment, "uTexture", texture, sampler),
     });
-
-    size = texture->get_size().to_f32();
 }
 
-void Blit::draw(const std::shared_ptr<CommandEncoder> &encoder, const Vec2I &framebuffer_size) {
-    // Get MVP matrix.
-    // -------------------------------
-    // The actual application order of these matrices is reversed.
-    auto model_mat = Mat4(1.0f);
-    model_mat = model_mat.translate(Vec3F(position / framebuffer_size.to_f32() * 2.0f, 0.0f));
-    model_mat = model_mat.translate(Vec3F(-1.0, -1.0, 0.0f));
-    model_mat = model_mat.scale(Vec3F(scale, 1.0f));
-    model_mat = model_mat.scale(Vec3F(size / framebuffer_size.to_f32() * 2.0f, 1.0f));
-
-    auto mvp_mat = model_mat;
-    // -------------------------------
-
-    encoder->write_buffer(uniform_buffer, 0, 16 * sizeof(float), &mvp_mat);
-
+void Blit::draw(const std::shared_ptr<CommandEncoder> &encoder) {
     encoder->bind_render_pipeline(pipeline);
 
     encoder->bind_vertex_buffers({vertex_buffer});

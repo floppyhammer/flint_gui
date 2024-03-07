@@ -1,5 +1,5 @@
-#ifndef FLINT_WINDOW_PROXY_H
-#define FLINT_WINDOW_PROXY_H
+#ifndef FLINT_NODE_SUB_WINDOW_PROXY_H
+#define FLINT_NODE_SUB_WINDOW_PROXY_H
 
 #include "../common/geometry.h"
 #include "node.h"
@@ -39,4 +39,4 @@ protected:
 
 } // namespace Flint
 
-#endif // FLINT_WINDOW_PROXY_H
+#endif // FLINT_NODE_SUB_WINDOW_PROXY_H

@@ -109,7 +109,7 @@ void App::main_loop() {
                 render_server->blit_->set_texture(vector_target_);
 
                 // Draw canvas to screen.
-                render_server->blit_->draw(encoder, primary_window_->get_size());
+                render_server->blit_->draw(encoder);
 
                 encoder->end_render_pass();
             }

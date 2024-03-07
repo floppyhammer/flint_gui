@@ -18,13 +18,9 @@ public:
 
     void set_texture(const std::shared_ptr<Pathfinder::Texture> &new_texture);
 
-    void draw(const std::shared_ptr<Pathfinder::CommandEncoder> &encoder, const Pathfinder::Vec2I &framebuffer_size);
+    void draw(const std::shared_ptr<Pathfinder::CommandEncoder> &encoder);
 
 private:
-    Pathfinder::Vec2F position;
-    Pathfinder::Vec2F size;
-    Pathfinder::Vec2F scale{1};
-
     std::shared_ptr<Pathfinder::Device> device;
 
     std::shared_ptr<Pathfinder::Queue> queue;
@@ -33,7 +29,7 @@ private:
 
     std::shared_ptr<Pathfinder::RenderPipeline> pipeline;
 
-    std::shared_ptr<Pathfinder::Buffer> vertex_buffer, uniform_buffer;
+    std::shared_ptr<Pathfinder::Buffer> vertex_buffer;
 
     std::shared_ptr<Pathfinder::DescriptorSet> descriptor_set;
 
