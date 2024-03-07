@@ -1,14 +1,15 @@
 #include "window.h"
 
-#ifndef __ANDROID__
-    #include "GLFW/glfw3.h"
+#ifdef PATHFINDER_USE_VULKAN
+    #include "vk/base.h"
+#else
+    #include "gl/base.h"
 #endif
 
 namespace Pathfinder {
 
 #ifdef __ANDROID__
-Window::Window(const Vec2I& size) : size_(size) {
-}
+Window::Window(const Vec2I& size) : size_(size) {}
 #else
 Window::Window(const Vec2I& size, GLFWwindow* window_handle) : size_(size), glfw_window_(window_handle) {
     // Assign this to window user, so we can fetch it when window size changes.
@@ -57,9 +58,7 @@ void Window::hide() {
 }
 
 void Window::show() {
-glfwRestoreWindow(glfw_window_);
     glfwShowWindow(glfw_window_);
-
 }
 
 #endif
