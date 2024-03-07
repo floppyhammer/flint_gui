@@ -5,7 +5,7 @@
 
 namespace Flint {
 
-std::string FileDialog::show() {
+std::optional<std::string> FileDialog::show() {
     Logger::info("Show file dialog", "FileDialog");
 
     // In case of multiple files, the separator is `|`.
@@ -22,7 +22,7 @@ std::string FileDialog::show() {
         return path;
     }
 
-    return "";
+    return {};
 }
 
 } // namespace Flint
