@@ -55,8 +55,15 @@ int main() {
 
         auto select_button = std::make_shared<Button>();
         select_button->set_text("Select");
-        // Callback to clean up staging resources.
-        auto callback = [file_dialog, text_edit] { text_edit->set_text(file_dialog->show()); };
+
+        std::weak_ptr file_dialog_weak = file_dialog;
+        std::weak_ptr text_edit_weak = text_edit;
+        auto callback = [file_dialog_weak, text_edit_weak] {
+            auto path = file_dialog_weak.lock()->show();
+            if (path.has_value()) {
+                text_edit_weak.lock()->set_text(path.value());
+            }
+        };
         select_button->connect_signal("pressed", callback);
         hstack_container->add_child(select_button);
 
