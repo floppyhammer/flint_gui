@@ -9,7 +9,8 @@
 namespace Pathfinder {
 
 #ifdef __ANDROID__
-Window::Window(const Vec2I& size) : size_(size) {}
+Window::Window(const Vec2I& size) : size_(size) {
+}
 #else
 Window::Window(const Vec2I& size, GLFWwindow* window_handle) : size_(size), glfw_window_(window_handle) {
     // Assign this to window user, so we can fetch it when window size changes.
@@ -54,11 +55,17 @@ bool Window::should_close() {
 }
 
 void Window::hide() {
-    glfwHideWindow(glfw_window_);
+    if (!hiden_) {
+        glfwHideWindow(glfw_window_);
+        hiden_ = true;
+    }
 }
 
 void Window::show() {
-    glfwShowWindow(glfw_window_);
+    if (hiden_) {
+        glfwShowWindow(glfw_window_);
+        hiden_ = false;
+    }
 }
 
 #endif
