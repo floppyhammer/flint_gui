@@ -26,12 +26,14 @@ ProgressBar::ProgressBar() {
     label->set_anchor_flag(AnchorFlag::Center);
     label->set_parent(this);
 
-    size = label->calc_minimum_size();
-    label->set_size(size);
+    // size = label->calc_minimum_size();
+    // label->set_size(size);
 }
 
-Vec2F ProgressBar::calc_minimum_size() const {
-    return label->calc_minimum_size().max(minimum_size);
+void ProgressBar::calc_minimum_size() {
+    label->calc_minimum_size();
+
+    calculated_minimum_size = label->get_effective_minimum_size();
 }
 
 void ProgressBar::update(double dt) {

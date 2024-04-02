@@ -15,7 +15,7 @@ public:
 
     void adjust_layout() override;
 
-    Vec2F calc_minimum_size() const override;
+    void calc_minimum_size();
 
     void set_margin(const RectF &new_margin);
 

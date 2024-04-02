@@ -22,7 +22,7 @@ public:
 
     void set_size(Vec2F new_size) override;
 
-    Vec2F calc_minimum_size() const override;
+    void calc_minimum_size() override;
 
     void set_value(float new_value);
 

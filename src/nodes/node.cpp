@@ -8,6 +8,59 @@
 
 namespace Flint {
 
+const char *NodeNames[] = {
+    "Node",
+    "Window",
+
+    "NodeUi",
+
+    "Container",
+    "CenterContainer",
+    "MarginContainer",
+    "HStackContainer",
+    "VStackContainer",
+    "ScrollContainer",
+    "TabContainer",
+
+    "Button",
+    "MenuButton",
+    "OptionButton",
+    "CheckButton",
+    "RadioButton",
+
+    "Label",
+    "TextEdit",
+    "SpinBox",
+    "Panel",
+    "TextureRect",
+    "Tree",
+    "ProgressBar",
+    "PopupMenu",
+
+    "NotInstantiable",
+
+    "Max",
+};
+
+std::string get_node_type_name(NodeType type) {
+    return NodeNames[(uint32_t)type];
+}
+
+void dfs_postorder_traversal(Node *node, std::vector<Node *> &ordered_nodes) {
+    if (node == nullptr) {
+        return;
+    }
+
+    for (auto &child : node->get_children()) {
+        dfs_postorder_traversal(child.get(), ordered_nodes);
+    }
+
+    // Debug print.
+    // std::cout << "Node: " << get_node_type_name(node->type) << std::endl;
+
+    ordered_nodes.push_back(node);
+}
+
 void Node::propagate_update(double dt) {
     update(dt);
 

@@ -4,7 +4,7 @@
 
 #include "../../common/utils.h"
 #include "../../servers/input_server.h"
-#include "margin_container.h"
+#include "container/margin_container.h"
 
 namespace Flint {
 
@@ -247,10 +247,10 @@ void TextEdit::draw() {
     NodeUi::draw();
 }
 
-Vec2F TextEdit::calc_minimum_size() const {
-    auto container_size = margin_container->calc_minimum_size();
+void TextEdit::calc_minimum_size() {
+    margin_container->calc_minimum_size();
 
-    return container_size.max(minimum_size);
+    calculated_minimum_size = margin_container->get_effective_minimum_size();
 }
 
 uint32_t TextEdit::calculate_caret_index(Vec2F local_cursor_position_to_label) {

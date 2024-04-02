@@ -18,7 +18,7 @@ public:
 
     [[nodiscard]] std::shared_ptr<Image> get_texture() const;
 
-    Vec2F calc_minimum_size() const override;
+    void calc_minimum_size() override;
 
     enum class StretchMode {
         Scale,        // Scale it to the TextureRect size.

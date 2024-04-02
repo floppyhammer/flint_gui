@@ -3,7 +3,7 @@
 
 #include <optional>
 
-#include "button.h"
+#include "../button.h"
 #include "container.h"
 
 namespace Flint {
@@ -16,7 +16,7 @@ public:
 
     void adjust_layout() override;
 
-    Vec2F calc_minimum_size() const override;
+    void calc_minimum_size()  override;
 
     void set_current_tab(int32_t index);
 

@@ -51,10 +51,13 @@ Button::Button() {
         [this] { InputServer::get_singleton()->set_cursor(this->get_window(), CursorShape::Arrow); });
 }
 
-Vec2F Button::calc_minimum_size() const {
-    auto container_size = margin_container->calc_minimum_size();
+void Button::calc_minimum_size() {
+    // Handle secondary nodes.
+    margin_container->calc_minimum_size_recursively();
 
-    return container_size.max(minimum_size);
+    auto container_size = margin_container->get_effective_minimum_size();
+
+    calculated_minimum_size = container_size;
 }
 
 void Button::input(InputEvent &event) {
@@ -188,11 +191,13 @@ void Button::set_position(Vec2F new_position) {
 }
 
 void Button::set_size(Vec2F p_size) {
-    if (size == p_size) return;
+    if (size == p_size) {
+        return;
+    }
 
     auto path = get_node_path();
 
-    auto final_size = p_size.max(margin_container->calc_minimum_size());
+    auto final_size = p_size.max(margin_container->get_effective_minimum_size());
     final_size = final_size.max(minimum_size);
 
     margin_container->set_size(final_size);

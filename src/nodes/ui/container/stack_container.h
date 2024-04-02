@@ -12,7 +12,7 @@ public:
     void adjust_layout() override;
 
     // TODO: merge this into adjust_layout to avoid duplicated calculation.
-    Vec2F calc_minimum_size() const override;
+    void calc_minimum_size() override;
 
     void set_separation(float new_separation);
 

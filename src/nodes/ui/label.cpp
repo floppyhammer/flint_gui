@@ -161,7 +161,7 @@ void Label::set_font(std::shared_ptr<Font> new_font) {
 
 void Label::consider_alignment() {
     // Make sure size has the correct value before using it.
-    size = calc_minimum_size();
+    size = get_effective_minimum_size();
 
     alignment_shift = Vec2F(0);
 
@@ -250,13 +250,13 @@ void Label::set_vertical_alignment(Alignment alignment) {
     consider_alignment();
 }
 
-Vec2F Label::calc_minimum_size() const {
+void Label::calc_minimum_size() {
     auto min_size = get_text_size();
 
     // Label has a minimal height even when the text is empty.
     min_size.y = std::max(min_size.y, (float)font->get_size());
 
-    return min_size.max(minimum_size);
+    calculated_minimum_size = min_size;
 }
 
 Vec2F Label::get_text_size() const {

@@ -18,8 +18,8 @@ void ScrollContainer::adjust_layout() {
     // Do nothing.
 }
 
-Vec2F ScrollContainer::calc_minimum_size() const {
-    return minimum_size;
+void ScrollContainer::calc_minimum_size() {
+    calculated_minimum_size = minimum_size;
 }
 
 void ScrollContainer::input(InputEvent &event) {

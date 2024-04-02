@@ -23,7 +23,7 @@ void StackContainer::adjust_layout() {
 
         auto cast_child = dynamic_cast<NodeUi *>(child.get());
 
-        auto child_min_size = cast_child->calc_minimum_size();
+        auto child_min_size = cast_child->get_effective_minimum_size();
 
         child_cache.push_back(std::pair(cast_child, child_min_size));
 
@@ -176,7 +176,7 @@ void StackContainer::adjust_layout() {
     }
 }
 
-Vec2F StackContainer::calc_minimum_size() const {
+void StackContainer::calc_minimum_size() {
     Vec2F min_size;
 
     uint32_t visible_child_count = 0;
@@ -190,7 +190,7 @@ Vec2F StackContainer::calc_minimum_size() const {
         }
 
         auto ui_child = dynamic_cast<NodeUi *>(child.get());
-        auto child_min_size = ui_child->calc_minimum_size();
+        auto child_min_size = ui_child->get_effective_minimum_size();
 
         if (horizontal) {
             min_size.x += child_min_size.x;
@@ -213,7 +213,7 @@ Vec2F StackContainer::calc_minimum_size() const {
         }
     }
 
-    return min_size.max(minimum_size);
+    calculated_minimum_size = min_size;
 }
 
 void StackContainer::set_separation(float new_separation) {

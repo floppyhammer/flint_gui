@@ -97,8 +97,8 @@ void TextureRect::draw() {
     NodeUi::draw();
 }
 
-Vec2F TextureRect::calc_minimum_size() const {
-    return minimum_size.max(texture ? texture->get_size().to_f32() : Vec2F(0));
+void TextureRect::calc_minimum_size() {
+    calculated_minimum_size = texture ? texture->get_size().to_f32() : Vec2F(0);
 }
 
 void TextureRect::set_stretch_mode(TextureRect::StretchMode new_stretch_mode) {

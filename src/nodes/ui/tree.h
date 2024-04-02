@@ -10,8 +10,8 @@
 #include "../../resources/style_box.h"
 #include "../../resources/vector_image.h"
 #include "button.h"
+#include "container/stack_container.h"
 #include "node_ui.h"
-#include "stack_container.h"
 
 namespace Flint {
 

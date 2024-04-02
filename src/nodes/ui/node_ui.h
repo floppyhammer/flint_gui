@@ -77,7 +77,13 @@ public:
 
     virtual Vec2F get_minimum_size() const;
 
-    virtual Vec2F calc_minimum_size() const;
+    Vec2F get_effective_minimum_size() const;
+
+    /// Runs once per frame.
+    virtual void calc_minimum_size();
+
+    /// Only for secondary (off-tree) nodes.
+    void calc_minimum_size_recursively();
 
     bool is_ui_node() const override {
         return true;
@@ -138,7 +144,10 @@ protected:
 
     bool is_pressed_inside = false;
 
-    Vec2F minimum_size{0};
+    Vec2F minimum_size{};
+
+    /// Minimum size with all elements considered. Differs from user set `minimum_size`.
+    Vec2F calculated_minimum_size{};
 
     Vec2F local_mouse_position;
 

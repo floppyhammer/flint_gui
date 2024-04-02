@@ -16,8 +16,33 @@ NodeUi::NodeUi() {
     debug_size_box.corner_radius = 0;
 }
 
-Vec2F NodeUi::calc_minimum_size() const {
-    return minimum_size;
+/// Runs once per frame.
+void NodeUi::calc_minimum_size() {
+    calculated_minimum_size = {};
+}
+
+void NodeUi::calc_minimum_size_recursively() {
+    std::vector<Node *> secondary_nodes;
+    dfs_postorder_traversal(this, secondary_nodes);
+    for (auto &node : secondary_nodes) {
+        if (node->is_ui_node()) {
+            auto ui_node = dynamic_cast<NodeUi *>(node);
+            ui_node->calc_minimum_size();
+
+            // Debug.
+            // auto effective_minimum_size = ui_node->get_effective_minimum_size();
+            // auto child_name = get_node_type_name(ui_node->type);
+            // auto _ = 0;
+        }
+    }
+
+    // After we get all children's minimum sizes, we calculate it own minimum size.
+    calc_minimum_size();
+}
+
+Vec2F NodeUi::get_effective_minimum_size() const {
+    // Take own minimum size into account.
+    return minimum_size.max(calculated_minimum_size);
 }
 
 void NodeUi::propagate_draw() {
@@ -129,7 +154,7 @@ void NodeUi::set_size(Vec2F new_size) {
         return;
     }
 
-    size = new_size.max(calc_minimum_size());
+    size = new_size.max(get_effective_minimum_size());
 }
 
 Vec2F NodeUi::get_position() const {
@@ -190,7 +215,7 @@ Vec2F NodeUi::get_max_child_min_size() const {
     for (auto &child : children) {
         if (child->is_ui_node()) {
             auto cast_child = dynamic_cast<NodeUi *>(child.get());
-            max_child_min_size.max(cast_child->calc_minimum_size());
+            max_child_min_size = max_child_min_size.max(cast_child->get_effective_minimum_size());
         }
     }
 

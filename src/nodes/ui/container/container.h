@@ -1,7 +1,7 @@
 #ifndef FLINT_CONTAINER_H
 #define FLINT_CONTAINER_H
 
-#include "node_ui.h"
+#include "../node_ui.h"
 
 namespace Flint {
 
@@ -16,7 +16,7 @@ public:
     void update(double dt) override;
 
     /// Calculates the minimum size of this node, considering all its children' sizing effect.
-    Vec2F calc_minimum_size() const override;
+    void calc_minimum_size() override;
 
 protected:
     /// Hide the constructor as this class is not meant for direct use as a node.
@@ -25,9 +25,6 @@ protected:
     /// The most important method for containers. Adjusts its own size (but not position),
     /// adjusts its children's sizes and local positions.
     virtual void adjust_layout();
-
-    /// Minimum size with all children considered. Differs from `minimum_size`.
-    Vec2F calculated_minimum_size{};
 };
 
 } // namespace Flint

@@ -39,7 +39,7 @@ void MenuItem::draw(Vec2F global_position) {
 }
 
 void MenuItem::update(Vec2F global_position, Vec2F size) {
-    size = size.max(container->calc_minimum_size());
+    size = size.max(container->get_effective_minimum_size());
 
     container->set_position(global_position + position);
     container->propagate_update(0);
@@ -47,7 +47,7 @@ void MenuItem::update(Vec2F global_position, Vec2F size) {
 }
 
 void MenuItem::input(InputEvent &event, Vec2F global_position) {
-    float item_height = label->calc_minimum_size().y;
+    float item_height = label->get_effective_minimum_size().y;
     auto item_global_rect = (RectF(0, position.y, container->get_size().x, position.y + item_height) + global_position);
 
     // if (event.type == InputEventType::MouseMotion) {

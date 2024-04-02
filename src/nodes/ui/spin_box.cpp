@@ -37,10 +37,10 @@ SpinBox::SpinBox() {
     container_h->set_size(size);
 }
 
-Vec2F SpinBox::calc_minimum_size() const {
-    auto container_size = container_h->calc_minimum_size();
+void SpinBox::calc_minimum_size() {
+    container_h->calc_minimum_size();
 
-    return container_size.max(minimum_size);
+    calculated_minimum_size = container_h->get_effective_minimum_size();
 }
 
 void SpinBox::input(InputEvent &event) {
@@ -154,7 +154,7 @@ void SpinBox::set_size(Vec2F p_size) {
 
     auto path = get_node_path();
 
-    auto final_size = p_size.max(container_h->calc_minimum_size());
+    auto final_size = p_size.max(container_h->get_effective_minimum_size());
     final_size = final_size.max(minimum_size);
 
     container_h->set_size(final_size);

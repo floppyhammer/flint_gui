@@ -30,12 +30,24 @@ void SceneTree::process(double dt) {
         root->propagate_input(event);
     }
 
+    // Run calc_minimum_size() depth-first.
+    {
+        std::vector<Node*> nodes;
+        dfs_postorder_traversal(root.get(), nodes);
+        for (auto& node : nodes) {
+            if (node->is_ui_node()) {
+                auto ui_node = dynamic_cast<NodeUi*>(node);
+                ui_node->calc_minimum_size();
+                // std::cout << "Node: " << get_node_type_name(node->type)
+                //           << ", size: " << ui_node->get_effective_minimum_size() << std::endl;
+            }
+        }
+    }
+
     root->propagate_update(dt);
 
     // Collect draw commands.
     root->propagate_draw();
-
-    // Actual drawing.
 }
 
 void SceneTree::when_primary_window_size_changed(Vec2I new_size) const {

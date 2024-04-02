@@ -9,9 +9,9 @@
 #include "../../resources/font.h"
 #include "../../resources/style_box.h"
 #include "../../resources/vector_image.h"
+#include "container/stack_container.h"
 #include "label.h"
 #include "node_ui.h"
-#include "stack_container.h"
 #include "texture_rect.h"
 
 namespace Flint {

@@ -22,20 +22,20 @@ void MarginContainer::adjust_layout() {
     }
 }
 
-Vec2F MarginContainer::calc_minimum_size() const {
+void MarginContainer::calc_minimum_size() {
     Vec2F margin_size = {margin.left + margin.right, margin.top + margin.bottom};
 
     Vec2F max_child_min_size;
     for (auto &child : children) {
         if (child->is_ui_node()) {
             auto cast_child = dynamic_cast<NodeUi *>(child.get());
-            auto child_min_size = cast_child->calc_minimum_size() + margin_size;
+            auto child_min_size = cast_child->get_effective_minimum_size() + margin_size;
 
             max_child_min_size = max_child_min_size.max(child_min_size);
         }
     }
 
-    return minimum_size.max(max_child_min_size);
+    calculated_minimum_size = max_child_min_size;
 }
 
 void MarginContainer::set_margin_all(float new_margin) {

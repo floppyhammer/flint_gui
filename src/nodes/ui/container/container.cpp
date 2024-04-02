@@ -10,7 +10,7 @@ Container::Container() {
 
 void Container::adjust_layout() {
     // Get the minimum size.
-    auto min_size = calc_minimum_size();
+    auto min_size = get_effective_minimum_size();
 
     // Adjust own size.
     size = size.max(min_size);
@@ -25,19 +25,18 @@ void Container::adjust_layout() {
     }
 }
 
-Vec2F Container::calc_minimum_size() const {
+void Container::calc_minimum_size() {
     // Get the minimum child size.
     Vec2F min_child_size{};
     for (const auto &child : children) {
         if (child->is_ui_node()) {
             auto cast_child = dynamic_cast<NodeUi *>(child.get());
-            auto child_min_size = cast_child->calc_minimum_size();
+            auto child_min_size = cast_child->get_effective_minimum_size();
             min_child_size = min_child_size.max(child_min_size);
         }
     }
 
-    // Take own minimum size into account.
-    return minimum_size.max(min_child_size);
+    calculated_minimum_size = min_child_size;
 }
 
 void Container::set_size(Vec2F new_size) {
@@ -45,7 +44,7 @@ void Container::set_size(Vec2F new_size) {
         return;
     }
 
-    auto min_size = calc_minimum_size();
+    auto min_size = get_effective_minimum_size();
 
     size = new_size.max(min_size);
 }

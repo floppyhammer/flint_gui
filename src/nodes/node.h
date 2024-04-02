@@ -46,6 +46,8 @@ enum class NodeType {
     Max,
 };
 
+std::string get_node_type_name(NodeType type);
+
 class SceneTree;
 
 /// Position-independent, window-independent base node.
@@ -137,6 +139,11 @@ protected:
     // Called when subtree structure changes.
     std::vector<std::function<void()>> subtree_changed_callbacks;
 };
+
+/// Return depth first search postorder traversal of the scene tree.
+/// Nodes on the same level will be returned from left to right.
+/// Major usages: container layout adjustment.
+void dfs_postorder_traversal(Node *node, std::vector<Node *> &ordered_nodes);
 
 } // namespace Flint
 

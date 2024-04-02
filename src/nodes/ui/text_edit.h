@@ -30,7 +30,7 @@ public:
 
     void draw() override;
 
-    Vec2F calc_minimum_size() const override;
+    void calc_minimum_size() override;
 
     void grab_focus() override;
 

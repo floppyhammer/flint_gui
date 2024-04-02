@@ -2,7 +2,6 @@
 #define FLINT_SCROLL_CONTAINER_H
 
 #include "container.h"
-#include "tree.h"
 
 namespace Flint {
 
@@ -18,7 +17,7 @@ public:
 
     void adjust_layout() override;
 
-    Vec2F calc_minimum_size() const override;
+    void calc_minimum_size();
 
     void set_hscroll(int32_t value);
 

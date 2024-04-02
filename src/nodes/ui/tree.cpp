@@ -156,7 +156,7 @@ void TreeItem::propagate_draw(float folding_width, uint32_t depth, float &offset
     float offset_x = (float)depth * folding_width;
 
     // Firstly, the item height will be decided by the minimum height of the icon and label.
-    float item_height = std::max(label->calc_minimum_size().y, icon->get_minimum_size().y);
+    float item_height = std::max(label->get_effective_minimum_size().y, icon->get_minimum_size().y);
 
     // Then the value set by the tree is considered.
     item_height = std::max(tree->get_item_height(), item_height);
@@ -193,7 +193,7 @@ void TreeItem::propagate_draw(float folding_width, uint32_t depth, float &offset
 }
 
 void TreeItem::input(InputEvent &event, Vec2F global_position) {
-    float item_height = label->calc_minimum_size().y;
+    float item_height = label->get_effective_minimum_size().y;
     auto item_global_rect = (RectF(0, position.y, tree->get_size().x, position.y + item_height) + global_position);
 
     if (event.type == InputEventType::MouseButton) {

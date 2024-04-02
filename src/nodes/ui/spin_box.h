@@ -6,9 +6,9 @@
 
 #include "../../resources/style_box.h"
 #include "button.h"
+#include "container/stack_container.h"
 #include "label.h"
 #include "node_ui.h"
-#include "stack_container.h"
 #include "texture_rect.h"
 
 namespace Flint {
@@ -35,7 +35,7 @@ public:
 
     void set_size(Vec2F p_size) override;
 
-    Vec2F calc_minimum_size() const override;
+    void calc_minimum_size() override;
 
     void connect_signal(const std::string& signal, std::function<void()> callback);
 

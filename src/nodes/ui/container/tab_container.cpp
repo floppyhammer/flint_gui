@@ -50,19 +50,18 @@ TabContainer::TabContainer() {
 }
 
 void TabContainer::adjust_layout() {
-    Container::adjust_layout();
+    // Adjust own size.
+    size = get_effective_minimum_size().max(size);
 
-    auto tab_button_height = button_container->calc_minimum_size().y;
+    auto tab_button_height = button_container->get_effective_minimum_size().y;
 
     for (int i = 0; i < children.size(); i++) {
-        children[i]->set_visibility(false);
-        if (i == current_tab) {
-            children[i]->set_visibility(true);
-        }
+        children[i]->set_visibility(i == current_tab);
 
         if (children[i]->is_ui_node()) {
-            auto cast_child = dynamic_cast<NodeUi *>(children[i].get());
-            cast_child->set_position({0, tab_button_height});
+            auto ui_child = dynamic_cast<NodeUi *>(children[i].get());
+            ui_child->set_position({0, tab_button_height});
+            ui_child->set_size({size.x, size.y - tab_button_height});
         }
     }
 
@@ -80,20 +79,27 @@ void TabContainer::update(double dt) {
     tab_button_group.update();
 }
 
-Vec2F TabContainer::calc_minimum_size() const {
+void TabContainer::calc_minimum_size() {
     Vec2F min_size;
 
-    uint32_t visible_child_count = 0;
-
-    // Add every child's minimum size.
+    // Find the largest child size.
     for (auto &child : children) {
-        if (child->is_ui_node()) {
-            auto cast_child = dynamic_cast<NodeUi *>(child.get());
-            auto child_min_size = cast_child->calc_minimum_size();
+        // Skip invisible/non-ui child.
+        // We only care about visible UI nodes in a container.
+        if (!child->get_visibility() || !child->is_ui_node()) {
+            continue;
         }
+
+        auto cast_child = dynamic_cast<NodeUi *>(child.get());
+        auto child_min_size = cast_child->get_effective_minimum_size();
+
+        min_size = min_size.max(child_min_size);
     }
 
-    return min_size.max(minimum_size);
+    auto tab_button_height = button_container->get_effective_minimum_size().y;
+    min_size.y += tab_button_height;
+
+    calculated_minimum_size = min_size;
 }
 
 void TabContainer::set_current_tab(int32_t index) {
@@ -107,7 +113,7 @@ void TabContainer::draw() {
 
     auto global_pos = get_global_position();
 
-    auto tab_button_height = button_container->calc_minimum_size().y;
+    auto tab_button_height = button_container->get_effective_minimum_size().y;
 
     vs->draw_style_box(theme_button_panel.value(), global_pos, {size.x, tab_button_height});
     vs->draw_style_box(

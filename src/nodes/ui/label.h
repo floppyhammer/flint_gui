@@ -55,7 +55,7 @@ public:
 
     void set_vertical_alignment(Alignment alignment);
 
-    Vec2F calc_minimum_size() const override;
+    void calc_minimum_size() override;
 
     std::vector<Glyph> &get_glyphs();
 
