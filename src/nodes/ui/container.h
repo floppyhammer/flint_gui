@@ -15,21 +15,19 @@ public:
 
     void update(double dt) override;
 
-    /**
-     * One of the most important methods to containers.
-     * Calculate the minimum size of this node, considering all its children' sizing effect.
-     */
+    /// Calculates the minimum size of this node, considering all its children' sizing effect.
     Vec2F calc_minimum_size() const override;
 
 protected:
-    // This class is not meant for direct use as a node.
+    /// Hide the constructor as this class is not meant for direct use as a node.
     Container();
 
-    /**
-     * One of the most important methods to containers.
-     * Adjust its own size (but not position), adjust its children' sizes and positions.
-     */
+    /// The most important method for containers. Adjusts its own size (but not position),
+    /// adjusts its children's sizes and local positions.
     virtual void adjust_layout();
+
+    /// Minimum size with all children considered. Differs from `minimum_size`.
+    Vec2F calculated_minimum_size{};
 };
 
 } // namespace Flint

@@ -183,25 +183,28 @@ Vec2F StackContainer::calc_minimum_size() const {
 
     // Add every child's minimum size.
     for (auto &child : children) {
-        if (child->is_ui_node()) {
-            auto cast_child = dynamic_cast<NodeUi *>(child.get());
-            auto child_min_size = cast_child->calc_minimum_size();
-            if (horizontal) {
-                min_size.x += child_min_size.x;
-                min_size.y = std::max(min_size.y, child_min_size.y);
-            } else {
-                min_size.x = std::max(min_size.x, child_min_size.x);
-                min_size.y += child_min_size.y;
-            }
-
-            if (cast_child->get_visibility()) {
-                visible_child_count++;
-            }
+        // Skip invisible/non-ui child.
+        // We only care about visible GUI nodes in a container.
+        if (!child->get_visibility() || !child->is_ui_node()) {
+            continue;
         }
+
+        auto ui_child = dynamic_cast<NodeUi *>(child.get());
+        auto child_min_size = ui_child->calc_minimum_size();
+
+        if (horizontal) {
+            min_size.x += child_min_size.x;
+            min_size.y = std::max(min_size.y, child_min_size.y);
+        } else {
+            min_size.x = std::max(min_size.x, child_min_size.x);
+            min_size.y += child_min_size.y;
+        }
+
+        visible_child_count++;
     }
 
     // Take separation into account.
-    if (visible_child_count > 0) {
+    if (visible_child_count > 1) {
         float total_separation_size = separation * (float)(visible_child_count - 1);
         if (horizontal) {
             min_size.x += total_separation_size;

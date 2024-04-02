@@ -41,6 +41,8 @@ enum class NodeType {
     ProgressBar,
     PopupMenu,
 
+    NotInstantiable,
+
     Max,
 };
 

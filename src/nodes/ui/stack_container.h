@@ -17,10 +17,12 @@ public:
     void set_separation(float new_separation);
 
 protected:
-    /// Separation between managed children.
+    StackContainer() = default;
+
+    /// Separation between UI children.
     float separation = 8;
 
-    /// Child organizing direction.
+    /// Organizing direction for UI children.
     bool horizontal = true;
 };
 

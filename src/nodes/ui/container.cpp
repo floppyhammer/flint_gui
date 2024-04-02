@@ -3,7 +3,7 @@
 namespace Flint {
 
 Container::Container() {
-    type = NodeType::Container;
+    type = NodeType::NotInstantiable;
 
     debug_size_box.border_color = ColorU::white();
 }
