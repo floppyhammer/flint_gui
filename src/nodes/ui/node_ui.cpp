@@ -23,7 +23,7 @@ void NodeUi::calc_minimum_size() {
 
 void NodeUi::calc_minimum_size_recursively() {
     std::vector<Node *> secondary_nodes;
-    dfs_postorder_traversal(this, secondary_nodes);
+    dfs_postorder_ltr_traversal(this, secondary_nodes);
     for (auto &node : secondary_nodes) {
         if (node->is_ui_node()) {
             auto ui_node = dynamic_cast<NodeUi *>(node);

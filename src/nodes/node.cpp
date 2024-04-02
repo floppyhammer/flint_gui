@@ -46,13 +46,43 @@ std::string get_node_type_name(NodeType type) {
     return NodeNames[(uint32_t)type];
 }
 
-void dfs_postorder_traversal(Node *node, std::vector<Node *> &ordered_nodes) {
+void dfs_preorder_ltr_traversal(Node *node, std::vector<Node *> &ordered_nodes) {
+    if (node == nullptr) {
+        return;
+    }
+
+    // Debug print.
+    // std::cout << "Node: " << get_node_type_name(node->type) << std::endl;
+
+    ordered_nodes.push_back(node);
+
+    for (auto &child : node->get_children()) {
+        dfs_preorder_ltr_traversal(child.get(), ordered_nodes);
+    }
+}
+
+void dfs_postorder_ltr_traversal(Node *node, std::vector<Node *> &ordered_nodes) {
     if (node == nullptr) {
         return;
     }
 
     for (auto &child : node->get_children()) {
-        dfs_postorder_traversal(child.get(), ordered_nodes);
+        dfs_postorder_ltr_traversal(child.get(), ordered_nodes);
+    }
+
+    // Debug print.
+    // std::cout << "Node: " << get_node_type_name(node->type) << std::endl;
+
+    ordered_nodes.push_back(node);
+}
+
+void dfs_postorder_rtl_traversal(Node *node, std::vector<Node *> &ordered_nodes) {
+    if (node == nullptr) {
+        return;
+    }
+
+    for (auto riter = node->get_children().rbegin(); riter != node->get_children().rend(); ++riter) {
+        dfs_postorder_rtl_traversal(riter->get(), ordered_nodes);
     }
 
     // Debug print.

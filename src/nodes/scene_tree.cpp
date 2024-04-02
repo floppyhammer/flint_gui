@@ -33,7 +33,7 @@ void SceneTree::process(double dt) {
     // Run calc_minimum_size() depth-first.
     {
         std::vector<Node*> nodes;
-        dfs_postorder_traversal(root.get(), nodes);
+        dfs_postorder_ltr_traversal(root.get(), nodes);
         for (auto& node : nodes) {
             if (node->is_ui_node()) {
                 auto ui_node = dynamic_cast<NodeUi*>(node);

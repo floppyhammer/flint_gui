@@ -29,7 +29,7 @@ enum class NodeType {
     Button,
     MenuButton,   // todo
     OptionButton, // todo
-    CheckButton,  // todo
+    CheckButton,
     RadioButton,  // todo
 
     Label,
@@ -140,10 +140,20 @@ protected:
     std::vector<std::function<void()>> subtree_changed_callbacks;
 };
 
-/// Return depth first search postorder traversal of the scene tree.
-/// Nodes on the same level will be returned from left to right.
-/// Major usages: container layout adjustment.
-void dfs_postorder_traversal(Node *node, std::vector<Node *> &ordered_nodes);
+/// Perform a depth-first-search preorder traversal from left-to-right.
+/// Usages: draw nodes back-to-front.
+/// See: https://faculty.cs.niu.edu/~mcmahon/CS241/Notes/Data_Structures/binary_tree_traversals.html
+void dfs_preorder_ltr_traversal(Node *node, std::vector<Node *> &ordered_nodes);
+
+/// Perform a depth-first-search postorder traversal from left-to-right.
+/// Usages: calculate node minimum size leaf-to-root.
+/// See: https://faculty.cs.niu.edu/~mcmahon/CS241/Notes/Data_Structures/binary_tree_traversals.html
+void dfs_postorder_ltr_traversal(Node *node, std::vector<Node *> &ordered_nodes);
+
+/// Perform a postorder traversal from right-to-left.
+/// Usages: handle input events front-to-back.
+/// See: https://faculty.cs.niu.edu/~mcmahon/CS241/Notes/Data_Structures/binary_tree_traversals.html
+void dfs_postorder_rtl_traversal(Node *node, std::vector<Node *> &ordered_nodes);
 
 } // namespace Flint
 
