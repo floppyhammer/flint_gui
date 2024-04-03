@@ -34,11 +34,11 @@ SpinBox::SpinBox() {
     container_h->add_child(container_v);
     container_h->set_separation(0);
     container_h->set_size(size);
+
+    add_embedded_child(container_h);
 }
 
 void SpinBox::calc_minimum_size() {
-    container_h->calc_minimum_size();
-
     calculated_minimum_size = container_h->get_effective_minimum_size();
 }
 
@@ -106,12 +106,6 @@ void SpinBox::input(InputEvent &event) {
 
 void SpinBox::update(double dt) {
     NodeUi::update(dt);
-
-    std::vector<Node *> descendants;
-    dfs_preorder_ltr_traversal(container_h.get(), descendants);
-    for (auto &node : descendants) {
-        node->update(dt);
-    }
 }
 
 void SpinBox::draw() {
@@ -130,8 +124,6 @@ void SpinBox::draw() {
     if (active_style_box.has_value()) {
         vector_server->draw_style_box(active_style_box.value(), global_position, size);
     }
-
-    container_h->propagate_draw();
 
     NodeUi::draw();
 }

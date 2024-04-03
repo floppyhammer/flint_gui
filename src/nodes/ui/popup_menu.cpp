@@ -34,8 +34,6 @@ void MenuItem::draw(Vec2F global_position) {
     if (hovered) {
         vector_server->draw_style_box(theme_hovered, global_position + position, container->get_size());
     }
-
-    container->propagate_draw();
 }
 
 void MenuItem::update(Vec2F global_position, Vec2F size) {

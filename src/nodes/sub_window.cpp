@@ -61,7 +61,7 @@ void SubWindow::update(double dt) {
     }
 }
 
-void SubWindow::propagate_draw() {
+void SubWindow::begin_draw() {
     if (!visible_) {
         return;
     }
@@ -86,9 +86,9 @@ void SubWindow::propagate_draw() {
 
     vector_server->get_canvas()->set_size(window_->get_size());
 
-    for (auto &child : children) {
-        child->propagate_draw();
-    }
+    // for (auto &child : children) {
+    //     child->propagate_draw();
+    // }
 
     vector_server->submit_and_clear();
 

@@ -63,9 +63,6 @@ public:
 
     virtual void propagate_notify(Signal signal);
 
-    // Override this to intercept the propagation of rendering operations.
-    virtual void propagate_draw();
-
     virtual void propagate_cleanup();
 
     virtual void input(InputEvent &event);
@@ -75,6 +72,12 @@ public:
     virtual void notify(Signal signal);
 
     virtual void draw();
+
+    virtual void pre_draw_children() {
+    }
+
+    virtual void post_draw_children() {
+    }
 
     virtual void custom_update(double dt) {
     }

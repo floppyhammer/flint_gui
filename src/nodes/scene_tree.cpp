@@ -1,5 +1,9 @@
 #include "scene_tree.h"
 
+#include <servers/render_server.h>
+
+#include "sub_window.h"
+
 namespace Flint {
 
 SceneTree::SceneTree() {
@@ -52,6 +56,94 @@ void transform_system(Node* node) {
     }
 }
 
+void propagate_draw(Node* node) {
+    node->pre_draw_children();
+
+    for (auto& child : node->get_all_children()) {
+        if (typeid(*child) == typeid(SubWindow) || !node->get_visibility()) {
+            continue;
+        }
+
+        child->draw();
+
+        propagate_draw(child.get());
+    }
+
+    node->post_draw_children();
+}
+
+void draw_system(Node* node) {
+    // Collect all sub-windows.
+    std::vector<Node*> nodes;
+    std::vector<SubWindow*> sub_windows;
+    dfs_preorder_ltr_traversal(node, nodes);
+    for (auto& node : nodes) {
+        if (typeid(*node) == typeid(SubWindow)) {
+            auto sub_window = dynamic_cast<SubWindow*>(node);
+            sub_windows.push_back(sub_window);
+        }
+    }
+
+    // Draw sub-windows.
+    for (auto& w : sub_windows) {
+        if (!w->get_visibility()) {
+            return;
+        }
+
+        // Acquire next swap chain image.
+        if (!w->get_swap_chain()->acquire_image()) {
+            return;
+        }
+
+        auto render_server = RenderServer::get_singleton();
+
+        auto vector_server = VectorServer::get_singleton();
+
+        if (w->get_raw_window()->get_resize_flag()) {
+            w->set_vector_target(render_server->device_->create_texture(
+                {w->get_raw_window()->get_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture"));
+        }
+
+        vector_server->set_dst_texture(w->get_vector_target());
+
+        auto previous_scene = vector_server->get_canvas()->take_scene();
+
+        vector_server->get_canvas()->set_size(w->get_raw_window()->get_size());
+
+        // DRAW
+        propagate_draw(w);
+
+        vector_server->submit_and_clear();
+
+        vector_server->get_canvas()->set_scene(previous_scene);
+
+        auto encoder = render_server->device_->create_command_encoder("Main encoder");
+
+        auto surface_texture = w->get_swap_chain()->get_surface_texture();
+
+        // Swap chain render pass.
+        {
+            encoder->begin_render_pass(
+                w->get_swap_chain()->get_render_pass(), surface_texture, ColorF(0.2, 0.2, 0.2, 1.0));
+
+            encoder->set_viewport({{0, 0}, w->get_raw_window()->get_size()});
+
+            render_server->blit_->set_texture(w->get_vector_target());
+
+            // Draw canvas to screen.
+            render_server->blit_->draw(encoder);
+
+            encoder->end_render_pass();
+        }
+
+        render_server->queue_->submit(encoder, w->get_swap_chain());
+
+        w->get_swap_chain()->present();
+    }
+
+    propagate_draw(node);
+}
+
 void SceneTree::process(double dt) {
     if (root == nullptr) {
         return;
@@ -92,8 +184,8 @@ void SceneTree::process(double dt) {
         }
     }
 
-    // Collect draw commands.
-    root->propagate_draw();
+    // Draw from-back-to-front.
+    draw_system(root.get());
 }
 
 void SceneTree::when_primary_window_size_changed(Vec2I new_size) const {

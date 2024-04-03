@@ -80,7 +80,7 @@ void ScrollContainer::update(double dt) {
     NodeUi::update(dt);
 }
 
-void ScrollContainer::draw() {
+void ScrollContainer::draw_scroll_bar() {
     if (children.empty() || !children.front()->is_ui_node()) {
         return;
     }
@@ -134,10 +134,9 @@ int32_t ScrollContainer::get_vscroll() {
     return vscroll;
 }
 
-void ScrollContainer::propagate_draw() {
+void ScrollContainer::pre_draw_children() {
     auto global_pos = get_global_position();
     auto size = get_size();
-    auto dst_rect = RectF(global_pos, global_pos + size);
 
     auto vector_server = VectorServer::get_singleton();
 
@@ -148,20 +147,27 @@ void ScrollContainer::propagate_draw() {
         render_target_desc = {size.to_i32(), "Scroller render target"};
     }
 
-    auto render_target_id = canvas->get_scene()->push_render_target(render_target_desc);
+    temp_draw_data.render_target_id = canvas->get_scene()->push_render_target(render_target_desc);
 
     vector_server->global_transform_offset = Transform2::from_translation(-global_pos);
+}
 
-    Node::propagate_draw();
+void ScrollContainer::post_draw_children() {
+    auto global_pos = get_global_position();
+    auto size = get_size();
+
+    auto vector_server = VectorServer::get_singleton();
+
+    auto canvas = vector_server->get_canvas();
 
     vector_server->global_transform_offset = Transform2();
 
     canvas->get_scene()->pop_render_target();
 
-    vector_server->get_canvas()->draw_render_target(render_target_id, dst_rect);
+    auto dst_rect = RectF(global_pos, global_pos + size);
+    vector_server->get_canvas()->draw_render_target(temp_draw_data.render_target_id, dst_rect);
 
-    // Draw scroll bar overlay.
-    draw();
+    draw_scroll_bar();
 }
 
 void ScrollContainer::propagate_input(InputEvent &event) {

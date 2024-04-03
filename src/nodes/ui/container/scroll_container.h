@@ -13,11 +13,14 @@ public:
 
     void update(double dt) override;
 
-    void draw() override;
+    void draw_scroll_bar();
+
+    void pre_draw_children() override;
+    void post_draw_children() override;
 
     void adjust_layout() override;
 
-    void calc_minimum_size();
+    void calc_minimum_size() override;
 
     void set_hscroll(int32_t value);
 
@@ -40,9 +43,11 @@ protected:
     StyleBox theme_scroll_bar;
     StyleBox theme_scroll_grabber;
 
-private:
-    void propagate_draw() override;
+    struct {
+        Pathfinder::RenderTargetId render_target_id{};
+    } temp_draw_data;
 
+private:
     void propagate_input(InputEvent &event) override;
 };
 

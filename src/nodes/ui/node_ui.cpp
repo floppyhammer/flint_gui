@@ -47,18 +47,6 @@ Vec2F NodeUi::get_effective_minimum_size() const {
     return custom_minimum_size.max(calculated_minimum_size);
 }
 
-void NodeUi::propagate_draw() {
-    if (!visible_) {
-        return;
-    }
-
-    draw();
-
-    for (auto &child : children) {
-        child->propagate_draw();
-    }
-}
-
 void NodeUi::draw() {
 #ifdef FLINT_GUI_DEBUG
     if (size.x > 0 && size.y > 0) {

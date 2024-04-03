@@ -183,8 +183,6 @@ void Button::draw() {
         vector_server->draw_style_box(active_style_box.value(), global_position, size);
     }
 
-    margin_container->propagate_draw();
-
     NodeUi::draw();
 }
 

@@ -91,14 +91,6 @@ void dfs_postorder_rtl_traversal(Node *node, std::vector<Node *> &ordered_nodes)
     ordered_nodes.push_back(node);
 }
 
-void Node::propagate_draw() {
-    draw();
-
-    for (auto &child : children) {
-        child->propagate_draw();
-    }
-}
-
 void Node::propagate_notify(Signal signal) {
     notify(signal);
 

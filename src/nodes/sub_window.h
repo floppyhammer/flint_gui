@@ -17,7 +17,9 @@ public:
 
     void update(double dt) override;
 
-    void propagate_draw() override;
+    void begin_draw();
+
+    void end_draw();
 
     Vec2I get_size() const;
 
@@ -25,6 +27,18 @@ public:
 
     std::shared_ptr<Pathfinder::Window> get_raw_window() const {
         return window_;
+    }
+
+    std::shared_ptr<Pathfinder::SwapChain> get_swap_chain() const {
+        return swap_chain_;
+    }
+
+    std::shared_ptr<Pathfinder::Texture> get_vector_target() const {
+        return vector_target_;
+    }
+
+    void set_vector_target(std::shared_ptr<Pathfinder::Texture> texture) {
+        vector_target_ = texture;
     }
 
 protected:

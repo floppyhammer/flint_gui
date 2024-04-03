@@ -185,7 +185,7 @@ void TreeItem::propagate_draw(float folding_width, uint32_t depth, float &offset
     for (auto &node : nodes) {
         node->update(0);
     }
-    container->propagate_draw();
+    // container->propagate_draw();
 
     offset_y += item_height;
 

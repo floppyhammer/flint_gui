@@ -96,8 +96,6 @@ public:
 
     virtual void draw();
 
-    void propagate_draw() override;
-
     void set_mouse_filter(MouseFilter filter);
 
     ContainerSizing container_sizing{};

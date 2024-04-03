@@ -102,8 +102,6 @@ void TabContainer::set_current_tab(int32_t index) {
 }
 
 void TabContainer::draw() {
-    NodeUi::draw();
-
     auto vs = VectorServer::get_singleton();
 
     auto global_pos = get_global_position();
@@ -114,7 +112,7 @@ void TabContainer::draw() {
     vs->draw_style_box(
         theme_panel.value(), global_pos + Vec2F(0, tab_button_height), size - Vec2F(0, tab_button_height));
 
-    button_container->propagate_draw();
+    NodeUi::draw();
 }
 
 void TabContainer::input(InputEvent &event) {
