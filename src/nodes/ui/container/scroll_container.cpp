@@ -170,23 +170,4 @@ void ScrollContainer::post_draw_children() {
     draw_scroll_bar();
 }
 
-void ScrollContainer::propagate_input(InputEvent &event) {
-    // Intercept out-of-scope mouse input events.
-    auto global_position = get_global_position();
-
-    auto active_rect = RectF(global_position, global_position + size);
-
-    switch (event.type) {
-        case InputEventType::MouseMotion:
-        case InputEventType::MouseButton:
-        case InputEventType::MouseScroll: {
-            if (active_rect.contains_point(InputServer::get_singleton()->cursor_position)) {
-                Node::propagate_input(event);
-            }
-        } break;
-        default:
-            break;
-    }
-}
-
 } // namespace Flint

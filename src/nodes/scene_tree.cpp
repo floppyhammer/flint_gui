@@ -20,6 +20,80 @@ void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
     root->tree_ = this;
 }
 
+void propagate_input(Node* node, InputEvent& event) {
+    if (!node->get_visibility()) {
+        return;
+    }
+
+    for (auto& child : node->get_all_children()) {
+        if (typeid(*child) == typeid(SubWindow) || !node->get_visibility()) {
+            continue;
+        }
+
+        // Do not propagate out-of-bounds mouse input events if they are explicitly ignored.
+        if (node->is_ui_node()) {
+            auto ui_node = dynamic_cast<NodeUi*>(node);
+
+            if (ui_node->ignore_mouse_input_outside_rect()) {
+                // Intercept out-of-scope mouse input events.
+                auto global_position = ui_node->get_global_position();
+
+                auto active_rect = RectF(global_position, global_position + ui_node->get_size());
+
+                switch (event.type) {
+                    case InputEventType::MouseMotion:
+                    case InputEventType::MouseButton:
+                    case InputEventType::MouseScroll: {
+                        if (!active_rect.contains_point(InputServer::get_singleton()->cursor_position)) {
+                            continue;
+                        }
+                    } break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        propagate_input(child.get(), event);
+    }
+
+    node->input(event);
+}
+
+void input_system(Node* root, std::vector<InputEvent>& input_queue) {
+    // Collect all sub-windows.
+    std::vector<SubWindow*> sub_windows;
+    {
+        std::vector<Node*> nodes;
+        dfs_preorder_ltr_traversal(root, nodes);
+
+        for (auto& node : nodes) {
+            if (typeid(*node) == typeid(SubWindow)) {
+                auto sub_window = dynamic_cast<SubWindow*>(node);
+                sub_windows.push_back(sub_window);
+            }
+        }
+    }
+
+    for (auto& w : sub_windows) {
+        if (!w->get_visibility()) {
+            return;
+        }
+
+        for (auto& event : input_queue) {
+            if (event.window != w->get_raw_window()->get_glfw_handle()) {
+                continue;
+            }
+
+            propagate_input(w, event);
+        }
+    }
+
+    for (auto& event : input_queue) {
+        propagate_input(root, event);
+    }
+}
+
 void propagate_transform(NodeUi* node, Vec2F parent_global_transform) {
     if (node == nullptr) {
         return;
@@ -35,15 +109,15 @@ void propagate_transform(NodeUi* node, Vec2F parent_global_transform) {
     }
 }
 
-void transform_system(Node* node) {
-    if (node == nullptr) {
+void transform_system(Node* root) {
+    if (root == nullptr) {
         return;
     }
 
     // Collect all orphan UI nodes.
     std::vector<Node*> nodes;
     std::vector<NodeUi*> orphan_ui_nodes;
-    dfs_preorder_ltr_traversal(node, nodes);
+    dfs_preorder_ltr_traversal(root, nodes);
     for (auto& node : nodes) {
         if (node->is_ui_node() && node->get_parent() == nullptr) {
             auto ui_node = dynamic_cast<NodeUi*>(node);
@@ -57,6 +131,8 @@ void transform_system(Node* node) {
 }
 
 void propagate_draw(Node* node) {
+    node->draw();
+
     node->pre_draw_children();
 
     for (auto& child : node->get_all_children()) {
@@ -64,23 +140,24 @@ void propagate_draw(Node* node) {
             continue;
         }
 
-        child->draw();
-
         propagate_draw(child.get());
     }
 
     node->post_draw_children();
 }
 
-void draw_system(Node* node) {
+void draw_system(Node* root) {
     // Collect all sub-windows.
-    std::vector<Node*> nodes;
+
     std::vector<SubWindow*> sub_windows;
-    dfs_preorder_ltr_traversal(node, nodes);
-    for (auto& node : nodes) {
-        if (typeid(*node) == typeid(SubWindow)) {
-            auto sub_window = dynamic_cast<SubWindow*>(node);
-            sub_windows.push_back(sub_window);
+    {
+        std::vector<Node*> nodes;
+        dfs_preorder_ltr_traversal(root, nodes);
+        for (auto& node : nodes) {
+            if (typeid(*node) == typeid(SubWindow)) {
+                auto sub_window = dynamic_cast<SubWindow*>(node);
+                sub_windows.push_back(sub_window);
+            }
         }
     }
 
@@ -90,58 +167,15 @@ void draw_system(Node* node) {
             return;
         }
 
-        // Acquire next swap chain image.
-        if (!w->get_swap_chain()->acquire_image()) {
-            return;
-        }
-
-        auto render_server = RenderServer::get_singleton();
-
-        auto vector_server = VectorServer::get_singleton();
-
-        if (w->get_raw_window()->get_resize_flag()) {
-            w->set_vector_target(render_server->device_->create_texture(
-                {w->get_raw_window()->get_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture"));
-        }
-
-        vector_server->set_dst_texture(w->get_vector_target());
-
-        auto previous_scene = vector_server->get_canvas()->take_scene();
-
-        vector_server->get_canvas()->set_size(w->get_raw_window()->get_size());
+        w->pre_draw_children();
 
         // DRAW
         propagate_draw(w);
 
-        vector_server->submit_and_clear();
-
-        vector_server->get_canvas()->set_scene(previous_scene);
-
-        auto encoder = render_server->device_->create_command_encoder("Main encoder");
-
-        auto surface_texture = w->get_swap_chain()->get_surface_texture();
-
-        // Swap chain render pass.
-        {
-            encoder->begin_render_pass(
-                w->get_swap_chain()->get_render_pass(), surface_texture, ColorF(0.2, 0.2, 0.2, 1.0));
-
-            encoder->set_viewport({{0, 0}, w->get_raw_window()->get_size()});
-
-            render_server->blit_->set_texture(w->get_vector_target());
-
-            // Draw canvas to screen.
-            render_server->blit_->draw(encoder);
-
-            encoder->end_render_pass();
-        }
-
-        render_server->queue_->submit(encoder, w->get_swap_chain());
-
-        w->get_swap_chain()->present();
+        w->post_draw_children();
     }
 
-    propagate_draw(node);
+    propagate_draw(root);
 }
 
 void SceneTree::process(double dt) {
@@ -154,9 +188,7 @@ void SceneTree::process(double dt) {
         when_primary_window_size_changed(old_primary_window_size);
     }
 
-    for (auto& event : InputServer::get_singleton()->input_queue) {
-        root->propagate_input(event);
-    }
+    input_system(root.get(), InputServer::get_singleton()->input_queue);
 
     // Run calc_minimum_size() depth-first.
     {

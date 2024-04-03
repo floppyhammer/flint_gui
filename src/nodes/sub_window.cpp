@@ -27,25 +27,6 @@ Vec2I SubWindow::get_size() const {
     return size_;
 }
 
-void SubWindow::propagate_input(InputEvent &event) {
-    if (!visible_) {
-        return;
-    }
-
-    // Filter events not belonging to this window.
-    if (event.window != window_->get_glfw_handle()) {
-        return;
-    }
-
-    auto it = children.rbegin();
-    while (it != children.rend()) {
-        (*it)->propagate_input(event);
-        ++it;
-    }
-
-    input(event);
-}
-
 void SubWindow::update(double dt) {
     // if (window_->get_resize_flag()) {
     //     // auto new_size = Vec2I(window_->get_size(), window->framebuffer_height);
@@ -61,7 +42,7 @@ void SubWindow::update(double dt) {
     }
 }
 
-void SubWindow::begin_draw() {
+void SubWindow::pre_draw_children() {
     if (!visible_) {
         return;
     }
@@ -72,7 +53,6 @@ void SubWindow::begin_draw() {
     }
 
     auto render_server = RenderServer::get_singleton();
-
     auto vector_server = VectorServer::get_singleton();
 
     if (window_->get_resize_flag()) {
@@ -82,17 +62,18 @@ void SubWindow::begin_draw() {
 
     vector_server->set_dst_texture(vector_target_);
 
-    auto previous_scene = vector_server->get_canvas()->take_scene();
+    temp_draw_data.previous_scene = vector_server->get_canvas()->take_scene();
 
     vector_server->get_canvas()->set_size(window_->get_size());
+}
 
-    // for (auto &child : children) {
-    //     child->propagate_draw();
-    // }
+void SubWindow::post_draw_children() {
+    auto render_server = RenderServer::get_singleton();
+    auto vector_server = VectorServer::get_singleton();
 
     vector_server->submit_and_clear();
 
-    vector_server->get_canvas()->set_scene(previous_scene);
+    vector_server->get_canvas()->set_scene(temp_draw_data.previous_scene);
 
     auto encoder = render_server->device_->create_command_encoder("Main encoder");
 

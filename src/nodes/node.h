@@ -59,12 +59,6 @@ public:
 
     virtual ~Node() = default;
 
-    virtual void propagate_input(InputEvent &event);
-
-    virtual void propagate_notify(Signal signal);
-
-    virtual void propagate_cleanup();
-
     virtual void input(InputEvent &event);
 
     virtual void update(double dt);

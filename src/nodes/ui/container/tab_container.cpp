@@ -115,8 +115,4 @@ void TabContainer::draw() {
     NodeUi::draw();
 }
 
-void TabContainer::input(InputEvent &event) {
-    button_container->propagate_input(event);
-}
-
 } // namespace Flint

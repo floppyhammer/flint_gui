@@ -94,6 +94,10 @@ public:
 
     void calc_global_position(Vec2F parent_global_position);
 
+    virtual bool ignore_mouse_input_outside_rect() const {
+        return false;
+    }
+
     virtual void draw();
 
     void set_mouse_filter(MouseFilter filter);

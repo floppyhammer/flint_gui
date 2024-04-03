@@ -30,6 +30,10 @@ public:
 
     int32_t get_vscroll();
 
+    bool ignore_mouse_input_outside_rect() const override {
+        return true;
+    }
+
 protected:
     bool horizontal_mode = true;
     bool vertical_mode = true;
@@ -46,9 +50,6 @@ protected:
     struct {
         Pathfinder::RenderTargetId render_target_id{};
     } temp_draw_data;
-
-private:
-    void propagate_input(InputEvent &event) override;
 };
 
 } // namespace Flint

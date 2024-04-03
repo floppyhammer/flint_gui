@@ -16,13 +16,11 @@ public:
 
     void adjust_layout() override;
 
-    void calc_minimum_size()  override;
+    void calc_minimum_size() override;
 
     void set_current_tab(int32_t index);
 
     void draw() override;
-
-    void input(InputEvent& event) override;
 
 protected:
     int32_t current_tab = -1;

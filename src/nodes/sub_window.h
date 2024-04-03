@@ -13,13 +13,11 @@ class SubWindow : public Node {
 public:
     explicit SubWindow(Vec2I size);
 
-    void propagate_input(InputEvent &event) override;
-
     void update(double dt) override;
 
-    void begin_draw();
+    void pre_draw_children() override;
 
-    void end_draw();
+    void post_draw_children() override;
 
     Vec2I get_size() const;
 
@@ -49,6 +47,11 @@ protected:
     std::shared_ptr<Pathfinder::Texture> vector_target_;
 
     void record_commands() const;
+
+private:
+    struct {
+        std::shared_ptr<Pathfinder::Scene> previous_scene;
+    } temp_draw_data;
 };
 
 } // namespace Flint

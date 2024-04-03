@@ -91,30 +91,6 @@ void dfs_postorder_rtl_traversal(Node *node, std::vector<Node *> &ordered_nodes)
     ordered_nodes.push_back(node);
 }
 
-void Node::propagate_notify(Signal signal) {
-    notify(signal);
-
-    for (auto &child : children) {
-        child->propagate_notify(signal);
-    }
-}
-
-void Node::propagate_input(InputEvent &event) {
-    auto it = children.rbegin();
-    while (it != children.rend()) {
-        (*it)->propagate_input(event);
-        it++;
-    }
-
-    input(event);
-}
-
-void Node::propagate_cleanup() {
-    for (auto &child : children) {
-        child->propagate_cleanup();
-    }
-}
-
 void Node::input(InputEvent &event) {
     custom_input(event);
 }
