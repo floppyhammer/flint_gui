@@ -10,7 +10,7 @@ struct StyleBox {
 
     ColorU border_color = ColorU(67, 67, 67, 255);
     float border_width = 0;
-    float corner_radius = 4;
+    float corner_radius = 8;
 
     ColorU shadow_color;
     float shadow_size = 0;

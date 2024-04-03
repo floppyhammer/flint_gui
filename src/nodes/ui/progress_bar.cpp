@@ -25,13 +25,10 @@ ProgressBar::ProgressBar() {
     label->set_vertical_alignment(Alignment::Center);
     label->set_anchor_flag(AnchorFlag::Center);
 
-    // size = label->calc_minimum_size();
-    // label->set_size(size);
+    add_embedded_child(label);
 }
 
 void ProgressBar::calc_minimum_size() {
-    label->calc_minimum_size();
-
     calculated_minimum_size = label->get_effective_minimum_size();
 }
 
@@ -72,7 +69,6 @@ void ProgressBar::set_value(float new_value) {
     ratio = (value - min_value) / (max_value - min_value);
 
     label->set_text(std::to_string((int)round(ratio * 100)) + "%");
-    label->update(0);
 }
 
 float ProgressBar::get_value() const {
