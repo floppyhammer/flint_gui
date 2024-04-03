@@ -39,16 +39,6 @@ void Container::calc_minimum_size() {
     calculated_minimum_size = min_child_size;
 }
 
-void Container::set_size(Vec2F new_size) {
-    if (size == new_size) {
-        return;
-    }
-
-    auto min_size = get_effective_minimum_size();
-
-    size = new_size.max(min_size);
-}
-
 void Container::update(double dt) {
     NodeUi::update(dt);
 

@@ -13,15 +13,14 @@ using Pathfinder::ColorF;
 
 namespace Flint {
 
-/// How a GUI node handles mouse input propagation.
+/// How a UI node handles mouse input propagation.
 enum class MouseFilter {
     Stop,   // Use input and mark it as consumed.
-    Pass,   // Use input.
+    Pass,   // Use input and don't mark it as consumed.
     Ignore, // Ignore input.
 };
 
-/// Anchor takes effect only when the GUI node is
-/// inside a non-container control node.
+/// Anchor takes effect only when a UI node is not a child of a container.
 enum class AnchorFlag {
     TopLeft,
     TopRight,
@@ -46,14 +45,14 @@ enum class AnchorFlag {
     Max,
 };
 
-/// How a parent container organizes this control node.
 enum class ContainerSizingFlag {
-    Fill,
-    ShrinkStart,
-    ShrinkCenter,
-    ShrinkEnd,
+    Fill,         // Occupy the full space in the grow direction.
+    ShrinkStart,  // Shrink to the minimum size at the start in the grow direction.
+    ShrinkCenter, // Shrink to the minimum size at the center in the grow direction.
+    ShrinkEnd,    // Shrink to the minimum size at the end in the grow direction.
 };
 
+/// How a parent container organizes this UI node.
 struct ContainerSizing {
     ContainerSizingFlag flag_h = ContainerSizingFlag::Fill;
     bool expand_h = false;

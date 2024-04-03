@@ -228,14 +228,14 @@ void NodeUi::apply_anchor() {
     }
 
     if (parent && parent->is_ui_node()) {
-        auto cast_parent = dynamic_cast<NodeUi *>(parent);
+        auto ui_parent = dynamic_cast<NodeUi *>(parent);
 
         auto actual_size = get_minimum_size().max(size);
 
-        float center_x = (cast_parent->size.x - actual_size.x) * 0.5f;
-        float center_y = (cast_parent->size.y - actual_size.y) * 0.5f;
-        float right = cast_parent->size.x - actual_size.x;
-        float bottom = cast_parent->size.y - actual_size.y;
+        float center_x = (ui_parent->size.x - actual_size.x) * 0.5f;
+        float center_y = (ui_parent->size.y - actual_size.y) * 0.5f;
+        float right = ui_parent->size.x - actual_size.x;
+        float bottom = ui_parent->size.y - actual_size.y;
 
         switch (anchor_mode) {
             case AnchorFlag::TopLeft: {
@@ -267,34 +267,34 @@ void NodeUi::apply_anchor() {
             } break;
             case AnchorFlag::LeftWide: {
                 position = {0, 0};
-                size = {actual_size.x, cast_parent->size.y};
+                size = {actual_size.x, ui_parent->size.y};
             } break;
             case AnchorFlag::RightWide: {
                 position = {right, 0};
-                size = {actual_size.x, cast_parent->size.y};
+                size = {actual_size.x, ui_parent->size.y};
             } break;
             case AnchorFlag::TopWide: {
                 position = {0, 0};
-                size = {cast_parent->size.x, actual_size.y};
+                size = {ui_parent->size.x, actual_size.y};
             } break;
             case AnchorFlag::BottomWide: {
                 position = {0, bottom};
-                size = {cast_parent->size.x, actual_size.y};
+                size = {ui_parent->size.x, actual_size.y};
             } break;
             case AnchorFlag::VCenterWide: {
                 position = {center_x, center_y};
-                size = {cast_parent->size.x, actual_size.y};
+                size = {ui_parent->size.x, actual_size.y};
             } break;
             case AnchorFlag::HCenterWide: {
                 position = {center_x, center_y};
-                size = {actual_size.x, cast_parent->size.y};
+                size = {actual_size.x, ui_parent->size.y};
             } break;
             case AnchorFlag::FullRect: {
                 position = {0, 0};
-                size = {cast_parent->size.x, cast_parent->size.y};
+                size = {ui_parent->size.x, ui_parent->size.y};
             } break;
             case AnchorFlag::Max: {
-                return;
+                abort();
             }
         }
     }
@@ -329,50 +329,6 @@ AnchorFlag NodeUi::get_anchor_flag() const {
 }
 
 void NodeUi::when_parent_size_changed(Vec2F new_size) {
-    switch (anchor_mode) {
-        case AnchorFlag::FullRect: {
-            size = new_size.to_f32();
-        } break;
-        case AnchorFlag::TopRight: {
-            position.x = new_size.x - size.x;
-        } break;
-        case AnchorFlag::BottomLeft: {
-            position.y = new_size.y - size.y;
-        } break;
-        case AnchorFlag::BottomRight: {
-            position = new_size.to_f32() - size;
-        } break;
-        case AnchorFlag::CenterLeft: {
-            position.y = new_size.y * 0.5 - size.y * 0.5;
-        } break;
-        case AnchorFlag::CenterRight: {
-            position.x = new_size.x - size.x;
-            position.y = new_size.y * 0.5 - size.y * 0.5;
-        } break;
-        case AnchorFlag::CenterTop: {
-            position.x = new_size.x * 0.5 - size.x * 0.5;
-        } break;
-        case AnchorFlag::CenterBottom:
-            break;
-        case AnchorFlag::Center:
-            break;
-        case AnchorFlag::LeftWide:
-            break;
-        case AnchorFlag::RightWide:
-            break;
-        case AnchorFlag::TopWide:
-            break;
-        case AnchorFlag::BottomWide:
-            break;
-        case AnchorFlag::VCenterWide:
-            break;
-        case AnchorFlag::HCenterWide:
-            break;
-        case AnchorFlag::Max:
-        default:
-            break;
-    }
-
     for (auto &child : children) {
         if (child->get_node_type() == NodeType::NodeUi) {
             auto cast_child = dynamic_cast<NodeUi *>(child.get());

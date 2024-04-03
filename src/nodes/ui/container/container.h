@@ -11,8 +11,6 @@ namespace Flint {
  */
 class Container : public NodeUi {
 public:
-    void set_size(Vec2F new_size) override;
-
     void update(double dt) override;
 
     /// Calculates the minimum size of this node, considering all its children' sizing effect.
