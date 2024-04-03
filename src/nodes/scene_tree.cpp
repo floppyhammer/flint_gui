@@ -16,6 +16,42 @@ void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
     root->tree_ = this;
 }
 
+void propagate_transform(NodeUi* node, Vec2F parent_global_transform) {
+    if (node == nullptr) {
+        return;
+    }
+
+    node->calc_global_position(parent_global_transform);
+
+    for (auto& child : node->get_all_children()) {
+        if (child->is_ui_node()) {
+            auto ui_child = dynamic_cast<NodeUi*>(child.get());
+            propagate_transform(ui_child, node->get_global_position());
+        }
+    }
+}
+
+void transform_system(Node* node) {
+    if (node == nullptr) {
+        return;
+    }
+
+    // Collect all orphan UI nodes.
+    std::vector<Node*> nodes;
+    std::vector<NodeUi*> orphan_ui_nodes;
+    dfs_preorder_ltr_traversal(node, nodes);
+    for (auto& node : nodes) {
+        if (node->is_ui_node() && node->get_parent() == nullptr) {
+            auto ui_node = dynamic_cast<NodeUi*>(node);
+            orphan_ui_nodes.push_back(ui_node);
+        }
+    }
+
+    for (auto& ui_node : orphan_ui_nodes) {
+        propagate_transform(ui_node, Vec2F{});
+    }
+}
+
 void SceneTree::process(double dt) {
     if (root == nullptr) {
         return;
@@ -32,9 +68,9 @@ void SceneTree::process(double dt) {
 
     // Run calc_minimum_size() depth-first.
     {
-        std::vector<Node*> nodes;
-        dfs_postorder_ltr_traversal(root.get(), nodes);
-        for (auto& node : nodes) {
+        std::vector<Node*> descendants;
+        dfs_postorder_ltr_traversal(root.get(), descendants);
+        for (auto& node : descendants) {
             if (node->is_ui_node()) {
                 auto ui_node = dynamic_cast<NodeUi*>(node);
                 ui_node->calc_minimum_size();
@@ -44,7 +80,17 @@ void SceneTree::process(double dt) {
         }
     }
 
-    root->propagate_update(dt);
+    // Update global transform.
+    transform_system(root.get());
+
+    // Update from-back-to-front.
+    {
+        std::vector<Node*> nodes;
+        dfs_preorder_ltr_traversal(root.get(), nodes);
+        for (auto& node : nodes) {
+            node->update(dt);
+        }
+    }
 
     // Collect draw commands.
     root->propagate_draw();

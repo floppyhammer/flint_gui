@@ -41,8 +41,9 @@ Button::Button() {
     margin_container = std::make_shared<MarginContainer>();
     margin_container->set_margin_all(4);
     margin_container->add_child(hstack_container);
-    margin_container->set_parent(this);
     margin_container->set_size(size);
+
+    add_embedded_child(margin_container);
 
     callbacks_cursor_entered.emplace_back(
         [this] { InputServer::get_singleton()->set_cursor(this->get_window(), CursorShape::Hand); });
@@ -52,9 +53,6 @@ Button::Button() {
 }
 
 void Button::calc_minimum_size() {
-    // Handle secondary nodes.
-    margin_container->calc_minimum_size_recursively();
-
     auto container_size = margin_container->get_effective_minimum_size();
 
     calculated_minimum_size = container_size;
@@ -147,7 +145,11 @@ void Button::input(InputEvent &event) {
 void Button::update(double dt) {
     NodeUi::update(dt);
 
-    margin_container->propagate_update(dt);
+    // std::vector<Node *> descendants;
+    // dfs_preorder_ltr_traversal(margin_container.get(), descendants);
+    // for (auto &node : descendants) {
+    //     node->update(dt);
+    // }
 }
 
 void Button::draw() {

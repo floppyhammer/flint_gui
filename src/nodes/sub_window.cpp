@@ -46,7 +46,7 @@ void SubWindow::propagate_input(InputEvent &event) {
     input(event);
 }
 
-void SubWindow::propagate_update(double dt) {
+void SubWindow::update(double dt) {
     // if (window_->get_resize_flag()) {
     //     // auto new_size = Vec2I(window_->get_size(), window->framebuffer_height);
     //     //        when_window_size_changed(new_size);
@@ -58,14 +58,6 @@ void SubWindow::propagate_update(double dt) {
         window_->hide();
     } else {
         window_->show();
-    }
-
-    if (!visible_) {
-        return;
-    }
-
-    for (auto &child : children) {
-        child->propagate_update(dt);
     }
 }
 

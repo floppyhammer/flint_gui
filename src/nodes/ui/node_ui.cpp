@@ -134,13 +134,11 @@ void NodeUi::input(InputEvent &event) {
 }
 
 Vec2F NodeUi::get_global_position() const {
-    if (parent != nullptr && parent->is_ui_node()) {
-        auto cast_parent = dynamic_cast<NodeUi *>(parent);
+    return calculated_glocal_position;
+}
 
-        return cast_parent->get_global_position() + position;
-    }
-
-    return position;
+void NodeUi::calc_global_position(Vec2F parent_global_position) {
+    calculated_glocal_position = parent_global_position + position;
 }
 
 void NodeUi::set_mouse_filter(MouseFilter filter) {
@@ -231,9 +229,9 @@ void NodeUi::apply_anchor() {
 
     Vec2F parent_size;
 
+    // If no parent or the parent is not a UI node, use the parent window's size for anchoring.
     if (parent && parent->is_ui_node()) {
         auto ui_parent = dynamic_cast<NodeUi *>(parent);
-
         parent_size = ui_parent->get_size();
     } else {
         parent_size = get_window()->get_size().to_f32();
@@ -247,6 +245,9 @@ void NodeUi::apply_anchor() {
     float bottom = parent_size.y - actual_size.y;
 
     switch (anchor_mode) {
+        case AnchorFlag::None: {
+            // Do nothing.
+        } break;
         case AnchorFlag::TopLeft: {
             position = {0, 0};
         } break;

@@ -24,7 +24,6 @@ ProgressBar::ProgressBar() {
     label->set_horizontal_alignment(Alignment::Center);
     label->set_vertical_alignment(Alignment::Center);
     label->set_anchor_flag(AnchorFlag::Center);
-    label->set_parent(this);
 
     // size = label->calc_minimum_size();
     // label->set_size(size);

@@ -30,7 +30,7 @@ enum class NodeType {
     MenuButton,   // todo
     OptionButton, // todo
     CheckButton,
-    RadioButton,  // todo
+    RadioButton, // todo
 
     Label,
     TextEdit,
@@ -61,8 +61,6 @@ public:
 
     virtual void propagate_input(InputEvent &event);
 
-    virtual void propagate_update(double delta);
-
     virtual void propagate_notify(Signal signal);
 
     // Override this to intercept the propagation of rendering operations.
@@ -86,13 +84,15 @@ public:
 
     void add_child(const std::shared_ptr<Node> &new_child);
 
-    NodeType get_node_type() const;
+    void add_embedded_child(const std::shared_ptr<Node> &new_child);
 
-    void set_parent(Node *node);
+    NodeType get_node_type() const;
 
     Node *get_parent() const;
 
     std::vector<std::shared_ptr<Node>> get_children();
+    std::vector<std::shared_ptr<Node>> get_embedded_children();
+    std::vector<std::shared_ptr<Node>> get_all_children();
 
     virtual std::shared_ptr<Node> get_child(size_t index);
 
@@ -130,6 +130,8 @@ protected:
 
     std::vector<std::shared_ptr<Node>> children;
 
+    std::vector<std::shared_ptr<Node>> embedded_children;
+
     // Don't use a shared pointer as it causes circular references.
     // Also, we must initialize it to null.
     Node *parent{};
@@ -141,7 +143,7 @@ protected:
 };
 
 /// Perform a depth-first-search preorder traversal from left-to-right.
-/// Usages: draw nodes back-to-front.
+/// Usages: draw nodes back-to-front, propagate transform.
 /// See: https://faculty.cs.niu.edu/~mcmahon/CS241/Notes/Data_Structures/binary_tree_traversals.html
 void dfs_preorder_ltr_traversal(Node *node, std::vector<Node *> &ordered_nodes);
 

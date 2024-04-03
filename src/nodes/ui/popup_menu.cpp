@@ -42,8 +42,13 @@ void MenuItem::update(Vec2F global_position, Vec2F size) {
     size = size.max(container->get_effective_minimum_size());
 
     container->set_position(global_position + position);
-    container->propagate_update(0);
     container->set_size(size);
+
+    std::vector<Node *> descendants;
+    dfs_preorder_ltr_traversal(container.get(), descendants);
+    for (auto &node : descendants) {
+        node->update(0);
+    }
 }
 
 void MenuItem::input(InputEvent &event, Vec2F global_position) {

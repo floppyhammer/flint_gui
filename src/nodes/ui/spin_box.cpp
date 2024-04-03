@@ -30,7 +30,6 @@ SpinBox::SpinBox() {
     container_v = std::make_shared<VStackContainer>();
 
     container_h = std::make_shared<HStackContainer>();
-    container_h->set_parent(this);
     container_h->add_child(label);
     container_h->add_child(container_v);
     container_h->set_separation(0);
@@ -108,17 +107,11 @@ void SpinBox::input(InputEvent &event) {
 void SpinBox::update(double dt) {
     NodeUi::update(dt);
 
-    //        if (icon.has_value()) {
-    //            auto icon_size = icon.value().size;
-    //            label->set_size({size.x - icon_size.x, size.y});
-    //            label->set_position({icon_size.x, 0});
-    //        } else {
-    //            label->set_size({size.x, size.y});
-    //            label->set_position({0, 0});
-    //        }
-    container_h->propagate_update(dt);
-
-    label->update(dt);
+    std::vector<Node *> descendants;
+    dfs_preorder_ltr_traversal(container_h.get(), descendants);
+    for (auto &node : descendants) {
+        node->update(dt);
+    }
 }
 
 void SpinBox::draw() {

@@ -92,6 +92,8 @@ public:
 
     Vec2F get_global_position() const;
 
+    void calc_global_position(Vec2F parent_global_position);
+
     virtual void draw();
 
     void propagate_draw() override;
@@ -140,6 +142,8 @@ protected:
     Vec2F scale{1};
     Vec2F pivot_offset{0}; // Top-left as the default pivot.
     float rotation = 0;
+
+    Vec2F calculated_glocal_position{0};
 
     bool focused = false;
 

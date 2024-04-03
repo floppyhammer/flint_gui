@@ -56,7 +56,7 @@ void dfs_preorder_ltr_traversal(Node *node, std::vector<Node *> &ordered_nodes) 
 
     ordered_nodes.push_back(node);
 
-    for (auto &child : node->get_children()) {
+    for (auto &child : node->get_all_children()) {
         dfs_preorder_ltr_traversal(child.get(), ordered_nodes);
     }
 }
@@ -66,7 +66,7 @@ void dfs_postorder_ltr_traversal(Node *node, std::vector<Node *> &ordered_nodes)
         return;
     }
 
-    for (auto &child : node->get_children()) {
+    for (auto &child : node->get_all_children()) {
         dfs_postorder_ltr_traversal(child.get(), ordered_nodes);
     }
 
@@ -81,7 +81,7 @@ void dfs_postorder_rtl_traversal(Node *node, std::vector<Node *> &ordered_nodes)
         return;
     }
 
-    for (auto riter = node->get_children().rbegin(); riter != node->get_children().rend(); ++riter) {
+    for (auto riter = node->get_all_children().rbegin(); riter != node->get_all_children().rend(); ++riter) {
         dfs_postorder_rtl_traversal(riter->get(), ordered_nodes);
     }
 
@@ -89,14 +89,6 @@ void dfs_postorder_rtl_traversal(Node *node, std::vector<Node *> &ordered_nodes)
     // std::cout << "Node: " << get_node_type_name(node->type) << std::endl;
 
     ordered_nodes.push_back(node);
-}
-
-void Node::propagate_update(double dt) {
-    update(dt);
-
-    for (auto &child : children) {
-        child->propagate_update(dt);
-    }
 }
 
 void Node::propagate_draw() {
@@ -145,10 +137,6 @@ void Node::notify(Signal signal) {
 void Node::draw() {
 }
 
-void Node::set_parent(Node *node) {
-    parent = node;
-}
-
 Node *Node::get_parent() const {
     return parent;
 }
@@ -157,12 +145,43 @@ std::vector<std::shared_ptr<Node>> Node::get_children() {
     return children;
 }
 
+std::vector<std::shared_ptr<Node>> Node::get_embedded_children() {
+    return embedded_children;
+}
+
+std::vector<std::shared_ptr<Node>> Node::get_all_children() {
+    std::vector<std::shared_ptr<Node>> all_children;
+    all_children.reserve(embedded_children.size() + children.size());
+    all_children.insert(all_children.end(), embedded_children.begin(), embedded_children.end());
+    all_children.insert(all_children.end(), children.begin(), children.end());
+
+    return all_children;
+}
+
 void Node::add_child(const std::shared_ptr<Node> &new_child) {
+    if (std::find(embedded_children.begin(), embedded_children.end(), new_child) != embedded_children.end()) {
+        std::cout << "Attempted to add a repated child!" << std::endl;
+        return;
+    }
+
     // Set self as the parent of the new node.
     new_child->parent = this;
     new_child->tree_ = tree_;
 
     children.push_back(new_child);
+}
+
+void Node::add_embedded_child(const std::shared_ptr<Node> &new_child) {
+    if (std::find(embedded_children.begin(), embedded_children.end(), new_child) != embedded_children.end()) {
+        std::cout << "Attempted to add a repated embedded child!" << std::endl;
+        return;
+    }
+
+    // Set self as the parent of the new node.
+    new_child->parent = this;
+    new_child->tree_ = tree_;
+
+    embedded_children.push_back(new_child);
 }
 
 std::shared_ptr<Node> Node::get_child(size_t index) {

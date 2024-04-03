@@ -15,7 +15,7 @@ public:
 
     void propagate_input(InputEvent &event) override;
 
-    void propagate_update(double dt) override;
+    void update(double dt) override;
 
     void propagate_draw() override;
 

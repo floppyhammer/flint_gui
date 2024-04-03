@@ -27,7 +27,7 @@ int main() {
 
         auto vstack_container = std::make_shared<VStackContainer>();
         vstack_container->set_separation(8);
-        vstack_container->set_minimum_size({500, 500});
+        vstack_container->set_custom_minimum_size({500, 500});
         scroll_container->add_child(vstack_container);
 
         for (int i = 0; i < 20; i++) {

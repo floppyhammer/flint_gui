@@ -17,8 +17,9 @@ TextEdit::TextEdit() {
     margin_container = std::make_shared<MarginContainer>();
     margin_container->set_margin_all(4);
     margin_container->add_child(label);
-    margin_container->set_parent(this);
     margin_container->set_size(size);
+
+    add_embedded_child(margin_container);
 
     theme_normal = std::optional(StyleBox());
     theme_normal->bg_color = ColorU(10, 10, 10);
@@ -193,8 +194,6 @@ void TextEdit::update(double dt) {
     NodeUi::update(dt);
 
     caret_blink_timer += dt;
-
-    margin_container->propagate_update(dt);
 }
 
 void TextEdit::draw() {
@@ -248,8 +247,6 @@ void TextEdit::draw() {
 }
 
 void TextEdit::calc_minimum_size() {
-    margin_container->calc_minimum_size();
-
     calculated_minimum_size = margin_container->get_effective_minimum_size();
 }
 

@@ -16,7 +16,7 @@ TabContainer::TabContainer() {
     theme_button_panel.value().bg_color = ColorU(29, 29, 29);
 
     button_container = std::make_shared<HStackContainer>();
-    button_container->set_parent(this);
+    add_embedded_child(button_container);
 
     for (int i = 0; i < 3; i++) {
         auto button = std::make_shared<Button>();
@@ -66,15 +66,10 @@ void TabContainer::adjust_layout() {
     }
 
     button_container->set_size({size.x, 0});
-    button_container->adjust_layout();
 }
 
 void TabContainer::update(double dt) {
-    NodeUi::update(dt);
-
-    adjust_layout();
-
-    button_container->propagate_update(dt);
+    Container::update(dt);
 
     tab_button_group.update();
 }
@@ -118,10 +113,6 @@ void TabContainer::draw() {
     vs->draw_style_box(theme_button_panel.value(), global_pos, {size.x, tab_button_height});
     vs->draw_style_box(
         theme_panel.value(), global_pos + Vec2F(0, tab_button_height), size - Vec2F(0, tab_button_height));
-
-    //    vs->draw_line(
-    //        global_pos + Vec2F{0, tab_button_height}, global_pos + Vec2F{size.x, tab_button_height}, 1,
-    //        ColorU::white());
 
     button_container->propagate_draw();
 }

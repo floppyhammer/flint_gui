@@ -17,8 +17,8 @@ Tree::Tree() {
     theme_bg_focused = std::make_optional(panel);
 }
 
-void Tree::update(double delta) {
-    NodeUi::update(delta);
+void Tree::update(double dt) {
+    NodeUi::update(dt);
 }
 
 void Tree::draw() {
@@ -116,10 +116,9 @@ uint32_t TreeItem::add_child(const std::shared_ptr<TreeItem> &item) {
 std::shared_ptr<TreeItem> TreeItem::get_child(uint32_t idx) {
     if (idx < children.size()) {
         return children[idx];
-    } else {
-        Logger::error("Invalid child index!", "TreeItem");
-        return nullptr;
     }
+    Logger::error("Invalid child index!", "TreeItem");
+    return nullptr;
 }
 
 uint32_t TreeItem::get_child_count() const {
@@ -180,7 +179,12 @@ void TreeItem::propagate_draw(float folding_width, uint32_t depth, float &offset
 
     container->set_position(Vec2F(offset_x, offset_y) + global_position);
     container->set_size({item_height, item_height});
-    container->propagate_update(0);
+
+    std::vector<Node *> nodes;
+    dfs_preorder_ltr_traversal(container.get(), nodes);
+    for (auto &node : nodes) {
+        node->update(0);
+    }
     container->propagate_draw();
 
     offset_y += item_height;

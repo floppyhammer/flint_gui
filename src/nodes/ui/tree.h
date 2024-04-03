@@ -73,7 +73,7 @@ public:
 
     void input(InputEvent &event) override;
 
-    void update(double delta) override;
+    void update(double dt) override;
 
     void draw() override;
 
@@ -88,7 +88,7 @@ public:
     float get_item_height();
 
 private:
-    float item_height;
+    float item_height = 48;
 
     std::shared_ptr<TreeItem> root;
     std::optional<StyleBox> theme_bg;
