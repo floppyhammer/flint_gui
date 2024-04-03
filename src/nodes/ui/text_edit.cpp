@@ -13,11 +13,12 @@ TextEdit::TextEdit() {
 
     label = std::make_shared<Label>();
     label->set_vertical_alignment(Alignment::Center);
+    label->set_mouse_filter(MouseFilter::Ignore);
 
     margin_container = std::make_shared<MarginContainer>();
     margin_container->set_margin_all(4);
     margin_container->add_child(label);
-    margin_container->set_size(size);
+    margin_container->set_mouse_filter(MouseFilter::Ignore);
 
     add_embedded_child(margin_container);
 
@@ -192,6 +193,8 @@ void TextEdit::input(InputEvent &event) {
 
 void TextEdit::update(double dt) {
     NodeUi::update(dt);
+
+    margin_container->set_size(size);
 
     caret_blink_timer += dt;
 }
