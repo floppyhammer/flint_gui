@@ -14,7 +14,7 @@ MenuItem::MenuItem() {
     label->set_vertical_alignment(Alignment::Center);
 
     icon = std::make_shared<TextureRect>();
-    icon->set_minimum_size({24, 24});
+    icon->set_custom_minimum_size({24, 24});
     icon->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
 
     // auto img = std::make_shared<VectorImage>("../assets/icons/ArrowRight.svg");
@@ -99,7 +99,7 @@ void PopupMenu::update(double delta) {
         item->update(global_position, {size.x, item_height_});
     }
 
-    size = size.max(minimum_size.max(Vec2F{0, offset_y}));
+    size = size.max(custom_minimum_size.max(Vec2F{0, offset_y}));
 
     NodeUi::update(delta);
 }

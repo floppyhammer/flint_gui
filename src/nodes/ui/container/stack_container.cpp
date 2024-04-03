@@ -58,7 +58,7 @@ void StackContainer::adjust_layout() {
     }
 
     // If the container is not large enough, readjust it to contain all its children.
-    size = size.max(minimum_size.max(total_size));
+    size = size.max(custom_minimum_size.max(total_size));
 
     uint32_t expanding_child_count = expanding_children.size();
 

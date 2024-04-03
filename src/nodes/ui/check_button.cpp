@@ -13,7 +13,7 @@ CheckButton::CheckButton() {
 
     theme_pressed = theme_normal;
 
-    icon_rect->set_minimum_size({24, 24});
+    icon_rect->set_custom_minimum_size({24, 24});
 
     icon_checked = ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/CheckBox_Checked.svg");
     icon_unchecked = ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/CheckBox_Unchecked.svg");

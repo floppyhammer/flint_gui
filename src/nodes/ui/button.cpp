@@ -198,7 +198,7 @@ void Button::set_size(Vec2F p_size) {
     auto path = get_node_path();
 
     auto final_size = p_size.max(margin_container->get_effective_minimum_size());
-    final_size = final_size.max(minimum_size);
+    final_size = final_size.max(custom_minimum_size);
 
     margin_container->set_size(final_size);
     size = final_size;

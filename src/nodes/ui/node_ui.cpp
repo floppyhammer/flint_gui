@@ -1,5 +1,7 @@
 #include "node_ui.h"
 
+#include <nodes/scene_tree.h>
+
 #include "../../common/geometry.h"
 #include "../../resources/default_resource.h"
 
@@ -41,8 +43,8 @@ void NodeUi::calc_minimum_size_recursively() {
 }
 
 Vec2F NodeUi::get_effective_minimum_size() const {
-    // Take own minimum size into account.
-    return minimum_size.max(calculated_minimum_size);
+    // Take both custom_minimum_size and calculated_minimum_size into account.
+    return custom_minimum_size.max(calculated_minimum_size);
 }
 
 void NodeUi::propagate_draw() {
@@ -165,12 +167,12 @@ Vec2F NodeUi::get_size() const {
     return size;
 }
 
-void NodeUi::set_minimum_size(Vec2F new_minimum_size) {
-    minimum_size = new_minimum_size;
+void NodeUi::set_custom_minimum_size(Vec2F new_size) {
+    custom_minimum_size = new_size;
 }
 
-Vec2F NodeUi::get_minimum_size() const {
-    return minimum_size;
+Vec2F NodeUi::get_custom_minimum_size() const {
+    return custom_minimum_size;
 }
 
 Vec2F NodeUi::get_local_mouse_position() const {
@@ -227,75 +229,81 @@ void NodeUi::apply_anchor() {
         return;
     }
 
+    Vec2F parent_size;
+
     if (parent && parent->is_ui_node()) {
         auto ui_parent = dynamic_cast<NodeUi *>(parent);
 
-        auto actual_size = get_minimum_size().max(size);
+        parent_size = ui_parent->get_size();
+    } else {
+        parent_size = get_window()->get_size().to_f32();
+    }
 
-        float center_x = (ui_parent->size.x - actual_size.x) * 0.5f;
-        float center_y = (ui_parent->size.y - actual_size.y) * 0.5f;
-        float right = ui_parent->size.x - actual_size.x;
-        float bottom = ui_parent->size.y - actual_size.y;
+    auto actual_size = get_effective_minimum_size().max(size);
 
-        switch (anchor_mode) {
-            case AnchorFlag::TopLeft: {
-                position = {0, 0};
-            } break;
-            case AnchorFlag::TopRight: {
-                position = {right, 0};
-            } break;
-            case AnchorFlag::BottomRight: {
-                position = {right, bottom};
-            } break;
-            case AnchorFlag::BottomLeft: {
-                position = {0, bottom};
-            } break;
-            case AnchorFlag::CenterLeft: {
-                position = {0, center_y};
-            } break;
-            case AnchorFlag::CenterRight: {
-                position = {right, center_y};
-            } break;
-            case AnchorFlag::CenterTop: {
-                position = {center_x, 0};
-            } break;
-            case AnchorFlag::CenterBottom: {
-                position = {center_x, bottom};
-            } break;
-            case AnchorFlag::Center: {
-                position = {center_x, center_y};
-            } break;
-            case AnchorFlag::LeftWide: {
-                position = {0, 0};
-                size = {actual_size.x, ui_parent->size.y};
-            } break;
-            case AnchorFlag::RightWide: {
-                position = {right, 0};
-                size = {actual_size.x, ui_parent->size.y};
-            } break;
-            case AnchorFlag::TopWide: {
-                position = {0, 0};
-                size = {ui_parent->size.x, actual_size.y};
-            } break;
-            case AnchorFlag::BottomWide: {
-                position = {0, bottom};
-                size = {ui_parent->size.x, actual_size.y};
-            } break;
-            case AnchorFlag::VCenterWide: {
-                position = {center_x, center_y};
-                size = {ui_parent->size.x, actual_size.y};
-            } break;
-            case AnchorFlag::HCenterWide: {
-                position = {center_x, center_y};
-                size = {actual_size.x, ui_parent->size.y};
-            } break;
-            case AnchorFlag::FullRect: {
-                position = {0, 0};
-                size = {ui_parent->size.x, ui_parent->size.y};
-            } break;
-            case AnchorFlag::Max: {
-                abort();
-            }
+    float center_x = (parent_size.x - actual_size.x) * 0.5f;
+    float center_y = (parent_size.y - actual_size.y) * 0.5f;
+    float right = parent_size.x - actual_size.x;
+    float bottom = parent_size.y - actual_size.y;
+
+    switch (anchor_mode) {
+        case AnchorFlag::TopLeft: {
+            position = {0, 0};
+        } break;
+        case AnchorFlag::TopRight: {
+            position = {right, 0};
+        } break;
+        case AnchorFlag::BottomRight: {
+            position = {right, bottom};
+        } break;
+        case AnchorFlag::BottomLeft: {
+            position = {0, bottom};
+        } break;
+        case AnchorFlag::CenterLeft: {
+            position = {0, center_y};
+        } break;
+        case AnchorFlag::CenterRight: {
+            position = {right, center_y};
+        } break;
+        case AnchorFlag::CenterTop: {
+            position = {center_x, 0};
+        } break;
+        case AnchorFlag::CenterBottom: {
+            position = {center_x, bottom};
+        } break;
+        case AnchorFlag::Center: {
+            position = {center_x, center_y};
+        } break;
+        case AnchorFlag::LeftWide: {
+            position = {0, 0};
+            size = {actual_size.x, parent_size.y};
+        } break;
+        case AnchorFlag::RightWide: {
+            position = {right, 0};
+            size = {actual_size.x, parent_size.y};
+        } break;
+        case AnchorFlag::TopWide: {
+            position = {0, 0};
+            size = {parent_size.x, actual_size.y};
+        } break;
+        case AnchorFlag::BottomWide: {
+            position = {0, bottom};
+            size = {parent_size.x, actual_size.y};
+        } break;
+        case AnchorFlag::VCenterWide: {
+            position = {center_x, center_y};
+            size = {parent_size.x, actual_size.y};
+        } break;
+        case AnchorFlag::HCenterWide: {
+            position = {center_x, center_y};
+            size = {actual_size.x, parent_size.y};
+        } break;
+        case AnchorFlag::FullRect: {
+            position = {0, 0};
+            size = {parent_size.x, parent_size.y};
+        } break;
+        case AnchorFlag::Max: {
+            abort();
         }
     }
 }

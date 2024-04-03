@@ -22,6 +22,8 @@ enum class MouseFilter {
 
 /// Anchor takes effect only when a UI node is not a child of a container.
 enum class AnchorFlag {
+    None,
+
     TopLeft,
     TopRight,
     BottomLeft,
@@ -72,9 +74,9 @@ public:
 
     virtual Vec2F get_size() const;
 
-    virtual void set_minimum_size(Vec2F new_minimum_size);
+    virtual void set_custom_minimum_size(Vec2F new_size);
 
-    virtual Vec2F get_minimum_size() const;
+    virtual Vec2F get_custom_minimum_size() const;
 
     Vec2F get_effective_minimum_size() const;
 
@@ -143,14 +145,14 @@ protected:
 
     bool is_pressed_inside = false;
 
-    Vec2F minimum_size{};
+    Vec2F custom_minimum_size{};
 
     /// Minimum size with all elements considered. Differs from user set `minimum_size`.
     Vec2F calculated_minimum_size{};
 
     Vec2F local_mouse_position;
 
-    AnchorFlag anchor_mode = AnchorFlag::Max;
+    AnchorFlag anchor_mode = AnchorFlag::None;
 
     bool is_cursor_inside = false;
 

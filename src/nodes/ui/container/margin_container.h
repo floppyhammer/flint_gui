@@ -7,22 +7,22 @@ using Pathfinder::Rect;
 
 namespace Flint {
 
-class MarginContainer : public Container {
+class MarginContainer final : public Container {
 public:
     MarginContainer() {
         type = NodeType::MarginContainer;
     }
 
+    void calc_minimum_size() override;
+
     void adjust_layout() override;
 
-    void calc_minimum_size();
+    void set_margin(const RectF &margin);
 
-    void set_margin(const RectF &new_margin);
-
-    void set_margin_all(float value);
+    void set_margin_all(float margin);
 
 private:
-    RectF margin = {8, 8, 8, 8};
+    RectF margin_ = {8, 8, 8, 8};
 };
 
 } // namespace Flint

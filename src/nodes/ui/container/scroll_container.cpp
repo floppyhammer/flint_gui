@@ -19,7 +19,7 @@ void ScrollContainer::adjust_layout() {
 }
 
 void ScrollContainer::calc_minimum_size() {
-    calculated_minimum_size = minimum_size;
+    calculated_minimum_size = custom_minimum_size;
 }
 
 void ScrollContainer::input(InputEvent &event) {

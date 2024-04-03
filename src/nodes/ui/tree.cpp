@@ -69,7 +69,7 @@ TreeItem::TreeItem() {
     label = std::make_shared<Label>();
 
     icon = std::make_shared<TextureRect>();
-    icon->set_minimum_size({24, 24});
+    icon->set_custom_minimum_size({24, 24});
     icon->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
 
     collapsed_tex = std::make_shared<VectorImage>("../assets/icons/ArrowRight.svg");
@@ -79,7 +79,7 @@ TreeItem::TreeItem() {
     collapse_button->set_icon(expanded_tex);
     collapse_button->set_text("");
     collapse_button->set_icon_expand(true);
-    collapse_button->set_minimum_size({24, 24});
+    collapse_button->set_custom_minimum_size({24, 24});
     collapse_button->theme_normal.border_width = 0;
     collapse_button->theme_normal.bg_color = ColorU::transparent_black();
 
@@ -156,7 +156,7 @@ void TreeItem::propagate_draw(float folding_width, uint32_t depth, float &offset
     float offset_x = (float)depth * folding_width;
 
     // Firstly, the item height will be decided by the minimum height of the icon and label.
-    float item_height = std::max(label->get_effective_minimum_size().y, icon->get_minimum_size().y);
+    float item_height = std::max(label->get_effective_minimum_size().y, icon->get_custom_minimum_size().y);
 
     // Then the value set by the tree is considered.
     item_height = std::max(tree->get_item_height(), item_height);
