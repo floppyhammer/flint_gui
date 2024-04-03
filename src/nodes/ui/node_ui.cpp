@@ -63,10 +63,6 @@ void NodeUi::update(double dt) {
 }
 
 void NodeUi::input(InputEvent &event) {
-    if (!is_event_relevant(event)) {
-        return;
-    }
-
     if (mouse_filter == MouseFilter::Ignore) {
         return;
     }
@@ -307,10 +303,6 @@ void NodeUi::cursor_exited() {
     for (auto &callback : callbacks_cursor_exited) {
         callback();
     }
-}
-
-bool NodeUi::is_event_relevant(const InputEvent &event) const {
-    return event.window == get_window()->get_glfw_handle();
 }
 
 void NodeUi::set_anchor_flag(AnchorFlag anchor_flag) {

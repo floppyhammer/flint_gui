@@ -62,10 +62,6 @@ void Button::calc_minimum_size() {
 }
 
 void Button::input(InputEvent &event) {
-    if (!is_event_relevant(event)) {
-        return;
-    }
-
     auto global_position = get_global_position();
 
     bool consume_flag = false;

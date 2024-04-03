@@ -77,7 +77,7 @@ void input_system(Node* root, std::vector<InputEvent>& input_queue) {
 
     for (auto& w : sub_windows) {
         if (!w->get_visibility()) {
-            return;
+            continue;
         }
 
         for (auto& event : input_queue) {
@@ -90,6 +90,10 @@ void input_system(Node* root, std::vector<InputEvent>& input_queue) {
     }
 
     for (auto& event : input_queue) {
+        // if (event.window != root->get_window()->get_glfw_handle()) {
+        //     continue;
+        // }
+
         propagate_input(root, event);
     }
 }
@@ -164,7 +168,7 @@ void draw_system(Node* root) {
     // Draw sub-windows.
     for (auto& w : sub_windows) {
         if (!w->get_visibility()) {
-            return;
+            continue;
         }
 
         w->pre_draw_children();

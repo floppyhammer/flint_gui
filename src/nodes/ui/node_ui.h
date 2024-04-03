@@ -170,8 +170,6 @@ protected:
 
     void cursor_exited();
 
-    bool is_event_relevant(const InputEvent &event) const;
-
     /// Visualize the node's size.
     StyleBox debug_size_box;
 
