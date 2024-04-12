@@ -24,6 +24,7 @@
 
 #include <gzip/decompress.hpp>
 #include <gzip/utils.hpp>
+#include <optional>
 
 namespace Flint {
 
@@ -298,7 +299,7 @@ void Font::get_glyphs(const std::string &text,
                     auto &pos = glyph_pos[i];
 
                     // Cluster unit is u16char, so it should be worked with std::u16string instead of std::string.
-                    Pathfinder::Range current_cluster;
+                    std::optional<Pathfinder::Range> current_cluster;
                     if (!run_is_rtl) {
                         if (i < glyph_count - 1) {
                             // Multiple glyphs may share the same cluster.
@@ -308,13 +309,12 @@ void Font::get_glyphs(const std::string &text,
                                     break;
                                 }
                             }
-                        } else {
+                        }
+                        if (!current_cluster.has_value()) {
                             current_cluster = {info.cluster, (unsigned long long)(para_start + logical_start + length)};
                         }
                     } else {
-                        if (i == 0) {
-                            current_cluster = {info.cluster, (unsigned long long)(para_start + logical_start + length)};
-                        } else {
+                        if (i > 0) {
                             // Multiple glyphs may share the same cluster.
                             for (int j = 1; i - j >= 0; j++) {
                                 if (info.cluster != glyph_info[i - j].cluster) {
@@ -323,9 +323,12 @@ void Font::get_glyphs(const std::string &text,
                                 }
                             }
                         }
+                        if (!current_cluster.has_value()) {
+                            current_cluster = {info.cluster, (unsigned long long)(para_start + logical_start + length)};
+                        }
                     }
 
-                    std::u16string glyph_text_u16 = text_u16.substr(current_cluster.start, current_cluster.length());
+                    std::u16string glyph_text_u16 = text_u16.substr(current_cluster->start, current_cluster->length());
 
                     std::string glyph_text = to_utf8(glyph_text_u16);
                     //                    std::cout << "Glyph text: " << glyph_text << std::endl;
