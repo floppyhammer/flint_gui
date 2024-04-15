@@ -2,6 +2,8 @@
 
 namespace Flint {
 
+constexpr float STROKE_WIDTH_FOR_PSEUDO_BOLD_TEXT = 1.0;
+
 void VectorServer::init(Pathfinder::Vec2I size,
                         const std::shared_ptr<Pathfinder::Device> &device,
                         const std::shared_ptr<Pathfinder::Queue> &queue,
@@ -172,7 +174,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
 
     auto skew_xform = Transform2::from_scale({1, 1});
     if (text_style.italic) {
-        skew_xform = Transform2({1, 0, tan(-15.f * 3.1415926f / 180.f), 1}, {});
+        skew_xform = Transform2({1, 0, std::tan(-15.f * 3.1415926f / 180.f), 1}, {});
     }
 
     // Draw glyph strokes. The strokes go below the fills.
@@ -188,7 +190,11 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
 
         // Add stroke if needed.
         canvas->set_stroke_paint(Pathfinder::Paint::from_color(text_style.stroke_color));
-        canvas->set_line_width(text_style.stroke_width);
+        float stroke_width = text_style.stroke_width;
+        if (text_style.bold) {
+            stroke_width += STROKE_WIDTH_FOR_PSEUDO_BOLD_TEXT;
+        }
+        canvas->set_line_width(stroke_width);
         canvas->set_line_join(Pathfinder::LineJoin::Round);
         canvas->stroke_path(g.path);
     }
@@ -211,7 +217,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
             // Use stroke to make a pseudo bold effect.
             if (text_style.bold) {
                 canvas->set_stroke_paint(Pathfinder::Paint::from_color(text_style.color));
-                canvas->set_line_width(1);
+                canvas->set_line_width(STROKE_WIDTH_FOR_PSEUDO_BOLD_TEXT);
                 canvas->set_line_join(Pathfinder::LineJoin::Bevel);
                 canvas->stroke_path(g.path);
             }
