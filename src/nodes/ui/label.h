@@ -94,6 +94,8 @@ public:
 private:
     void measure();
 
+    void make_layout();
+
     void consider_alignment();
 
     Vec2F get_text_size() const;

@@ -68,7 +68,7 @@ std::vector<Line> get_lines_with_word_wrap(float limited_width,
 
     std::vector<Line> wrapped_lines;
 
-    Vec2F textSize{};
+    Vec2F text_size{};
 
     for (const auto &para : original_paras) {
         const auto &para_range = para.glyph_ranges;
@@ -157,7 +157,7 @@ std::vector<Line> get_lines_with_word_wrap(float limited_width,
                 Pathfinder::Range new_range = {current_group.start, current_group.end};
                 wrapped_lines.push_back({new_range, para.rtl, current_group_width});
 
-                textSize.x = std::max(current_group_width, textSize.x);
+                text_size.x = std::max(current_group_width, text_size.x);
                 current_group_idx++;
                 continue;
             }
@@ -175,7 +175,7 @@ std::vector<Line> get_lines_with_word_wrap(float limited_width,
                 Pathfinder::Range new_range = {line_start, line_end};
                 wrapped_lines.push_back({new_range, para.rtl, current_line_width});
 
-                textSize.x = std::max(current_line_width, textSize.x);
+                text_size.x = std::max(current_line_width, text_size.x);
 
                 current_line_groups.clear();
                 current_line_width = 0;
@@ -198,11 +198,11 @@ std::vector<Line> get_lines_with_word_wrap(float limited_width,
             Pathfinder::Range new_range = {line_start, line_end};
             wrapped_lines.push_back({new_range, para.rtl, current_line_width});
 
-            textSize.x = std::max(current_line_width, textSize.x);
+            text_size.x = std::max(current_line_width, text_size.x);
         }
     }
 
-    out_text_size = textSize;
+    out_text_size = text_size;
 
     return wrapped_lines;
 }
@@ -281,8 +281,9 @@ void Label::set_size(Vec2F new_size) {
         return;
     }
 
-    size = new_size;
-    consider_alignment();
+    layout_is_dirty = true;
+
+    size = new_size.max(get_effective_minimum_size());
 }
 
 /// A very crude way for line-breaking.
@@ -331,7 +332,9 @@ void Label::measure() {
     }
 
     in_context_glyphs_ = convert_to_in_context_glyphs(glyphs_);
+}
 
+void Label::make_layout() {
     // Reset text's layout box.
     layout_box = RectF();
 
@@ -401,7 +404,7 @@ void Label::set_font(std::shared_ptr<Font> new_font) {
 
 void Label::consider_alignment() {
     // Make sure size has the correct value before using it.
-    size = get_effective_minimum_size();
+    size = size.max(get_effective_minimum_size());
 
     alignment_shift = Vec2F(0);
 
@@ -434,6 +437,10 @@ void Label::update(double dt) {
     if (need_to_remeasure) {
         need_to_remeasure = false;
         measure();
+    }
+    if (layout_is_dirty) {
+        layout_is_dirty = false;
+        make_layout();
     }
 
     consider_alignment();
@@ -476,8 +483,6 @@ void Label::set_horizontal_alignment(Alignment alignment) {
     }
 
     horizontal_alignment = alignment;
-
-    consider_alignment();
 }
 
 void Label::set_vertical_alignment(Alignment alignment) {
@@ -486,8 +491,6 @@ void Label::set_vertical_alignment(Alignment alignment) {
     }
 
     vertical_alignment = alignment;
-
-    consider_alignment();
 }
 
 void Label::calc_minimum_size() {

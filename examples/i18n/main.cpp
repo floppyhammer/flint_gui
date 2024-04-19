@@ -55,7 +55,8 @@ int main() {
                 false,
             });
             label->set_text(text);
-
+            label->container_sizing.expand_h = true;
+            label->container_sizing.flag_h = ContainerSizingFlag::Fill;
             stack_container->add_child(label);
         }
 
@@ -73,6 +74,8 @@ int main() {
                 false,
             });
             label->set_text(text);
+            label->container_sizing.expand_h = true;
+            label->container_sizing.flag_h = ContainerSizingFlag::Fill;
 
             stack_container->add_child(label);
         }

@@ -56,9 +56,13 @@ enum class ContainerSizingFlag {
 
 /// How a parent container organizes this UI node.
 struct ContainerSizing {
+    // Control how the size changes in the horizontal direction.
     ContainerSizingFlag flag_h = ContainerSizingFlag::Fill;
+    // Expand position in the horizontal direction, but not changing size.
     bool expand_h = false;
+    // Control how the size changes in the vertical direction.
     ContainerSizingFlag flag_v = ContainerSizingFlag::Fill;
+    // Expand position in the vertical direction, but not changing size.
     bool expand_v = false;
 };
 
@@ -146,6 +150,8 @@ protected:
     float rotation = 0;
 
     Vec2F calculated_glocal_position{0};
+
+    bool layout_is_dirty = true;
 
     bool focused = false;
 
