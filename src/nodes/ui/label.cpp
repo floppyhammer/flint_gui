@@ -370,8 +370,20 @@ void Label::make_layout() {
     for (const auto &line : effective_line_ranges) {
         const auto &range = line.glyph_ranges;
 
-        if (line.rtl) {
-            cursor_x = effective_max_line_width - line.width;
+        switch (bidi_alignment_) {
+            case BidiAlignment::Auto: {
+                if (line.rtl) {
+                    cursor_x = effective_max_line_width - line.width;
+                }
+            } break;
+            case BidiAlignment::Begin: {
+            } break;
+            case BidiAlignment::Center: {
+                cursor_x = effective_max_line_width * 0.5f - line.width * 0.5f;
+            } break;
+            case BidiAlignment::End: {
+                cursor_x = effective_max_line_width - line.width;
+            } break;
         }
 
         for (int i = range.start; i < range.end; i++) {

@@ -14,6 +14,13 @@ using Pathfinder::Rect;
 
 namespace Flint {
 
+enum class BidiAlignment {
+    Auto,
+    Begin,
+    Center,
+    End,
+};
+
 enum class Alignment {
     Begin,
     Center,
@@ -151,6 +158,8 @@ private:
     Alignment horizontal_alignment = Alignment::Begin;
     Alignment vertical_alignment = Alignment::Begin;
     Vec2F alignment_shift{0};
+
+    BidiAlignment bidi_alignment_ = BidiAlignment::Auto;
 };
 
 } // namespace Flint
