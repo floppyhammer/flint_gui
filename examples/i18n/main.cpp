@@ -26,20 +26,9 @@ int main() {
         margin_container->set_anchor_flag(AnchorFlag::FullRect);
         root->add_child(margin_container);
 
-        auto vstack_container = std::make_shared<VStackContainer>();
-        vstack_container->set_separation(16);
-        margin_container->add_child(vstack_container);
-
-        auto label = std::make_shared<Label>();
-        label->set_text_style(TextStyle{
-            ColorU::white(),
-            ColorU::red(),
-            0,
-            true,
-            true,
-            false,
-        });
-        vstack_container->add_child(label);
+        auto stack_container = std::make_shared<HStackContainer>();
+        stack_container->set_separation(16);
+        margin_container->add_child(stack_container);
 
         std::string text = "";
         text += "👍😁😂\n";                   // Emoji
@@ -53,7 +42,40 @@ int main() {
         text += "Chào thế giới!\n";           // Vietnamese
         text += "שלום עולם!\n\n\n";           // Hebrew
         text += "Hello123!مرحبا٠١٢!你好123！\n"; // Mixed languages
-        label->set_text(text);
+
+        // No word wrapping.
+        {
+            auto label = std::make_shared<Label>();
+            label->set_text_style(TextStyle{
+                ColorU::white(),
+                ColorU::red(),
+                0,
+                false,
+                false,
+                false,
+            });
+            label->set_text(text);
+
+            stack_container->add_child(label);
+        }
+
+        // Word wrapping.
+        {
+            auto label = std::make_shared<Label>();
+            label->set_word_wrap(true);
+            label->set_custom_minimum_size(Vec2F(200, 600));
+            label->set_text_style(TextStyle{
+                ColorU::white(),
+                ColorU::red(),
+                0,
+                false,
+                false,
+                false,
+            });
+            label->set_text(text);
+
+            stack_container->add_child(label);
+        }
     }
 
     app.main_loop();

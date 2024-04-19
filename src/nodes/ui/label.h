@@ -20,6 +20,11 @@ enum class Alignment {
     End,
 };
 
+struct InContextGlyph {
+    Glyph glyph_;
+    bool line_breakable_ = false;
+};
+
 class Label : public NodeUi {
 public:
     Label();
@@ -75,6 +80,14 @@ public:
     /// Get the closest codepoint to a mouse click.
     uint32_t get_codepoint_by_position(Vec2F position);
 
+    bool get_word_wrap() const {
+        return word_wrap_;
+    }
+
+    void set_word_wrap(bool word_wrap) {
+        word_wrap_ = word_wrap;
+    }
+
 public:
     StyleBox theme_background;
 
@@ -97,14 +110,20 @@ private:
 
     bool clip = false;
 
-    bool autowrap = false;
+    /// If automatically break lines at suitable positions.
+    bool word_wrap_ = false;
 
     // Layout-independent. Glyph count will not necessarily be the same as the character count.
     std::vector<Glyph> glyphs_;
 
+    // Context-independent.
+    std::vector<InContextGlyph> in_context_glyphs_;
+
     // Layout-dependent. Ranges for glyphs, not for characters.
-    std::vector<Pathfinder::Range> para_ranges;
-    std::vector<Pathfinder::Range> line_ranges;
+    std::vector<Line> para_ranges_;
+
+    // If word_wrap is enabled, use this instead of para_ranges.
+    std::vector<Line> line_ranges_;
 
     // Layout-dependent.
     std::vector<Vec2F> glyph_positions;

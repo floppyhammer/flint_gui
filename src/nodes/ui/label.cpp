@@ -1,5 +1,6 @@
 #include "label.h"
 
+#include <list>
 #include <string>
 
 #include "../../resources/default_resource.h"
@@ -13,6 +14,198 @@ enum class Bidi {
     LeftToRight,
     RightToLeft,
 };
+
+std::vector<Pathfinder::Range> get_line_breakable_groups(const std::vector<InContextGlyph> &glyphs, int offset) {
+    std::vector<Pathfinder::Range> groups;
+
+    bool rtl = false;
+
+    if (rtl) {
+        //        uint32_t group_start = glyphs.size() - 1;
+        //
+        //        for (int g_idx = glyphs.size() - 1; g_idx >= 0; g_idx--) {
+        //            auto &g = glyphs[g_idx];
+        //
+        //            if (g.line_breakable_ && g_idx != glyphs.size() - 1) {
+        //                Pathfinder::Range group = {group_start, group_start - g_idx};
+        //                group_start = g_idx;
+        //                groups.push_back(group);
+        //            }
+        //        }
+        //
+        //        Pathfinder::Range group = {group_start, group_start + 1};
+        //        groups.push_back(group);
+        //
+        //        for (auto &r : groups) {
+        //            r.begin = r.begin + 1 - r.length;
+        //        }
+    } else {
+        uint32_t group_start = 0;
+
+        for (int g_idx = 0; g_idx < glyphs.size(); g_idx++) {
+            auto &g = glyphs[g_idx];
+
+            if (g.line_breakable_ && g_idx != 0) {
+                Pathfinder::Range group = {offset + group_start, offset + static_cast<unsigned long long>(g_idx)};
+                group_start = g_idx;
+                groups.push_back(group);
+            }
+        }
+
+        Pathfinder::Range group = {offset + group_start, offset + (uint32_t)glyphs.size()};
+        groups.push_back(group);
+    }
+
+    return groups;
+}
+
+/// PARAs -> LINEs
+std::vector<Line> get_lines_with_word_wrap(float limited_width,
+                                           const std::vector<Line> &original_paras,
+                                           const std::vector<InContextGlyph> &glyphs,
+                                           Vec2F &out_text_size) {
+    float tracking = 0;
+
+    std::vector<Line> wrapped_lines;
+
+    Vec2F textSize{};
+
+    for (const auto &para : original_paras) {
+        const auto &para_range = para.glyph_ranges;
+
+        // Get glyphs in this paragraph.
+        std::vector<InContextGlyph> para_glyphs;
+        for (int glyph_idx = para_range.start; glyph_idx < para_range.end; glyph_idx++) {
+            para_glyphs.push_back(glyphs[glyph_idx]);
+        }
+
+        // Get line-breakable groups in this paragraph.
+        auto groups_in_para = get_line_breakable_groups(para_glyphs, para_range.start);
+
+        std::vector<float> group_widths_in_para;
+
+        // For RTL paragraphs, we handle the groups reversely.
+        if (para.rtl) {
+            std::reverse(groups_in_para.begin(), groups_in_para.end());
+        }
+
+        // Break groups that are too long.
+        for (auto p_group = groups_in_para.begin(); p_group != groups_in_para.end(); p_group++) {
+            auto group = *p_group;
+
+            float group_width = 0;
+
+            for (int j = para.rtl ? p_group->length() - 1 : 0; para.rtl ? j >= 0 : j < p_group->length();
+                 para.rtl ? j-- : j++) {
+                int glyph_idx = p_group->start + j;
+
+                const Glyph &glyph = glyphs[glyph_idx].glyph_;
+                float glyph_width = glyph.x_advance;
+
+                // Handle some abonormal graphs which are too wide.
+                if (group_width == 0 && glyph_width > limited_width) {
+                    break;
+                }
+
+                // Break the current group if it is too wide.
+                if ((group_width + glyph_width + tracking) > limited_width) {
+                    // Break the current group into two ones.
+                    Pathfinder::Range range_pre;
+                    Pathfinder::Range range_next;
+
+                    if (para.rtl) {
+                        range_pre = {p_group->start + j + 1, p_group->start + p_group->length()};
+                        range_next = {p_group->start, p_group->start + j + 1};
+                    } else {
+                        range_pre = {p_group->start, p_group->start + j};
+                        range_next = {p_group->start + j, p_group->start + p_group->length()};
+                    }
+
+                    // Replace the old group with the two newly created groups.
+                    *p_group = range_next;
+                    p_group = groups_in_para.insert(p_group, range_pre);
+
+                    // Move on to handle the next group.
+                    break;
+                }
+
+                group_width += glyph_width;
+                group_width += tracking;
+            }
+
+            group_width -= tracking;
+            group_widths_in_para.push_back(group_width);
+        }
+
+        // Up to this point, all the groups in the paragraph meet the width requirement.
+        // We can start breaking the paragraph into lines.
+
+        int current_group_idx = 0;
+        float current_line_width = 0;
+        std::vector<Pathfinder::Range> current_line_groups;
+
+        while (!groups_in_para.empty()) {
+            Pathfinder::Range current_group;
+
+            current_group = groups_in_para.front();
+            groups_in_para.erase(groups_in_para.begin());
+
+            float current_group_width = group_widths_in_para[current_group_idx];
+
+            // Handle some abonormal graphs which are too wide.
+            if (current_line_groups.empty() && current_group_width > limited_width) {
+                Pathfinder::Range new_range = {current_group.start, current_group.end};
+                wrapped_lines.push_back({new_range, para.rtl, current_group_width});
+
+                textSize.x = std::max(current_group_width, textSize.x);
+                current_group_idx++;
+                continue;
+            }
+
+            // Finish a line.
+            if (current_line_width + current_group_width + tracking > limited_width) {
+                uint32_t line_start = current_line_groups.front().start;
+                uint32_t line_end = current_line_groups.front().end;
+
+                for (auto &group : current_line_groups) {
+                    line_start = std::min(line_start, (uint32_t)group.start);
+                    line_end = std::max(line_end, (uint32_t)group.end);
+                }
+
+                Pathfinder::Range new_range = {line_start, line_end};
+                wrapped_lines.push_back({new_range, para.rtl, current_line_width});
+
+                textSize.x = std::max(current_line_width, textSize.x);
+
+                current_line_groups.clear();
+                current_line_width = 0;
+            }
+
+            current_line_groups.push_back(current_group);
+            current_line_width += current_group_width + tracking;
+            current_group_idx++;
+        }
+
+        if (!current_line_groups.empty()) {
+            uint32_t line_start = current_line_groups.front().start;
+            uint32_t line_end = current_line_groups.front().end;
+
+            for (auto &group : current_line_groups) {
+                line_start = std::min(line_start, (uint32_t)group.start);
+                line_end = std::max(line_end, (uint32_t)group.end);
+            }
+
+            Pathfinder::Range new_range = {line_start, line_end};
+            wrapped_lines.push_back({new_range, para.rtl, current_line_width});
+
+            textSize.x = std::max(current_line_width, textSize.x);
+        }
+    }
+
+    out_text_size = textSize;
+
+    return wrapped_lines;
+}
 
 Label::Label() {
     type = NodeType::Label;
@@ -92,12 +285,37 @@ void Label::set_size(Vec2F new_size) {
     consider_alignment();
 }
 
+/// A very crude way for line-breaking.
+std::vector<InContextGlyph> convert_to_in_context_glyphs(const std::vector<Glyph> &glyphs) {
+    std::vector<InContextGlyph> in_context_glyphs;
+    in_context_glyphs.reserve(glyphs.size());
+
+    // Add emoji data.
+    for (auto &glyph : glyphs) {
+        InContextGlyph in_context_glyph;
+        in_context_glyph.glyph_ = glyph;
+        in_context_glyph.line_breakable_ = false;
+
+        if (glyph.script == Script::Cjk) {
+            in_context_glyph.line_breakable_ = true;
+        } else {
+            if (glyph.text == " ") {
+                in_context_glyph.line_breakable_ = true;
+            }
+        }
+
+        in_context_glyphs.push_back(in_context_glyph);
+    }
+
+    return in_context_glyphs;
+}
+
 void Label::measure() {
     // Get font info.
     int ascent = font->get_ascent();
     int descent = font->get_descent();
 
-    font->get_glyphs(text_, glyphs_, para_ranges);
+    font->get_glyphs(text_, glyphs_, para_ranges_);
 
     // Add emoji data.
     for (auto &glyph : glyphs_) {
@@ -112,6 +330,8 @@ void Label::measure() {
         }
     }
 
+    in_context_glyphs_ = convert_to_in_context_glyphs(glyphs_);
+
     // Reset text's layout box.
     layout_box = RectF();
 
@@ -125,8 +345,28 @@ void Label::measure() {
     float cursor_x = 0;
     float cursor_y = 0;
 
+    if (word_wrap_) {
+        Vec2F text_size{};
+        line_ranges_ = get_lines_with_word_wrap(size.x, para_ranges_, in_context_glyphs_, text_size);
+    }
+
+    const auto &effective_line_ranges = word_wrap_ ? line_ranges_ : para_ranges_;
+
+    float effective_max_line_width = 0;
+    for (const auto &line : effective_line_ranges) {
+        effective_max_line_width = std::max(effective_max_line_width, line.width);
+    }
+
+    glyph_positions.resize(glyphs_.size());
+
     // Build layout.
-    for (auto &range : para_ranges) {
+    for (const auto &line : effective_line_ranges) {
+        const auto &range = line.glyph_ranges;
+
+        if (line.rtl) {
+            cursor_x = effective_max_line_width - line.width;
+        }
+
         for (int i = range.start; i < range.end; i++) {
             const auto &g = glyphs_[i];
 
@@ -135,7 +375,7 @@ void Label::measure() {
             RectF glyph_layout_box =
                 RectF(cursor_x + g.x_offset, cursor_y + g.y_offset, cursor_x + g.x_advance, cursor_y + line_height);
 
-            glyph_positions.emplace_back(cursor_x + g.x_offset, cursor_y + g.y_offset);
+            glyph_positions[i] = {cursor_x + g.x_offset, cursor_y + g.y_offset};
 
             // The whole text's layout box.
             layout_box = layout_box.union_rect(glyph_layout_box);
@@ -260,6 +500,9 @@ void Label::calc_minimum_size() {
 }
 
 Vec2F Label::get_text_size() const {
+    if (word_wrap_) {
+        return Vec2F(0);
+    }
     return layout_box.is_valid() ? layout_box.size() : Vec2F(0);
 }
 

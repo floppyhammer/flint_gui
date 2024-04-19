@@ -182,7 +182,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         auto &g = glyphs[i];
         auto &p = glyph_positions[i];
 
-        if (g.emoji) {
+        if (g.emoji || g.skip_drawing) {
             continue;
         }
 
@@ -203,6 +203,10 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
     for (int i = 0; i < glyphs.size(); i++) {
         auto &g = glyphs[i];
         auto &p = glyph_positions[i];
+
+        if (g.skip_drawing) {
+            continue;
+        }
 
         // No italic for emojis and debug boxes.
         auto glyph_global_transform = global_transform_offset * Transform2::from_translation(p) * transform;

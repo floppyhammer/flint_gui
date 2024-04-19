@@ -28,14 +28,6 @@
 
 namespace Flint {
 
-enum class Script {
-    Common,
-    Arabic,
-    Bengali,
-    Devanagari,
-    Hebrew,
-};
-
 hb_script_t to_harfbuzz_script(Script script) {
     switch (script) {
         case Script::Arabic: {
@@ -74,6 +66,9 @@ Script get_text_script(const std::string &text) {
         }
         if (codepoint >= 0x0590 && codepoint <= 0x05FF) {
             return Script::Hebrew;
+        }
+        if (codepoint >= 0x4E00 && codepoint <= 0x9FFF) {
+            return Script::Cjk;
         }
     }
 
@@ -175,9 +170,7 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
     return path;
 }
 
-void Font::get_glyphs(const std::string &text,
-                      std::vector<Glyph> &glyphs,
-                      std::vector<Pathfinder::Range> &para_ranges) {
+void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &para_ranges) {
     glyphs.clear();
     para_ranges.clear();
 
@@ -246,6 +239,11 @@ void Font::get_glyphs(const std::string &text,
                 break;
             }
 
+            bool para_is_rtl = false;
+
+            // The width of the paragraph in a single line.
+            float para_width = 0;
+
             // The first glyph in the new paragraph.
             size_t para_glyph_start = glyphs.size();
 
@@ -259,6 +257,8 @@ void Font::get_glyphs(const std::string &text,
                 UBiDiDirection dir = ubidi_getVisualRun(line_bidi, run_index, &logical_start, &length);
 
                 bool run_is_rtl = dir == UBIDI_RTL;
+
+                para_is_rtl |= run_is_rtl;
 
                 // Get run text from the whole text.
                 std::u16string run_text_u16 = text_u16.substr(para_start + logical_start, length);
@@ -338,11 +338,6 @@ void Font::get_glyphs(const std::string &text,
                     std::u32string glyph_text_u32;
                     from_utf8(glyph_text, glyph_text_u32);
 
-                    // Skip line breaks, so they're not drawn.
-                    if (glyph_text == "\n") {
-                        continue;
-                    }
-
                     Glyph glyph;
 
                     glyph.codepoints = glyph_text_u32;
@@ -358,26 +353,35 @@ void Font::get_glyphs(const std::string &text,
                         continue;
                     }
 
-                    glyph.x_offset = pos.x_offset;
-                    glyph.y_offset = pos.y_offset;
+                    glyph.script = run_script;
 
-                    // Don't know why harfbuzz returns incorrect advance.
-                    // So, we use the info provided by freetype.
-                    //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
-                    glyph.x_advance = get_glyph_advance(glyph.index);
+                    // Mark line breaks, so they're not drawn.
+                    if (glyph_text == "\n") {
+                        glyph.skip_drawing = true;
+                    } else {
+                        glyph.x_offset = pos.x_offset;
+                        glyph.y_offset = pos.y_offset;
 
-                    // Get glyph path.
-                    glyph.path = get_glyph_path(glyph.index);
+                        // Don't know why harfbuzz returns incorrect advance.
+                        // So, we use the info provided by freetype.
+                        //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
+                        glyph.x_advance = get_glyph_advance(glyph.index);
 
-                    // The glyph's layout box in the glyph's local coordinates.
-                    // The origin is the baseline. The Y axis is downward.
-                    glyph.box = RectF(0, (float)-ascent, glyph.x_advance, (float)-descent);
+                        para_width += glyph.x_advance;
 
-                    // Get the glyph path's bounding box. The Y axis points down.
-                    RectI bounding_box = get_glyph_bounds(glyph.index);
+                        // Get glyph path.
+                        glyph.path = get_glyph_path(glyph.index);
 
-                    // BBox in the glyph's local coordinates.
-                    glyph.bbox = bounding_box.to_f32();
+                        // The glyph's layout box in the glyph's local coordinates.
+                        // The origin is the baseline. The Y axis is downward.
+                        glyph.box = RectF(0, (float)-ascent, glyph.x_advance, (float)-descent);
+
+                        // Get the glyph path's bounding box. The Y axis points down.
+                        RectI bounding_box = get_glyph_bounds(glyph.index);
+
+                        // BBox in the glyph's local coordinates.
+                        glyph.bbox = bounding_box.to_f32();
+                    }
 
                     glyphs.push_back(glyph);
                 }
@@ -386,7 +390,11 @@ void Font::get_glyphs(const std::string &text,
             }
 
             // Record glyph start and end in the new paragraph.
-            para_ranges.emplace_back(para_glyph_start, glyphs.size());
+            Line para{};
+            para.glyph_ranges = {para_glyph_start, glyphs.size()};
+            para.rtl = para_is_rtl;
+            para.width = para_width;
+            para_ranges.push_back(para);
         }
     } while (false);
 

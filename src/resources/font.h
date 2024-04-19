@@ -71,6 +71,16 @@ struct TextStyle {
     bool debug = false;
 };
 
+enum class Script {
+    Common,
+    Arabic,
+    Bengali,
+    Devanagari,
+    Hebrew,
+    Cjk,
+};
+
+// Text-context-independent glyph data.
 struct Glyph {
     // Glyph index (font specific) or UTF-32 codepoint (for the invalid glyphs).
     // A particular glyph ID within the font does not necessarily correlate to a predictable Unicode codepoint.
@@ -82,11 +92,15 @@ struct Glyph {
 
     bool emoji = false;
 
+    Script script = Script::Common;
+
     int32_t x_offset = 0; // Offset from the origin of the glyph on baseline.
     int32_t y_offset = 0;
 
     float x_advance = 0; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
     float y_advance = 0;
+
+    bool skip_drawing = false;
 
     // Glyph path. The points are in the glyph's baseline coordinates.
     Pathfinder::Path2d path;
@@ -106,6 +120,12 @@ struct Glyph {
     RectF bbox;
 };
 
+struct Line {
+    Pathfinder::Range glyph_ranges;
+    bool rtl = false;
+    float width = 0;
+};
+
 class Font : public Resource {
 public:
     explicit Font(const std::string &path);
@@ -123,7 +143,7 @@ public:
     /// Paragraphs and lines are different concepts.
     /// Paragraphs are seperated by line breaks, while lines are results of automatic layout.
     /// A paragraph may contain one or more lines.
-    void get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Pathfinder::Range> &para_ranges);
+    void get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &para_ranges);
 
     uint16_t find_glyph_index_by_codepoint(int codepoint);
 
