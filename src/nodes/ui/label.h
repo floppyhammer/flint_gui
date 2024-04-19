@@ -88,6 +88,10 @@ public:
         word_wrap_ = word_wrap;
     }
 
+    void set_multi_line(bool enabled) {
+        multi_line_ = enabled;
+    }
+
 public:
     StyleBox theme_background;
 
@@ -98,7 +102,8 @@ private:
 
     void consider_alignment();
 
-    Vec2F get_text_size() const;
+    /// The minimum size of the text box, which is determined by the text content.
+    Vec2F get_text_minimum_size() const;
 
 private:
     // Raw text.
@@ -111,6 +116,8 @@ private:
     std::shared_ptr<Font> font, emoji_font;
 
     bool clip = false;
+
+    bool multi_line_ = false;
 
     /// If automatically break lines at suitable positions.
     bool word_wrap_ = false;
@@ -140,7 +147,7 @@ private:
 
     TextStyle text_style;
 
-    // Layout
+    // Controls how to align the text box to the label area.
     Alignment horizontal_alignment = Alignment::Begin;
     Alignment vertical_alignment = Alignment::Begin;
     Vec2F alignment_shift{0};

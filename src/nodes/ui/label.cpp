@@ -356,8 +356,12 @@ void Label::make_layout() {
     const auto &effective_line_ranges = word_wrap_ ? line_ranges_ : para_ranges_;
 
     float effective_max_line_width = 0;
-    for (const auto &line : effective_line_ranges) {
-        effective_max_line_width = std::max(effective_max_line_width, line.width);
+    if (word_wrap_) {
+        for (const auto &line : effective_line_ranges) {
+            effective_max_line_width = std::max(effective_max_line_width, line.width);
+        }
+    } else {
+        effective_max_line_width = size.x;
     }
 
     glyph_positions.resize(glyphs_.size());
@@ -403,10 +407,15 @@ void Label::set_font(std::shared_ptr<Font> new_font) {
 }
 
 void Label::consider_alignment() {
+    alignment_shift = Vec2F(0);
+
+    // For multi line label, the text box always occupies the whole label area.
+    if (multi_line_) {
+        return;
+    }
+
     // Make sure size has the correct value before using it.
     size = size.max(get_effective_minimum_size());
-
-    alignment_shift = Vec2F(0);
 
     switch (horizontal_alignment) {
         case Alignment::Begin:
@@ -494,7 +503,7 @@ void Label::set_vertical_alignment(Alignment alignment) {
 }
 
 void Label::calc_minimum_size() {
-    auto min_size = get_text_size();
+    auto min_size = get_text_minimum_size();
 
     // Label has a minimal height even when the text is empty.
     min_size.y = std::max(min_size.y, (float)font->get_size());
@@ -502,11 +511,17 @@ void Label::calc_minimum_size() {
     calculated_minimum_size = min_size;
 }
 
-Vec2F Label::get_text_size() const {
+Vec2F Label::get_text_minimum_size() const {
     if (word_wrap_) {
         return Vec2F(0);
     }
-    return layout_box.is_valid() ? layout_box.size() : Vec2F(0);
+
+    float effective_max_para_width = 0;
+    for (const auto &para : para_ranges_) {
+        effective_max_para_width = std::max(effective_max_para_width, para.width);
+    }
+
+    return {effective_max_para_width, para_ranges_.size() * ((float)font->get_ascent() + (float)font->get_descent())};
 }
 
 std::vector<Glyph> &Label::get_glyphs() {
