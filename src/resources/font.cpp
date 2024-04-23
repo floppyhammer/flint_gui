@@ -174,6 +174,8 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
     glyphs.clear();
     para_ranges.clear();
 
+#ifndef __APPLE__
+
 #ifdef ICU_STATIC_DATA
     static bool icu_data_loaded = false;
     if (!icu_data_loaded) {
@@ -400,6 +402,8 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
 
     ubidi_close(line_bidi);
     ubidi_close(para_bidi);
+
+#endif
 }
 
 uint16_t Font::find_glyph_index_by_codepoint(int codepoint) {

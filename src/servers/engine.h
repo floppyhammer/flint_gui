@@ -29,7 +29,7 @@ public:
     float get_fps() const;
 
 private:
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__APPLE__)
     std::chrono::time_point<std::chrono::steady_clock> last_time_updated_fps;
 #elif __linux__
     std::chrono::time_point<std::chrono::system_clock> last_time_updated_fps;
