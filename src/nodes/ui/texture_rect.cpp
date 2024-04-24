@@ -6,10 +6,6 @@
 #include "../../resources/default_resource.h"
 #include "../../servers/engine.h"
 
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
 namespace Flint {
 
 TextureRect::TextureRect() {

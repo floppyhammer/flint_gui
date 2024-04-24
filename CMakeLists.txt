@@ -39,9 +39,6 @@ endif ()
 include_directories(third_party/pathfinder-cpp)
 add_subdirectory(third_party/pathfinder-cpp)
 
-include_directories(third_party/glm-0.9.9.8)
-add_subdirectory(third_party/glm-0.9.9.8)
-
 include_directories(third_party/harfbuzz-8.4.0/src)
 add_subdirectory(third_party/harfbuzz-8.4.0)
 
