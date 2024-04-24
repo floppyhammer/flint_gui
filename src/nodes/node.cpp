@@ -17,8 +17,8 @@ const char *NodeNames[] = {
     "Container",
     "CenterContainer",
     "MarginContainer",
-    "HStackContainer",
-    "VStackContainer",
+    "HBoxContainer",
+    "VBoxContainer",
     "ScrollContainer",
     "TabContainer",
 

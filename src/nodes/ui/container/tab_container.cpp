@@ -15,7 +15,7 @@ TabContainer::TabContainer() {
     theme_button_panel.value().border_width = 0;
     theme_button_panel.value().bg_color = ColorU(29, 29, 29);
 
-    button_container = std::make_shared<HStackContainer>();
+    button_container = std::make_shared<HBoxContainer>();
     add_embedded_child(button_container);
 
     for (int i = 0; i < 3; i++) {

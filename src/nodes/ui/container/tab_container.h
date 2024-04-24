@@ -25,7 +25,7 @@ public:
 protected:
     int32_t current_tab = -1;
 
-    std::shared_ptr<HStackContainer> button_container;
+    std::shared_ptr<HBoxContainer> button_container;
 
     ButtonGroup tab_button_group;
 

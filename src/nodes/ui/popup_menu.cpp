@@ -20,7 +20,7 @@ MenuItem::MenuItem() {
     // auto img = std::make_shared<VectorImage>("../assets/icons/ArrowRight.svg");
     // icon->set_texture(img);
 
-    container = std::make_shared<HStackContainer>();
+    container = std::make_shared<HBoxContainer>();
     container->set_separation(0);
     container->add_child(icon);
     container->add_child(label);

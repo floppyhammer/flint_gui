@@ -4,8 +4,8 @@
 #include <functional>
 
 #include "../../resources/style_box.h"
+#include "container/box_container.h"
 #include "container/margin_container.h"
-#include "container/stack_container.h"
 #include "label.h"
 #include "node_ui.h"
 #include "texture_rect.h"
@@ -58,9 +58,9 @@ protected:
 
     bool icon_expand_ = false;
 
-    /// Button[HStackContainer[TextureRect, Label]]
+    /// Button[HBoxContainer[TextureRect, Label]]
     std::shared_ptr<MarginContainer> margin_container;
-    std::shared_ptr<HStackContainer> hstack_container;
+    std::shared_ptr<HBoxContainer> hbox_container;
     std::shared_ptr<TextureRect> icon_rect;
     std::shared_ptr<Label> label;
 

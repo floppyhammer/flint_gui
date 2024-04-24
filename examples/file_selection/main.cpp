@@ -34,21 +34,21 @@ int main() {
         margin_container->set_anchor_flag(AnchorFlag::FullRect);
         panel->add_child(margin_container);
 
-        auto vstack_container = std::make_shared<VStackContainer>();
-        vstack_container->set_separation(16);
-        margin_container->add_child(vstack_container);
+        auto vbox_container = std::make_shared<VBoxContainer>();
+        vbox_container->set_separation(16);
+        margin_container->add_child(vbox_container);
 
         auto label = std::make_shared<Label>();
         label->set_text("File path:");
-        vstack_container->add_child(label);
+        vbox_container->add_child(label);
 
-        auto hstack_container = std::make_shared<HStackContainer>();
-        vstack_container->add_child(hstack_container);
+        auto hbox_container = std::make_shared<HBoxContainer>();
+        vbox_container->add_child(hbox_container);
 
         auto text_edit = std::make_shared<TextEdit>();
         text_edit->container_sizing.expand_h = true;
         text_edit->container_sizing.flag_h = ContainerSizingFlag::Fill;
-        hstack_container->add_child(text_edit);
+        hbox_container->add_child(text_edit);
 
         auto file_dialog = std::make_shared<FileDialog>();
         panel->add_child(file_dialog);
@@ -65,12 +65,12 @@ int main() {
             }
         };
         select_button->connect_signal("pressed", callback);
-        hstack_container->add_child(select_button);
+        hbox_container->add_child(select_button);
 
         auto confirm_button = std::make_shared<Button>();
         confirm_button->set_text("Confirm");
         confirm_button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
-        vstack_container->add_child(confirm_button);
+        vbox_container->add_child(confirm_button);
     }
 
     app.main_loop();

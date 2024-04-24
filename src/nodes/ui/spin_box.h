@@ -6,7 +6,7 @@
 
 #include "../../resources/style_box.h"
 #include "button.h"
-#include "container/stack_container.h"
+#include "container/box_container.h"
 #include "label.h"
 #include "node_ui.h"
 #include "texture_rect.h"
@@ -60,8 +60,8 @@ protected:
 
     bool focused = false;
 
-    std::shared_ptr<HStackContainer> container_h;
-    std::shared_ptr<VStackContainer> container_v;
+    std::shared_ptr<HBoxContainer> container_h;
+    std::shared_ptr<VBoxContainer> container_v;
     std::shared_ptr<Button> increase_button, decrease_button;
     std::shared_ptr<Label> label;
 

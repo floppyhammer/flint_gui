@@ -26,9 +26,9 @@ int main() {
         margin_container->set_anchor_flag(AnchorFlag::FullRect);
         root->add_child(margin_container);
 
-        auto stack_container = std::make_shared<HStackContainer>();
-        stack_container->set_separation(16);
-        margin_container->add_child(stack_container);
+        auto box_container = std::make_shared<HBoxContainer>();
+        box_container->set_separation(16);
+        margin_container->add_child(box_container);
 
         std::string text = "";
         text += "👍😁😂\n";                   // Emoji
@@ -57,7 +57,7 @@ int main() {
             label->set_text(text);
             label->container_sizing.expand_h = true;
             label->container_sizing.flag_h = ContainerSizingFlag::Fill;
-            stack_container->add_child(label);
+            box_container->add_child(label);
         }
 
         // Word wrapping.
@@ -77,7 +77,7 @@ int main() {
             label->container_sizing.expand_h = true;
             label->container_sizing.flag_h = ContainerSizingFlag::Fill;
 
-            stack_container->add_child(label);
+            box_container->add_child(label);
         }
     }
 

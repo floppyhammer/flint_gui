@@ -21,7 +21,7 @@ int main() {
         open_window_button->set_text("Show window");
         auto close_window_button = std::make_shared<Button>();
         close_window_button->set_text("Hide window");
-        auto container = std::make_shared<HStackContainer>();
+        auto container = std::make_shared<HBoxContainer>();
         container->add_child(open_window_button);
         container->add_child(close_window_button);
 

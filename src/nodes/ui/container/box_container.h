@@ -1,13 +1,13 @@
-#ifndef FLINT_STACK_CONTAINER_H
-#define FLINT_STACK_CONTAINER_H
+#ifndef FLINT_BOX_CONTAINER_H
+#define FLINT_BOX_CONTAINER_H
 
 #include "container.h"
 
 namespace Flint {
 
-/// StackContainer is not meant for direct use as a node.
-/// Instead, use HStackContainer/VStackContainer.
-class StackContainer : public Container {
+/// BoxContainer is not meant for direct use as a node.
+/// Instead, use HBoxContainer/VBoxContainer.
+class BoxContainer : public Container {
 public:
     void adjust_layout() override;
 
@@ -17,7 +17,7 @@ public:
     void set_separation(float new_separation);
 
 protected:
-    StackContainer() = default;
+    BoxContainer() = default;
 
     /// Separation between UI children.
     float separation = 8;
@@ -26,22 +26,22 @@ protected:
     bool horizontal = true;
 };
 
-class HStackContainer : public StackContainer {
+class HBoxContainer : public BoxContainer {
 public:
-    HStackContainer() {
-        type = NodeType::HStackContainer;
+    HBoxContainer() {
+        type = NodeType::HBoxContainer;
         horizontal = true;
     }
 };
 
-class VStackContainer : public StackContainer {
+class VBoxContainer : public BoxContainer {
 public:
-    VStackContainer() {
-        type = NodeType::VStackContainer;
+    VBoxContainer() {
+        type = NodeType::VBoxContainer;
         horizontal = false;
     }
 };
 
 } // namespace Flint
 
-#endif // FLINT_STACK_CONTAINER_H
+#endif // FLINT_BOX_CONTAINER_H

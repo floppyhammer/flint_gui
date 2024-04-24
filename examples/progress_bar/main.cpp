@@ -25,16 +25,16 @@ int main() {
     {
         auto root = app.get_tree()->get_root();
 
-        auto vstack_container = std::make_shared<VStackContainer>();
-        root->add_child(vstack_container);
+        auto vbox_container = std::make_shared<VBoxContainer>();
+        root->add_child(vbox_container);
 
         for (int i = 0; i < 5; i++) {
             auto progress_bar = std::make_shared<MyProgressBar>();
             progress_bar->set_value(i * 20);
-            vstack_container->add_child(progress_bar);
+            vbox_container->add_child(progress_bar);
         }
 
-        vstack_container->set_size({400, 300});
+        vbox_container->set_size({400, 300});
     }
 
     app.main_loop();

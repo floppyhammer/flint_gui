@@ -1,8 +1,8 @@
-#include "stack_container.h"
+#include "box_container.h"
 
 namespace Flint {
 
-void StackContainer::adjust_layout() {
+void BoxContainer::adjust_layout() {
     if (children.empty()) {
         return;
     }
@@ -176,7 +176,7 @@ void StackContainer::adjust_layout() {
     }
 }
 
-void StackContainer::calc_minimum_size() {
+void BoxContainer::calc_minimum_size() {
     Vec2F min_size;
 
     uint32_t visible_child_count = 0;
@@ -216,7 +216,7 @@ void StackContainer::calc_minimum_size() {
     calculated_minimum_size = min_size;
 }
 
-void StackContainer::set_separation(float new_separation) {
+void BoxContainer::set_separation(float new_separation) {
     if (separation == new_separation) {
         return;
     }

@@ -10,7 +10,7 @@
 #include "../../resources/style_box.h"
 #include "../../resources/vector_image.h"
 #include "button.h"
-#include "container/stack_container.h"
+#include "container/box_container.h"
 #include "node_ui.h"
 
 namespace Flint {
@@ -57,7 +57,7 @@ private:
 
     std::shared_ptr<Label> label;
 
-    std::shared_ptr<HStackContainer> container;
+    std::shared_ptr<HBoxContainer> container;
 
     std::vector<std::shared_ptr<TreeItem>> children;
     TreeItem *parent;

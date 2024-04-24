@@ -21,8 +21,8 @@ enum class NodeType {
     Container,
     CenterContainer,
     MarginContainer,
-    HStackContainer,
-    VStackContainer,
+    HBoxContainer,
+    VBoxContainer,
     ScrollContainer,
     TabContainer,
 

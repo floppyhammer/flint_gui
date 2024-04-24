@@ -19,7 +19,7 @@ int main() {
     {
         auto root = app.get_tree()->get_root();
 
-        auto hbox_container = std::make_shared<HStackContainer>();
+        auto hbox_container = std::make_shared<HBoxContainer>();
         hbox_container->set_separation(8);
         hbox_container->set_position({100, 100});
         root->add_child(hbox_container);
@@ -46,7 +46,7 @@ int main() {
         }
         hbox_container->set_size({800, 100});
 
-        auto vbox_container = std::make_shared<VStackContainer>();
+        auto vbox_container = std::make_shared<VBoxContainer>();
         vbox_container->set_separation(8);
         vbox_container->set_position({100, 300});
         root->add_child(vbox_container);

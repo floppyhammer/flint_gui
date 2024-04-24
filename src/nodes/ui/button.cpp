@@ -34,15 +34,15 @@ Button::Button() {
     icon_rect->set_stretch_mode(TextureRect::StretchMode::KeepCentered);
     icon_rect->set_mouse_filter(MouseFilter::Ignore);
 
-    hstack_container = std::make_shared<HStackContainer>();
-    hstack_container->add_child(icon_rect);
-    hstack_container->add_child(label);
-    hstack_container->set_separation(2);
-    hstack_container->set_mouse_filter(MouseFilter::Ignore);
+    hbox_container = std::make_shared<HBoxContainer>();
+    hbox_container->add_child(icon_rect);
+    hbox_container->add_child(label);
+    hbox_container->set_separation(2);
+    hbox_container->set_mouse_filter(MouseFilter::Ignore);
 
     margin_container = std::make_shared<MarginContainer>();
     margin_container->set_margin_all(4);
-    margin_container->add_child(hstack_container);
+    margin_container->add_child(hbox_container);
     margin_container->set_size(size);
     margin_container->set_mouse_filter(MouseFilter::Ignore);
 

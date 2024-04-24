@@ -9,7 +9,7 @@
 #include "../../resources/font.h"
 #include "../../resources/style_box.h"
 #include "../../resources/vector_image.h"
-#include "container/stack_container.h"
+#include "container/box_container.h"
 #include "label.h"
 #include "node_ui.h"
 #include "texture_rect.h"
@@ -50,7 +50,7 @@ private:
 
     std::shared_ptr<TextureRect> expand_icon;
 
-    std::shared_ptr<HStackContainer> container;
+    std::shared_ptr<HBoxContainer> container;
 
     std::shared_ptr<PopupMenu> sub_menu;
 
