@@ -21,7 +21,7 @@ include_directories(${Vulkan_INCLUDE_DIRS})
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
         src/*.cpp
-        third_party/tinyfiledialogs/*.c
+        third_party/tinyfiledialogs/tinyfiledialogs.c
         #        third_party/fribidi/*.c
         third_party/ttf2mesh/ttf2mesh.c)
 
@@ -42,8 +42,8 @@ add_subdirectory(third_party/pathfinder-cpp)
 include_directories(third_party/glm-0.9.9.8)
 add_subdirectory(third_party/glm-0.9.9.8)
 
-include_directories(third_party/harfbuzz-8.3.0/src)
-add_subdirectory(third_party/harfbuzz-8.3.0)
+include_directories(third_party/harfbuzz-8.4.0/src)
+add_subdirectory(third_party/harfbuzz-8.4.0)
 
 include_directories(third_party/GSL-4.0.0/include)
 add_subdirectory(third_party/GSL-4.0.0)
