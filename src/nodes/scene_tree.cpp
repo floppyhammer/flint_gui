@@ -15,11 +15,6 @@ SceneTree::SceneTree() {
     root->tree_ = this;
 }
 
-void SceneTree::replace_scene(const std::shared_ptr<Node>& new_scene) {
-    root = new_scene;
-    root->tree_ = this;
-}
-
 void propagate_input(Node* node, InputEvent& event) {
     if (!node->get_visibility()) {
         return;
@@ -226,6 +221,16 @@ void SceneTree::process(double dt) {
 
 void SceneTree::when_primary_window_size_changed(Vec2I new_size) const {
     root->when_parent_size_changed(new_size.to_f32());
+}
+
+std::shared_ptr<Node> SceneTree::replace_root(const std::shared_ptr<Node>& new_root) {
+    auto old_root = root;
+    old_root->tree_ = nullptr;
+
+    root = new_root;
+    root->tree_ = this;
+
+    return old_root;
 }
 
 std::shared_ptr<Node> SceneTree::get_root() const {

@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 option(FLINT_GUI_VULKAN "Use Vulkan instead of OpenGL" OFF)
-option(FLINT_GUI_DEBUG "Enable visual debug" OFF)
+option(FLINT_GUI_VISUAL_DEBUG "Enable visual debug" OFF)
 
 # More generally, you are using find_package and then later you're using add_subdirectory
 # to try to incorporate these external projects. That's not how it works. find_package will
@@ -75,8 +75,8 @@ endif ()
 
 add_library(flint_gui ${SOURCE_FILES})
 
-if (FLINT_GUI_DEBUG)
-    add_compile_definitions(FLINT_GUI_DEBUG)
+if (FLINT_GUI_VISUAL_DEBUG)
+    add_compile_definitions(FLINT_GUI_VISUAL_DEBUG)
 endif ()
 
 # Add examples.

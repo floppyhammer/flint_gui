@@ -17,7 +17,7 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto root = app.get_tree()->get_root();
+        auto root = app.get_tree_root();
 
         auto margin_container = std::make_shared<MarginContainer>();
         margin_container->set_position({0, 0});

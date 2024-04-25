@@ -13,7 +13,7 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto root = app.get_tree()->get_root();
+        auto root = app.get_tree_root();
 
         auto raste_image = ResourceManager::get_singleton()->load<RasterImage>("../assets/duck.png");
         auto vector_image = ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Button.svg");

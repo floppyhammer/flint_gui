@@ -13,7 +13,7 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto root = app.get_tree()->get_root();
+        auto root = app.get_tree_root();
 
         auto tab_container = std::make_shared<TabContainer>();
         tab_container->set_position({200, 200});

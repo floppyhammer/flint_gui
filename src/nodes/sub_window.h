@@ -52,6 +52,8 @@ private:
     struct {
         std::shared_ptr<Pathfinder::Scene> previous_scene;
     } temp_draw_data;
+
+    float scale_factor = 1.0;
 };
 
 } // namespace Flint

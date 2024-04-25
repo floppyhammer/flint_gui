@@ -15,7 +15,7 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto root = app.get_tree()->get_root();
+        auto root = app.get_tree_root();
 
         auto open_window_button = std::make_shared<Button>();
         open_window_button->set_text("Show window");

@@ -23,7 +23,7 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto root = app.get_tree()->get_root();
+        auto root = app.get_tree_root();
 
         auto vbox_container = std::make_shared<VBoxContainer>();
         root->add_child(vbox_container);

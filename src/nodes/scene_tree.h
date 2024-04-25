@@ -33,7 +33,7 @@ public:
 
     void process(double dt);
 
-    void replace_scene(const std::shared_ptr<Node>& new_scene);
+    std::shared_ptr<Node> replace_root(const std::shared_ptr<Node>& new_root);
 
     std::shared_ptr<Node> get_root() const;
 

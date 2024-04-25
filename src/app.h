@@ -22,7 +22,9 @@ public:
 
     void main_loop();
 
-    SceneTree* get_tree();
+    SceneTree* get_tree() const;
+
+    std::shared_ptr<Node> get_tree_root() const;
 
 private:
     std::unique_ptr<SceneTree> tree;

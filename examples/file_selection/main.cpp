@@ -14,7 +14,7 @@ int main() {
 
     // Build scene tree. Use a block, so we don't increase ref counts for the node.
     {
-        auto root = app.get_tree()->get_root();
+        auto root = app.get_tree_root();
 
         auto panel = std::make_shared<Panel>();
         panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
