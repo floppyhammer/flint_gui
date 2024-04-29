@@ -9,6 +9,10 @@
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb/stb_truetype.h>
 
+// For debugging glyph bitmap
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb/stb_image_write.h>
+
 #ifdef _WIN32
     // With Windows 10 Fall Creators Update and later, you can just include the single header <icu.h>.
     // See https://learn.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-
@@ -176,16 +180,16 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
 
 #ifndef __APPLE__
 
-#ifdef ICU_STATIC_DATA
+    #ifdef ICU_STATIC_DATA
     static bool icu_data_loaded = false;
     if (!icu_data_loaded) {
         UErrorCode err = U_ZERO_ERROR;
         u_init(&err); // Do not check for errors, since we only load part of the data.
         icu_data_loaded = true;
     }
-#else
-// Load data manually.
-#endif
+    #else
+    // Load data manually.
+    #endif
 
     uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
 
@@ -368,6 +372,32 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
                         // So, we use the info provided by freetype.
                         //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
                         glyph.x_advance = get_glyph_advance(glyph.index);
+
+                        // Debug
+                        // {
+                        //     int bitmap_width;
+                        //     int bitmap_height;
+                        //     int bitmap_xoffset;
+                        //     int bitmap_yoffset;
+                        //
+                        //     auto bitmap_data = stbtt_GetGlyphBitmap(&stbtt_info,
+                        //                                             scale,
+                        //                                             scale,
+                        //                                             glyph.index,
+                        //                                             &bitmap_width,
+                        //                                             &bitmap_height,
+                        //                                             &bitmap_xoffset,
+                        //                                             &bitmap_yoffset);
+                        //
+                        //     stbi_write_png(("glyph_bitmap_" + glyph.text + ".png").c_str(),
+                        //                    bitmap_width,
+                        //                    bitmap_height,
+                        //                    1,
+                        //                    bitmap_data,
+                        //                    bitmap_width);
+                        //
+                        //     int _ = 0;
+                        // }
 
                         para_width += glyph.x_advance;
 
