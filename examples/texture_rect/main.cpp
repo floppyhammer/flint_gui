@@ -8,13 +8,8 @@ using Pathfinder::Vec3;
 const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
 
-int main() {
-    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
-
-    // Build scene tree. Use a block, so we don't increase ref counts for the node.
-    {
-        auto root = app.get_tree_root();
-
+class MyNode : public Node {
+    void custom_ready() override {
         auto raste_image = ResourceManager::get_singleton()->load<RasterImage>("../assets/duck.png");
         auto vector_image = ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Button.svg");
 
@@ -23,13 +18,13 @@ int main() {
             texture_rect_svg->set_position({400.0f, i * 100.0f});
             texture_rect_svg->set_size({200, 100});
             texture_rect_svg->set_texture(raste_image);
-            root->add_child(texture_rect_svg);
+            add_child(texture_rect_svg);
 
             auto texture_rect_image = std::make_shared<TextureRect>();
             texture_rect_image->set_texture(vector_image);
             texture_rect_image->set_position({0.0f, i * 100.0f});
             texture_rect_image->set_size({200, 100});
-            root->add_child(texture_rect_image);
+            add_child(texture_rect_image);
 
             if (i == 0) {
                 texture_rect_svg->set_stretch_mode(TextureRect::StretchMode::Keep);
@@ -57,6 +52,12 @@ int main() {
             }
         }
     }
+};
+
+int main() {
+    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
+
+    app.get_tree()->replace_root(std::make_shared<MyNode>());
 
     app.main_loop();
 

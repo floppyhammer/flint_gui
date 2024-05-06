@@ -1,6 +1,5 @@
 #include <iostream>
 #include <random>
-#include <stdexcept>
 
 #include "app.h"
 
@@ -9,17 +8,12 @@ using namespace Flint;
 const uint32_t WINDOW_WIDTH = 640;
 const uint32_t WINDOW_HEIGHT = 480;
 
-int main() {
-    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
-
-    // Build scene tree. Use a block, so we don't increase ref counts for the node.
-    {
-        auto root = app.get_tree_root();
-
+class MyNode : public Node {
+    void custom_ready() override {
         auto panel = std::make_shared<Panel>();
         panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         panel->set_anchor_flag(AnchorFlag::FullRect);
-        root->add_child(panel);
+        add_child(panel);
         {
             StyleBox new_theme;
             new_theme.bg_color = ColorU(27, 27, 27, 255);
@@ -72,6 +66,12 @@ int main() {
         confirm_button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
         vbox_container->add_child(confirm_button);
     }
+};
+
+int main() {
+    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
+
+    app.get_tree()->replace_root(std::make_shared<MyNode>());
 
     app.main_loop();
 

@@ -17,7 +17,9 @@ public:
     void set_separation(float new_separation);
 
 protected:
-    BoxContainer() = default;
+    BoxContainer() {
+        debug_size_box.border_color = ColorU(100, 234, 123);
+    }
 
     /// Separation between UI children.
     float separation = 8;

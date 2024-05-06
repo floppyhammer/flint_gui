@@ -18,15 +18,10 @@ class MyProgressBar : public ProgressBar {
     }
 };
 
-int main() {
-    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
-
-    // Build scene tree. Use a block, so we don't increase ref counts for the node.
-    {
-        auto root = app.get_tree_root();
-
+class MyNode : public Node {
+    void custom_ready() override {
         auto vbox_container = std::make_shared<VBoxContainer>();
-        root->add_child(vbox_container);
+        add_child(vbox_container);
 
         for (int i = 0; i < 5; i++) {
             auto progress_bar = std::make_shared<MyProgressBar>();
@@ -36,6 +31,12 @@ int main() {
 
         vbox_container->set_size({400, 300});
     }
+};
+
+int main() {
+    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
+
+    app.get_tree()->replace_root(std::make_shared<MyNode>());
 
     app.main_loop();
 

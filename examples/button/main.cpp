@@ -1,6 +1,5 @@
 #include <iostream>
 #include <random>
-#include <stdexcept>
 
 #include "app.h"
 
@@ -11,6 +10,12 @@ using Pathfinder::Vec3;
 
 const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
+
+class MyNode : public Node {
+    void custom_ready() override {
+
+    }
+};
 
 int main() {
     App app({WINDOW_WIDTH, WINDOW_HEIGHT});
@@ -45,6 +50,10 @@ int main() {
 
         vbox_container->set_size({800, 100});
     }
+
+    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
+
+    app.get_tree()->replace_root(std::make_shared<MyNode>());
 
     app.main_loop();
 

@@ -59,6 +59,17 @@ public:
 
     virtual ~Node() = default;
 
+    /// Called when entering the tree.
+    virtual void ready() {
+        if (ready_) {
+            return;
+        }
+
+        ready_ = true;
+
+        custom_ready();
+    }
+
     virtual void input(InputEvent &event);
 
     virtual void update(double dt);
@@ -71,6 +82,9 @@ public:
     }
 
     virtual void post_draw_children() {
+    }
+
+    virtual void custom_ready() {
     }
 
     virtual void custom_update(double dt) {
@@ -122,6 +136,8 @@ public:
 
 protected:
     NodeType type = NodeType::Node;
+
+    bool ready_ = false;
 
     bool visible_ = true;
 

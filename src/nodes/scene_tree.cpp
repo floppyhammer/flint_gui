@@ -118,9 +118,12 @@ void transform_system(Node* root) {
     std::vector<NodeUi*> orphan_ui_nodes;
     dfs_preorder_ltr_traversal(root, nodes);
     for (auto& node : nodes) {
-        if (node->is_ui_node() && node->get_parent() == nullptr) {
-            auto ui_node = dynamic_cast<NodeUi*>(node);
-            orphan_ui_nodes.push_back(ui_node);
+        if (node->is_ui_node()) {
+            // Has no parent or no UI parent.
+            if (node->get_parent() == nullptr || !node->get_parent()->is_ui_node()) {
+                auto ui_node = dynamic_cast<NodeUi*>(node);
+                orphan_ui_nodes.push_back(ui_node);
+            }
         }
     }
 
@@ -185,6 +188,15 @@ void SceneTree::process(double dt) {
     if (primary_window && old_primary_window_size != primary_window->get_size()) {
         old_primary_window_size = primary_window->get_size();
         when_primary_window_size_changed(old_primary_window_size);
+    }
+
+    // Get ready from-back-to-front.
+    {
+        std::vector<Node*> nodes;
+        dfs_preorder_ltr_traversal(root.get(), nodes);
+        for (auto& node : nodes) {
+            node->ready();
+        }
     }
 
     input_system(root.get(), InputServer::get_singleton()->input_queue);

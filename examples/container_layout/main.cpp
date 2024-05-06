@@ -1,6 +1,5 @@
 #include <iostream>
 #include <random>
-#include <stdexcept>
 
 #include "app.h"
 
@@ -12,17 +11,12 @@ using Pathfinder::Vec3;
 const uint32_t WINDOW_WIDTH = 1280;
 const uint32_t WINDOW_HEIGHT = 720;
 
-int main() {
-    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
-
-    // Build scene tree. Use a block, so we don't increase ref counts for the node.
-    {
-        auto root = app.get_tree_root();
-
+class MyNode : public Node {
+    void custom_ready() override {
         auto hbox_container = std::make_shared<HBoxContainer>();
         hbox_container->set_separation(8);
         hbox_container->set_position({100, 100});
-        root->add_child(hbox_container);
+        add_child(hbox_container);
 
         for (int _ = 0; _ < 4; _++) {
             auto button = std::make_shared<Button>();
@@ -49,7 +43,7 @@ int main() {
         auto vbox_container = std::make_shared<VBoxContainer>();
         vbox_container->set_separation(8);
         vbox_container->set_position({100, 300});
-        root->add_child(vbox_container);
+        add_child(vbox_container);
 
         for (int _ = 0; _ < 4; _++) {
             auto button = std::make_shared<Button>();
@@ -72,8 +66,13 @@ int main() {
             }
         }
         vbox_container->set_size({200, 300});
-        // ----------------------------------------------------
     }
+};
+
+int main() {
+    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
+
+    app.get_tree()->replace_root(std::make_shared<MyNode>());
 
     app.main_loop();
 
