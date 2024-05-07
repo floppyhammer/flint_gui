@@ -17,36 +17,68 @@
 namespace Flint {
 
 template <typename T>
-void utf8_to_utf16(const std::string &source, std::basic_string<T, std::char_traits<T>, std::allocator<T>> &result) {
+void utf8_to_utf16(const std::string &source, std::basic_string<T> &result) {
     std::wstring_convert<std::codecvt_utf8_utf16<T>, T> convertor;
     result = convertor.from_bytes(source);
+
+    if (convertor.converted() < source.size()) {
+        throw std::runtime_error("Incomplete utf16-to-utf8 conversion!");
+    }
 }
 
 template <typename T>
-std::string utf16_to_utf8(const std::basic_string<T, std::char_traits<T>, std::allocator<T>> &source) {
-    std::string result;
-
+std::string utf16_to_utf8(const std::basic_string<T> &source) {
     std::wstring_convert<std::codecvt_utf8_utf16<T>, T> convertor;
-    result = convertor.to_bytes(source);
+    std::string result = convertor.to_bytes(source);
+
+    if (convertor.converted() < source.size()) {
+        throw std::runtime_error("Incomplete utf8-to-utf16 conversion!");
+    }
 
     return result;
 }
 
 template <typename T>
-void utf8_to_utf32(const std::string &source, std::basic_string<T, std::char_traits<T>, std::allocator<T>> &result) {
+void utf8_to_utf32(const std::string &source, std::basic_string<T> &result) {
     std::wstring_convert<std::codecvt_utf8<char32_t>, T> convertor;
     result = convertor.from_bytes(source);
+
+    if (convertor.converted() < source.size()) {
+        throw std::runtime_error("Incomplete utf8-to-utf32 conversion!");
+    }
 }
 
 template <typename T>
-std::string utf32_to_utf8(const std::basic_string<T, std::char_traits<T>, std::allocator<T>> &source) {
-    std::string result;
-
+std::string utf32_to_utf8(const std::basic_string<T> &source) {
     std::wstring_convert<std::codecvt_utf8<char32_t>, T> convertor;
-    result = convertor.to_bytes(source);
+    std::string result = convertor.to_bytes(source);
+
+    if (convertor.converted() < source.size()) {
+        throw std::runtime_error("Incomplete utf32-to-utf8 conversion!");
+    }
 
     return result;
 }
+
+// // This should convert to whatever the system-wide character encoding
+// // is for the platform (UTF-32/Linux - UCS-2/Windows)
+// std::string ws_to_utf8(std::wstring const &s) {
+//     std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> cnv;
+//     std::string utf8 = cnv.to_bytes(s);
+//     if (cnv.converted() < s.size()) {
+//         throw std::runtime_error("Incomplete wstring-to-utf8 conversion!");
+//     }
+//     return utf8;
+// }
+//
+// std::wstring utf8_to_ws(std::string const &utf8) {
+//     std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> cnv;
+//     std::wstring s = cnv.from_bytes(utf8);
+//     if (cnv.converted() < utf8.size()) {
+//         throw std::runtime_error("Incomplete utf8-to-wstring conversion!");
+//     }
+//     return s;
+// }
 
 struct HarfBuzzRes {
     hb_blob_t *blob{}; /* or hb_blob_create_from_file_or_fail() */
