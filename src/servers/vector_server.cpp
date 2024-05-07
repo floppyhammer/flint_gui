@@ -229,7 +229,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
             auto svg_scene = std::make_shared<Pathfinder::SvgScene>(g.svg, *canvas);
 
             // The emoji's svg size is always fixed for a specific font no matter what the font size you set.
-            auto svg_size = svg_scene->get_scene()->get_view_box().size();
+            auto svg_size = svg_scene->get_size();
             auto glyph_size = g.box.size();
 
             auto emoji_scale = Transform2::from_scale(glyph_size / svg_size);
