@@ -69,8 +69,12 @@ if (ON)
     include_directories(third_party/fribidi/generated)
     #add_compile_definitions(DONT_HAVE_FRIBIDI_CONFIG_H)
     #add_compile_definitions(DONT_HAVE_FRIBIDI_UNICODE_VERSION_H)
-    add_compile_definitions(HAVE_STRINGIZE=1 HAVE_STDLIB_H HAVE_STRINGS_H)
+    add_compile_definitions(HAVE_STRINGIZE=1 HAVE_STDLIB_H)
     add_compile_definitions(FRIBIDI_BUILD)
+
+    if (APPLE)
+        add_compile_definitions(HAVE_STRINGS_H)
+    endif ()
 endif ()
 
 add_library(flint_gui ${SOURCE_FILES})
