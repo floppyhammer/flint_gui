@@ -58,7 +58,7 @@ hb_script_t to_harfbuzz_script(Script script) {
 
 Script get_text_script(const std::string &text) {
     std::u16string utf16_string;
-    from_utf8_to_utf16(text, utf16_string);
+    utf8_to_utf16(text, utf16_string);
 
     for (auto &codepoint : utf16_string) {
         if (codepoint >= 0x0600 && codepoint <= 0x06FF) {
@@ -176,7 +176,7 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
     return path;
 }
 
-#ifdef __APPLE__
+#ifndef __APPLE__
 
 void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &para_ranges) {
     glyphs.clear();
@@ -198,7 +198,7 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
     // Note: don't use icu::UnicodeString, it doesn't work. Use plain UChar* instead.
 
     std::u16string text_u16;
-    from_utf8(text, text_u16);
+    utf8_to_utf16(text, text_u16);
 
     const UChar *uchar_data = text_u16.c_str();
     const int32_t uchar_count = text_u16.length();
@@ -271,7 +271,7 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
                 // Get run text from the whole text.
                 std::u16string run_text_u16 = text_u16.substr(para_start + logical_start, length);
 
-                std::string run_text = to_utf8(run_text_u16);
+                std::string run_text = utf16_to_utf8(run_text_u16);
 
                 //                std::cout << "Visual run in paragraph: \t" << run_index << "\t" << run_is_rtl << "\t"
                 //                << logical_start
@@ -338,13 +338,13 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
 
                     std::u16string glyph_text_u16 = text_u16.substr(current_cluster->start, current_cluster->length());
 
-                    std::string glyph_text = to_utf8(glyph_text_u16);
+                    std::string glyph_text = utf16_to_utf8(glyph_text_u16);
                     //                    std::cout << "Glyph text: " << glyph_text << std::endl;
 
                     // One glyph may have multiple codepoints.
                     // Eg. स् = स + ्
                     std::u32string glyph_text_u32;
-                    from_utf8(glyph_text, glyph_text_u32);
+                    utf8_to_utf32(glyph_text, glyph_text_u32);
 
                     Glyph glyph;
 
@@ -447,7 +447,7 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
     uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
 
     std::u32string text_u32;
-    from_utf8_to_utf32(text, text_u32);
+    utf8_to_utf32(text, text_u32);
 
     std::vector<FriBidiChar> fribidi_in_char(FRIBIDI_MAX_STR_LEN);
     const FriBidiStrIndex fribidi_len =
@@ -562,7 +562,7 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
             // Get run text from the whole text.
             std::u32string run_text_u32 = text_u32.substr(run_range.start, run_length);
 
-            std::string run_text = from_utf32_to_utf8(run_text_u32);
+            std::string run_text = utf32_to_utf8(run_text_u32);
 
             //                std::cout << "Visual run in paragraph: \t" << run_index << "\t" << run_is_rtl << "\t"
             //                << logical_start
@@ -629,7 +629,7 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
 
                 std::u32string glyph_text_u32 = text_u32.substr(current_cluster->start, current_cluster->length());
 
-                std::string glyph_text = from_utf32_to_utf8(glyph_text_u32);
+                std::string glyph_text = utf32_to_utf8(glyph_text_u32);
                 //                    std::cout << "Glyph text: " << glyph_text << std::endl;
 
                 Glyph glyph;

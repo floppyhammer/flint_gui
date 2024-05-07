@@ -17,14 +17,13 @@
 namespace Flint {
 
 template <typename T>
-void from_utf8_to_utf16(const std::string &source,
-                        std::basic_string<T, std::char_traits<T>, std::allocator<T>> &result) {
+void utf8_to_utf16(const std::string &source, std::basic_string<T, std::char_traits<T>, std::allocator<T>> &result) {
     std::wstring_convert<std::codecvt_utf8_utf16<T>, T> convertor;
     result = convertor.from_bytes(source);
 }
 
 template <typename T>
-std::string from_utf16_to_utf8(const std::basic_string<T, std::char_traits<T>, std::allocator<T>> &source) {
+std::string utf16_to_utf8(const std::basic_string<T, std::char_traits<T>, std::allocator<T>> &source) {
     std::string result;
 
     std::wstring_convert<std::codecvt_utf8_utf16<T>, T> convertor;
@@ -34,14 +33,13 @@ std::string from_utf16_to_utf8(const std::basic_string<T, std::char_traits<T>, s
 }
 
 template <typename T>
-void from_utf8_to_utf32(const std::string &source,
-                        std::basic_string<T, std::char_traits<T>, std::allocator<T>> &result) {
+void utf8_to_utf32(const std::string &source, std::basic_string<T, std::char_traits<T>, std::allocator<T>> &result) {
     std::wstring_convert<std::codecvt_utf8<char32_t>, T> convertor;
     result = convertor.from_bytes(source);
 }
 
 template <typename T>
-std::string from_utf32_to_utf8(const std::basic_string<T, std::char_traits<T>, std::allocator<T>> &source) {
+std::string utf32_to_utf8(const std::basic_string<T, std::char_traits<T>, std::allocator<T>> &source) {
     std::string result;
 
     std::wstring_convert<std::codecvt_utf8<char32_t>, T> convertor;

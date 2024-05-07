@@ -229,7 +229,7 @@ void Label::set_text(const std::string &new_text) {
     }
 
     text_ = new_text;
-    from_utf8_to_utf32(text_, text_u32_);
+    utf8_to_utf32(text_, text_u32_);
 
     need_to_remeasure = true;
 }
@@ -242,10 +242,10 @@ void Label::insert_text(uint32_t codepint_position, const std::string &new_text)
     assert(codepint_position <= text_u32_.size() && "Codepoint index is out of bounds!");
 
     std::u32string new_text_u32;
-    from_utf8_to_utf32(new_text, new_text_u32);
+    utf8_to_utf32(new_text, new_text_u32);
 
     text_u32_.insert(codepint_position, new_text_u32);
-    text_ = from_utf32_to_utf8(text_u32_);
+    text_ = utf32_to_utf8(text_u32_);
 
     need_to_remeasure = true;
 }
@@ -254,7 +254,7 @@ void Label::remove_text(uint32_t codepint_position, uint32_t count) {
     assert((codepint_position + count) <= text_u32_.size() && "Codepoint index is out of bounds!");
 
     text_u32_.erase(codepint_position, count);
-    text_ = from_utf32_to_utf8(text_u32_);
+    text_ = utf32_to_utf8(text_u32_);
 
     need_to_remeasure = true;
 }
@@ -263,7 +263,7 @@ std::string Label::get_sub_text(uint32_t codepint_position, uint32_t count) cons
     assert((codepint_position + count) <= text_u32_.size() && "Codepoint index is out of bounds!");
 
     auto subtext_u32 = text_u32_.substr(codepint_position, count);
-    auto subtext = from_utf32_to_utf8(subtext_u32);
+    auto subtext = utf32_to_utf8(subtext_u32);
 
     return subtext;
 }
