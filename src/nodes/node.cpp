@@ -1,9 +1,8 @@
 #include "node.h"
 
-#include <servers/render_server.h>
-
 #include <string>
 
+#include "../servers/render_server.h"
 #include "sub_window.h"
 
 namespace Flint {
