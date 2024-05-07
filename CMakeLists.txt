@@ -22,7 +22,7 @@ include_directories(${Vulkan_INCLUDE_DIRS})
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
         src/*.cpp
         third_party/tinyfiledialogs/tinyfiledialogs.c
-        #        third_party/fribidi/*.c
+        third_party/fribidi/*.c
         third_party/ttf2mesh/ttf2mesh.c)
 
 # Include external and third-party headers.
@@ -62,14 +62,14 @@ else ()
     set(LINKING_LIBS glfw pathfinder Vulkan::Vulkan poly2tri harfbuzz ICU::uc ICU::i18n zlib)
 endif ()
 
-if (OFF)
+if (ON)
     # Alternative to icu4c. If the target platform comes with ICU, we just use it.
     # Else, we build fribidi. It's too cumbersome to build ICU ourselves.
     include_directories(third_party/fribidi)
     include_directories(third_party/fribidi/generated)
     #add_compile_definitions(DONT_HAVE_FRIBIDI_CONFIG_H)
     #add_compile_definitions(DONT_HAVE_FRIBIDI_UNICODE_VERSION_H)
-    add_compile_definitions(HAVE_STRINGIZE=1)
+    add_compile_definitions(HAVE_STRINGIZE=1 HAVE_STDLIB_H)
     add_compile_definitions(FRIBIDI_BUILD)
 endif ()
 

@@ -26,6 +26,8 @@
     #include <unicode/utypes.h>
 #endif
 
+#include <fribidi/fribidi.h>
+
 #include <gzip/decompress.hpp>
 #include <gzip/utils.hpp>
 #include <optional>
@@ -56,7 +58,7 @@ hb_script_t to_harfbuzz_script(Script script) {
 
 Script get_text_script(const std::string &text) {
     std::u16string utf16_string;
-    from_utf8(text, utf16_string);
+    from_utf8_to_utf16(text, utf16_string);
 
     for (auto &codepoint : utf16_string) {
         if (codepoint >= 0x0600 && codepoint <= 0x06FF) {
@@ -174,11 +176,11 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
     return path;
 }
 
+#ifdef __APPLE__
+
 void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &para_ranges) {
     glyphs.clear();
     para_ranges.clear();
-
-#ifndef __APPLE__
 
     #ifdef ICU_STATIC_DATA
     static bool icu_data_loaded = false;
@@ -432,9 +434,293 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
 
     ubidi_close(line_bidi);
     ubidi_close(para_bidi);
+}
+
+#else
+
+    #define FRIBIDI_MAX_STR_LEN 65000
+
+void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &para_ranges) {
+    glyphs.clear();
+    para_ranges.clear();
+
+    uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
+
+    std::u32string text_u32;
+    from_utf8_to_utf32(text, text_u32);
+
+    std::vector<FriBidiChar> fribidi_in_char(FRIBIDI_MAX_STR_LEN);
+    const FriBidiStrIndex fribidi_len =
+        fribidi_charset_to_unicode(FRIBIDI_CHAR_SET_UTF8, text.c_str(), text.size(), fribidi_in_char.data());
+
+    assert(fribidi_len < FRIBIDI_MAX_STR_LEN);
+    fribidi_in_char.resize(fribidi_len);
+
+    FriBidiCharType fribidi_pbase_dir = FRIBIDI_TYPE_LTR;
+    std::vector<FriBidiChar> fribidi_visual_char(fribidi_len);
+    std::vector<FriBidiLevel> embedding_level_list(fribidi_len);
+    std::vector<FriBidiStrIndex> position_logical_to_visual_list(fribidi_len);
+    std::vector<FriBidiStrIndex> position_visual_to_logical_list(fribidi_len);
+
+    const fribidi_boolean stat = fribidi_log2vis(fribidi_in_char.data(),
+                                                 fribidi_len,
+                                                 &fribidi_pbase_dir,
+                                                 fribidi_visual_char.data(),
+                                                 position_logical_to_visual_list.data(),
+                                                 position_visual_to_logical_list.data(),
+                                                 embedding_level_list.data());
+
+    if (stat) {
+        std::string string_formatted_ptr(FRIBIDI_MAX_STR_LEN, 0);
+        const FriBidiStrIndex new_len = fribidi_unicode_to_charset(
+            FRIBIDI_CHAR_SET_UTF8, fribidi_visual_char.data(), fribidi_len, string_formatted_ptr.data());
+        assert(new_len < FRIBIDI_MAX_STR_LEN);
+        string_formatted_ptr.resize(new_len);
+    }
+
+    std::vector<Pathfinder::Range> para_ranges_unicode;
+    int new_para_start_idx = 0;
+    for (int char_idx = 0; char_idx < fribidi_len; char_idx++) {
+        if (fribidi_in_char[char_idx] == 10) {
+            para_ranges_unicode.push_back({(uint32_t)new_para_start_idx, (uint32_t)char_idx + 1});
+            new_para_start_idx = char_idx + 1;
+        }
+    }
+
+    if (!fribidi_in_char.empty() && fribidi_in_char.back() != 10) {
+        para_ranges_unicode.push_back({(uint32_t)new_para_start_idx, (uint32_t)fribidi_len});
+    }
+
+    int para_count = para_ranges_unicode.size();
+
+    // Go through paragraphs.
+    for (int32_t para_index = 0; para_index < para_count; para_index++) {
+        // Paragraph start and end in the whole text. Unit: u16char.
+        int32_t para_start = para_ranges_unicode[para_index].start;
+        int32_t para_end = para_ranges_unicode[para_index].end;
+
+        //            std::string para_text = to_utf8(text_u16.substr(para_start, para_end));
+        //            std::cout << "Paragraph text: " << para_text << std::endl;
+        //            std::cout << "Paragraph range: " << para_start << " -> " << para_end << std::endl;
+
+        bool para_is_rtl = false;
+
+        // The width of the paragraph in a single line.
+        float para_width = 0;
+
+        // The first glyph in the new paragraph.
+        size_t para_glyph_start = glyphs.size();
+
+        // Get run count in the current paragraph.
+
+        std::vector<Pathfinder::Range> para_runs;
+        signed char current_level = embedding_level_list[para_start];
+        int new_run_start_idx = para_start;
+        std::vector<signed char> para_levels;
+        para_levels.push_back(current_level);
+
+        for (int char_idx = para_start; char_idx < para_end; char_idx++) {
+            signed char level = embedding_level_list[char_idx];
+            if (level != current_level) {
+                para_runs.push_back({(uint32_t)new_run_start_idx, (uint32_t)char_idx});
+                new_run_start_idx = char_idx;
+                current_level = level;
+
+                para_levels.push_back(level);
+            }
+        }
+
+        para_runs.push_back({(uint32_t)new_run_start_idx, (uint32_t)para_end});
+
+        int32_t run_count = para_levels.size();
+
+        for (int32_t run_index = 0; run_index < run_count; run_index++) {
+            signed char level = para_levels[run_index];
+
+            bool run_is_rtl = level % 2 == 1;
+
+            para_is_rtl |= run_is_rtl;
+        }
+
+        // Reorder runs from logical to visual.
+        if (para_is_rtl) {
+            std::reverse(para_runs.begin(), para_runs.end());
+            std::reverse(para_levels.begin(), para_levels.end());
+        }
+
+        // Go through runs.
+        for (int32_t run_index = 0; run_index < run_count; run_index++) {
+            signed char level = para_levels[run_index];
+            auto run_range = para_runs[run_index];
+
+            // Run start and end in the paragraph.
+            int32_t run_start = run_range.start;
+            int32_t run_length = run_range.end - run_range.start;
+
+            bool run_is_rtl = level % 2 == 1;
+
+            // Get run text from the whole text.
+            std::u32string run_text_u32 = text_u32.substr(run_range.start, run_length);
+
+            std::string run_text = from_utf32_to_utf8(run_text_u32);
+
+            //                std::cout << "Visual run in paragraph: \t" << run_index << "\t" << run_is_rtl << "\t"
+            //                << logical_start
+            //                          << '\t' << length << '\t' << run_text << std::endl;
+
+            auto run_script = get_text_script(run_text);
+
+            // Buffers are sequences of Unicode characters that use the same font
+            // and have the same text direction, script, and language.
+            hb_buffer_t *hb_buffer = hb_buffer_create();
+
+            // Item offset and length should represent a specific run.
+            hb_buffer_add_utf32(
+                hb_buffer, reinterpret_cast<const uint32_t *>(text_u32.c_str()), -1, run_start, run_length);
+
+            hb_buffer_set_direction(hb_buffer, run_is_rtl ? HB_DIRECTION_RTL : HB_DIRECTION_LTR);
+            hb_buffer_set_script(hb_buffer, to_harfbuzz_script(run_script));
+
+            hb_shape(harfbuzz_res->font, hb_buffer, nullptr, 0);
+
+            unsigned int glyph_count;
+            hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(hb_buffer, &glyph_count);
+            hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(hb_buffer, &glyph_count);
+
+            std::vector<hb_glyph_info_t> debug_glyph_info;
+            for (int i = 0; i < glyph_count; i++) {
+                debug_glyph_info.push_back(glyph_info[i]);
+            }
+
+            // Shaped glyph positions will always be in one line (regardless of line breaks).
+            for (int i = 0; i < glyph_count; i++) {
+                auto &info = glyph_info[i];
+                auto &pos = glyph_pos[i];
+
+                // Cluster unit is u16char, so it should be worked with std::u16string instead of std::string.
+                std::optional<Pathfinder::Range> current_cluster;
+                if (!run_is_rtl) {
+                    if (i < glyph_count - 1) {
+                        // Multiple glyphs may share the same cluster.
+                        for (int j = 1; i + j < glyph_count; j++) {
+                            if (info.cluster != glyph_info[i + j].cluster) {
+                                current_cluster = {info.cluster, glyph_info[i + j].cluster};
+                                break;
+                            }
+                        }
+                    }
+                    if (!current_cluster.has_value()) {
+                        current_cluster = {info.cluster, (unsigned long long)(run_range.end)};
+                    }
+                } else {
+                    if (i > 0) {
+                        // Multiple glyphs may share the same cluster.
+                        for (int j = 1; i - j >= 0; j++) {
+                            if (info.cluster != glyph_info[i - j].cluster) {
+                                current_cluster = {info.cluster, glyph_info[i - j].cluster};
+                                break;
+                            }
+                        }
+                    }
+                    if (!current_cluster.has_value()) {
+                        current_cluster = {info.cluster, (unsigned long long)(run_range.end)};
+                    }
+                }
+
+                std::u32string glyph_text_u32 = text_u32.substr(current_cluster->start, current_cluster->length());
+
+                std::string glyph_text = from_utf32_to_utf8(glyph_text_u32);
+                //                    std::cout << "Glyph text: " << glyph_text << std::endl;
+
+                Glyph glyph;
+
+                // One glyph may have multiple codepoints.
+                // Eg. स् = स + ्
+                glyph.codepoints = glyph_text_u32;
+
+                glyph.text = glyph_text;
+
+                // Codepoint property is replaced with glyph ID after shaping.
+                glyph.index = info.codepoint;
+
+                // Check if the glyph has already been cached.
+                if (glyph_cache.find(glyph.index) != glyph_cache.end()) {
+                    glyphs.push_back(glyph_cache[glyph.index]);
+                    continue;
+                }
+
+                glyph.script = run_script;
+
+                // Mark line breaks, so they're not drawn.
+                if (glyph_text == "\n") {
+                    glyph.skip_drawing = true;
+                } else {
+                    glyph.x_offset = pos.x_offset;
+                    glyph.y_offset = pos.y_offset;
+
+                    // Don't know why harfbuzz returns incorrect advance.
+                    // So, we use the info provided by freetype.
+                    //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
+                    glyph.x_advance = get_glyph_advance(glyph.index);
+
+                    // Debug
+                    // {
+                    //     int bitmap_width;
+                    //     int bitmap_height;
+                    //     int bitmap_xoffset;
+                    //     int bitmap_yoffset;
+                    //
+                    //     auto bitmap_data = stbtt_GetGlyphBitmap(&stbtt_info,
+                    //                                             scale,
+                    //                                             scale,
+                    //                                             glyph.index,
+                    //                                             &bitmap_width,
+                    //                                             &bitmap_height,
+                    //                                             &bitmap_xoffset,
+                    //                                             &bitmap_yoffset);
+                    //
+                    //     stbi_write_png(("glyph_bitmap_" + glyph.text + ".png").c_str(),
+                    //                    bitmap_width,
+                    //                    bitmap_height,
+                    //                    1,
+                    //                    bitmap_data,
+                    //                    bitmap_width);
+                    //
+                    //     int _ = 0;
+                    // }
+
+                    para_width += glyph.x_advance;
+
+                    // Get glyph path.
+                    glyph.path = get_glyph_path(glyph.index);
+
+                    // The glyph's layout box in the glyph's local coordinates.
+                    // The origin is the baseline. The Y axis is downward.
+                    glyph.box = RectF(0, (float)-ascent, glyph.x_advance, (float)-descent);
+
+                    // Get the glyph path's bounding box. The Y axis points down.
+                    RectI bounding_box = get_glyph_bounds(glyph.index);
+
+                    // BBox in the glyph's local coordinates.
+                    glyph.bbox = bounding_box.to_f32();
+                }
+
+                glyphs.push_back(glyph);
+            }
+
+            hb_buffer_destroy(hb_buffer);
+        }
+
+        // Record glyph start and end in the new paragraph.
+        Line para{};
+        para.glyph_ranges = {para_glyph_start, glyphs.size()};
+        para.rtl = para_is_rtl;
+        para.width = para_width;
+        para_ranges.push_back(para);
+    }
+}
 
 #endif
-}
 
 uint16_t Font::find_glyph_index_by_codepoint(int codepoint) {
     return stbtt_FindGlyphIndex(&stbtt_info, codepoint);

@@ -165,7 +165,7 @@ void TextEdit::input(InputEvent &event) {
                 if (key_args.key == KeyCode::V && input_server->is_key_pressed(KeyCode::LeftControl)) {
                     auto clipboard_text = input_server->get_clipboard(get_window());
                     std::u32string clipboard_text_u32;
-                    from_utf8(clipboard_text, clipboard_text_u32);
+                    from_utf8_to_utf16(clipboard_text, clipboard_text_u32);
                     label->insert_text(current_caret_index, clipboard_text);
                     current_caret_index += clipboard_text_u32.size();
                     selection_start_index = current_caret_index;
