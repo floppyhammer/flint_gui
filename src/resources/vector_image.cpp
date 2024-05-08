@@ -8,8 +8,6 @@
 #include "../common/utils.h"
 #include "../servers/vector_server.h"
 
-using std::vector;
-
 namespace Flint {
 
 VectorImage::VectorImage(Vec2I _size) {
@@ -36,11 +34,11 @@ void VectorImage::add_path(const VectorPath &new_path) {
     paths.push_back(new_path);
 }
 
-vector<VectorPath> &VectorImage::get_paths() {
+std::vector<VectorPath> &VectorImage::get_paths() {
     return paths;
 }
 
-shared_ptr<Pathfinder::SvgScene> VectorImage::get_svg_scene() {
+std::shared_ptr<Pathfinder::SvgScene> VectorImage::get_svg_scene() {
     return svg_scene;
 }
 

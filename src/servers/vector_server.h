@@ -63,7 +63,7 @@ public:
                      const Transform2 &transform,
                      const RectF &clip_box);
 
-    shared_ptr<Pathfinder::SvgScene> load_svg(const std::string &path);
+    std::shared_ptr<Pathfinder::SvgScene> load_svg(const std::string &path);
 
     std::shared_ptr<Pathfinder::Canvas> get_canvas() const;
 

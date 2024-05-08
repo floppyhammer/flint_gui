@@ -264,7 +264,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
     canvas->restore_state();
 }
 
-shared_ptr<Pathfinder::SvgScene> VectorServer::load_svg(const std::string &path) {
+std::shared_ptr<Pathfinder::SvgScene> VectorServer::load_svg(const std::string &path) {
     auto bytes = Pathfinder::load_file_as_string(path);
 
     auto svg_scene = std::make_shared<Pathfinder::SvgScene>(bytes, *canvas);

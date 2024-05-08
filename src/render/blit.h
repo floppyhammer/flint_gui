@@ -14,7 +14,7 @@ class Blit {
 public:
     Blit(const std::shared_ptr<Pathfinder::Device> &_device,
          const std::shared_ptr<Pathfinder::Queue> &_queue,
-         const std::shared_ptr<Pathfinder::RenderPass> &render_pass);
+         Pathfinder::TextureFormat target_format);
 
     void set_texture(const std::shared_ptr<Pathfinder::Texture> &new_texture);
 

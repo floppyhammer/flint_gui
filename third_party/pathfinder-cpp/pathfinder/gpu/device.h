@@ -41,15 +41,15 @@ public:
 
     virtual std::shared_ptr<ShaderModule> create_shader_module(const std::vector<char> &source_code,
                                                                ShaderStage shader_stage,
-                                                               const std::string &label = "") = 0;
+                                                               const std::string &label) = 0;
 
     virtual std::shared_ptr<RenderPipeline> create_render_pipeline(
         const std::shared_ptr<ShaderModule> &vert_shader_module,
         const std::shared_ptr<ShaderModule> &frag_shader_module,
-        const std::vector<VertexInputAttributeDescription> &_attribute_descriptions,
-        BlendState _blend_state,
+        const std::vector<VertexInputAttributeDescription> &attribute_descriptions,
+        BlendState blend_state,
         const std::shared_ptr<DescriptorSet> &descriptor_set,
-        const std::shared_ptr<RenderPass> &render_pass,
+        TextureFormat target_format,
         const std::string &label) = 0;
 
     virtual std::shared_ptr<ComputePipeline> create_compute_pipeline(

@@ -32,7 +32,7 @@ struct ShadowBlurRenderTargetInfo {
  * @param outline_bounds Original path bounds.
  */
 ShadowBlurRenderTargetInfo push_shadow_blur_render_targets(Scene &scene,
-                                                           BrushState &current_state,
+                                                           const BrushState &current_state,
                                                            RectF outline_bounds) {
     ShadowBlurRenderTargetInfo shadow_blur_info;
 
@@ -45,8 +45,8 @@ ShadowBlurRenderTargetInfo push_shadow_blur_render_targets(Scene &scene,
     // Bounds expansion caused by blurring.
     auto bounds = outline_bounds.dilate(sigma * 3.f).round_out().to_i32();
 
-    shadow_blur_info.id_y = scene.push_render_target(RenderTargetDesc{bounds.size(), "Shadow Blur X"});
-    shadow_blur_info.id_x = scene.push_render_target(RenderTargetDesc{bounds.size(), "Shadow Blur Y"});
+    shadow_blur_info.id_y = scene.push_render_target(RenderTargetDesc{bounds.size(), "shadow blur x"});
+    shadow_blur_info.id_x = scene.push_render_target(RenderTargetDesc{bounds.size(), "shadow blur y"});
 
     shadow_blur_info.sigma = sigma;
     shadow_blur_info.bounds = bounds;
@@ -128,17 +128,17 @@ Canvas::Canvas(Vec2I size,
                RenderLevel _render_level)
     : device(_device), render_level(_render_level) {
     // Create the renderer and scene builder.
-    if (render_level == RenderLevel::Dx9) {
-        Logger::info("Created new canvas using Dx9 render level", "Canvas");
+    if (render_level == RenderLevel::D3d9) {
+        Logger::info("Created new canvas using D3d9 render level", "Canvas");
         renderer = std::make_shared<RendererD3D9>(device, _queue);
         scene_builder = std::make_shared<SceneBuilderD3D9>();
     } else {
 #ifdef PATHFINDER_ENABLE_D3D11
-        Logger::info("Created new canvas using Dx11 render level", "Canvas");
+        Logger::info("Created new canvas using D3d11 render level", "Canvas");
         renderer = std::make_shared<RendererD3D11>(device, _queue);
         scene_builder = std::make_shared<SceneBuilderD3D11>();
 #else
-        throw std::runtime_error(std::string("Pathfinder Dx11 level is selected but not enabled!"));
+        throw std::runtime_error(std::string("Pathfinder D3d11 level is selected but not enabled!"));
 #endif
     }
 

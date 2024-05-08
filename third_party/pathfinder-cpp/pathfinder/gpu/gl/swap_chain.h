@@ -24,8 +24,6 @@ public:
     }
 #else
     SwapChainGl(Vec2I _size) : SwapChain(_size) {
-        framebuffer_ = std::shared_ptr<FramebufferGl>(new FramebufferGl(size_));
-
         command_encoder_ = std::shared_ptr<CommandEncoderGl>(new CommandEncoderGl());
 
         render_pass_ = std::shared_ptr<RenderPassGl>(new RenderPassGl(AttachmentLoadOp::Clear));
@@ -38,6 +36,10 @@ public:
 
     std::shared_ptr<Texture> get_surface_texture() override {
         return nullptr;
+    }
+
+    TextureFormat get_surface_format() const override {
+        return TextureFormat::Rgba8Unorm;
     }
 
     bool acquire_image() override {

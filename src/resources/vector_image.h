@@ -35,12 +35,12 @@ public:
 
     std::vector<VectorPath> &get_paths();
 
-    shared_ptr<Pathfinder::SvgScene> get_svg_scene();
+    std::shared_ptr<Pathfinder::SvgScene> get_svg_scene();
 
 protected:
     std::vector<VectorPath> paths;
 
-    shared_ptr<Pathfinder::SvgScene> svg_scene;
+    std::shared_ptr<Pathfinder::SvgScene> svg_scene;
 };
 
 } // namespace Flint

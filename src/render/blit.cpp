@@ -12,9 +12,7 @@ using namespace Pathfinder;
 
 namespace Flint {
 
-Blit::Blit(const std::shared_ptr<Device> &_device,
-           const std::shared_ptr<Queue> &_queue,
-           const std::shared_ptr<RenderPass> &render_pass) {
+Blit::Blit(const std::shared_ptr<Device> &_device, const std::shared_ptr<Queue> &_queue, TextureFormat target_format) {
     device = _device;
     queue = _queue;
 
@@ -63,13 +61,13 @@ Blit::Blit(const std::shared_ptr<Device> &_device,
             Descriptor::sampled(0, ShaderStage::Fragment, "uTexture"),
         });
 
-        pipeline = device->create_render_pipeline(device->create_shader_module(vert_source, ShaderStage::Vertex),
-                                                  device->create_shader_module(frag_source, ShaderStage::Fragment),
+        pipeline = device->create_render_pipeline(device->create_shader_module(vert_source, ShaderStage::Vertex, ""),
+                                                  device->create_shader_module(frag_source, ShaderStage::Fragment, ""),
                                                   attribute_descriptions,
                                                   blend_state,
                                                   descriptor_set,
-                                                  render_pass,
-                                                  "Blit pipeline");
+                                                  target_format,
+                                                  "blit pipeline");
     }
 }
 

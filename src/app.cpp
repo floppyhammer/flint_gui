@@ -35,14 +35,14 @@ App::App(Vec2I primary_window_size) {
 
     auto vector_server = VectorServer::get_singleton();
     vector_server->init(
-        primary_window_->get_size(), render_server->device_, render_server->queue_, Pathfinder::RenderLevel::Dx9);
+        primary_window_->get_size(), render_server->device_, render_server->queue_, Pathfinder::RenderLevel::D3d9);
 
     tree = std::make_unique<SceneTree>();
     tree->primary_window = primary_window_;
 
     {
         render_server->blit_ = std::make_shared<Blit>(
-            render_server->device_, render_server->queue_, primary_swap_chain_->get_render_pass());
+            render_server->device_, render_server->queue_, primary_swap_chain_->get_surface_format());
 
         vector_target_ = render_server->device_->create_texture(
             {primary_window_size, Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
