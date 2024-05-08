@@ -24,25 +24,27 @@ App::App(Vec2I primary_window_size) {
     primary_window_ = render_server->window_builder_->get_primary_window();
 
     auto input_server = InputServer::get_singleton();
-    input_server->initialize_window_callbacks((GLFWwindow*)primary_window_->get_glfw_handle());
+    input_server->initialize_window_callbacks((GLFWwindow*)primary_window_.lock()->get_glfw_handle());
 
     // Create device and queue.
     render_server->device_ = render_server->window_builder_->request_device();
     render_server->queue_ = render_server->window_builder_->create_queue();
 
     // Create swap chains for windows.
-    primary_swap_chain_ = primary_window_->get_swap_chain(render_server->device_);
+    primary_swap_chain_ = primary_window_.lock()->get_swap_chain(render_server->device_);
 
     auto vector_server = VectorServer::get_singleton();
-    vector_server->init(
-        primary_window_->get_size(), render_server->device_, render_server->queue_, Pathfinder::RenderLevel::D3d9);
+    vector_server->init(primary_window_.lock()->get_size(),
+                        render_server->device_,
+                        render_server->queue_,
+                        Pathfinder::RenderLevel::D3d9);
 
     tree = std::make_unique<SceneTree>();
     tree->primary_window = primary_window_;
 
     {
         render_server->blit_ = std::make_shared<Blit>(
-            render_server->device_, render_server->queue_, primary_swap_chain_->get_surface_format());
+            render_server->device_, render_server->queue_, primary_swap_chain_.lock()->get_surface_format());
 
         vector_target_ = render_server->device_->create_texture(
             {primary_window_size, Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
@@ -53,8 +55,13 @@ App::~App() {
     // Clean up the scene tree.
     tree.reset();
 
+    vector_target_.reset();
+
     VectorServer::get_singleton()->cleanup();
     Logger::verbose("Cleaned up VectorServer.", "App");
+
+    RenderServer::get_singleton()->destroy();
+    Logger::verbose("Cleaned up RenderServer.", "App");
 }
 
 SceneTree* App::get_tree() const {
@@ -66,15 +73,15 @@ std::shared_ptr<Node> App::get_tree_root() const {
 }
 
 void App::main_loop() {
-    while (!primary_window_->should_close()) {
+    while (!primary_window_.lock()->should_close()) {
         InputServer::get_singleton()->clear_events();
 
         RenderServer::get_singleton()->window_builder_->poll_events();
 
-        if (primary_window_->get_resize_flag()) {
+        if (primary_window_.lock()->get_resize_flag()) {
             vector_target_ = RenderServer::get_singleton()->device_->create_texture(
-                {primary_window_->get_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
-            VectorServer::get_singleton()->get_canvas()->set_size(primary_window_->get_size());
+                {primary_window_.lock()->get_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
+            VectorServer::get_singleton()->get_canvas()->set_size(primary_window_.lock()->get_size());
         }
 
         // Engine processing.
@@ -89,7 +96,7 @@ void App::main_loop() {
         // Drawing process for the primary window;
         {
             // Acquire next swap chain image.
-            if (!primary_swap_chain_->acquire_image()) {
+            if (!primary_swap_chain_.lock()->acquire_image()) {
                 continue;
             }
 
@@ -101,14 +108,14 @@ void App::main_loop() {
 
             auto encoder = render_server->device_->create_command_encoder("Main encoder");
 
-            auto surface_texture = primary_swap_chain_->get_surface_texture();
+            auto surface_texture = primary_swap_chain_.lock()->get_surface_texture();
 
             // Swap chain render pass.
             {
                 encoder->begin_render_pass(
-                    primary_swap_chain_->get_render_pass(), surface_texture, ColorF(0.2, 0.2, 0.2, 1.0));
+                    primary_swap_chain_.lock()->get_render_pass(), surface_texture, ColorF(0.2, 0.2, 0.2, 1.0));
 
-                encoder->set_viewport({{0, 0}, primary_window_->get_size()});
+                encoder->set_viewport({{0, 0}, primary_window_.lock()->get_size()});
 
                 render_server->blit_->set_texture(vector_target_);
 
@@ -118,9 +125,9 @@ void App::main_loop() {
                 encoder->end_render_pass();
             }
 
-            render_server->queue_->submit(encoder, primary_swap_chain_);
+            render_server->queue_->submit(encoder, primary_swap_chain_.lock());
 
-            primary_swap_chain_->present();
+            primary_swap_chain_.lock()->present();
         }
     }
 

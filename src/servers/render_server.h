@@ -13,6 +13,13 @@ public:
         return &singleton;
     }
 
+    void destroy() {
+        blit_.reset();
+        queue_.reset();
+        device_.reset();
+        window_builder_.reset();
+    }
+
     std::shared_ptr<Pathfinder::WindowBuilder> window_builder_;
     std::shared_ptr<Pathfinder::Device> device_;
     std::shared_ptr<Pathfinder::Queue> queue_;

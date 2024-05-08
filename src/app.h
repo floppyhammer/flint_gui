@@ -29,8 +29,8 @@ public:
 private:
     std::unique_ptr<SceneTree> tree;
 
-    std::shared_ptr<Pathfinder::Window> primary_window_;
-    std::shared_ptr<Pathfinder::SwapChain> primary_swap_chain_;
+    std::weak_ptr<Pathfinder::Window> primary_window_;
+    std::weak_ptr<Pathfinder::SwapChain> primary_swap_chain_;
     std::shared_ptr<Pathfinder::Texture> vector_target_;
 };
 

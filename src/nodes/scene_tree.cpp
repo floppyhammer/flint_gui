@@ -185,8 +185,8 @@ void SceneTree::process(double dt) {
         return;
     }
 
-    if (primary_window && old_primary_window_size != primary_window->get_size()) {
-        old_primary_window_size = primary_window->get_size();
+    if (primary_window.lock() && old_primary_window_size != primary_window.lock()->get_size()) {
+        old_primary_window_size = primary_window.lock()->get_size();
         when_primary_window_size_changed(old_primary_window_size);
     }
 

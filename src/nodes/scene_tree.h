@@ -44,7 +44,7 @@ public:
     bool has_quited() const;
 
 private:
-    std::shared_ptr<Pathfinder::Window> primary_window;
+    std::weak_ptr<Pathfinder::Window> primary_window;
     Vec2I old_primary_window_size;
 
     std::shared_ptr<Node> root;
