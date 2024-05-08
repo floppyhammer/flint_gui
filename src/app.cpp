@@ -123,6 +123,8 @@ void App::main_loop() {
             primary_swap_chain_->present();
         }
     }
+
+    RenderServer::get_singleton()->window_builder_->preapre_destruction();
 }
 
 } // namespace Flint
