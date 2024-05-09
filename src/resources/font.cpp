@@ -27,6 +27,7 @@
 #endif
 
 #include <fribidi/fribidi.h>
+#include <hb.h>
 
 #include <gzip/decompress.hpp>
 #include <gzip/utils.hpp>
@@ -81,6 +82,32 @@ Script get_text_script(const std::string &text) {
     return Script::Common;
 }
 
+struct HarfBuzzRes {
+    hb_blob_t *blob{};
+    hb_face_t *face{};
+    hb_font_t *font{};
+
+    HarfBuzzRes() = default;
+
+    explicit HarfBuzzRes(const std::vector<char> &bytes) {
+        blob = hb_blob_create(bytes.data(), bytes.size(), HB_MEMORY_MODE_READONLY, nullptr, nullptr);
+        face = hb_face_create(blob, 0);
+        font = hb_font_create(face);
+    }
+
+    ~HarfBuzzRes() {
+        if (font) {
+            hb_font_destroy(font);
+        }
+        if (face) {
+            hb_face_destroy(face);
+        }
+        if (blob) {
+            hb_blob_destroy(blob);
+        }
+    }
+};
+
 Font::Font(const std::string &path) : Resource(path) {
     font_data = Pathfinder::load_file_as_bytes(path.c_str());
 
@@ -90,7 +117,8 @@ Font::Font(const std::string &path) : Resource(path) {
     memcpy(stbtt_buffer, font_data.data(), byte_size);
 
     // Prepare font info.
-    if (!stbtt_InitFont(&stbtt_info, stbtt_buffer, 0)) {
+    stbtt_info = new stbtt_fontinfo;
+    if (!stbtt_InitFont(stbtt_info, stbtt_buffer, 0)) {
         Logger::error("Failed to prepare font info!", "Font");
     }
 
@@ -101,18 +129,20 @@ Font::Font(const std::string &path) : Resource(path) {
 
 Font::~Font() {
     free(stbtt_buffer);
+
+    delete stbtt_info;
 }
 
 void Font::get_metrics() {
     // Calculate font scaling.
-    scale = stbtt_ScaleForPixelHeight(&stbtt_info, (float)size);
+    scale = stbtt_ScaleForPixelHeight(stbtt_info, (float)size);
 
     // The origin is baseline and the Y axis points upward.
     // So, ascent is usually positive, and descent negative.
     int unscaled_ascent;
     int unscaled_descent;
     int unscaled_line_gap;
-    stbtt_GetFontVMetrics(&stbtt_info, &unscaled_ascent, &unscaled_descent, &unscaled_line_gap);
+    stbtt_GetFontVMetrics(stbtt_info, &unscaled_ascent, &unscaled_descent, &unscaled_line_gap);
 
     // Take scale into account.
     ascent = roundf(float(unscaled_ascent) * scale);
@@ -121,7 +151,7 @@ void Font::get_metrics() {
 
 std::string Font::get_glyph_svg(uint16_t glyph_index) const {
     const char *data{};
-    size_t data_size = stbtt_GetGlyphSVG(&stbtt_info, glyph_index, &data);
+    size_t data_size = stbtt_GetGlyphSVG(stbtt_info, glyph_index, &data);
     if (data_size > 0) {
         // Check if compressed. Can check both gzip and zlib.
         bool compressed = gzip::is_compressed(data, data_size);
@@ -140,7 +170,7 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
     Pathfinder::Path2d path;
 
     stbtt_vertex *vertices{};
-    int num_vertices = stbtt_GetGlyphShape(&stbtt_info, glyph_index, &vertices);
+    int num_vertices = stbtt_GetGlyphShape(stbtt_info, glyph_index, &vertices);
 
     // Glyph has no shape (e.g. Space).
     if (vertices == nullptr) {
@@ -171,7 +201,7 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
     // Close the last contour in the outline.
     path.close_path();
 
-    stbtt_FreeShape(&stbtt_info, vertices);
+    stbtt_FreeShape(stbtt_info, vertices);
 
     return path;
 }
@@ -723,13 +753,13 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
 #endif
 
 uint16_t Font::find_glyph_index_by_codepoint(int codepoint) {
-    return stbtt_FindGlyphIndex(&stbtt_info, codepoint);
+    return stbtt_FindGlyphIndex(stbtt_info, codepoint);
 }
 
 RectI Font::get_glyph_bounds(uint16_t glyph_index) const {
     RectI bounding_box;
 
-    stbtt_GetGlyphBitmapBox(&stbtt_info,
+    stbtt_GetGlyphBitmapBox(stbtt_info,
                             glyph_index,
                             scale,
                             scale,
@@ -751,7 +781,7 @@ float Font::get_glyph_advance(uint16_t glyph_index) const {
     // It is positive for horizontal layouts, and in most cases negative for vertical ones.
     int left_side_bearing;
 
-    stbtt_GetGlyphHMetrics(&stbtt_info, glyph_index, &advance_width, &left_side_bearing);
+    stbtt_GetGlyphHMetrics(stbtt_info, glyph_index, &advance_width, &left_side_bearing);
 
     return (float)advance_width * scale;
 }

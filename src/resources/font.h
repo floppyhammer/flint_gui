@@ -1,9 +1,7 @@
 #ifndef FLINT_FONT_H
 #define FLINT_FONT_H
 
-#include <hb.h>
 #include <pathfinder/prelude.h>
-#include <stb/stb_truetype.h>
 
 #include <codecvt>
 #include <cstdio>
@@ -13,6 +11,8 @@
 #include "../common/geometry.h"
 #include "../common/utils.h"
 #include "resource.h"
+
+struct stbtt_fontinfo;
 
 namespace Flint {
 
@@ -80,36 +80,6 @@ std::string utf32_to_utf8(const std::basic_string<T> &source) {
 //     return s;
 // }
 
-struct HarfBuzzRes {
-    hb_blob_t *blob{}; /* or hb_blob_create_from_file_or_fail() */
-    hb_face_t *face{};
-    hb_font_t *font{};
-
-    HarfBuzzRes() = default;
-
-    explicit HarfBuzzRes(const std::vector<char> &bytes) {
-        blob = hb_blob_create(bytes.data(),
-                              bytes.size(),
-                              HB_MEMORY_MODE_READONLY,
-                              nullptr,
-                              nullptr); /* or hb_blob_create_from_file_or_fail() */
-        face = hb_face_create(blob, 0);
-        font = hb_font_create(face);
-    }
-
-    ~HarfBuzzRes() {
-        if (font) {
-            hb_font_destroy(font);
-        }
-        if (face) {
-            hb_face_destroy(face);
-        }
-        if (blob) {
-            hb_blob_destroy(blob);
-        }
-    }
-};
-
 struct TextStyle {
     ColorU color = ColorU::white();
     ColorU stroke_color;
@@ -174,6 +144,8 @@ struct Line {
     float width = 0;
 };
 
+struct HarfBuzzRes;
+
 class Font : public Resource {
 public:
     explicit Font(const std::string &path);
@@ -207,7 +179,7 @@ private:
     /// Stores font data, should not be freed until font is deleted.
     unsigned char *stbtt_buffer{};
 
-    stbtt_fontinfo stbtt_info{};
+    stbtt_fontinfo *stbtt_info{};
 
     uint32_t size = 32;
 
@@ -222,7 +194,6 @@ private:
 
     std::vector<char> font_data;
 
-private:
     void get_metrics();
 };
 
