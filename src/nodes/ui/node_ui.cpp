@@ -1,9 +1,8 @@
 #include "node_ui.h"
 
-#include <nodes/scene_tree.h>
-
 #include "../../common/geometry.h"
 #include "../../resources/default_resource.h"
+#include "../scene_tree.h"
 
 using Pathfinder::Rect;
 

@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.16.1)
+cmake_minimum_required(VERSION 3.16)
 
-project(flint_gui)
+project(flint_gui
+        VERSION 0.1
+        LANGUAGES C CXX)
 
 # Has to be 17 or above.
 set(CMAKE_CXX_STANDARD 17)
@@ -24,6 +26,8 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
         third_party/tinyfiledialogs/tinyfiledialogs.c
         third_party/fribidi/*.c
         third_party/ttf2mesh/ttf2mesh.c)
+
+add_library(flint_gui STATIC ${SOURCE_FILES})
 
 # Include external and third-party headers.
 include_directories(third_party)
@@ -76,8 +80,6 @@ if (ON)
         add_compile_definitions(HAVE_STRINGS_H)
     endif ()
 endif ()
-
-add_library(flint_gui ${SOURCE_FILES})
 
 if (FLINT_GUI_VISUAL_DEBUG)
     add_compile_definitions(FLINT_GUI_VISUAL_DEBUG)

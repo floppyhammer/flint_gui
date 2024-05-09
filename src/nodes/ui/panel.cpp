@@ -1,10 +1,9 @@
 #include "panel.h"
 
-#include <resources/default_resource.h>
-
 #include <string>
 
 #include "../../common/utils.h"
+#include "../../resources/default_resource.h"
 
 namespace Flint {
 

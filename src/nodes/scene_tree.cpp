@@ -1,7 +1,6 @@
 #include "scene_tree.h"
 
-#include <servers/render_server.h>
-
+#include "../servers/render_server.h"
 #include "sub_window.h"
 
 namespace Flint {

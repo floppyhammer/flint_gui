@@ -1,6 +1,6 @@
 #include "check_button.h"
 
-#include "resources/default_resource.h"
+#include "../../resources/default_resource.h"
 
 namespace Flint {
 
