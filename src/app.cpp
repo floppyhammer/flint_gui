@@ -131,7 +131,7 @@ void App::main_loop() {
         }
     }
 
-    RenderServer::get_singleton()->window_builder_->preapre_destruction();
+    RenderServer::get_singleton()->window_builder_->stop_and_destroy_swapchains();
 }
 
 } // namespace Flint
