@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(pathfinder)
-
-set(CMAKE_CXX_STANDARD 14)
+project(pathfinder
+        VERSION 0.1
+        LANGUAGES C CXX)
 
 # Set binary output directory.
 # (Using CMAKE_CURRENT_SOURCE_DIR is necessary.)
@@ -13,7 +13,7 @@ option(PATHFINDER_VULKAN_SUPPORT "Use Vulkan instead of OpenGL" OFF)
 option(PATHFINDER_BUILD_DEMO "Build demo" OFF)
 
 # Identify Linux.
-if (UNIX AND NOT APPLE)
+if (UNIX AND NOT APPLE AND NOT ANDROID)
     set(LINUX ON)
 endif ()
 
@@ -32,20 +32,14 @@ endif ()
 
 add_subdirectory(pathfinder)
 
+target_compile_features(pathfinder PUBLIC cxx_std_14)
+
 if (PATHFINDER_VULKAN_SUPPORT)
     message("[Pathfinder] Use Vulkan")
 
-    # In case Vulkan is found but Vulkan_LIBRARY is not.
-    #    set(Vulkan_LIBRARY "C:/VulkanSDK/1.3.224.1/Lib/vulkan-1.lib")
-
-    # More generally, you are using find_package and then later you're using add_subdirectory
-    # to try to incorporate these external projects. That's not how it works. find_package will
-    # look for a pre-existing binary of the package, while add_subdirectory isn't designed to
-    # just swallow entire existing external CMake projects.
-    # Cf. https://stackoverflow.com/questions/56795645/how-can-i-add-vulkan-to-a-cross-platform-cmake-project
     find_package(Vulkan REQUIRED)
 
-    # We need to include Vulkan headers manually because of the above reason.
+    # This is to please GitHub Actions.
     target_include_directories(pathfinder PUBLIC "${Vulkan_INCLUDE_DIRS}")
 else ()
     message("[Pathfinder] Use OpenGL")
@@ -61,14 +55,10 @@ if ((WIN32 OR LINUX OR APPLE) AND NOT (EMSCRIPTEN OR ANDROID))
             GIT_REPOSITORY https://github.com/floppyhammer/glfw.git
             GIT_TAG master
     )
-    FetchContent_GetProperties(glfw)
 
-    if (NOT glfw_POPULATED)
-        message("[Pathfinder] Fetching external git repositories")
-        FetchContent_Populate(glfw)
-    endif ()
+    message("[Pathfinder] Fetching external git repositories")
+    FetchContent_MakeAvailable(glfw)
 
-    add_subdirectory("${glfw_SOURCE_DIR}" glfw)
     target_include_directories(pathfinder PUBLIC "${glfw_SOURCE_DIR}/include")
     target_link_libraries(pathfinder PUBLIC glfw)
 endif ()
@@ -81,19 +71,17 @@ endif ()
 
 # Link libraries.
 if (WIN32)
-    target_link_libraries(pathfinder PUBLIC glfw)
     if (PATHFINDER_VULKAN_SUPPORT)
         target_link_libraries(pathfinder PUBLIC Vulkan::Vulkan)
     endif ()
 elseif (LINUX)
-    target_link_libraries(pathfinder PUBLIC glfw)
     if (PATHFINDER_VULKAN_SUPPORT)
         target_link_libraries(pathfinder PUBLIC -lvulkan)
     else ()
         target_link_libraries(pathfinder PUBLIC -lGL)
     endif ()
 elseif (APPLE)
-    target_link_libraries(pathfinder PUBLIC glfw Vulkan::Vulkan)
+    target_link_libraries(pathfinder PUBLIC Vulkan::Vulkan)
 endif ()
 
 if (PATHFINDER_BUILD_DEMO)
@@ -109,7 +97,6 @@ if (PATHFINDER_BUILD_DEMO)
     add_subdirectory(demo/common)
 
     if ((WIN32 OR LINUX OR APPLE) AND NOT (EMSCRIPTEN OR ANDROID))
-        add_subdirectory(${glfw_SOURCE_DIR})
         add_subdirectory(demo/native)
     elseif (EMSCRIPTEN)
         # Set output directory to the web demo, so we don't have to copy output files manually.
