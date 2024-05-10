@@ -4,7 +4,7 @@ This is an experimental vector-based GUI framework.
 
 **Warning: still in development.**
 
-Features:
+### Features
 
 * Node-based scene management
 * Vulkan/OpenGL backend
@@ -15,6 +15,10 @@ Features:
 
 The development work has been mostly done on Windows, but it should be easy to make
 it run on other platforms.
+
+### How it looks
+
+![Example 0](screenshot_0.png)
 
 ![Example 1](screenshot_1.png)
 
