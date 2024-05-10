@@ -28,10 +28,6 @@ target_compile_features(flint_gui PUBLIC cxx_std_17)
 # Include external and third-party headers.
 target_include_directories(flint_gui PUBLIC "third_party")
 
-# GLFW
-target_include_directories(flint_gui PUBLIC "third_party/glfw/include")
-add_subdirectory("third_party/glfw")
-
 if (FLINT_GUI_VULKAN)
     set(PATHFINDER_VULKAN_SUPPORT ON CACHE BOOL "" FORCE)
 else ()
