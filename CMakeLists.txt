@@ -4,8 +4,6 @@ project(flint_gui
         VERSION 0.1
         LANGUAGES C CXX)
 
-# Has to be 17 or above.
-set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 # Identify Linux.
@@ -23,6 +21,9 @@ file(GLOB_RECURSE FLINT_GUI_SOURCE_FILES CONFIGURE_DEPENDS
         third_party/ttf2mesh/ttf2mesh.c)
 
 add_library(flint_gui STATIC ${FLINT_GUI_SOURCE_FILES})
+
+# Has to be 17 or above.
+target_compile_features(flint_gui PUBLIC cxx_std_17)
 
 # Include external and third-party headers.
 target_include_directories(flint_gui PUBLIC "third_party")
