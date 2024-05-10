@@ -8,6 +8,11 @@ project(flint_gui
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
+# Identify Linux.
+if (UNIX AND NOT APPLE)
+    set(LINUX ON)
+endif ()
+
 option(FLINT_GUI_VULKAN "Use Vulkan instead of OpenGL" OFF)
 option(FLINT_GUI_VISUAL_DEBUG "Enable visual debug" OFF)
 
@@ -18,16 +23,6 @@ file(GLOB_RECURSE FLINT_GUI_SOURCE_FILES CONFIGURE_DEPENDS
         third_party/ttf2mesh/ttf2mesh.c)
 
 add_library(flint_gui STATIC ${FLINT_GUI_SOURCE_FILES})
-
-# More generally, you are using find_package and then later you're using add_subdirectory
-# to try to incorporate these external projects. That's not how it works. find_package will
-# look for a pre-existing binary of the package, while add_subdirectory isn't designed to
-# just swallow entire existing external CMake projects.
-# Cf. https://stackoverflow.com/questions/56795645/how-can-i-add-vulkan-to-a-cross-platform-cmake-project
-find_package(Vulkan REQUIRED)
-
-# We need to include Vulkan headers manually because of the above reason.
-target_include_directories(flint_gui PUBLIC "${Vulkan_INCLUDE_DIRS}")
 
 # Include external and third-party headers.
 target_include_directories(flint_gui PUBLIC "third_party")
@@ -55,16 +50,18 @@ target_include_directories(flint_gui PUBLIC "third_party/stduuid-1.2.3")
 add_subdirectory("third_party/poly2tri")
 add_subdirectory("third_party/zlib")
 
+target_link_libraries(flint_gui PUBLIC pathfinder poly2tri harfbuzz zlib)
+
 if (WIN32)
     # Fix "too many characters in constant" error when using CMake with MSVC.
     string(APPEND CMAKE_CXX_FLAGS " /utf-8")
 
-    set(LINKING_LIBS flint_gui glfw pathfinder Vulkan::Vulkan poly2tri harfbuzz icu zlib)
-else ()
+    target_link_libraries(flint_gui PUBLIC icu)
+elseif (LINUX)
     # icu4c.
     find_package(ICU 70.0 COMPONENTS uc i18n REQUIRED)
 
-    set(LINKING_LIBS flint_gui glfw pathfinder Vulkan::Vulkan poly2tri harfbuzz ICU::uc ICU::i18n zlib)
+    target_link_libraries(flint_gui PUBLIC ICU::uc ICU::i18n)
 endif ()
 
 if (ON)

@@ -2,4 +2,4 @@ add_executable(progress_bar ${SOURCE_FILES} main.cpp)
 
 target_include_directories(progress_bar PUBLIC "../../src")
 
-target_link_libraries(progress_bar ${LINKING_LIBS})
+target_link_libraries(progress_bar flint_gui)
