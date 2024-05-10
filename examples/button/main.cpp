@@ -13,21 +13,10 @@ const uint32_t WINDOW_HEIGHT = 720;
 
 class MyNode : public Node {
     void custom_ready() override {
-
-    }
-};
-
-int main() {
-    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
-
-    // Build scene tree. Use a block, so we don't increase ref counts for the node.
-    {
-        auto root = app.get_tree_root();
-
         auto vbox_container = std::make_shared<VBoxContainer>();
         vbox_container->set_separation(8);
         vbox_container->set_position({100, 100});
-        root->add_child(vbox_container);
+        add_child(vbox_container);
 
         {
             auto button = std::make_shared<Button>();
@@ -50,7 +39,9 @@ int main() {
 
         vbox_container->set_size({800, 100});
     }
+};
 
+int main() {
     App app({WINDOW_WIDTH, WINDOW_HEIGHT});
 
     app.get_tree()->replace_root(std::make_shared<MyNode>());
