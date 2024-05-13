@@ -5,6 +5,7 @@
 #include "node.h"
 #include "ui/button.h"
 #include "ui/check_button.h"
+#include "ui/container/collapsing_container.h"
 #include "ui/container/box_container.h"
 #include "ui/container/margin_container.h"
 #include "ui/container/scroll_container.h"

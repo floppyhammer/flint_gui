@@ -36,7 +36,7 @@ public:
 
     void draw_line(Vec2F start, Vec2F end, float width, ColorU color);
 
-    void draw_rectangle(const RectF &rect, float line_width, ColorU color);
+    void draw_rectangle(const RectF &rect, float line_width, ColorU color, bool fill);
 
     void draw_circle(Vec2F center, float radius, float line_width, bool fill, ColorU color);
 

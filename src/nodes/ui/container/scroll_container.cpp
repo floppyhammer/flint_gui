@@ -8,10 +8,10 @@ ScrollContainer::ScrollContainer() {
     type = NodeType::ScrollContainer;
 
     theme_scroll_bar.bg_color = ColorU(100, 100, 100, 50);
-    theme_scroll_bar.corner_radius = 4;
+    theme_scroll_bar.corner_radius = 8;
 
     theme_scroll_grabber.bg_color = ColorU(163, 163, 163, 255);
-    theme_scroll_grabber.corner_radius = 4;
+    theme_scroll_grabber.corner_radius = 8;
 }
 
 void ScrollContainer::adjust_layout() {

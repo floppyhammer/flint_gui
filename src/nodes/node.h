@@ -25,6 +25,7 @@ enum class NodeType {
     VBoxContainer,
     ScrollContainer,
     TabContainer,
+    CollapsingContainer,
 
     Button,
     MenuButton,   // todo

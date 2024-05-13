@@ -80,7 +80,7 @@ PopupMenu::PopupMenu() {
 
     auto panel = StyleBox();
     panel.bg_color = ColorU(39, 39, 39, 255);
-    panel.corner_radius = 4;
+    panel.corner_radius = 8;
     panel.border_width = 2;
 
     theme_bg_ = std::make_optional(panel);

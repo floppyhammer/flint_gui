@@ -41,6 +41,10 @@ public:
 
     void set_icon(const std::shared_ptr<Image> &_icon);
 
+    void set_flat(bool flat) {
+        flat_ = flat;
+    }
+
     /// The icon will expand until it's height matches that of the button.
     void set_icon_expand(bool enable);
 
@@ -57,6 +61,8 @@ protected:
     bool toggle_mode = false;
 
     bool icon_expand_ = false;
+
+    bool flat_ = false;
 
     /// Button[HBoxContainer[TextureRect, Label]]
     std::shared_ptr<MarginContainer> margin_container;

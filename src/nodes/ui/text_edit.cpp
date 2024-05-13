@@ -33,7 +33,7 @@ TextEdit::TextEdit() {
 
     theme_selection_box.bg_color = ColorU(33, 66, 131, 255);
     theme_selection_box.border_width = 0;
-    theme_selection_box.corner_radius = 0;
+    theme_selection_box.corner_radius = {};
 
     set_text("Enter text");
 

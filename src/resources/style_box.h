@@ -22,7 +22,7 @@ struct StyleBox {
 
         box.border_color = ColorU::transparent_black();
         box.border_width = 0;
-        box.corner_radius = 0;
+        box.corner_radius = {};
 
         box.shadow_color = ColorU::transparent_black();
         box.shadow_size = 0;

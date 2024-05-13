@@ -178,7 +178,7 @@ void Button::draw() {
     active_style_box->bg_color = ColorU(active_style_box->bg_color.to_f32() * modulate.to_f32());
     active_style_box->border_color = ColorU(active_style_box->border_color.to_f32() * modulate.to_f32());
 
-    if (active_style_box.has_value()) {
+    if (active_style_box.has_value() && !flat_) {
         vector_server->draw_style_box(active_style_box.value(), global_position, size);
     }
 

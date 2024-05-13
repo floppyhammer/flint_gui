@@ -42,15 +42,20 @@ void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) 
     canvas->restore_state();
 }
 
-void VectorServer::draw_rectangle(const RectF &rect, float line_width, ColorU color) {
+void VectorServer::draw_rectangle(const RectF &rect, float line_width, ColorU color, bool fill) {
     canvas->save_state();
 
     Pathfinder::Path2d path;
     path.add_rect(rect);
 
-    canvas->set_stroke_paint(Pathfinder::Paint::from_color(color));
-    canvas->set_line_width(line_width);
-    canvas->stroke_path(path);
+    if (fill) {
+        canvas->set_fill_paint(Pathfinder::Paint::from_color(color));
+        canvas->fill_path(path, Pathfinder::FillRule::Winding);
+    } else {
+        canvas->set_stroke_paint(Pathfinder::Paint::from_color(color));
+        canvas->set_line_width(line_width);
+        canvas->stroke_path(path);
+    }
 
     canvas->restore_state();
 }

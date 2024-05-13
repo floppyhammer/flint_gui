@@ -40,6 +40,25 @@ public:
             style_box.corner_radius = 8;
             panel.styles["background"] = style_box;
         }
+
+        {
+            {
+                auto style_box = StyleBox();
+                style_box.bg_color = ColorU(86, 170, 114, 255);
+                style_box.border_width = 0;
+                style_box.corner_radius = 8;
+                collapsing_panel.styles["title_bar"] = style_box;
+            }
+
+            {
+                auto style_box = StyleBox();
+                style_box.bg_color = ColorU(32, 32, 32, 255);
+                style_box.border_color = {86, 170, 114, 255};
+                style_box.border_width = 2;
+                style_box.corner_radius = 8;
+                collapsing_panel.styles["background"] = style_box;
+            }
+        }
     }
 
     struct {
@@ -58,6 +77,11 @@ public:
         std::map<std::string, ColorU> colors;
         std::map<std::string, StyleBox> styles;
     } panel;
+
+    struct {
+        std::map<std::string, ColorU> colors;
+        std::map<std::string, StyleBox> styles;
+    } collapsing_panel;
 };
 
 } // namespace Flint
