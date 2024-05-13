@@ -24,4 +24,6 @@ it run on other platforms.
 
 ![Example 2](screenshot_2.png)
 
-![Example 2](screenshot_3.png)
+![Example 3](screenshot_3.png)
+
+![Example 4](screenshot_4.png)

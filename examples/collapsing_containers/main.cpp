@@ -18,13 +18,21 @@ class MyNode : public Node {
         auto vbox = std::make_shared<VBoxContainer>();
         collasping_panel->add_child(vbox);
 
+        auto label = std::make_shared<Label>();
+        label->set_text("This is a label");
+        label->container_sizing.expand_h = true;
+        label->container_sizing.flag_h = ContainerSizingFlag::Fill;
+        vbox->add_child(label);
+
         auto collasping_panel2 = std::make_shared<CollapsingContainer>();
+        collasping_panel2->set_color(ColorU{201, 79, 79});
         vbox->add_child(collasping_panel2);
 
         auto button = std::make_shared<Button>();
         collasping_panel2->add_child(button);
 
         auto collasping_panel3 = std::make_shared<CollapsingContainer>();
+        collasping_panel3->set_color(ColorU{66, 105, 183});
         vbox->add_child(collasping_panel3);
     }
 };

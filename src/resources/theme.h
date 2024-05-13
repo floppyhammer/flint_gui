@@ -7,7 +7,7 @@ namespace Flint {
 class Theme {
 public:
     Theme() {
-        button.colors["text"] = ColorU(206, 206, 206, 255);
+        button.colors["text"] = ColorU(229, 229, 229, 255);
 
         {
             auto style_box = StyleBox();

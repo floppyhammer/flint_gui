@@ -182,7 +182,12 @@ bool NodeUi::is_inside_container() const {
         switch (parent->get_node_type()) {
             case NodeType::Container:
             case NodeType::CenterContainer:
-            case NodeType::MarginContainer: {
+            case NodeType::CollapsingContainer:
+            case NodeType::MarginContainer:
+            case NodeType::HBoxContainer:
+            case NodeType::VBoxContainer:
+            case NodeType::ScrollContainer:
+            case NodeType::TabContainer: {
                 return true;
             } break;
             default:

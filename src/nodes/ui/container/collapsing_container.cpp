@@ -13,19 +13,16 @@ CollapsingContainer::CollapsingContainer() {
     auto default_theme = DefaultResource::get_singleton()->get_default_theme();
 
     theme_title_bar_ = std::make_optional(default_theme->collapsing_panel.styles["title_bar"]);
+    theme_title_bar_->corner_radiuses = {8, 8, 8, 8};
     theme_panel_ = std::make_optional(default_theme->collapsing_panel.styles["background"]);
 
-    title_bar_container_ = std::make_shared<HBoxContainer>();
-    title_bar_container_->set_custom_minimum_size({0, title_bar_height_});
-
     collapse_button_ = std::make_shared<Button>();
+    collapse_button_->set_custom_minimum_size({0, title_bar_height_});
     collapse_button_->set_icon_normal(std::make_shared<VectorImage>("../assets/icons/ArrowDown.svg"));
     collapse_button_->set_icon_pressed(std::make_shared<VectorImage>("../assets/icons/ArrowRight.svg"));
-    collapse_button_->set_text("");
+    collapse_button_->set_text("Collasping Container");
     collapse_button_->set_flat(true);
     collapse_button_->set_toggle_mode(true);
-    collapse_button_->set_icon_expand(true);
-    title_bar_container_->add_child(collapse_button_);
     collapse_button_->connect_signal_toggled([this](bool p_pressed) {
         if (!this->collapsed_ && p_pressed) {
             this->size_before_collapse_ = this->size;
@@ -38,16 +35,9 @@ CollapsingContainer::CollapsingContainer() {
         this->collapsed_ = p_pressed;
     });
 
-    title_label_ = std::make_shared<Label>();
-    title_label_->set_text("Collasping Container");
-    title_label_->set_mouse_filter(MouseFilter::Ignore);
-    title_label_->set_horizontal_alignment(Alignment::Center);
-    title_label_->set_vertical_alignment(Alignment::Center);
-    title_label_->set_text_style(TextStyle{default_theme->button.colors["text"]});
-    title_label_->theme_background = StyleBox::from_empty();
-    title_bar_container_->add_child(title_label_);
+    add_embedded_child(collapse_button_);
 
-    add_embedded_child(title_bar_container_);
+    container_sizing.expand_h = true;
 }
 
 void CollapsingContainer::adjust_layout() {
@@ -57,11 +47,11 @@ void CollapsingContainer::adjust_layout() {
     // Adjust own size.
     size = size.max(min_size);
 
-    if (collapsed_) {
+    if (!is_inside_container() && collapsed_) {
         size = min_size;
     }
 
-    title_bar_container_->set_size({size.x, title_bar_height_});
+    collapse_button_->set_size({size.x, title_bar_height_});
 
     // Adjust child size.
     for (auto &child : children) {

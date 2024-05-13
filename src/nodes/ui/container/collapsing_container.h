@@ -23,11 +23,18 @@ public:
 
     void adjust_layout() override;
 
+    void set_color(ColorU color) {
+        if (theme_title_bar_.has_value()) {
+            theme_title_bar_->bg_color = color;
+        }
+        if (theme_panel_.has_value()) {
+            theme_panel_->border_color = color;
+        }
+    }
+
 private:
     bool collapsed_ = false;
 
-    std::shared_ptr<HBoxContainer> title_bar_container_;
-    std::shared_ptr<Label> title_label_;
     std::shared_ptr<Button> collapse_button_;
 
     float title_bar_height_ = 48;
