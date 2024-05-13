@@ -36,10 +36,13 @@ public:
     void calc_minimum_size() override;
 
     void connect_signal(const std::string &signal, const std::function<void()> &callback);
+    void connect_signal_toggled(const std::function<void(bool)> &callback);
 
     void set_text(const std::string &text);
 
-    void set_icon(const std::shared_ptr<Image> &_icon);
+    void set_icon_normal(const std::shared_ptr<Image> &icon);
+
+    void set_icon_pressed(const std::shared_ptr<Image> &icon);
 
     void set_flat(bool flat) {
         flat_ = flat;
@@ -69,6 +72,9 @@ protected:
     std::shared_ptr<HBoxContainer> hbox_container;
     std::shared_ptr<TextureRect> icon_rect;
     std::shared_ptr<Label> label;
+
+    std::shared_ptr<Image> icon_normal_;
+    std::shared_ptr<Image> icon_pressed_;
 
     // Callbacks.
     std::vector<std::function<void()>> pressed_callbacks;

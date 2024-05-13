@@ -160,6 +160,8 @@ void Button::draw() {
 
     auto global_position = get_global_position();
 
+    icon_rect->set_texture(icon_normal_);
+
     // Draw bg.
     std::optional<StyleBox> active_style_box;
     if (pressed) {
@@ -168,6 +170,10 @@ void Button::draw() {
         // When toggled, hovering the button should show the hover effect.
         if (toggle_mode && hovered) {
             active_style_box = theme_hovered;
+        }
+
+        if (icon_pressed_) {
+            icon_rect->set_texture(icon_pressed_);
         }
     } else if (hovered) {
         active_style_box = theme_hovered;
@@ -223,12 +229,20 @@ void Button::connect_signal(const std::string &signal, const std::function<void(
     }
 }
 
+void Button::connect_signal_toggled(const std::function<void(bool)> &callback) {
+    toggled_callbacks.push_back(callback);
+}
+
 void Button::set_text(const std::string &text) {
     label->set_text(text);
 }
 
-void Button::set_icon(const std::shared_ptr<Image> &p_icon) {
-    icon_rect->set_texture(p_icon);
+void Button::set_icon_normal(const std::shared_ptr<Image> &icon) {
+    icon_normal_ = icon;
+}
+
+void Button::set_icon_pressed(const std::shared_ptr<Image> &icon) {
+    icon_pressed_ = icon;
 }
 
 void Button::set_icon_expand(bool enable) {

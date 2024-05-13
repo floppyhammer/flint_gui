@@ -126,6 +126,8 @@ std::vector<std::shared_ptr<Node>> Node::get_all_children() {
 }
 
 void Node::add_child(const std::shared_ptr<Node> &new_child) {
+    assert(new_child && new_child.get() != this);
+
     if (std::find(embedded_children.begin(), embedded_children.end(), new_child) != embedded_children.end()) {
         std::cout << "Attempted to add a repated child!" << std::endl;
         return;

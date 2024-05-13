@@ -76,7 +76,7 @@ TreeItem::TreeItem() {
     expanded_tex = std::make_shared<VectorImage>("../assets/icons/ArrowDown.svg");
 
     collapse_button = std::make_shared<Button>();
-    collapse_button->set_icon(expanded_tex);
+    collapse_button->set_icon_normal(expanded_tex);
     collapse_button->set_text("");
     collapse_button->set_icon_expand(true);
     collapse_button->set_custom_minimum_size({24, 24});
@@ -86,9 +86,9 @@ TreeItem::TreeItem() {
     auto callback = [this] {
         collapsed = !collapsed;
         if (collapsed) {
-            collapse_button->set_icon(collapsed_tex);
+            collapse_button->set_icon_normal(collapsed_tex);
         } else {
-            collapse_button->set_icon(expanded_tex);
+            collapse_button->set_icon_normal(expanded_tex);
         }
     };
     collapse_button->connect_signal("pressed", callback);
@@ -172,7 +172,7 @@ void TreeItem::propagate_draw(float folding_width, uint32_t depth, float &offset
         // Otherwise, the container layout will change and the intent will be gone.
         collapse_button->modulate = ColorU::transparent_black();
 
-        collapse_button->set_icon(nullptr);
+        collapse_button->set_icon_normal(nullptr);
     } else {
         collapse_button->modulate = ColorU::white();
     }

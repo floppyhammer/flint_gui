@@ -19,6 +19,10 @@ public:
 
     void set_theme_panel(StyleBox style_box);
 
+    void calc_minimum_size() override;
+
+    void adjust_layout() override;
+
 private:
     bool collapsed_ = false;
 
@@ -27,6 +31,9 @@ private:
     std::shared_ptr<Button> collapse_button_;
 
     float title_bar_height_ = 48;
+    float margin_ = 8;
+
+    Vec2F size_before_collapse_;
 
     std::optional<StyleBox> theme_title_bar_;
     std::optional<StyleBox> theme_panel_;

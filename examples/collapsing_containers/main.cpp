@@ -14,6 +14,18 @@ class MyNode : public Node {
         collasping_panel->set_position({400, 200});
         collasping_panel->set_size({500, 400});
         add_child(collasping_panel);
+
+        auto vbox = std::make_shared<VBoxContainer>();
+        collasping_panel->add_child(vbox);
+
+        auto collasping_panel2 = std::make_shared<CollapsingContainer>();
+        vbox->add_child(collasping_panel2);
+
+        auto button = std::make_shared<Button>();
+        collasping_panel2->add_child(button);
+
+        auto collasping_panel3 = std::make_shared<CollapsingContainer>();
+        vbox->add_child(collasping_panel3);
     }
 };
 
