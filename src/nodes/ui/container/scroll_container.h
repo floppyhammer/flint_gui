@@ -35,8 +35,8 @@ public:
     }
 
 protected:
-    bool horizontal_mode = true;
-    bool vertical_mode = true;
+    bool hscroll_enabled = true;
+    bool vscroll_enabled = true;
 
     /// Scroll value can be negative to achieve blank scrolling space.
     float hscroll = 0;

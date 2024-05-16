@@ -15,7 +15,34 @@ ScrollContainer::ScrollContainer() {
 }
 
 void ScrollContainer::adjust_layout() {
-    // Do nothing.
+    // Get the minimum size.
+    Vec2F max_child_min_size = get_max_child_min_size();
+
+    auto min_size = max_child_min_size.max(custom_minimum_size);
+
+    // Adjust own size.
+
+    if (!vscroll_enabled) {
+        size.y = size.max(min_size).y;
+    }
+    if (!hscroll_enabled) {
+        size.x = size.max(min_size).x;
+    }
+
+    // Adjust child size.
+    for (auto &child : children) {
+        if (child->is_ui_node()) {
+            auto cast_child = dynamic_cast<NodeUi *>(child.get());
+            cast_child->set_position({0, 0});
+
+            if (!vscroll_enabled) {
+                cast_child->set_size({cast_child->get_size().x, size.y});
+            }
+            if (!hscroll_enabled) {
+                cast_child->set_size({size.x, cast_child->get_size().y});
+            }
+        }
+    }
 }
 
 void ScrollContainer::calc_minimum_size() {
@@ -69,6 +96,10 @@ void ScrollContainer::input(InputEvent &event) {
 }
 
 void ScrollContainer::update(double dt) {
+    NodeUi::update(dt);
+
+    adjust_layout();
+
     if (children.empty() || !children.front()->is_ui_node()) {
         return;
     }
@@ -94,8 +125,6 @@ void ScrollContainer::update(double dt) {
     auto content = (NodeUi *)children.front().get();
 
     content->set_position({-hscroll, -vscroll});
-
-    NodeUi::update(dt);
 }
 
 void ScrollContainer::draw_scroll_bar() {
