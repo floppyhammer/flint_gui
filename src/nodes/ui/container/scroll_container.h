@@ -39,8 +39,8 @@ protected:
     bool vertical_mode = true;
 
     /// Scroll value can be negative to achieve blank scrolling space.
-    int32_t hscroll = 0;
-    int32_t vscroll = 0;
+    float hscroll = 0;
+    float vscroll = 0;
 
     float scroll_speed = 15.0;
 

@@ -47,14 +47,8 @@ void ScrollContainer::input(InputEvent &event) {
                 if (!event.is_consumed()) {
                     if (InputServer::get_singleton()->is_key_pressed(KeyCode::LeftShift)) {
                         hscroll -= delta * scroll_speed;
-
-                        auto grabber_length = size.x / content->get_size().x * size.x;
-                        hscroll = clamp(hscroll, 0, int32_t(size.x - grabber_length));
                     } else {
                         vscroll -= delta * scroll_speed;
-
-                        auto grabber_length = size.y / content->get_size().y * size.y;
-                        vscroll = clamp(vscroll, 0, int32_t(size.y - grabber_length));
                     }
                 }
 
@@ -79,10 +73,27 @@ void ScrollContainer::update(double dt) {
         return;
     }
 
+    vscroll = std::max(0.0f, vscroll);
+    hscroll = std::max(0.0f, hscroll);
+
+    Vec2F max_child_min_size = get_max_child_min_size();
+
+    if (max_child_min_size.x > size.x) {
+        hscroll = std::min(hscroll, max_child_min_size.x - size.x);
+    } else {
+        hscroll = 0;
+    }
+
+    if (max_child_min_size.y > size.y) {
+        vscroll = std::min(vscroll, max_child_min_size.y - size.y);
+    } else {
+        hscroll = 0;
+    }
+
     // Scroll container can only have one effective control child.
     auto content = (NodeUi *)children.front().get();
 
-    content->set_position({(float)-hscroll, (float)-vscroll});
+    content->set_position({-hscroll, -vscroll});
 
     NodeUi::update(dt);
 }
@@ -102,27 +113,31 @@ void ScrollContainer::draw_scroll_bar() {
     auto size = get_size();
 
     // Vertical.
-    {
+    if (content_size.y > size.y) {
         auto scroll_bar_pos = Vec2F(size.x - 8, 0) + global_pos;
         auto scroll_bar_size = Vec2F(8, size.y);
 
         vector_server->draw_style_box(theme_scroll_bar, scroll_bar_pos, scroll_bar_size);
 
-        auto grabber_pos = Vec2F(size.x - 8, vscroll) + global_pos;
-        auto grabber_size = Vec2F(8, size.y / content_size.y * size.y);
+        auto grabber_length = size.y / content_size.y * size.y;
+
+        auto grabber_pos = Vec2F(size.x - 8, size.y / content_size.y * vscroll) + global_pos;
+        auto grabber_size = Vec2F(8, grabber_length);
 
         vector_server->draw_style_box(theme_scroll_grabber, grabber_pos, grabber_size);
     }
 
     // Horizontal.
-    {
+    if (content_size.x > size.x) {
         auto scroll_bar_pos = Vec2F(0, size.y - 8) + global_pos;
         auto scroll_bar_size = Vec2F(size.x, 8);
 
         vector_server->draw_style_box(theme_scroll_bar, scroll_bar_pos, scroll_bar_size);
 
-        auto grabber_pos = Vec2F(hscroll, size.y - 8) + global_pos;
-        auto grabber_size = Vec2F(size.x / content_size.x * size.x, 8);
+        auto grabber_length = size.x / content_size.x * size.x;
+
+        auto grabber_pos = Vec2F(size.x / content_size.x * hscroll, size.y - 8) + global_pos;
+        auto grabber_size = Vec2F(grabber_length, 8);
 
         vector_server->draw_style_box(theme_scroll_grabber, grabber_pos, grabber_size);
     }
@@ -135,9 +150,7 @@ void ScrollContainer::set_hscroll(int32_t value) {
         return;
     }
 
-    Vec2F max_child_min_size = get_max_child_min_size();
-
-    hscroll = std::min(0.0f, max_child_min_size.x - size.x);
+    hscroll = value;
 }
 
 int32_t ScrollContainer::get_hscroll() const {
@@ -149,10 +162,7 @@ void ScrollContainer::set_vscroll(int32_t value) {
         return;
     }
 
-    Vec2F max_child_min_size = get_max_child_min_size();
-
-    vscroll = std::min(0.0f, max_child_min_size.y - size.y);
-    hscroll = std::min(0.0f, max_child_min_size.x - size.x);
+    vscroll = value;
 }
 
 int32_t ScrollContainer::get_vscroll() const {
@@ -169,7 +179,7 @@ void ScrollContainer::pre_draw_children() {
 
     // Use a RenderTarget to achieve content clip, instead of using clip path.
     if (render_target_desc.size == Vec2I()) {
-        render_target_desc = {size.to_i32(), "Scroller render target"};
+        render_target_desc = {size.to_i32(), "ScrollContainer render target"};
     }
 
     temp_draw_data.render_target_id = canvas->get_scene()->push_render_target(render_target_desc);

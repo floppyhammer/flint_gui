@@ -11,22 +11,18 @@ const uint32_t WINDOW_HEIGHT = 720;
 class MyNode : public Node {
     void custom_ready() override {
         auto panel = std::make_shared<Panel>();
-        panel->set_position({200, 200});
-        panel->set_size({400, 300});
+        panel->set_position({300, 200});
+        panel->set_size({200, 300});
         add_child(panel);
 
         auto scroll_container = std::make_shared<ScrollContainer>();
         scroll_container->set_anchor_flag(AnchorFlag::FullRect);
-
         panel->add_child(scroll_container);
 
-        auto margin_container = std::make_shared<MarginContainer>();
-        margin_container->set_custom_minimum_size({300, 500});
-        scroll_container->add_child(margin_container);
-
         auto vbox_container = std::make_shared<VBoxContainer>();
+        vbox_container->set_custom_minimum_size({400, 0});
         vbox_container->set_separation(8);
-        margin_container->add_child(vbox_container);
+        scroll_container->add_child(vbox_container);
 
         for (int i = 0; i < 20; i++) {
             auto button = std::make_shared<Button>();
