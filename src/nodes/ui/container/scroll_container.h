@@ -24,11 +24,11 @@ public:
 
     void set_hscroll(int32_t value);
 
-    int32_t get_hscroll();
+    int32_t get_hscroll() const;
 
     void set_vscroll(int32_t value);
 
-    int32_t get_vscroll();
+    int32_t get_vscroll() const;
 
     bool ignore_mouse_input_outside_rect() const override {
         return true;
@@ -41,6 +41,8 @@ protected:
     /// Scroll value can be negative to achieve blank scrolling space.
     int32_t hscroll = 0;
     int32_t vscroll = 0;
+
+    float scroll_speed = 15.0;
 
     Pathfinder::RenderTargetDesc render_target_desc;
 

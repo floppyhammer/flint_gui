@@ -20,10 +20,13 @@ class MyNode : public Node {
 
         panel->add_child(scroll_container);
 
+        auto margin_container = std::make_shared<MarginContainer>();
+        margin_container->set_custom_minimum_size({300, 500});
+        scroll_container->add_child(margin_container);
+
         auto vbox_container = std::make_shared<VBoxContainer>();
         vbox_container->set_separation(8);
-        vbox_container->set_custom_minimum_size({500, 500});
-        scroll_container->add_child(vbox_container);
+        margin_container->add_child(vbox_container);
 
         for (int i = 0; i < 20; i++) {
             auto button = std::make_shared<Button>();

@@ -27,6 +27,7 @@ enum class InputEventType {
 enum class KeyCode {
     Unknown = 0,
     LeftControl,
+    LeftShift,
     C,
     V,
     X,

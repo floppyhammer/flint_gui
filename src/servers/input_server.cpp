@@ -114,6 +114,9 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
             case GLFW_KEY_LEFT_CONTROL: {
                 key_args.key = KeyCode::LeftControl;
             } break;
+            case GLFW_KEY_LEFT_SHIFT: {
+                key_args.key = KeyCode::LeftShift;
+            } break;
             case GLFW_KEY_C: {
                 key_args.key = KeyCode::C;
             } break;
@@ -130,6 +133,7 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
 
         if (key_args.pressed) {
             input_server->keys_pressed.insert(key_args.key);
+        } else if (key_args.repeated) {
         } else {
             input_server->keys_pressed.erase(key_args.key);
         }

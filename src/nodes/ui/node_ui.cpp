@@ -58,6 +58,8 @@ void NodeUi::draw() {
 void NodeUi::update(double dt) {
     apply_anchor();
 
+    size = get_effective_minimum_size().max(size);
+
     Node::update(dt);
 }
 

@@ -45,10 +45,17 @@ void ScrollContainer::input(InputEvent &event) {
 
             if (active_rect.contains_point(InputServer::get_singleton()->cursor_position)) {
                 if (!event.is_consumed()) {
-                    vscroll -= delta * 10;
+                    if (InputServer::get_singleton()->is_key_pressed(KeyCode::LeftShift)) {
+                        hscroll -= delta * scroll_speed;
 
-                    auto grabber_size = Vec2F(16, size.y / content->get_size().y * size.y);
-                    vscroll = clamp(vscroll, 0, int32_t(size.y - grabber_size.y));
+                        auto grabber_length = size.x / content->get_size().x * size.x;
+                        hscroll = clamp(hscroll, 0, int32_t(size.x - grabber_length));
+                    } else {
+                        vscroll -= delta * scroll_speed;
+
+                        auto grabber_length = size.y / content->get_size().y * size.y;
+                        vscroll = clamp(vscroll, 0, int32_t(size.y - grabber_length));
+                    }
                 }
 
                 // Will stop input propagation.
@@ -75,7 +82,7 @@ void ScrollContainer::update(double dt) {
     // Scroll container can only have one effective control child.
     auto content = (NodeUi *)children.front().get();
 
-    content->set_position({0, (float)-vscroll});
+    content->set_position({(float)-hscroll, (float)-vscroll});
 
     NodeUi::update(dt);
 }
@@ -87,21 +94,38 @@ void ScrollContainer::draw_scroll_bar() {
 
     // Scroll container can only have one effective control child.
     auto content = (NodeUi *)children.front().get();
+    auto content_size = content->get_size();
 
     auto vector_server = VectorServer::get_singleton();
 
     auto global_pos = get_global_position();
     auto size = get_size();
 
-    auto scroll_bar_pos = Vec2F(size.x - 8, 0) + global_pos;
-    auto scroll_bar_size = Vec2F(8, size.y);
+    // Vertical.
+    {
+        auto scroll_bar_pos = Vec2F(size.x - 8, 0) + global_pos;
+        auto scroll_bar_size = Vec2F(8, size.y);
 
-    vector_server->draw_style_box(theme_scroll_bar, scroll_bar_pos, scroll_bar_size);
+        vector_server->draw_style_box(theme_scroll_bar, scroll_bar_pos, scroll_bar_size);
 
-    auto grabber_pos = Vec2F(size.x - 8, vscroll) + global_pos;
-    auto grabber_size = Vec2F(8, size.y / content->get_size().y * size.y);
+        auto grabber_pos = Vec2F(size.x - 8, vscroll) + global_pos;
+        auto grabber_size = Vec2F(8, size.y / content_size.y * size.y);
 
-    vector_server->draw_style_box(theme_scroll_grabber, grabber_pos, grabber_size);
+        vector_server->draw_style_box(theme_scroll_grabber, grabber_pos, grabber_size);
+    }
+
+    // Horizontal.
+    {
+        auto scroll_bar_pos = Vec2F(0, size.y - 8) + global_pos;
+        auto scroll_bar_size = Vec2F(size.x, 8);
+
+        vector_server->draw_style_box(theme_scroll_bar, scroll_bar_pos, scroll_bar_size);
+
+        auto grabber_pos = Vec2F(hscroll, size.y - 8) + global_pos;
+        auto grabber_size = Vec2F(size.x / content_size.x * size.x, 8);
+
+        vector_server->draw_style_box(theme_scroll_grabber, grabber_pos, grabber_size);
+    }
 
     NodeUi::draw();
 }
@@ -116,7 +140,7 @@ void ScrollContainer::set_hscroll(int32_t value) {
     hscroll = std::min(0.0f, max_child_min_size.x - size.x);
 }
 
-int32_t ScrollContainer::get_hscroll() {
+int32_t ScrollContainer::get_hscroll() const {
     return hscroll;
 }
 
@@ -128,9 +152,10 @@ void ScrollContainer::set_vscroll(int32_t value) {
     Vec2F max_child_min_size = get_max_child_min_size();
 
     vscroll = std::min(0.0f, max_child_min_size.y - size.y);
+    hscroll = std::min(0.0f, max_child_min_size.x - size.x);
 }
 
-int32_t ScrollContainer::get_vscroll() {
+int32_t ScrollContainer::get_vscroll() const {
     return vscroll;
 }
 
@@ -160,14 +185,14 @@ void ScrollContainer::post_draw_children() {
 
     auto canvas = vector_server->get_canvas();
 
+    draw_scroll_bar();
+
     vector_server->global_transform_offset = Transform2();
 
     canvas->get_scene()->pop_render_target();
 
     auto dst_rect = RectF(global_pos, global_pos + size);
     vector_server->get_canvas()->draw_render_target(temp_draw_data.render_target_id, dst_rect);
-
-    draw_scroll_bar();
 }
 
 } // namespace Flint
