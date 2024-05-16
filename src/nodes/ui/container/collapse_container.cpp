@@ -1,4 +1,4 @@
-#include "collapsing_container.h"
+#include "collapse_container.h"
 
 #include <string>
 
@@ -7,8 +7,8 @@
 
 namespace Flint {
 
-CollapsingContainer::CollapsingContainer() {
-    type = NodeType::CollapsingContainer;
+CollapseContainer::CollapseContainer() {
+    type = NodeType::CollapseContainer;
 
     auto default_theme = DefaultResource::get_singleton()->get_default_theme();
 
@@ -40,7 +40,7 @@ CollapsingContainer::CollapsingContainer() {
     container_sizing.expand_h = true;
 }
 
-void CollapsingContainer::adjust_layout() {
+void CollapseContainer::adjust_layout() {
     // Get the minimum size.
     auto min_size = get_effective_minimum_size();
 
@@ -67,7 +67,7 @@ void CollapsingContainer::adjust_layout() {
     }
 }
 
-void CollapsingContainer::calc_minimum_size() {
+void CollapseContainer::calc_minimum_size() {
     // Get the minimum child size.
     Vec2F min_child_size{};
     if (!collapsed_) {
@@ -94,13 +94,13 @@ void CollapsingContainer::calc_minimum_size() {
     calculated_minimum_size = min_child_size + min_embeded_child_size;
 }
 
-void CollapsingContainer::update(double dt) {
+void CollapseContainer::update(double dt) {
     NodeUi::update(dt);
 
     adjust_layout();
 }
 
-void CollapsingContainer::draw() {
+void CollapseContainer::draw() {
     if (!visible_) {
         return;
     }

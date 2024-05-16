@@ -4,14 +4,14 @@
 
 #include "../../../resources/style_box.h"
 #include "../button.h"
-#include "box_container.h"
 #include "../label.h"
+#include "box_container.h"
 
 namespace Flint {
 
-class CollapsingContainer : public Container {
+class CollapseContainer : public Container {
 public:
-    CollapsingContainer();
+    CollapseContainer();
 
     void update(double dt) override;
 

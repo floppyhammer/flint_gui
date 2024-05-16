@@ -10,7 +10,7 @@ const uint32_t WINDOW_HEIGHT = 720;
 
 class MyNode : public Node {
     void custom_ready() override {
-        auto collasping_panel = std::make_shared<CollapsingContainer>();
+        auto collasping_panel = std::make_shared<CollapseContainer>();
         collasping_panel->set_position({400, 200});
         collasping_panel->set_size({500, 400});
         add_child(collasping_panel);
@@ -24,14 +24,14 @@ class MyNode : public Node {
         label->container_sizing.flag_h = ContainerSizingFlag::Fill;
         vbox->add_child(label);
 
-        auto collasping_panel2 = std::make_shared<CollapsingContainer>();
+        auto collasping_panel2 = std::make_shared<CollapseContainer>();
         collasping_panel2->set_color(ColorU{201, 79, 79});
         vbox->add_child(collasping_panel2);
 
         auto button = std::make_shared<Button>();
         collasping_panel2->add_child(button);
 
-        auto collasping_panel3 = std::make_shared<CollapsingContainer>();
+        auto collasping_panel3 = std::make_shared<CollapseContainer>();
         collasping_panel3->set_color(ColorU{66, 105, 183});
         vbox->add_child(collasping_panel3);
     }
