@@ -18,9 +18,13 @@ class MyNode : public Node {
         panel->set_size({400, 300});
         add_child(panel);
 
+        auto a = std::make_shared<CollapseContainer>();
+        a->set_size({400, 300});
+        panel->add_child(a);
+
         auto tree = std::make_shared<Tree>();
         tree->set_anchor_flag(AnchorFlag::FullRect);
-        panel->add_child(tree);
+        a->add_child(tree);
 
         // Set up tree items.
         {

@@ -25,6 +25,13 @@ class Window;
 
 namespace Flint {
 
+void transform_system(Node* root);
+
+void draw_system(Node* root);
+
+/// Run calc_minimum_size() depth-first.
+void calc_minimum_size(Node* root);
+
 /// Processing order: Input -> Update -> Draw.
 class SceneTree {
     friend class App;

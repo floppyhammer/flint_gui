@@ -3,6 +3,7 @@
 #include <string>
 
 #include "../../common/utils.h"
+#include "../scene_tree.h"
 
 namespace Flint {
 
@@ -34,6 +35,10 @@ void MenuItem::draw(Vec2F global_position) {
     if (hovered) {
         vector_server->draw_style_box(theme_hovered, global_position + position, container->get_size());
     }
+
+    container->set_position(global_position + position);
+
+    draw_system(container.get());
 }
 
 void MenuItem::update(Vec2F global_position, Vec2F size) {
@@ -41,6 +46,8 @@ void MenuItem::update(Vec2F global_position, Vec2F size) {
 
     container->set_position(global_position + position);
     container->set_size(size);
+
+    transform_system(container.get());
 
     std::vector<Node *> descendants;
     dfs_preorder_ltr_traversal(container.get(), descendants);

@@ -34,7 +34,7 @@ public:
 
     void set_icon(const std::shared_ptr<Image> &image);
 
-private:
+public:
     bool hovered = false;
 
     // Expanded sub menu.

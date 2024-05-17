@@ -179,6 +179,19 @@ void draw_system(Node* root) {
     propagate_draw(root);
 }
 
+void calc_minimum_size(Node* root) {
+    std::vector<Node*> descendants;
+    dfs_postorder_ltr_traversal(root, descendants);
+    for (auto& node : descendants) {
+        if (node->is_ui_node()) {
+            auto ui_node = dynamic_cast<NodeUi*>(node);
+            ui_node->calc_minimum_size();
+            // std::cout << "Node: " << get_node_type_name(node->type)
+            //           << ", size: " << ui_node->get_effective_minimum_size() << std::endl;
+        }
+    }
+}
+
 void SceneTree::process(double dt) {
     if (root == nullptr) {
         return;
@@ -201,18 +214,7 @@ void SceneTree::process(double dt) {
     input_system(root.get(), InputServer::get_singleton()->input_queue);
 
     // Run calc_minimum_size() depth-first.
-    {
-        std::vector<Node*> descendants;
-        dfs_postorder_ltr_traversal(root.get(), descendants);
-        for (auto& node : descendants) {
-            if (node->is_ui_node()) {
-                auto ui_node = dynamic_cast<NodeUi*>(node);
-                ui_node->calc_minimum_size();
-                // std::cout << "Node: " << get_node_type_name(node->type)
-                //           << ", size: " << ui_node->get_effective_minimum_size() << std::endl;
-            }
-        }
-    }
+    calc_minimum_size(root.get());
 
     // Update global transform.
     transform_system(root.get());

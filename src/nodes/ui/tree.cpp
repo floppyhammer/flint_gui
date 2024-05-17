@@ -3,6 +3,7 @@
 #include <string>
 
 #include "../../common/utils.h"
+#include "../scene_tree.h"
 
 namespace Flint {
 
@@ -22,6 +23,10 @@ void Tree::update(double dt) {
 }
 
 void Tree::draw() {
+    if (!visible_) {
+        return;
+    }
+
     auto vector_server = VectorServer::get_singleton();
 
     if (theme_bg.has_value()) {
@@ -65,8 +70,19 @@ float Tree::get_item_height() {
     return item_height;
 }
 
+void Tree::calc_minimum_size() {
+    Vec2F minimum_size;
+    uint32_t uncollapsed_item_count = 0;
+    root->propagate_calc_minimum_size(folding_width, 0, uncollapsed_item_count, minimum_size);
+
+    calculated_minimum_size = {minimum_size.x, item_height * uncollapsed_item_count};
+}
+
 TreeItem::TreeItem() {
     label = std::make_shared<Label>();
+    label->container_sizing.expand_v = true;
+    label->container_sizing.flag_v = ContainerSizingFlag::Fill;
+    label->set_vertical_alignment(Alignment::Center);
 
     icon = std::make_shared<TextureRect>();
     icon->set_custom_minimum_size({24, 24});
@@ -101,9 +117,6 @@ TreeItem::TreeItem() {
 
     collapse_button->container_sizing.expand_v = true;
     collapse_button->container_sizing.flag_v = ContainerSizingFlag::Fill;
-
-    label->container_sizing.expand_v = true;
-    label->container_sizing.flag_v = ContainerSizingFlag::Fill;
 
     theme_selected.bg_color = ColorU(100, 100, 100, 150);
 }
@@ -180,12 +193,17 @@ void TreeItem::propagate_draw(float folding_width, uint32_t depth, float &offset
     container->set_position(Vec2F(offset_x, offset_y) + global_position);
     container->set_size({item_height, item_height});
 
+    calc_minimum_size(container.get());
+
+    transform_system(container.get());
+
     std::vector<Node *> nodes;
     dfs_preorder_ltr_traversal(container.get(), nodes);
     for (auto &node : nodes) {
         node->update(0);
     }
-    // container->propagate_draw();
+
+    draw_system(container.get());
 
     offset_y += item_height;
 
@@ -196,8 +214,34 @@ void TreeItem::propagate_draw(float folding_width, uint32_t depth, float &offset
     }
 }
 
+void TreeItem::propagate_calc_minimum_size(float folding_width,
+                                           uint32_t depth,
+                                           uint32_t &uncollapsed_item_count,
+                                           Vec2F &minimum_size) {
+    float offset_x = (float)depth * folding_width;
+
+    uncollapsed_item_count++;
+
+    // Firstly, the item height will be decided by the minimum height of the icon and label.
+    float item_height = std::max(label->get_effective_minimum_size().y, icon->get_custom_minimum_size().y);
+
+    // Then the value set by the tree is considered.
+    item_height = std::max(tree->get_item_height(), item_height);
+
+    float item_width = label->get_effective_minimum_size().x + icon->get_custom_minimum_size().x;
+    minimum_size = minimum_size.max({item_width + offset_x, item_height});
+
+    if (!collapsed) {
+        auto it = children.rbegin();
+        while (it != children.rend()) {
+            (*it)->propagate_calc_minimum_size(folding_width, depth + 1, uncollapsed_item_count, minimum_size);
+            it++;
+        }
+    }
+}
+
 void TreeItem::input(InputEvent &event, Vec2F global_position) {
-    float item_height = label->get_effective_minimum_size().y;
+    float item_height = container->get_effective_minimum_size().y;
     auto item_global_rect = (RectF(0, position.y, tree->get_size().x, position.y + item_height) + global_position);
 
     if (event.type == InputEventType::MouseButton) {

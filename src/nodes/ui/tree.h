@@ -39,6 +39,8 @@ public:
 
     void propagate_draw(float folding_width, uint32_t depth, float &offset_y, Vec2F global_position);
 
+    void propagate_calc_minimum_size(float folding_width, uint32_t depth, uint32_t &max_depth, Vec2F &minimum_size);
+
     void set_text(const std::string &text);
 
     void set_icon(const std::shared_ptr<Image> &image);
@@ -86,6 +88,8 @@ public:
     void set_item_height(float new_item_height);
 
     float get_item_height();
+
+    void Tree::calc_minimum_size() override;
 
 private:
     float item_height = 48;

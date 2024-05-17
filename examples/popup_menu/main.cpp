@@ -16,7 +16,7 @@ public:
     std::weak_ptr<PopupMenu> menu_;
 
     void custom_ready() override {
-        add_child(std::make_shared<Label>());
+        // add_child(std::make_shared<Label>());
 
         auto menu = std::make_shared<PopupMenu>();
         for (int i = 0; i < 4; i++) {
