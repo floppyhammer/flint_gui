@@ -89,7 +89,7 @@ public:
 
     float get_item_height();
 
-    void Tree::calc_minimum_size() override;
+    void calc_minimum_size() override;
 
 private:
     float item_height = 48;
