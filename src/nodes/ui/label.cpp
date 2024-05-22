@@ -426,9 +426,6 @@ void Label::consider_alignment() {
         return;
     }
 
-    // Make sure size has the correct value before using it.
-    size = size.max(get_effective_minimum_size());
-
     switch (horizontal_alignment) {
         case Alignment::Begin:
             break;
@@ -463,6 +460,9 @@ void Label::update(double dt) {
         layout_is_dirty = false;
         make_layout();
     }
+
+    auto min_size = get_text_minimum_size();
+    size = size.max(min_size);
 
     consider_alignment();
 }
@@ -524,17 +524,20 @@ void Label::calc_minimum_size() {
 }
 
 Vec2F Label::get_text_minimum_size() const {
-    if (word_wrap_) {
-        return Vec2F(0);
-    }
-
     float effective_max_para_width = 0;
-    for (const auto &para : para_ranges_) {
+    for (const auto &para : line_ranges_) {
         effective_max_para_width = std::max(effective_max_para_width, para.width);
     }
 
-    return {effective_max_para_width,
-            para_ranges_.size() * (std::abs((float)font->get_ascent()) + std::abs((float)font->get_descent()))};
+    Vec2F text_bbox = {
+        effective_max_para_width,
+        line_ranges_.size() * (std::abs((float)font->get_ascent()) + std::abs((float)font->get_descent()))};
+
+    if (word_wrap_) {
+        return Vec2F(0, text_bbox.y);
+    }
+
+    return text_bbox;
 }
 
 std::vector<Glyph> &Label::get_glyphs() {
