@@ -287,26 +287,42 @@ void Label::set_size(Vec2F new_size) {
 }
 
 /// A very crude way for line-breaking.
-std::vector<InContextGlyph> convert_to_in_context_glyphs(const std::vector<Glyph> &glyphs) {
+std::vector<InContextGlyph> convert_to_in_context_glyphs(const std::vector<Glyph> &glyphs,
+                                                         const std::vector<Line> &para_ranges) {
     std::vector<InContextGlyph> in_context_glyphs;
-    in_context_glyphs.reserve(glyphs.size());
+    in_context_glyphs.resize(glyphs.size());
 
     // Add emoji data.
-    for (auto &glyph : glyphs) {
-        InContextGlyph in_context_glyph;
-        in_context_glyph.glyph_ = glyph;
-        in_context_glyph.line_breakable_ = false;
+    for (auto &para : para_ranges)
+        for (int glyph_idx = para.glyph_ranges.start; glyph_idx < para.glyph_ranges.end; glyph_idx++) {
+            auto &glyph = glyphs[glyph_idx];
 
-        if (glyph.script == Script::Cjk) {
-            in_context_glyph.line_breakable_ = true;
-        } else {
-            if (glyph.text == " ") {
+            InContextGlyph in_context_glyph;
+            in_context_glyph.glyph_ = glyph;
+            in_context_glyph.line_breakable_ = false;
+
+            if (glyph.script == Script::Cjk) {
                 in_context_glyph.line_breakable_ = true;
+            } else {
+                if (para.rtl) {
+                    if (glyph_idx < para.glyph_ranges.end - 1) {
+                        auto &previous_glyph = glyphs[glyph_idx + 1];
+                        if (previous_glyph.text == " ") {
+                            in_context_glyph.line_breakable_ = true;
+                        }
+                    }
+                } else {
+                    if (glyph_idx > para.glyph_ranges.start) {
+                        auto &previous_glyph = glyphs[glyph_idx - 1];
+                        if (previous_glyph.text == " ") {
+                            in_context_glyph.line_breakable_ = true;
+                        }
+                    }
+                }
             }
-        }
 
-        in_context_glyphs.push_back(in_context_glyph);
-    }
+            in_context_glyphs[glyph_idx] = in_context_glyph;
+        }
 
     return in_context_glyphs;
 }
@@ -316,7 +332,7 @@ void Label::measure() {
     int ascent = font->get_ascent();
     int descent = font->get_descent();
 
-    font->get_glyphs(text_, glyphs_, para_ranges_);
+    font->get_glyphs(text_, glyphs_, paragraphs_);
 
     // Add emoji data.
     for (auto &glyph : glyphs_) {
@@ -331,7 +347,7 @@ void Label::measure() {
         }
     }
 
-    in_context_glyphs_ = convert_to_in_context_glyphs(glyphs_);
+    in_context_glyphs_ = convert_to_in_context_glyphs(glyphs_, paragraphs_);
 }
 
 void Label::make_layout() {
@@ -350,10 +366,10 @@ void Label::make_layout() {
 
     if (word_wrap_) {
         Vec2F text_size{};
-        line_ranges_ = get_lines_with_word_wrap(size.x, para_ranges_, in_context_glyphs_, text_size);
+        lines_ = get_lines_with_word_wrap(size.x, paragraphs_, in_context_glyphs_, text_size);
     }
 
-    const auto &effective_line_ranges = word_wrap_ ? line_ranges_ : para_ranges_;
+    const auto &effective_line_ranges = word_wrap_ ? lines_ : paragraphs_;
 
     float effective_max_line_width = 0;
     if (word_wrap_) {
@@ -525,13 +541,12 @@ void Label::calc_minimum_size() {
 
 Vec2F Label::get_text_minimum_size() const {
     float effective_max_para_width = 0;
-    for (const auto &para : line_ranges_) {
-        effective_max_para_width = std::max(effective_max_para_width, para.width);
+    for (const auto &line : lines_) {
+        effective_max_para_width = std::max(effective_max_para_width, line.width);
     }
 
-    Vec2F text_bbox = {
-        effective_max_para_width,
-        line_ranges_.size() * (std::abs((float)font->get_ascent()) + std::abs((float)font->get_descent()))};
+    Vec2F text_bbox = {effective_max_para_width,
+                       lines_.size() * (std::abs((float)font->get_ascent()) + std::abs((float)font->get_descent()))};
 
     if (word_wrap_) {
         return Vec2F(0, text_bbox.y);

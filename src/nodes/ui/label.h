@@ -136,10 +136,10 @@ private:
     std::vector<InContextGlyph> in_context_glyphs_;
 
     // Layout-dependent. Ranges for glyphs, not for characters.
-    std::vector<Line> para_ranges_;
+    std::vector<Line> paragraphs_;
 
     // If word_wrap is enabled, use this instead of para_ranges.
-    std::vector<Line> line_ranges_;
+    std::vector<Line> lines_;
 
     // Layout-dependent.
     std::vector<Vec2F> glyph_positions;

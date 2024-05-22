@@ -208,9 +208,9 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
 
 #ifndef __APPLE__
 
-void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &para_ranges) {
+void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &paragraphs_) {
     glyphs.clear();
-    para_ranges.clear();
+    paragraphs_.clear();
 
     #ifdef ICU_STATIC_DATA
     static bool icu_data_loaded = false;
@@ -458,7 +458,7 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
             para.glyph_ranges = {para_glyph_start, glyphs.size()};
             para.rtl = para_is_rtl;
             para.width = para_width;
-            para_ranges.push_back(para);
+            paragraphs_.push_back(para);
         }
     } while (false);
 
@@ -470,9 +470,9 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
 
     #define FRIBIDI_MAX_STR_LEN 65000
 
-void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &para_ranges) {
+void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &paragraphs_) {
     glyphs.clear();
-    para_ranges.clear();
+    paragraphs_.clear();
 
     uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
 
@@ -746,7 +746,7 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
         para.glyph_ranges = {para_glyph_start, glyphs.size()};
         para.rtl = para_is_rtl;
         para.width = para_width;
-        para_ranges.push_back(para);
+        paragraphs_.push_back(para);
     }
 }
 
