@@ -533,7 +533,8 @@ Vec2F Label::get_text_minimum_size() const {
         effective_max_para_width = std::max(effective_max_para_width, para.width);
     }
 
-    return {effective_max_para_width, para_ranges_.size() * ((float)font->get_ascent() + (float)font->get_descent())};
+    return {effective_max_para_width,
+            para_ranges_.size() * (std::abs((float)font->get_ascent()) + std::abs((float)font->get_descent()))};
 }
 
 std::vector<Glyph> &Label::get_glyphs() {
