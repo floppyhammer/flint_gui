@@ -357,11 +357,11 @@ void Label::make_layout() {
 
     float effective_max_line_width = 0;
     if (word_wrap_) {
+        effective_max_line_width = size.x;
+    } else {
         for (const auto &line : effective_line_ranges) {
             effective_max_line_width = std::max(effective_max_line_width, line.width);
         }
-    } else {
-        effective_max_line_width = size.x;
     }
 
     glyph_positions.resize(glyphs_.size());
