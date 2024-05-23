@@ -800,6 +800,10 @@ uint32_t Font::get_size() const {
     return size;
 }
 
+bool Font::is_valid() const {
+    return !font_data.empty();
+}
+
 int Font::get_ascent() const {
     return ascent;
 }

@@ -335,14 +335,16 @@ void Label::measure() {
     font->get_glyphs(text_, glyphs_, paragraphs_);
 
     // Add emoji data.
-    for (auto &glyph : glyphs_) {
-        if (glyph.codepoints.size() == 1) {
-            uint16_t glyph_index = emoji_font->find_glyph_index_by_codepoint(glyph.codepoints.front());
-            glyph.svg = emoji_font->get_glyph_svg(glyph_index);
-            if (!glyph.svg.empty() && glyph.index == 0) {
-                glyph.x_advance = font->get_size();
-                glyph.box = {0, 0, (float)font->get_size(), (float)font->get_size()};
-                glyph.emoji = true;
+    if (emoji_font->is_valid()) {
+        for (auto &glyph : glyphs_) {
+            if (glyph.codepoints.size() == 1) {
+                uint16_t glyph_index = emoji_font->find_glyph_index_by_codepoint(glyph.codepoints.front());
+                glyph.svg = emoji_font->get_glyph_svg(glyph_index);
+                if (!glyph.svg.empty() && glyph.index == 0) {
+                    glyph.x_advance = font->get_size();
+                    glyph.box = {0, 0, (float)font->get_size(), (float)font->get_size()};
+                    glyph.emoji = true;
+                }
             }
         }
     }

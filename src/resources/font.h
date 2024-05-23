@@ -156,6 +156,8 @@ public:
 
     uint32_t get_size() const;
 
+    bool is_valid() const;
+
     Pathfinder::Path2d get_glyph_path(uint16_t glyph_index) const;
 
     std::string get_glyph_svg(uint16_t glyph_index) const;
