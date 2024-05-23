@@ -47,7 +47,7 @@ target_include_directories(flint_gui PUBLIC "third_party/stduuid-1.2.3")
 add_subdirectory("third_party/poly2tri")
 add_subdirectory("third_party/zlib")
 
-target_link_libraries(flint_gui PUBLIC pathfinder poly2tri harfbuzz zlib)
+target_link_libraries(flint_gui PUBLIC pathfinder poly2tri harfbuzz zlibstatic)
 
 if (WIN32)
     # Fix "too many characters in constant" error when using CMake with MSVC.
