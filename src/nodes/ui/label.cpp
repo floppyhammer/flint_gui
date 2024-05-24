@@ -543,12 +543,15 @@ void Label::calc_minimum_size() {
 
 Vec2F Label::get_text_minimum_size() const {
     float effective_max_para_width = 0;
-    for (const auto &line : lines_) {
+
+    const auto& effecttive_lines = word_wrap_ ? lines_ : paragraphs_;
+
+    for (const auto &line : effecttive_lines) {
         effective_max_para_width = std::max(effective_max_para_width, line.width);
     }
 
     Vec2F text_bbox = {effective_max_para_width,
-                       lines_.size() * (std::abs((float)font->get_ascent()) + std::abs((float)font->get_descent()))};
+                       effecttive_lines.size() * (std::abs((float)font->get_ascent()) + std::abs((float)font->get_descent()))};
 
     if (word_wrap_) {
         return Vec2F(0, text_bbox.y);
