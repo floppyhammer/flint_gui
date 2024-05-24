@@ -2,11 +2,13 @@
 
 namespace Flint {
 
-uint64_t TextServer::load_font_from_file(const std::string& file_path) {
-    return 0;
+void TextServer::load_font_from_file(const std::string& file_path) {
 }
 
-std::shared_ptr<std::vector<char>> TextServer::get_font(uint64_t font_id) {
+void TextServer::load_font_from_momery(const std::vector<char>& bytes) {
+}
+
+std::shared_ptr<std::vector<char>> TextServer::get_font(std::string font_id) {
     auto find = raw_font_cache.find(font_id);
     if (find != raw_font_cache.end()) {
         return raw_font_cache[font_id];

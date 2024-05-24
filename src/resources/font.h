@@ -150,6 +150,8 @@ class Font : public Resource {
 public:
     explicit Font(const std::string &path);
 
+    explicit Font(const std::vector<char> &bytes);
+
     ~Font() override;
 
     void set_size(uint32_t new_size);

@@ -127,6 +127,25 @@ Font::Font(const std::string &path) : Resource(path) {
     harfbuzz_res = std::make_shared<HarfBuzzRes>(font_data);
 }
 
+Font::Font(const std::vector<char> &bytes) {
+    font_data = bytes;
+
+    auto byte_size = font_data.size() * sizeof(unsigned char);
+
+    stbtt_buffer = static_cast<unsigned char *>(malloc(byte_size));
+    memcpy(stbtt_buffer, font_data.data(), byte_size);
+
+    // Prepare font info.
+    stbtt_info = new stbtt_fontinfo;
+    if (!stbtt_InitFont(stbtt_info, stbtt_buffer, 0)) {
+        Logger::error("Failed to prepare font info!", "Font");
+    }
+
+    get_metrics();
+
+    harfbuzz_res = std::make_shared<HarfBuzzRes>(font_data);
+}
+
 Font::~Font() {
     free(stbtt_buffer);
 
