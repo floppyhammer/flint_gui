@@ -16,14 +16,12 @@ option(FLINT_GUI_VISUAL_DEBUG "Enable visual debug" OFF)
 option(FLINT_GUI_FRIBIDI "Use fribidi instead of icu" OFF)
 
 if (APPLE)
-    set(FLINT_USE_FRIBIDI ON)
+    set(FLINT_GUI_FRIBIDI ON)
 endif ()
 
 file(GLOB_RECURSE FLINT_GUI_SOURCE_FILES CONFIGURE_DEPENDS
         src/*.cpp
-        third_party/tinyfiledialogs/tinyfiledialogs.c
-        third_party/fribidi/*.c
-        third_party/ttf2mesh/ttf2mesh.c)
+        third_party/tinyfiledialogs/tinyfiledialogs.c)
 
 if (FLINT_GUI_FRIBIDI)
     file(GLOB FLINT_GUI_SOURCE_FILES CONFIGURE_DEPENDS ${FLINT_GUI_SOURCE_FILES} third_party/fribidi/*.c)
