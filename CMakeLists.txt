@@ -91,6 +91,9 @@ if (FLINT_GUI_VISUAL_DEBUG)
     add_compile_definitions(FLINT_GUI_VISUAL_DEBUG)
 endif ()
 
+# Copy the assets to the binary directory.
+file(COPY "assets" DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
 # Add examples.
 add_subdirectory(examples/file_selection)
 add_subdirectory(examples/container_layout)

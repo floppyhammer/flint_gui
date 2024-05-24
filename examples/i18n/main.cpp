@@ -25,17 +25,19 @@ class MyNode : public Node {
         margin_container->add_child(box_container);
 
         std::string text = "";
-        text += "👍😁😂\n";                   // Emoji
-        text += "你好世界！\n";                    // Chinese
-        text += "こんにちは世界！\n";                 // Japanese
-        text += "مرحبا بالعالم!\n";           // Arabic
-        text += "ওহে বিশ্ব!\n";               // Bengali
-        text += "สวัสดีชาวโลก!\n";            // Thai
-        text += "سلام دنیا!\n";               // Persian
-        text += "नमस्ते दुनिया!\n";           // Hindi
-        text += "Chào thế giới!\n";           // Vietnamese
-        text += "שלום עולם!\n\n\n";           // Hebrew
+        text += "👍😁😂\n";                      // Emoji
+        text += "你好世界！\n";                  // Chinese
+        text += "こんにちは世界！\n";            // Japanese
+        text += "مرحبا بالعالم!\n";              // Arabic
+        text += "ওহে বিশ্ব!\n";                   // Bengali
+        text += "สวัสดีชาวโลก!\n";                 // Thai
+        text += "سلام دنیا!\n";                  // Persian
+        text += "नमस्ते दुनिया!\n";                 // Hindi
+        text += "Chào thế giới!\n";              // Vietnamese
+        text += "שלום עולם!\n\n\n";              // Hebrew
         text += "Hello123!مرحبا٠١٢!你好123！\n"; // Mixed languages
+
+        auto font = std::make_shared<Font>("assets/fonts/Arial Unicode MS Font.ttf");
 
         // No word wrapping.
         {
@@ -51,6 +53,8 @@ class MyNode : public Node {
             label->set_text(text);
             label->container_sizing.expand_h = true;
             label->container_sizing.flag_h = ContainerSizingFlag::Fill;
+            label->set_font(font);
+
             box_container->add_child(label);
         }
 
@@ -70,6 +74,7 @@ class MyNode : public Node {
             label->set_text(text);
             label->container_sizing.expand_h = true;
             label->container_sizing.flag_h = ContainerSizingFlag::Fill;
+            label->set_font(font);
 
             box_container->add_child(label);
         }
