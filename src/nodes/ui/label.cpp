@@ -473,6 +473,7 @@ void Label::update(double dt) {
     if (need_to_remeasure) {
         need_to_remeasure = false;
         measure();
+        layout_is_dirty = true;
     }
     if (layout_is_dirty) {
         layout_is_dirty = false;

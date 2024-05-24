@@ -15,7 +15,7 @@ namespace Flint {
 
 App::App(Vec2I primary_window_size) {
     // Set logger level.
-    Logger::set_level(Logger::Level::Verbose);
+    Logger::set_level(Logger::Level::Warn);
 
     auto render_server = RenderServer::get_singleton();
 
