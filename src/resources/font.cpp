@@ -13,20 +13,23 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb/stb_image_write.h>
 
-#ifdef _WIN32
-    // With Windows 10 Fall Creators Update and later, you can just include the single header <icu.h>.
-    // See https://learn.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-
-    #include <icu.h>
-#elif __linux__
-    #include <unicode/ubidi.h>
-    #include <unicode/ubrk.h>
-    #include <unicode/uclean.h>
-    #include <unicode/udata.h>
-    #include <unicode/uscript.h>
-    #include <unicode/utypes.h>
+#ifndef FLINT_USE_FRIBIDI
+    #ifdef _WIN32
+        // With Windows 10 Fall Creators Update and later, you can just include the single header <icu.h>.
+        // See https://learn.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-
+        #include <icu.h>
+    #elif __linux__
+        #include <unicode/ubidi.h>
+        #include <unicode/ubrk.h>
+        #include <unicode/uclean.h>
+        #include <unicode/udata.h>
+        #include <unicode/uscript.h>
+        #include <unicode/utypes.h>
+    #endif
+#else
+    #include <fribidi/fribidi.h>
 #endif
 
-#include <fribidi/fribidi.h>
 #include <hb.h>
 
 #include <gzip/decompress.hpp>
@@ -225,7 +228,7 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
     return path;
 }
 
-#ifndef __APPLE__
+#ifndef FLINT_USE_FRIBIDI
 
 void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &paragraphs_) {
     glyphs.clear();
