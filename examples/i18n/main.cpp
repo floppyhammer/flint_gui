@@ -1,3 +1,5 @@
+#include <resources/default_resource.h>
+
 #include <iostream>
 #include <random>
 
@@ -25,16 +27,16 @@ class MyNode : public Node {
         margin_container->add_child(box_container);
 
         std::string text = "";
-        text += "👍😁😂\n";                      // Emoji
-        text += "你好世界！\n";                  // Chinese
-        text += "こんにちは世界！\n";            // Japanese
-        text += "مرحبا بالعالم!\n";              // Arabic
-        text += "ওহে বিশ্ব!\n";                   // Bengali
-        text += "สวัสดีชาวโลก!\n";                 // Thai
-        text += "سلام دنیا!\n";                  // Persian
-        text += "नमस्ते दुनिया!\n";                 // Hindi
-        text += "Chào thế giới!\n";              // Vietnamese
-        text += "שלום עולם!\n\n\n";              // Hebrew
+        text += "👍😁😂\n";                   // Emoji
+        text += "你好世界！\n";                    // Chinese
+        text += "こんにちは世界！\n";                 // Japanese
+        text += "مرحبا بالعالم!\n";           // Arabic
+        text += "ওহে বিশ্ব!\n";               // Bengali
+        text += "สวัสดีชาวโลก!\n";            // Thai
+        text += "سلام دنیا!\n";               // Persian
+        text += "नमस्ते दुनिया!\n";           // Hindi
+        text += "Chào thế giới!\n";           // Vietnamese
+        text += "שלום עולם!\n\n\n";           // Hebrew
         text += "Hello123!مرحبا٠١٢!你好123！\n"; // Mixed languages
 
         auto font = std::make_shared<Font>("assets/fonts/Arial Unicode MS Font.ttf");

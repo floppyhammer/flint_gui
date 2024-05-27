@@ -6,6 +6,8 @@
 
 namespace Flint {
 
+class Font;
+
 class DefaultResource {
 public:
     DefaultResource() {
@@ -25,6 +27,10 @@ public:
 
     std::shared_ptr<Font> get_default_font() {
         return default_font;
+    }
+
+    void set_default_font(std::shared_ptr<Font> font) {
+        default_font = font;
     }
 
 private:

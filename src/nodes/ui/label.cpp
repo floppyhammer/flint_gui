@@ -288,14 +288,14 @@ void Label::set_size(Vec2F new_size) {
 
 /// A very crude way for line-breaking.
 std::vector<InContextGlyph> convert_to_in_context_glyphs(const std::vector<Glyph> &glyphs,
-                                                         const std::vector<Line> &para_ranges) {
+                                                         const std::vector<Line> &paragraphs) {
     std::vector<InContextGlyph> in_context_glyphs;
     in_context_glyphs.resize(glyphs.size());
 
-    // Add emoji data.
-    for (auto &para : para_ranges)
+    // Add line-breaking info.
+    for (auto &para : paragraphs)
         for (int glyph_idx = para.glyph_ranges.start; glyph_idx < para.glyph_ranges.end; glyph_idx++) {
-            auto &glyph = glyphs[glyph_idx];
+            const auto &glyph = glyphs[glyph_idx];
 
             InContextGlyph in_context_glyph;
             in_context_glyph.glyph_ = glyph;
@@ -337,13 +337,40 @@ void Label::measure() {
     // Add emoji data.
     if (emoji_font->is_valid()) {
         for (auto &glyph : glyphs_) {
-            if (glyph.codepoints.size() == 1) {
+            if (glyph.codepoints.size() == 1 && glyph.index == 0) {
                 uint16_t glyph_index = emoji_font->find_glyph_index_by_codepoint(glyph.codepoints.front());
+                if (glyph_index == 0) {
+                    continue;
+                }
+                glyph.emoji = true;
+
                 glyph.svg = emoji_font->get_glyph_svg(glyph_index);
                 if (!glyph.svg.empty() && glyph.index == 0) {
                     glyph.x_advance = font->get_size();
                     glyph.box = {0, 0, (float)font->get_size(), (float)font->get_size()};
-                    glyph.emoji = true;
+                }
+            }
+        }
+    }
+
+    // Font fallback.
+    bool need_fallback = false;
+    for (auto &glyph : glyphs_) {
+        if (glyph.index == 0 && !glyph.emoji) {
+            need_fallback = true;
+        }
+    }
+    if (need_fallback) {
+        std::vector<Glyph> fallback_glyphs;
+        std::vector<Line> fallback_paragraphs;
+        DefaultResource::get_singleton()->get_default_font()->get_glyphs(text_, fallback_glyphs, fallback_paragraphs);
+
+        for (auto &glyph : glyphs_) {
+            if (glyph.index == 0 && !glyph.emoji) {
+                for (auto &fallback_glyph : fallback_glyphs) {
+                    if (fallback_glyph.index != 0 && fallback_glyph.codepoints == glyph.codepoints) {
+                        glyph = fallback_glyph;
+                    }
                 }
             }
         }
@@ -545,14 +572,15 @@ void Label::calc_minimum_size() {
 Vec2F Label::get_text_minimum_size() const {
     float effective_max_para_width = 0;
 
-    const auto& effecttive_lines = word_wrap_ ? lines_ : paragraphs_;
+    const auto &effecttive_lines = word_wrap_ ? lines_ : paragraphs_;
 
     for (const auto &line : effecttive_lines) {
         effective_max_para_width = std::max(effective_max_para_width, line.width);
     }
 
-    Vec2F text_bbox = {effective_max_para_width,
-                       effecttive_lines.size() * (std::abs((float)font->get_ascent()) + std::abs((float)font->get_descent()))};
+    Vec2F text_bbox = {
+        effective_max_para_width,
+        effecttive_lines.size() * (std::abs((float)font->get_ascent()) + std::abs((float)font->get_descent()))};
 
     if (word_wrap_) {
         return Vec2F(0, text_bbox.y);

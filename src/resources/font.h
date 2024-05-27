@@ -100,7 +100,7 @@ enum class Script {
 
 // Text-context-independent glyph data.
 struct Glyph {
-    // Glyph index (font specific) or UTF-32 codepoint (for the invalid glyphs).
+    // Glyph index (font specific). Zero for invalid glyphs.
     // A particular glyph ID within the font does not necessarily correlate to a predictable Unicode codepoint.
     uint16_t index = 0;
 

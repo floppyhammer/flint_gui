@@ -115,6 +115,7 @@ Font::Font(const std::string &path) : Resource(path) {
     font_data = Pathfinder::load_file_as_bytes(path.c_str());
 
     auto byte_size = font_data.size() * sizeof(unsigned char);
+    assert(byte_size != 0);
 
     stbtt_buffer = static_cast<unsigned char *>(malloc(byte_size));
     memcpy(stbtt_buffer, font_data.data(), byte_size);
@@ -501,6 +502,7 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
     std::u32string text_u32;
     utf8_to_utf32(text, text_u32);
 
+    // Get FriBidiChar data.
     std::vector<FriBidiChar> fribidi_in_char(FRIBIDI_MAX_STR_LEN);
     const FriBidiStrIndex fribidi_len =
         fribidi_charset_to_unicode(FRIBIDI_CHAR_SET_UTF8, text.c_str(), text.size(), fribidi_in_char.data());
@@ -514,46 +516,48 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
     std::vector<FriBidiStrIndex> position_logical_to_visual_list(fribidi_len);
     std::vector<FriBidiStrIndex> position_visual_to_logical_list(fribidi_len);
 
-    const fribidi_boolean stat = fribidi_log2vis(fribidi_in_char.data(),
-                                                 fribidi_len,
-                                                 &fribidi_pbase_dir,
-                                                 fribidi_visual_char.data(),
-                                                 position_logical_to_visual_list.data(),
-                                                 position_visual_to_logical_list.data(),
-                                                 embedding_level_list.data());
+    // Loggical list to visual list.
+    const FriBidiLevel max_level = fribidi_log2vis(fribidi_in_char.data(),
+                                                   fribidi_len,
+                                                   &fribidi_pbase_dir,
+                                                   fribidi_visual_char.data(),
+                                                   position_logical_to_visual_list.data(),
+                                                   position_visual_to_logical_list.data(),
+                                                   embedding_level_list.data());
+    assert(max_level != 0);
 
-    if (stat) {
-        std::string string_formatted_ptr(FRIBIDI_MAX_STR_LEN, 0);
-        const FriBidiStrIndex new_len = fribidi_unicode_to_charset(
-            FRIBIDI_CHAR_SET_UTF8, fribidi_visual_char.data(), fribidi_len, string_formatted_ptr.data());
-        assert(new_len < FRIBIDI_MAX_STR_LEN);
-        string_formatted_ptr.resize(new_len);
-    }
+    // if (max_level) {
+    //     std::string string_formatted_ptr(FRIBIDI_MAX_STR_LEN, 0);
+    //     const FriBidiStrIndex new_len = fribidi_unicode_to_charset(
+    //         FRIBIDI_CHAR_SET_UTF8, fribidi_visual_char.data(), fribidi_len, string_formatted_ptr.data());
+    //     assert(new_len < FRIBIDI_MAX_STR_LEN);
+    //     string_formatted_ptr.resize(new_len);
+    // }
 
     std::vector<Pathfinder::Range> para_ranges_unicode;
     int new_para_start_idx = 0;
     for (int char_idx = 0; char_idx < fribidi_len; char_idx++) {
         if (fribidi_in_char[char_idx] == 10) {
-            para_ranges_unicode.push_back({(uint32_t)new_para_start_idx, (uint32_t)char_idx + 1});
+            para_ranges_unicode.emplace_back((uint32_t)new_para_start_idx, (uint32_t)char_idx + 1);
             new_para_start_idx = char_idx + 1;
         }
     }
 
     if (!fribidi_in_char.empty() && fribidi_in_char.back() != 10) {
-        para_ranges_unicode.push_back({(uint32_t)new_para_start_idx, (uint32_t)fribidi_len});
+        para_ranges_unicode.emplace_back((uint32_t)new_para_start_idx, (uint32_t)fribidi_len);
     }
 
     int para_count = para_ranges_unicode.size();
 
     // Go through paragraphs.
-    for (int32_t para_index = 0; para_index < para_count; para_index++) {
-        // Paragraph start and end in the whole text. Unit: u16char.
-        int32_t para_start = para_ranges_unicode[para_index].start;
-        int32_t para_end = para_ranges_unicode[para_index].end;
+    for (int para_index = 0; para_index < para_count; para_index++) {
+        // Paragraph start and end in the whole text. Unit: u32char.
+        int para_start = para_ranges_unicode[para_index].start;
+        int para_end = para_ranges_unicode[para_index].end;
 
-        //            std::string para_text = to_utf8(text_u16.substr(para_start, para_end));
-        //            std::cout << "Paragraph text: " << para_text << std::endl;
-        //            std::cout << "Paragraph range: " << para_start << " -> " << para_end << std::endl;
+        // std::string para_text = utf32_to_utf8(text_u32.substr(para_start, para_end));
+        // std::cout << "Paragraph text: " << para_text << std::endl;
+        // std::cout << "Paragraph range: " << para_start << " -> " << para_end << std::endl;
 
         bool para_is_rtl = false;
 
