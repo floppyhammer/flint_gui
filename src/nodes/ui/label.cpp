@@ -328,11 +328,7 @@ std::vector<InContextGlyph> convert_to_in_context_glyphs(const std::vector<Glyph
 }
 
 void Label::measure() {
-    // Get font info.
-    int ascent = font->get_ascent();
-    int descent = font->get_descent();
-
-    font->get_glyphs(text_, glyphs_, paragraphs_);
+    font->get_glyphs(text_, font_size_, baseline_position_, glyphs_, paragraphs_);
 
     // Add emoji data.
     if (emoji_font->is_valid()) {
@@ -346,31 +342,8 @@ void Label::measure() {
 
                 glyph.svg = emoji_font->get_glyph_svg(glyph_index);
                 if (!glyph.svg.empty() && glyph.index == 0) {
-                    glyph.x_advance = font->get_size();
-                    glyph.box = {0, 0, (float)font->get_size(), (float)font->get_size()};
-                }
-            }
-        }
-    }
-
-    // Font fallback.
-    bool need_fallback = false;
-    for (auto &glyph : glyphs_) {
-        if (glyph.index == 0 && !glyph.emoji) {
-            need_fallback = true;
-        }
-    }
-    if (need_fallback) {
-        std::vector<Glyph> fallback_glyphs;
-        std::vector<Line> fallback_paragraphs;
-        DefaultResource::get_singleton()->get_default_font()->get_glyphs(text_, fallback_glyphs, fallback_paragraphs);
-
-        for (auto &glyph : glyphs_) {
-            if (glyph.index == 0 && !glyph.emoji) {
-                for (auto &fallback_glyph : fallback_glyphs) {
-                    if (fallback_glyph.index != 0 && fallback_glyph.codepoints == glyph.codepoints) {
-                        glyph = fallback_glyph;
-                    }
+                    glyph.x_advance = font_size_;
+                    glyph.box = {0, 0, (float)font_size_, (float)font_size_};
                 }
             }
         }
@@ -388,7 +361,7 @@ void Label::make_layout() {
     glyph_boxes.clear();
     character_boxes.clear();
 
-    float line_height = font->get_size();
+    float line_height = font_size_;
 
     float cursor_x = 0;
     float cursor_y = 0;
@@ -528,7 +501,7 @@ void Label::draw() {
 
     vector_server->draw_style_box(theme_background, global_position, size);
 
-    auto baseline_position = Vec2F(0, font->get_ascent());
+    auto baseline_position = Vec2F(0, baseline_position_);
 
     auto translation = Transform2::from_translation(global_position + alignment_shift + baseline_position);
 
@@ -564,7 +537,7 @@ void Label::calc_minimum_size() {
     auto min_size = get_text_minimum_size();
 
     // Label has a minimal height even when the text is empty.
-    min_size.y = std::max(min_size.y, (float)font->get_size());
+    min_size.y = std::max(min_size.y, (float)font_size_);
 
     calculated_minimum_size = min_size;
 }
@@ -578,9 +551,7 @@ Vec2F Label::get_text_minimum_size() const {
         effective_max_para_width = std::max(effective_max_para_width, line.width);
     }
 
-    Vec2F text_bbox = {
-        effective_max_para_width,
-        effecttive_lines.size() * (std::abs((float)font->get_ascent()) + std::abs((float)font->get_descent()))};
+    Vec2F text_bbox = {effective_max_para_width, effecttive_lines.size() * (float)font_size_};
 
     if (word_wrap_) {
         return Vec2F(0, text_bbox.y);

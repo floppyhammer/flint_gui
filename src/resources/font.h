@@ -90,12 +90,15 @@ struct TextStyle {
 };
 
 enum class Script {
-    Common,
+    Common = 0,
     Arabic,
     Bengali,
     Devanagari,
     Hebrew,
     Cjk,
+    Hiragana,
+    Katakana,
+    Thai,
 };
 
 // Text-context-independent glyph data.
@@ -144,8 +147,9 @@ struct Line {
     float width = 0;
 };
 
-struct HarfBuzzRes;
+struct HarfBuzzData;
 
+// A font is pointsize-carefree.
 class Font : public Resource {
 public:
     explicit Font(const std::string &path);
@@ -154,10 +158,6 @@ public:
 
     ~Font() override;
 
-    void set_size(uint32_t new_size);
-
-    uint32_t get_size() const;
-
     bool is_valid() const;
 
     Pathfinder::Path2d get_glyph_path(uint16_t glyph_index) const;
@@ -165,9 +165,13 @@ public:
     std::string get_glyph_svg(uint16_t glyph_index) const;
 
     /// Paragraphs and lines are different concepts.
-    /// Paragraphs are seperated by line breaks, while lines are results of automatic layout.
+    /// Paragraphs are seperated by line breaks, while lines are produced by further layouting.
     /// A paragraph may contain one or more lines.
-    void get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &para_ranges);
+    void get_glyphs(const std::string &text,
+                    uint32_t font_size,
+                    float &baseline_position,
+                    std::vector<Glyph> &glyphs,
+                    std::vector<Line> &paragraphs);
 
     uint16_t find_glyph_index_by_codepoint(int codepoint);
 
@@ -175,9 +179,7 @@ public:
 
     RectI get_glyph_bounds(uint16_t glyph_index) const;
 
-    int get_ascent() const;
-
-    int get_descent() const;
+    std::shared_ptr<HarfBuzzData> harfbuzz_data;
 
 private:
     /// Stores font data, should not be freed until font is deleted.
@@ -185,20 +187,21 @@ private:
 
     stbtt_fontinfo *stbtt_info{};
 
-    uint32_t size = 32;
+    /// Will fallback to the default font for unfound glyphs.
+    bool allow_fallback = true;
 
+    // Dynamic values, don't use them from outside.
     float scale;
-
     int32_t ascent;
     int32_t descent;
 
-    std::shared_ptr<HarfBuzzRes> harfbuzz_res;
-
+    // Obsoleted, caching glyphs requires setting a font size, which we don't do to a font.
     std::unordered_map<uint16_t, Glyph> glyph_cache;
 
+    // Raw font data, read directly from a file or from memory.
     std::vector<char> font_data;
 
-    void get_metrics();
+    void update_metrics(uint32_t size);
 };
 
 } // namespace Flint

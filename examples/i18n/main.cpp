@@ -30,16 +30,20 @@ class MyNode : public Node {
         text += "👍😁😂\n";                   // Emoji
         text += "你好世界！\n";                    // Chinese
         text += "こんにちは世界！\n";                 // Japanese
+        text += "안녕 세계\n";                    // Korean
         text += "مرحبا بالعالم!\n";           // Arabic
         text += "ওহে বিশ্ব!\n";               // Bengali
         text += "สวัสดีชาวโลก!\n";            // Thai
         text += "سلام دنیا!\n";               // Persian
         text += "नमस्ते दुनिया!\n";           // Hindi
         text += "Chào thế giới!\n";           // Vietnamese
-        text += "שלום עולם!\n\n\n";           // Hebrew
+        text += "Привет, мир\n";              // Russian
+        text += "שלום עולם!\n\n";             // Hebrew
         text += "Hello123!مرحبا٠١٢!你好123！\n"; // Mixed languages
 
-        auto font = std::make_shared<Font>("assets/fonts/Arial Unicode MS Font.ttf");
+        auto font = std::make_shared<Font>("assets/fonts/test.ttf");
+        DefaultResource::get_singleton()->set_default_font(
+            std::make_shared<Font>("assets/fonts/Arial Unicode MS Font.ttf"));
 
         // No word wrapping.
         {
@@ -56,6 +60,7 @@ class MyNode : public Node {
             label->container_sizing.expand_h = true;
             label->container_sizing.flag_h = ContainerSizingFlag::Fill;
             label->set_font(font);
+            label->set_font_size(48);
 
             box_container->add_child(label);
         }

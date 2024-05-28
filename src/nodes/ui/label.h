@@ -57,6 +57,14 @@ public:
 
     void set_font(std::shared_ptr<Font> new_font);
 
+    void set_font_size(uint32_t new_font_size) {
+        font_size_ = new_font_size;
+    }
+
+    uint32_t get_font_size() const {
+        return font_size_;
+    }
+
     void set_text_style(TextStyle new_text_style);
 
     void update(double dt) override;
@@ -121,6 +129,10 @@ private:
     /// text_u32_ is more related to navigation, glyphs_ is more about rendering.
 
     std::shared_ptr<Font> font, emoji_font;
+
+    uint32_t font_size_ = 32;
+
+    float baseline_position_ = 0;
 
     bool clip = false;
 

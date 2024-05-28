@@ -36,6 +36,8 @@
 #include <gzip/utils.hpp>
 #include <optional>
 
+#include "default_resource.h"
+
 namespace Flint {
 
 hb_script_t to_harfbuzz_script(Script script) {
@@ -54,51 +56,90 @@ hb_script_t to_harfbuzz_script(Script script) {
             //            return HB_SCRIPT_DEVANAGARI;
             return HB_SCRIPT_LATIN;
         }
+        case Script::Thai: {
+            return HB_SCRIPT_THAI;
+        }
+        case Script::Hiragana: {
+            return HB_SCRIPT_HIRAGANA;
+        }
+        case Script::Katakana: {
+            return HB_SCRIPT_KATAKANA;
+        }
         default: {
             return HB_SCRIPT_COMMON;
         }
     }
 }
 
-Script get_text_script(const std::string &text) {
-    std::u16string utf16_string;
-    utf8_to_utf16(text, utf16_string);
+std::vector<std::pair<Script, Pathfinder::Range>> get_text_script(const std::u32string &utf32_text) {
+    std::vector<Script> scripts;
 
-    for (auto &codepoint : utf16_string) {
+    for (auto &codepoint : utf32_text) {
         if (codepoint >= 0x0600 && codepoint <= 0x06FF) {
-            return Script::Arabic;
-        }
-        if (codepoint >= 0x0981 && codepoint <= 0x09FB) {
-            return Script::Bengali;
-        }
-        if (codepoint >= 0x0901 && codepoint <= 0x097F) {
-            return Script::Devanagari;
-        }
-        if (codepoint >= 0x0590 && codepoint <= 0x05FF) {
-            return Script::Hebrew;
-        }
-        if (codepoint >= 0x4E00 && codepoint <= 0x9FFF) {
-            return Script::Cjk;
+            scripts.push_back(Script::Arabic);
+        } else if (codepoint >= 0x0981 && codepoint <= 0x09FB) {
+            scripts.push_back(Script::Bengali);
+        } else if (codepoint >= 0x0901 && codepoint <= 0x097F) {
+            scripts.push_back(Script::Devanagari);
+        } else if (codepoint >= 0x0590 && codepoint <= 0x05FF) {
+            scripts.push_back(Script::Hebrew);
+        } else if (codepoint >= 0x4E00 && codepoint <= 0x9FFF) {
+            scripts.push_back(Script::Cjk);
+        } else if (codepoint >= 0x3040 && codepoint <= 0x309F) {
+            scripts.push_back(Script::Hiragana);
+        } else if (codepoint >= 0x30A0 && codepoint <= 0x30FF) {
+            scripts.push_back(Script::Katakana);
+        } else if (codepoint >= 0x0E00 && codepoint <= 0x0E7F) {
+            scripts.push_back(Script::Thai);
+        } else {
+            scripts.push_back(Script::Common);
         }
     }
 
-    return Script::Common;
+    std::vector<std::pair<Script, Pathfinder::Range>> script_groups;
+    auto current_script = scripts.front();
+    uint32_t current_codepoint_start = 0;
+    for (uint32_t idx = 0; idx < scripts.size(); idx++) {
+        const auto &s = scripts[idx];
+
+        if (s != current_script) {
+            script_groups.emplace_back(current_script, Pathfinder::Range{current_codepoint_start, idx});
+
+            current_script = s;
+            current_codepoint_start = idx;
+        }
+    }
+
+    script_groups.emplace_back(current_script, Pathfinder::Range{current_codepoint_start, scripts.size()});
+
+    return script_groups;
 }
 
-struct HarfBuzzRes {
+bool glyphs_exist_in_font(std::u32string codepoints, Font *font) {
+    assert(font != nullptr);
+
+    for (const auto &c : codepoints) {
+        if (font->find_glyph_index_by_codepoint(c) == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+struct HarfBuzzData {
     hb_blob_t *blob{};
     hb_face_t *face{};
     hb_font_t *font{};
 
-    HarfBuzzRes() = default;
+    HarfBuzzData() = default;
 
-    explicit HarfBuzzRes(const std::vector<char> &bytes) {
+    explicit HarfBuzzData(const std::vector<char> &bytes) {
         blob = hb_blob_create(bytes.data(), bytes.size(), HB_MEMORY_MODE_READONLY, nullptr, nullptr);
         face = hb_face_create(blob, 0);
         font = hb_font_create(face);
     }
 
-    ~HarfBuzzRes() {
+    ~HarfBuzzData() {
         if (font) {
             hb_font_destroy(font);
         }
@@ -126,9 +167,7 @@ Font::Font(const std::string &path) : Resource(path) {
         Logger::error("Failed to prepare font info!", "Font");
     }
 
-    get_metrics();
-
-    harfbuzz_res = std::make_shared<HarfBuzzRes>(font_data);
+    harfbuzz_data = std::make_shared<HarfBuzzData>(font_data);
 }
 
 Font::Font(const std::vector<char> &bytes) {
@@ -145,9 +184,7 @@ Font::Font(const std::vector<char> &bytes) {
         Logger::error("Failed to prepare font info!", "Font");
     }
 
-    get_metrics();
-
-    harfbuzz_res = std::make_shared<HarfBuzzRes>(font_data);
+    harfbuzz_data = std::make_shared<HarfBuzzData>(font_data);
 }
 
 Font::~Font() {
@@ -156,7 +193,7 @@ Font::~Font() {
     delete stbtt_info;
 }
 
-void Font::get_metrics() {
+void Font::update_metrics(uint32_t size) {
     // Calculate font scaling.
     scale = stbtt_ScaleForPixelHeight(stbtt_info, (float)size);
 
@@ -231,9 +268,19 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
 
 #ifndef FLINT_USE_FRIBIDI
 
-void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &paragraphs_) {
+// Not font fallback when using ICU.
+
+void Font::get_glyphs(const std::string &text,
+                      uint32_t font_size,
+                      float &baseline_position,
+                      std::vector<Glyph> &glyphs,
+                      std::vector<Line> &paragraphs) {
     glyphs.clear();
-    paragraphs_.clear();
+    paragraphs.clear();
+
+    update_metrics(font_size);
+
+    baseline_position = ascent;
 
     #ifdef ICU_STATIC_DATA
     static bool icu_data_loaded = false;
@@ -246,7 +293,7 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
     // Load data manually.
     #endif
 
-    uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
+    uint32_t units_per_em = hb_face_get_upem(harfbuzz_data->face);
 
     // Note: don't use icu::UnicodeString, it doesn't work. Use plain UChar* instead.
 
@@ -326,11 +373,14 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
 
                 std::string run_text = utf16_to_utf8(run_text_u16);
 
+                std::u32string run_text_u32;
+                utf8_to_utf32(run_text, run_text_u32);
+
                 //                std::cout << "Visual run in paragraph: \t" << run_index << "\t" << run_is_rtl << "\t"
                 //                << logical_start
                 //                          << '\t' << length << '\t' << run_text << std::endl;
 
-                auto run_script = get_text_script(run_text);
+                auto run_script = get_text_script(run_text_u32).front().first;
 
                 // Buffers are sequences of Unicode characters that use the same font
                 // and have the same text direction, script, and language.
@@ -343,15 +393,15 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
                 hb_buffer_set_direction(hb_buffer, run_is_rtl ? HB_DIRECTION_RTL : HB_DIRECTION_LTR);
                 hb_buffer_set_script(hb_buffer, to_harfbuzz_script(run_script));
 
-                hb_shape(harfbuzz_res->font, hb_buffer, nullptr, 0);
+                hb_shape(harfbuzz_data->font, hb_buffer, nullptr, 0);
 
                 unsigned int glyph_count;
                 hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(hb_buffer, &glyph_count);
                 hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(hb_buffer, &glyph_count);
 
-                std::vector<hb_glyph_info_t> debug_glyph_info;
+                std::vector<hb_glyph_info_t> debug_glyph_info(glyph_count);
                 for (int i = 0; i < glyph_count; i++) {
-                    debug_glyph_info.push_back(glyph_info[i]);
+                    debug_glyph_info[i] = glyph_info[i];
                 }
 
                 // Shaped glyph positions will always be in one line (regardless of line breaks).
@@ -481,7 +531,7 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
             para.glyph_ranges = {para_glyph_start, glyphs.size()};
             para.rtl = para_is_rtl;
             para.width = para_width;
-            paragraphs_.push_back(para);
+            paragraphs.push_back(para);
         }
     } while (false);
 
@@ -493,11 +543,19 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
 
     #define FRIBIDI_MAX_STR_LEN 65000
 
-void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::vector<Line> &paragraphs_) {
+void Font::get_glyphs(const std::string &text,
+                      uint32_t font_size,
+                      float &baseline_position,
+                      std::vector<Glyph> &glyphs,
+                      std::vector<Line> &paragraphs) {
     glyphs.clear();
-    paragraphs_.clear();
+    paragraphs.clear();
 
-    uint32_t units_per_em = hb_face_get_upem(harfbuzz_res->face);
+    update_metrics(font_size);
+
+    baseline_position = ascent;
+
+    uint32_t units_per_em = hb_face_get_upem(harfbuzz_data->face);
 
     std::u32string text_u32;
     utf8_to_utf32(text, text_u32);
@@ -618,153 +676,173 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
             // Get run text from the whole text.
             std::u32string run_text_u32 = text_u32.substr(run_range.start, run_length);
 
-            std::string run_text = utf32_to_utf8(run_text_u32);
+            // std::string run_text = utf32_to_utf8(run_text_u32);
 
             //                std::cout << "Visual run in paragraph: \t" << run_index << "\t" << run_is_rtl << "\t"
             //                << logical_start
             //                          << '\t' << length << '\t' << run_text << std::endl;
 
-            auto run_script = get_text_script(run_text);
+            // Seperate the run into script groups, so we can fallback font when necessary.
+            auto run_script_ranges = get_text_script(run_text_u32);
 
-            // Buffers are sequences of Unicode characters that use the same font
-            // and have the same text direction, script, and language.
-            hb_buffer_t *hb_buffer = hb_buffer_create();
+            for (const auto &script_range : run_script_ranges) {
+                auto script = script_range.first;
+                auto script_range_in_run = script_range.second;
 
-            // Item offset and length should represent a specific run.
-            hb_buffer_add_utf32(
-                hb_buffer, reinterpret_cast<const uint32_t *>(text_u32.c_str()), -1, run_start, run_length);
+                uint32_t script_start = run_start + script_range_in_run.start;
+                uint32_t script_end = run_start + script_range_in_run.end;
+                uint32_t script_length = script_end - script_start;
 
-            hb_buffer_set_direction(hb_buffer, run_is_rtl ? HB_DIRECTION_RTL : HB_DIRECTION_LTR);
-            hb_buffer_set_script(hb_buffer, to_harfbuzz_script(run_script));
+                std::u32string script_text_u32 = text_u32.substr(script_start, script_length);
+                bool use_fallback_font = !glyphs_exist_in_font(script_text_u32, this);
 
-            hb_shape(harfbuzz_res->font, hb_buffer, nullptr, 0);
+                Font *font_to_use = this;
 
-            unsigned int glyph_count;
-            hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(hb_buffer, &glyph_count);
-            hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(hb_buffer, &glyph_count);
-
-            std::vector<hb_glyph_info_t> debug_glyph_info;
-            for (int i = 0; i < glyph_count; i++) {
-                debug_glyph_info.push_back(glyph_info[i]);
-            }
-
-            // Shaped glyph positions will always be in one line (regardless of line breaks).
-            for (int i = 0; i < glyph_count; i++) {
-                auto &info = glyph_info[i];
-                auto &pos = glyph_pos[i];
-
-                // Cluster unit is u16char, so it should be worked with std::u16string instead of std::string.
-                std::optional<Pathfinder::Range> current_cluster;
-                if (!run_is_rtl) {
-                    if (i < glyph_count - 1) {
-                        // Multiple glyphs may share the same cluster.
-                        for (int j = 1; i + j < glyph_count; j++) {
-                            if (info.cluster != glyph_info[i + j].cluster) {
-                                current_cluster = {info.cluster, glyph_info[i + j].cluster};
-                                break;
-                            }
-                        }
-                    }
-                    if (!current_cluster.has_value()) {
-                        current_cluster = {info.cluster, (unsigned long long)(run_range.end)};
-                    }
-                } else {
-                    if (i > 0) {
-                        // Multiple glyphs may share the same cluster.
-                        for (int j = 1; i - j >= 0; j++) {
-                            if (info.cluster != glyph_info[i - j].cluster) {
-                                current_cluster = {info.cluster, glyph_info[i - j].cluster};
-                                break;
-                            }
-                        }
-                    }
-                    if (!current_cluster.has_value()) {
-                        current_cluster = {info.cluster, (unsigned long long)(run_range.end)};
-                    }
+                if (allow_fallback && use_fallback_font) {
+                    font_to_use = DefaultResource::get_singleton()->get_default_font().get();
+                    font_to_use->update_metrics(font_size);
                 }
 
-                std::u32string glyph_text_u32 = text_u32.substr(current_cluster->start, current_cluster->length());
+                // Buffers are sequences of Unicode characters that use the same font
+                // and have the same text direction, script, and language.
+                hb_buffer_t *hb_buffer = hb_buffer_create();
 
-                std::string glyph_text = utf32_to_utf8(glyph_text_u32);
-                //                    std::cout << "Glyph text: " << glyph_text << std::endl;
+                // Item offset and length should represent a specific run.
+                hb_buffer_add_utf32(
+                    hb_buffer, reinterpret_cast<const uint32_t *>(text_u32.c_str()), -1, script_start, script_length);
 
-                Glyph glyph;
+                hb_buffer_set_direction(hb_buffer, run_is_rtl ? HB_DIRECTION_RTL : HB_DIRECTION_LTR);
+                hb_buffer_set_script(hb_buffer, to_harfbuzz_script(script));
 
-                // One glyph may have multiple codepoints.
-                // Eg. स् = स + ्
-                glyph.codepoints = glyph_text_u32;
+                hb_shape(font_to_use->harfbuzz_data->font, hb_buffer, nullptr, 0);
 
-                glyph.text = glyph_text;
+                unsigned int glyph_count;
+                hb_glyph_info_t *glyph_info = hb_buffer_get_glyph_infos(hb_buffer, &glyph_count);
+                hb_glyph_position_t *glyph_pos = hb_buffer_get_glyph_positions(hb_buffer, &glyph_count);
 
-                // Codepoint property is replaced with glyph ID after shaping.
-                glyph.index = info.codepoint;
-
-                // Check if the glyph has already been cached.
-                if (glyph_cache.find(glyph.index) != glyph_cache.end()) {
-                    glyphs.push_back(glyph_cache[glyph.index]);
-                    continue;
+                std::vector<hb_glyph_info_t> debug_glyph_info(glyph_count);
+                for (int i = 0; i < glyph_count; i++) {
+                    debug_glyph_info[i] = glyph_info[i];
                 }
 
-                glyph.script = run_script;
+                // Shaped glyph positions will always be in one line (regardless of line breaks).
+                for (int i = 0; i < glyph_count; i++) {
+                    auto &info = glyph_info[i];
+                    auto &pos = glyph_pos[i];
 
-                // Mark line breaks, so they're not drawn.
-                if (glyph_text == "\n") {
-                    glyph.skip_drawing = true;
-                } else {
-                    glyph.x_offset = pos.x_offset;
-                    glyph.y_offset = pos.y_offset;
+                    // Cluster unit is u32char, so it should be worked with std::u32string instead of std::string.
+                    std::optional<Pathfinder::Range> current_cluster;
+                    if (!run_is_rtl) {
+                        if (i < glyph_count - 1) {
+                            // Multiple glyphs may share the same cluster.
+                            for (int j = 1; i + j < glyph_count; j++) {
+                                if (info.cluster != glyph_info[i + j].cluster) {
+                                    current_cluster = {info.cluster, glyph_info[i + j].cluster};
+                                    break;
+                                }
+                            }
+                        }
+                        if (!current_cluster.has_value()) {
+                            current_cluster = {info.cluster, run_range.end};
+                        }
+                    } else {
+                        if (i > 0) {
+                            // Multiple glyphs may share the same cluster.
+                            for (int j = 1; i - j >= 0; j++) {
+                                if (info.cluster != glyph_info[i - j].cluster) {
+                                    current_cluster = {info.cluster, glyph_info[i - j].cluster};
+                                    break;
+                                }
+                            }
+                        }
+                        if (!current_cluster.has_value()) {
+                            current_cluster = {info.cluster, run_range.end};
+                        }
+                    }
 
-                    // Don't know why harfbuzz returns incorrect advance.
-                    // So, we use the info provided by freetype.
-                    //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
-                    glyph.x_advance = get_glyph_advance(glyph.index);
+                    std::u32string glyph_text_u32 = text_u32.substr(current_cluster->start, current_cluster->length());
 
-                    // Debug
-                    // {
-                    //     int bitmap_width;
-                    //     int bitmap_height;
-                    //     int bitmap_xoffset;
-                    //     int bitmap_yoffset;
-                    //
-                    //     auto bitmap_data = stbtt_GetGlyphBitmap(&stbtt_info,
-                    //                                             scale,
-                    //                                             scale,
-                    //                                             glyph.index,
-                    //                                             &bitmap_width,
-                    //                                             &bitmap_height,
-                    //                                             &bitmap_xoffset,
-                    //                                             &bitmap_yoffset);
-                    //
-                    //     stbi_write_png(("glyph_bitmap_" + glyph.text + ".png").c_str(),
-                    //                    bitmap_width,
-                    //                    bitmap_height,
-                    //                    1,
-                    //                    bitmap_data,
-                    //                    bitmap_width);
-                    //
-                    //     int _ = 0;
+                    std::string glyph_text = utf32_to_utf8(glyph_text_u32);
+                    //                    std::cout << "Glyph text: " << glyph_text << std::endl;
+
+                    Glyph glyph;
+
+                    // One glyph may have multiple codepoints.
+                    // Eg. स् = स + ्
+                    glyph.codepoints = glyph_text_u32;
+
+                    glyph.text = glyph_text;
+
+                    // Codepoint property is replaced with glyph ID after shaping.
+                    glyph.index = info.codepoint;
+
+                    // Check if the glyph has already been cached.
+                    // if (glyph_cache.find(glyph.index) != glyph_cache.end()) {
+                    //     glyphs.push_back(glyph_cache[glyph.index]);
+                    //     continue;
                     // }
 
-                    para_width += glyph.x_advance;
+                    glyph.script = script;
 
-                    // Get glyph path.
-                    glyph.path = get_glyph_path(glyph.index);
+                    // Mark line breaks, so they're not drawn.
+                    if (glyph_text == "\n") {
+                        glyph.skip_drawing = true;
+                    } else {
+                        glyph.x_offset = pos.x_offset;
+                        glyph.y_offset = pos.y_offset;
 
-                    // The glyph's layout box in the glyph's local coordinates.
-                    // The origin is the baseline. The Y axis is downward.
-                    glyph.box = RectF(0, (float)-ascent, glyph.x_advance, (float)-descent);
+                        // Don't know why harfbuzz returns incorrect advance.
+                        // So, we use the info provided by freetype.
+                        //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
+                        glyph.x_advance = font_to_use->get_glyph_advance(glyph.index);
 
-                    // Get the glyph path's bounding box. The Y axis points down.
-                    RectI bounding_box = get_glyph_bounds(glyph.index);
+                        // Debug
+                        // {
+                        //     int bitmap_width;
+                        //     int bitmap_height;
+                        //     int bitmap_xoffset;
+                        //     int bitmap_yoffset;
+                        //
+                        //     auto bitmap_data = stbtt_GetGlyphBitmap(&stbtt_info,
+                        //                                             scale,
+                        //                                             scale,
+                        //                                             glyph.index,
+                        //                                             &bitmap_width,
+                        //                                             &bitmap_height,
+                        //                                             &bitmap_xoffset,
+                        //                                             &bitmap_yoffset);
+                        //
+                        //     stbi_write_png(("glyph_bitmap_" + glyph.text + ".png").c_str(),
+                        //                    bitmap_width,
+                        //                    bitmap_height,
+                        //                    1,
+                        //                    bitmap_data,
+                        //                    bitmap_width);
+                        //
+                        //     int _ = 0;
+                        // }
 
-                    // BBox in the glyph's local coordinates.
-                    glyph.bbox = bounding_box.to_f32();
+                        para_width += glyph.x_advance;
+
+                        // Get glyph path.
+                        glyph.path = font_to_use->get_glyph_path(glyph.index);
+
+                        // The glyph's layout box in the glyph's local coordinates.
+                        // The origin is the baseline. The Y axis is downward.
+                        glyph.box = RectF(0, (float)-ascent, glyph.x_advance, (float)-descent);
+
+                        // Get the glyph path's bounding box. The Y axis points down.
+                        RectI bounding_box = font_to_use->get_glyph_bounds(glyph.index);
+
+                        // BBox in the glyph's local coordinates.
+                        glyph.bbox = bounding_box.to_f32();
+                    }
+
+                    glyphs.push_back(glyph);
                 }
 
-                glyphs.push_back(glyph);
+                hb_buffer_destroy(hb_buffer);
             }
-
-            hb_buffer_destroy(hb_buffer);
         }
 
         // Record glyph start and end in the new paragraph.
@@ -772,7 +850,7 @@ void Font::get_glyphs(const std::string &text, std::vector<Glyph> &glyphs, std::
         para.glyph_ranges = {para_glyph_start, glyphs.size()};
         para.rtl = para_is_rtl;
         para.width = para_width;
-        paragraphs_.push_back(para);
+        paragraphs.push_back(para);
     }
 }
 
@@ -812,30 +890,22 @@ float Font::get_glyph_advance(uint16_t glyph_index) const {
     return (float)advance_width * scale;
 }
 
-void Font::set_size(uint32_t new_size) {
-    if (new_size == size) {
-        return;
-    }
-
-    size = new_size;
-
-    get_metrics();
-}
-
-uint32_t Font::get_size() const {
-    return size;
-}
+// void Font::set_size(uint32_t new_size) {
+//     if (new_size == size) {
+//         return;
+//     }
+//
+//     size = new_size;
+//
+//     get_metrics();
+// }
+//
+// uint32_t Font::get_size() const {
+//     return size;
+// }
 
 bool Font::is_valid() const {
     return !font_data.empty();
-}
-
-int Font::get_ascent() const {
-    return ascent;
-}
-
-int Font::get_descent() const {
-    return descent;
 }
 
 } // namespace Flint
