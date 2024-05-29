@@ -685,6 +685,10 @@ void Font::get_glyphs(const std::string &text,
             // Seperate the run into script groups, so we can fallback font when necessary.
             auto run_script_ranges = get_text_script(run_text_u32);
 
+            if (run_is_rtl) {
+                std::reverse(run_script_ranges.begin(), run_script_ranges.end());
+            }
+
             for (const auto &script_range : run_script_ranges) {
                 auto script = script_range.first;
                 auto script_range_in_run = script_range.second;
