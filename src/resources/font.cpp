@@ -743,7 +743,7 @@ void Font::get_glyphs(const std::string &text,
                             }
                         }
                         if (!current_cluster.has_value()) {
-                            current_cluster = {info.cluster, run_range.end};
+                            current_cluster = {info.cluster, run_range.start + script_range_in_run.end};
                         }
                     } else {
                         if (i > 0) {
@@ -756,7 +756,7 @@ void Font::get_glyphs(const std::string &text,
                             }
                         }
                         if (!current_cluster.has_value()) {
-                            current_cluster = {info.cluster, run_range.end};
+                            current_cluster = {info.cluster, run_range.start + script_range_in_run.end};
                         }
                     }
 
