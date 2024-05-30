@@ -51,10 +51,9 @@ add_subdirectory("third_party/GSL-4.0.0")
 
 target_include_directories(flint_gui PUBLIC "third_party/stduuid-1.2.3")
 
-add_subdirectory("third_party/poly2tri")
 add_subdirectory("third_party/zlib")
 
-target_link_libraries(flint_gui PUBLIC pathfinder poly2tri harfbuzz zlibstatic)
+target_link_libraries(flint_gui PUBLIC pathfinder harfbuzz zlibstatic)
 
 if (NOT FLINT_GUI_FRIBIDI)
     if (WIN32)
