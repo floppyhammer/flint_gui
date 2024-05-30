@@ -119,6 +119,10 @@ bool glyphs_exist_in_font(std::u32string codepoints, Font *font) {
     assert(font != nullptr);
 
     for (const auto &c : codepoints) {
+        // Skip line breaks.
+        if (c == 0x000A) {
+            continue;
+        }
         if (font->find_glyph_index_by_codepoint(c) == 0) {
             return false;
         }
