@@ -632,24 +632,39 @@ void Font::get_glyphs(const std::string &text,
 
         // Get run count in the current paragraph.
 
-        std::vector<Pathfinder::Range> para_runs;
+        std::vector<Pathfinder::Range> logical_para_runs;
         signed char current_level = embedding_level_list[para_start];
         int new_run_start_idx = para_start;
-        std::vector<signed char> para_levels;
-        para_levels.push_back(current_level);
+        std::vector<signed char> logical_para_levels;
+        logical_para_levels.push_back(current_level);
 
         for (int char_idx = para_start; char_idx < para_end; char_idx++) {
             signed char level = embedding_level_list[char_idx];
             if (level != current_level) {
-                para_runs.push_back({(uint32_t)new_run_start_idx, (uint32_t)char_idx});
+                logical_para_runs.push_back({(uint32_t)new_run_start_idx, (uint32_t)char_idx});
                 new_run_start_idx = char_idx;
                 current_level = level;
 
-                para_levels.push_back(level);
+                logical_para_levels.push_back(level);
             }
         }
 
-        para_runs.push_back({(uint32_t)new_run_start_idx, (uint32_t)para_end});
+        logical_para_runs.push_back({(uint32_t)new_run_start_idx, (uint32_t)para_end});
+
+        // Reorder runs from logical to visual.
+        std::vector<Pathfinder::Range> para_runs;
+        std::vector<signed char> para_levels;
+        for (const auto &char_idx : position_visual_to_logical_list) {
+            for (int run_idx = 0; run_idx < logical_para_runs.size(); run_idx++) {
+                auto run = logical_para_runs[run_idx];
+                auto level = logical_para_levels[run_idx];
+
+                if (char_idx == run.start) {
+                    para_runs.push_back(run);
+                    para_levels.push_back(level);
+                }
+            }
+        }
 
         int32_t run_count = para_levels.size();
 
@@ -659,12 +674,6 @@ void Font::get_glyphs(const std::string &text,
             bool run_is_rtl = level % 2 == 1;
 
             para_is_rtl |= run_is_rtl;
-        }
-
-        // Reorder runs from logical to visual.
-        if (para_is_rtl) {
-            std::reverse(para_runs.begin(), para_runs.end());
-            std::reverse(para_levels.begin(), para_levels.end());
         }
 
         // Go through runs.
