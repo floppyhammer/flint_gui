@@ -27,7 +27,7 @@
         #include <unicode/utypes.h>
     #endif
 #else
-    #include <fribidi/fribidi.h>
+    #include <fribidi.h>
 #endif
 
 #include <hb.h>
@@ -134,6 +134,7 @@ struct HarfBuzzData {
     HarfBuzzData() = default;
 
     explicit HarfBuzzData(const std::vector<char> &bytes) {
+        // We need to keep bytes.data() valid for HarfBuzz to work properly.
         blob = hb_blob_create(bytes.data(), bytes.size(), HB_MEMORY_MODE_READONLY, nullptr, nullptr);
         face = hb_face_create(blob, 0);
         font = hb_font_create(face);
@@ -700,11 +701,12 @@ void Font::get_glyphs(const std::string &text,
                 std::u32string script_text_u32 = text_u32.substr(script_start, script_length);
                 bool use_fallback_font = !glyphs_exist_in_font(script_text_u32, this);
 
-                Font *font_to_use = this;
-
+                Font *font_to_use;
                 if (allow_fallback && use_fallback_font) {
                     font_to_use = DefaultResource::get_singleton()->get_default_font().get();
                     font_to_use->update_metrics(font_size);
+                } else {
+                    font_to_use = this;
                 }
 
                 // Buffers are sequences of Unicode characters that use the same font

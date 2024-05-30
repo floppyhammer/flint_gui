@@ -23,10 +23,6 @@ file(GLOB_RECURSE FLINT_GUI_SOURCE_FILES CONFIGURE_DEPENDS
         src/*.cpp
         third_party/tinyfiledialogs/tinyfiledialogs.c)
 
-if (FLINT_GUI_FRIBIDI)
-    file(GLOB FLINT_GUI_SOURCE_FILES CONFIGURE_DEPENDS ${FLINT_GUI_SOURCE_FILES} third_party/fribidi/*.c)
-endif ()
-
 add_library(flint_gui STATIC ${FLINT_GUI_SOURCE_FILES})
 
 # Has to be 17 or above.
@@ -72,18 +68,10 @@ endif ()
 if (FLINT_GUI_FRIBIDI)
     # Alternative to icu4c. If the target platform comes with ICU, we just use it.
     # Else, we build fribidi. It's too cumbersome to build ICU ourselves.
-    target_include_directories(flint_gui PUBLIC "third_party/fribidi")
-    target_include_directories(flint_gui PUBLIC "third_party/fribidi/generated")
-    #add_compile_definitions(DONT_HAVE_FRIBIDI_CONFIG_H)
-    #add_compile_definitions(DONT_HAVE_FRIBIDI_UNICODE_VERSION_H)
-    target_compile_definitions(flint_gui PUBLIC HAVE_STRINGIZE=1 HAVE_STDLIB_H)
-    target_compile_definitions(flint_gui PUBLIC FRIBIDI_BUILD)
+    add_subdirectory("third_party/fribidi")
+    target_link_libraries(flint_gui PUBLIC fribidi)
 
     target_compile_definitions(flint_gui PUBLIC FLINT_USE_FRIBIDI)
-
-    if (APPLE)
-        add_compile_definitions(HAVE_STRINGS_H)
-    endif ()
 endif ()
 
 if (FLINT_GUI_VISUAL_DEBUG)
