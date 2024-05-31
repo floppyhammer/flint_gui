@@ -650,7 +650,7 @@ void Font::get_glyphs(const std::string &text,
 
             int new_run_start_idx = 0;
 
-            for (int char_idx = 0; char_idx < para_end - para_start; char_idx++) {
+            for (int char_idx = 0; char_idx < para_length; char_idx++) {
                 signed char level = embedding_level_list[char_idx];
                 if (level != current_level) {
                     logical_para_runs.push_back({(uint32_t)new_run_start_idx, (uint32_t)char_idx});
@@ -798,7 +798,7 @@ void Font::get_glyphs(const std::string &text,
                     Glyph glyph;
 
                     // One glyph may have multiple codepoints.
-                    // Eg. स् = स + ्
+                    // E.g. स् = स + ्
                     glyph.codepoints = glyph_text_u32;
 
                     glyph.text = glyph_text;
@@ -818,13 +818,10 @@ void Font::get_glyphs(const std::string &text,
                     if (glyph_text == "\n") {
                         glyph.skip_drawing = true;
                     } else {
-                        glyph.x_offset = pos.x_offset;
-                        glyph.y_offset = pos.y_offset;
+                        glyph.x_offset = (float)pos.x_offset * scale;
+                        glyph.y_offset = (float)pos.y_offset * scale * -1.0;
 
-                        // Don't know why harfbuzz returns incorrect advance.
-                        // So, we use the info provided by freetype.
-                        //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
-                        glyph.x_advance = font_to_use->get_glyph_advance(glyph.index);
+                        glyph.x_advance = (float)pos.x_advance * scale;
 
                         // Debug
                         // {

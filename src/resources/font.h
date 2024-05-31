@@ -115,8 +115,8 @@ struct Glyph {
 
     Script script = Script::Common;
 
-    int32_t x_offset = 0; // Offset from the origin of the glyph on baseline.
-    int32_t y_offset = 0;
+    float x_offset = 0; // Offset from the origin of the glyph on baseline.
+    float y_offset = 0;
 
     float x_advance = 0; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
     float y_advance = 0;
