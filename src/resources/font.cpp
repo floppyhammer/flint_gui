@@ -560,54 +560,25 @@ void Font::get_glyphs(const std::string &text,
 
     baseline_position = ascent;
 
-    uint32_t units_per_em = hb_face_get_upem(harfbuzz_data->face);
+    // uint32_t units_per_em = hb_face_get_upem(harfbuzz_data->face);
 
     std::u32string text_u32;
     utf8_to_utf32(text, text_u32);
 
-    // Get FriBidiChar data.
-    std::vector<FriBidiChar> fribidi_in_char(FRIBIDI_MAX_STR_LEN);
-    const FriBidiStrIndex fribidi_len =
-        fribidi_charset_to_unicode(FRIBIDI_CHAR_SET_UTF8, text.c_str(), text.size(), fribidi_in_char.data());
-
-    assert(fribidi_len < FRIBIDI_MAX_STR_LEN);
-    fribidi_in_char.resize(fribidi_len);
-
-    FriBidiCharType fribidi_pbase_dir = FRIBIDI_TYPE_LTR;
-    std::vector<FriBidiChar> fribidi_visual_char(fribidi_len);
-    std::vector<FriBidiLevel> embedding_level_list(fribidi_len);
-    std::vector<FriBidiStrIndex> position_logical_to_visual_list(fribidi_len);
-    std::vector<FriBidiStrIndex> position_visual_to_logical_list(fribidi_len);
-
-    // Loggical list to visual list.
-    const FriBidiLevel max_level = fribidi_log2vis(fribidi_in_char.data(),
-                                                   fribidi_len,
-                                                   &fribidi_pbase_dir,
-                                                   fribidi_visual_char.data(),
-                                                   position_logical_to_visual_list.data(),
-                                                   position_visual_to_logical_list.data(),
-                                                   embedding_level_list.data());
-    assert(max_level != 0);
-
-    // if (max_level) {
-    //     std::string string_formatted_ptr(FRIBIDI_MAX_STR_LEN, 0);
-    //     const FriBidiStrIndex new_len = fribidi_unicode_to_charset(
-    //         FRIBIDI_CHAR_SET_UTF8, fribidi_visual_char.data(), fribidi_len, string_formatted_ptr.data());
-    //     assert(new_len < FRIBIDI_MAX_STR_LEN);
-    //     string_formatted_ptr.resize(new_len);
-    // }
-
+    // Separation into paragraphs.
     std::vector<Pathfinder::Range> para_ranges_unicode;
-    int new_para_start_idx = 0;
-    for (int char_idx = 0; char_idx < fribidi_len; char_idx++) {
-        if (fribidi_in_char[char_idx] == 10) {
-            para_ranges_unicode.emplace_back((uint32_t)new_para_start_idx, (uint32_t)char_idx + 1);
-            new_para_start_idx = char_idx + 1;
+    {
+        int new_para_start_idx = 0;
+        for (int char_idx = 0; char_idx < text_u32.size(); char_idx++) {
+            if (text_u32[char_idx] == 10) {
+                para_ranges_unicode.emplace_back((uint32_t)new_para_start_idx, (uint32_t)char_idx + 1);
+                new_para_start_idx = char_idx + 1;
+            }
         }
-    }
 
-    if (!fribidi_in_char.empty() && fribidi_in_char.back() != 10) {
-        para_ranges_unicode.emplace_back((uint32_t)new_para_start_idx, (uint32_t)fribidi_len);
+        if (!text_u32.empty() && text_u32.back() != 10) {
+            para_ranges_unicode.emplace_back((uint32_t)new_para_start_idx, (uint32_t)text_u32.size());
+        }
     }
 
     int para_count = para_ranges_unicode.size();
@@ -617,6 +588,45 @@ void Font::get_glyphs(const std::string &text,
         // Paragraph start and end in the whole text. Unit: u32char.
         int para_start = para_ranges_unicode[para_index].start;
         int para_end = para_ranges_unicode[para_index].end;
+        int para_length = para_end - para_start;
+
+        auto para_text_u32 = text_u32.substr(para_start, para_length);
+        auto para_text = utf32_to_utf8(para_text_u32);
+
+        // Get FriBidiChar data.
+        std::vector<FriBidiChar> fribidi_in_char(FRIBIDI_MAX_STR_LEN);
+        const FriBidiStrIndex fribidi_len = fribidi_charset_to_unicode(
+            FRIBIDI_CHAR_SET_UTF8, para_text.c_str(), para_text.size(), fribidi_in_char.data());
+
+        assert(fribidi_len < FRIBIDI_MAX_STR_LEN && fribidi_len == para_text_u32.size());
+        fribidi_in_char.resize(fribidi_len);
+
+        std::vector<FriBidiChar> fribidi_visual_char(fribidi_len);
+        std::vector<FriBidiLevel> embedding_level_list(fribidi_len);
+        std::vector<FriBidiStrIndex> position_logical_to_visual_list(fribidi_len);
+        std::vector<FriBidiStrIndex> position_visual_to_logical_list(fribidi_len);
+
+        // See https://www.unicode.org/reports/tr9/#Bidirectional_Character_Types
+        FriBidiCharType fribidi_pbase_dir = fribidi_get_bidi_type(fribidi_in_char.front());
+
+        // Logical list to visual list.
+        // This function only handles one-line paragraphs.
+        const FriBidiLevel max_level = fribidi_log2vis(fribidi_in_char.data(),
+                                                       fribidi_len,
+                                                       &fribidi_pbase_dir,
+                                                       fribidi_visual_char.data(),
+                                                       position_logical_to_visual_list.data(),
+                                                       position_visual_to_logical_list.data(),
+                                                       embedding_level_list.data());
+        assert(max_level != 0);
+
+        // if (max_level) {
+        //     std::string string_formatted_ptr(FRIBIDI_MAX_STR_LEN, 0);
+        //     const FriBidiStrIndex new_len = fribidi_unicode_to_charset(
+        //         FRIBIDI_CHAR_SET_UTF8, fribidi_visual_char.data(), fribidi_len, string_formatted_ptr.data());
+        //     assert(new_len < FRIBIDI_MAX_STR_LEN);
+        //     string_formatted_ptr.resize(new_len);
+        // }
 
         // std::string para_text = utf32_to_utf8(text_u32.substr(para_start, para_end));
         // std::cout << "Paragraph text: " << para_text << std::endl;
@@ -633,23 +643,26 @@ void Font::get_glyphs(const std::string &text,
         // Get run count in the current paragraph.
 
         std::vector<Pathfinder::Range> logical_para_runs;
-        signed char current_level = embedding_level_list[para_start];
-        int new_run_start_idx = para_start;
         std::vector<signed char> logical_para_levels;
-        logical_para_levels.push_back(current_level);
+        {
+            signed char current_level = embedding_level_list[0];
+            logical_para_levels.push_back(current_level);
 
-        for (int char_idx = para_start; char_idx < para_end; char_idx++) {
-            signed char level = embedding_level_list[char_idx];
-            if (level != current_level) {
-                logical_para_runs.push_back({(uint32_t)new_run_start_idx, (uint32_t)char_idx});
-                new_run_start_idx = char_idx;
-                current_level = level;
+            int new_run_start_idx = 0;
 
-                logical_para_levels.push_back(level);
+            for (int char_idx = 0; char_idx < para_end - para_start; char_idx++) {
+                signed char level = embedding_level_list[char_idx];
+                if (level != current_level) {
+                    logical_para_runs.push_back({(uint32_t)new_run_start_idx, (uint32_t)char_idx});
+                    new_run_start_idx = char_idx;
+                    current_level = level;
+
+                    logical_para_levels.push_back(level);
+                }
             }
-        }
 
-        logical_para_runs.push_back({(uint32_t)new_run_start_idx, (uint32_t)para_end});
+            logical_para_runs.push_back({(uint32_t)new_run_start_idx, (uint32_t)para_end});
+        }
 
         // Reorder runs from logical to visual.
         std::vector<Pathfinder::Range> para_runs;
@@ -688,15 +701,9 @@ void Font::get_glyphs(const std::string &text,
             bool run_is_rtl = level % 2 == 1;
 
             // Get run text from the whole text.
-            std::u32string run_text_u32 = text_u32.substr(run_range.start, run_length);
+            std::u32string run_text_u32 = para_text_u32.substr(run_range.start, run_length);
 
-            // std::string run_text = utf32_to_utf8(run_text_u32);
-
-            //                std::cout << "Visual run in paragraph: \t" << run_index << "\t" << run_is_rtl << "\t"
-            //                << logical_start
-            //                          << '\t' << length << '\t' << run_text << std::endl;
-
-            // Seperate the run into script groups, so we can fallback font when necessary.
+            // Separate the run into script groups, so we can fall back font when necessary.
             auto run_script_ranges = get_text_script(run_text_u32);
 
             if (run_is_rtl) {
@@ -711,7 +718,7 @@ void Font::get_glyphs(const std::string &text,
                 uint32_t script_end = run_start + script_range_in_run.end;
                 uint32_t script_length = script_end - script_start;
 
-                std::u32string script_text_u32 = text_u32.substr(script_start, script_length);
+                std::u32string script_text_u32 = para_text_u32.substr(script_start, script_length);
                 bool use_fallback_font = !glyphs_exist_in_font(script_text_u32, this);
 
                 Font *font_to_use;
@@ -727,8 +734,11 @@ void Font::get_glyphs(const std::string &text,
                 hb_buffer_t *hb_buffer = hb_buffer_create();
 
                 // Item offset and length should represent a specific run.
-                hb_buffer_add_utf32(
-                    hb_buffer, reinterpret_cast<const uint32_t *>(text_u32.c_str()), -1, script_start, script_length);
+                hb_buffer_add_utf32(hb_buffer,
+                                    reinterpret_cast<const uint32_t *>(para_text_u32.c_str()),
+                                    -1,
+                                    script_start,
+                                    script_length);
 
                 hb_buffer_set_direction(hb_buffer, run_is_rtl ? HB_DIRECTION_RTL : HB_DIRECTION_LTR);
                 hb_buffer_set_script(hb_buffer, to_harfbuzz_script(script));
@@ -779,7 +789,8 @@ void Font::get_glyphs(const std::string &text,
                         }
                     }
 
-                    std::u32string glyph_text_u32 = text_u32.substr(current_cluster->start, current_cluster->length());
+                    std::u32string glyph_text_u32 =
+                        para_text_u32.substr(current_cluster->start, current_cluster->length());
 
                     std::string glyph_text = utf32_to_utf8(glyph_text_u32);
                     //                    std::cout << "Glyph text: " << glyph_text << std::endl;
