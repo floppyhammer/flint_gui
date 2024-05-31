@@ -122,7 +122,6 @@ void VectorServer::draw_vector_image(VectorImage &image, Transform2 transform) {
 void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size) {
     auto path = Pathfinder::Path2d();
     if (style_box.corner_radiuses.has_value()) {
-
     }
     path.add_rect({{}, size}, style_box.corner_radius);
 
@@ -194,7 +193,12 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
             continue;
         }
 
-        canvas->set_transform(global_transform_offset * Transform2::from_translation(p) * transform * skew_xform);
+        auto baseline_xform = Transform2::from_translation({0, g.ascent});
+
+        auto glyph_global_transform =
+            global_transform_offset * Transform2::from_translation(p) * transform * baseline_xform;
+
+        canvas->set_transform(glyph_global_transform * skew_xform);
 
         // Add stroke if needed.
         canvas->set_stroke_paint(Pathfinder::Paint::from_color(text_style.stroke_color));
@@ -216,8 +220,11 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
             continue;
         }
 
+        auto baseline_xform = Transform2::from_translation({0, g.ascent});
+
         // No italic for emojis and debug boxes.
-        auto glyph_global_transform = global_transform_offset * Transform2::from_translation(p) * transform;
+        auto glyph_global_transform =
+            global_transform_offset * Transform2::from_translation(p) * transform * baseline_xform;
 
         if (!g.emoji) {
             canvas->set_transform(glyph_global_transform * skew_xform);

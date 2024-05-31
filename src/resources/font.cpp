@@ -198,9 +198,9 @@ Font::~Font() {
     delete stbtt_info;
 }
 
-void Font::update_metrics(uint32_t size) {
+float Font::update_metrics(uint32_t size, float &ascent, float &descent) {
     // Calculate font scaling.
-    scale = stbtt_ScaleForPixelHeight(stbtt_info, (float)size);
+    float scale = stbtt_ScaleForPixelHeight(stbtt_info, (float)size);
 
     // The origin is baseline and the Y axis points upward.
     // So, ascent is usually positive, and descent negative.
@@ -210,8 +210,10 @@ void Font::update_metrics(uint32_t size) {
     stbtt_GetFontVMetrics(stbtt_info, &unscaled_ascent, &unscaled_descent, &unscaled_line_gap);
 
     // Take scale into account.
-    ascent = roundf(float(unscaled_ascent) * scale);
-    descent = roundf(float(unscaled_descent) * scale);
+    ascent = float(unscaled_ascent) * scale;
+    descent = float(unscaled_descent) * scale;
+
+    return scale;
 }
 
 std::string Font::get_glyph_svg(uint16_t glyph_index) const {
@@ -231,7 +233,7 @@ std::string Font::get_glyph_svg(uint16_t glyph_index) const {
     return {};
 }
 
-Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index) const {
+Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index, float scale) const {
     Pathfinder::Path2d path;
 
     stbtt_vertex *vertices{};
@@ -550,15 +552,10 @@ void Font::get_glyphs(const std::string &text,
 
 void Font::get_glyphs(const std::string &text,
                       uint32_t font_size,
-                      float &baseline_position,
                       std::vector<Glyph> &glyphs,
                       std::vector<Line> &paragraphs) {
     glyphs.clear();
     paragraphs.clear();
-
-    update_metrics(font_size);
-
-    baseline_position = ascent;
 
     // uint32_t units_per_em = hb_face_get_upem(harfbuzz_data->face);
 
@@ -724,10 +721,12 @@ void Font::get_glyphs(const std::string &text,
                 Font *font_to_use;
                 if (allow_fallback && use_fallback_font) {
                     font_to_use = DefaultResource::get_singleton()->get_default_font().get();
-                    font_to_use->update_metrics(font_size);
                 } else {
                     font_to_use = this;
                 }
+
+                float ascent, descent;
+                float scale = font_to_use->update_metrics(font_size, ascent, descent);
 
                 // Buffers are sequences of Unicode characters that use the same font
                 // and have the same text direction, script, and language.
@@ -797,6 +796,9 @@ void Font::get_glyphs(const std::string &text,
 
                     Glyph glyph;
 
+                    glyph.ascent = ascent;
+                    glyph.descent = descent;
+
                     // One glyph may have multiple codepoints.
                     // E.g. स् = स + ्
                     glyph.codepoints = glyph_text_u32;
@@ -852,14 +854,14 @@ void Font::get_glyphs(const std::string &text,
                         para_width += glyph.x_advance;
 
                         // Get glyph path.
-                        glyph.path = font_to_use->get_glyph_path(glyph.index);
+                        glyph.path = font_to_use->get_glyph_path(glyph.index, scale);
 
                         // The glyph's layout box in the glyph's local coordinates.
                         // The origin is the baseline. The Y axis is downward.
                         glyph.box = RectF(0, (float)-ascent, glyph.x_advance, (float)-descent);
 
                         // Get the glyph path's bounding box. The Y axis points down.
-                        RectI bounding_box = font_to_use->get_glyph_bounds(glyph.index);
+                        RectI bounding_box = font_to_use->get_glyph_bounds(glyph.index, scale);
 
                         // BBox in the glyph's local coordinates.
                         glyph.bbox = bounding_box.to_f32();
@@ -887,7 +889,7 @@ uint16_t Font::find_glyph_index_by_codepoint(int codepoint) {
     return stbtt_FindGlyphIndex(stbtt_info, codepoint);
 }
 
-RectI Font::get_glyph_bounds(uint16_t glyph_index) const {
+RectI Font::get_glyph_bounds(uint16_t glyph_index, float scale) const {
     RectI bounding_box;
 
     stbtt_GetGlyphBitmapBox(stbtt_info,
@@ -902,7 +904,7 @@ RectI Font::get_glyph_bounds(uint16_t glyph_index) const {
     return bounding_box;
 }
 
-float Font::get_glyph_advance(uint16_t glyph_index) const {
+float Font::get_glyph_advance(uint16_t glyph_index, float scale) const {
     // The horizontal distance to increment (for left-to-right writing) or decrement (for right-to-left writing)
     // the pen position after a glyph has been rendered when processing text.
     // It is always positive for horizontal layouts, and zero for vertical ones.

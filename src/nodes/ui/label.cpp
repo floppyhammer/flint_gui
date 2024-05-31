@@ -328,7 +328,7 @@ std::vector<InContextGlyph> convert_to_in_context_glyphs(const std::vector<Glyph
 }
 
 void Label::measure() {
-    font->get_glyphs(text_, font_size_, baseline_position_, glyphs_, paragraphs_);
+    font->get_glyphs(text_, font_size_, glyphs_, paragraphs_);
 
     // Add emoji data.
     if (emoji_font->is_valid()) {
@@ -501,9 +501,7 @@ void Label::draw() {
 
     vector_server->draw_style_box(theme_background, global_position, size);
 
-    auto baseline_position = Vec2F(0, baseline_position_);
-
-    auto translation = Transform2::from_translation(global_position + alignment_shift + baseline_position);
+    auto translation = Transform2::from_translation(global_position + alignment_shift);
 
     RectF clip_box;
     //    if (clip) {

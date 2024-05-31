@@ -132,8 +132,6 @@ private:
 
     uint32_t font_size_ = 32;
 
-    float baseline_position_ = 0;
-
     bool clip = false;
 
     bool multi_line_ = false;

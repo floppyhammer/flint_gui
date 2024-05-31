@@ -121,6 +121,9 @@ struct Glyph {
     float x_advance = 0; // Advance to the next glyph along baseline (x for horizontal layout, y for vertical).
     float y_advance = 0;
 
+    float ascent = 0;
+    float descent = 0;
+
     bool skip_drawing = false;
 
     // Glyph path. The points are in the glyph's baseline coordinates.
@@ -160,7 +163,7 @@ public:
 
     bool is_valid() const;
 
-    Pathfinder::Path2d get_glyph_path(uint16_t glyph_index) const;
+    Pathfinder::Path2d get_glyph_path(uint16_t glyph_index, float scale) const;
 
     std::string get_glyph_svg(uint16_t glyph_index) const;
 
@@ -169,15 +172,14 @@ public:
     /// A paragraph may contain one or more lines.
     void get_glyphs(const std::string &text,
                     uint32_t font_size,
-                    float &baseline_position,
                     std::vector<Glyph> &glyphs,
                     std::vector<Line> &paragraphs);
 
     uint16_t find_glyph_index_by_codepoint(int codepoint);
 
-    float get_glyph_advance(uint16_t glyph_index) const;
+    float get_glyph_advance(uint16_t glyph_index, float scale) const;
 
-    RectI get_glyph_bounds(uint16_t glyph_index) const;
+    RectI get_glyph_bounds(uint16_t glyph_index, float scale) const;
 
     std::shared_ptr<HarfBuzzData> harfbuzz_data;
 
@@ -187,13 +189,8 @@ private:
 
     stbtt_fontinfo *stbtt_info{};
 
-    /// Will fallback to the default font for unfound glyphs.
+    /// Will fall back to the default font for unfound glyphs.
     bool allow_fallback = true;
-
-    // Dynamic values, don't use them from outside.
-    float scale;
-    int32_t ascent;
-    int32_t descent;
 
     // Obsoleted, caching glyphs requires setting a font size, which we don't do to a font.
     std::unordered_map<uint16_t, Glyph> glyph_cache;
@@ -201,7 +198,7 @@ private:
     // Raw font data, read directly from a file or from memory.
     std::vector<char> font_data;
 
-    void update_metrics(uint32_t size);
+    float update_metrics(uint32_t size, float &ascent, float &descent);
 };
 
 } // namespace Flint
