@@ -13,7 +13,7 @@ endif ()
 
 option(FLINT_GUI_VULKAN "Use Vulkan instead of OpenGL" OFF)
 option(FLINT_GUI_VISUAL_DEBUG "Enable visual debug" OFF)
-option(FLINT_GUI_FRIBIDI "Use fribidi instead of icu" OFF)
+option(FLINT_GUI_FRIBIDI "Use fribidi instead of icu" ON)
 
 if (APPLE)
     set(FLINT_GUI_FRIBIDI ON)

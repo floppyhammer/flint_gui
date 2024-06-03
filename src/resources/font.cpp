@@ -277,15 +277,10 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index, float scale) const
 
 void Font::get_glyphs(const std::string &text,
                       uint32_t font_size,
-                      float &baseline_position,
                       std::vector<Glyph> &glyphs,
                       std::vector<Line> &paragraphs) {
     glyphs.clear();
     paragraphs.clear();
-
-    update_metrics(font_size);
-
-    baseline_position = ascent;
 
     #ifdef ICU_STATIC_DATA
     static bool icu_data_loaded = false;
@@ -387,6 +382,9 @@ void Font::get_glyphs(const std::string &text,
 
                 auto run_script = get_text_script(run_text_u32).front().first;
 
+                float ascent, descent;
+                float scale = update_metrics(font_size, ascent, descent);
+
                 // Buffers are sequences of Unicode characters that use the same font
                 // and have the same text direction, script, and language.
                 hb_buffer_t *hb_buffer = hb_buffer_create();
@@ -450,7 +448,7 @@ void Font::get_glyphs(const std::string &text,
                     //                    std::cout << "Glyph text: " << glyph_text << std::endl;
 
                     // One glyph may have multiple codepoints.
-                    // Eg. स् = स + ्
+                    // E.g. स् = स + ्
                     std::u32string glyph_text_u32;
                     utf8_to_utf32(glyph_text, glyph_text_u32);
 
@@ -475,13 +473,10 @@ void Font::get_glyphs(const std::string &text,
                     if (glyph_text == "\n") {
                         glyph.skip_drawing = true;
                     } else {
-                        glyph.x_offset = pos.x_offset;
-                        glyph.y_offset = pos.y_offset;
+                        glyph.x_offset = (float)pos.x_offset * scale;
+                        glyph.y_offset = (float)pos.y_offset * scale * -1.0;
 
-                        // Don't know why harfbuzz returns incorrect advance.
-                        // So, we use the info provided by freetype.
-                        //            glyph.x_advance = (float)pos.x_advance * font_size / (float)units_per_em;
-                        glyph.x_advance = get_glyph_advance(glyph.index);
+                        glyph.x_advance = (float)pos.x_advance * scale;
 
                         // Debug
                         // {
@@ -512,14 +507,14 @@ void Font::get_glyphs(const std::string &text,
                         para_width += glyph.x_advance;
 
                         // Get glyph path.
-                        glyph.path = get_glyph_path(glyph.index);
+                        glyph.path = get_glyph_path(glyph.index, scale);
 
                         // The glyph's layout box in the glyph's local coordinates.
                         // The origin is the baseline. The Y axis is downward.
                         glyph.box = RectF(0, (float)-ascent, glyph.x_advance, (float)-descent);
 
                         // Get the glyph path's bounding box. The Y axis points down.
-                        RectI bounding_box = get_glyph_bounds(glyph.index);
+                        RectI bounding_box = get_glyph_bounds(glyph.index, scale);
 
                         // BBox in the glyph's local coordinates.
                         glyph.bbox = bounding_box.to_f32();
