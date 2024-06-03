@@ -52,9 +52,7 @@ hb_script_t to_harfbuzz_script(Script script) {
             return HB_SCRIPT_BENGALI;
         }
         case Script::Devanagari: {
-            // It doesn't seem correct to set script as DEVANAGARI for Devanagari.
-            //            return HB_SCRIPT_DEVANAGARI;
-            return HB_SCRIPT_LATIN;
+            return HB_SCRIPT_DEVANAGARI;
         }
         case Script::Thai: {
             return HB_SCRIPT_THAI;
