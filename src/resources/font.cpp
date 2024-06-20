@@ -912,20 +912,6 @@ float Font::get_glyph_advance(uint16_t glyph_index, float scale) const {
     return (float)advance_width * scale;
 }
 
-// void Font::set_size(uint32_t new_size) {
-//     if (new_size == size) {
-//         return;
-//     }
-//
-//     size = new_size;
-//
-//     get_metrics();
-// }
-//
-// uint32_t Font::get_size() const {
-//     return size;
-// }
-
 bool Font::is_valid() const {
     return !font_data.empty();
 }

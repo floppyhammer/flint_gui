@@ -63,6 +63,8 @@ public:
         }
     }
 
+    uint32_t font_size = 24;
+
     struct {
         std::map<std::string, float> constants;
         std::map<std::string, ColorU> colors;

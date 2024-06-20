@@ -57,14 +57,14 @@ void SubWindow::pre_draw_children() {
 
     if (window_->get_resize_flag()) {
         vector_target_ = render_server->device_->create_texture(
-            {window_->get_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
+            {window_->get_logical_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
     }
 
     vector_server->set_dst_texture(vector_target_);
 
     temp_draw_data.previous_scene = vector_server->get_canvas()->take_scene();
 
-    vector_server->get_canvas()->set_size(window_->get_size());
+    vector_server->get_canvas()->set_size(window_->get_logical_size());
 }
 
 void SubWindow::post_draw_children() {
@@ -83,7 +83,7 @@ void SubWindow::post_draw_children() {
     {
         encoder->begin_render_pass(swap_chain_->get_render_pass(), surface_texture, ColorF(0.2, 0.2, 0.2, 1.0));
 
-        encoder->set_viewport({{0, 0}, window_->get_size()});
+        encoder->set_viewport({{0, 0}, window_->get_logical_size()});
 
         render_server->blit_->set_texture(vector_target_);
 

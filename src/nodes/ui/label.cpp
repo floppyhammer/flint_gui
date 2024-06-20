@@ -220,6 +220,8 @@ Label::Label() {
     text_style.color = {163, 163, 163, 255};
 
     theme_background = DefaultResource::get_singleton()->get_default_theme()->label.styles["background"];
+
+    font_size_ = DefaultResource::get_singleton()->get_default_theme()->font_size;
 }
 
 void Label::set_text(const std::string &new_text) {

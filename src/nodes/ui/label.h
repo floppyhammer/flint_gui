@@ -130,7 +130,7 @@ private:
 
     std::shared_ptr<Font> font, emoji_font;
 
-    uint32_t font_size_ = 32;
+    uint32_t font_size_;
 
     bool clip = false;
 

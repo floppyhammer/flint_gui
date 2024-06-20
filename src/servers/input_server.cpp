@@ -48,6 +48,17 @@ InputServer::InputServer() {
 void InputServer::initialize_window_callbacks(GLFWwindow *window) {
     // A lambda function that doesn't capture anything can be implicitly converted to a regular function pointer.
     auto cursor_position_callback = [](GLFWwindow *window, double x_pos, double y_pos) {
+    // Mouse position are under the logical coordinates instead of the physical ones.
+
+#if defined(__linux__) || defined(_WIN32)
+        // Get DPI scale.
+        float dpi_scale_x, dpi_scale_y;
+        glfwGetWindowContentScale(window, &dpi_scale_x, &dpi_scale_y);
+        assert(dpi_scale_x == dpi_scale_y);
+        x_pos /= dpi_scale_x;
+        y_pos /= dpi_scale_x;
+#endif
+
         InputEvent input_event{};
         input_event.type = InputEventType::MouseMotion;
         input_event.window = window;

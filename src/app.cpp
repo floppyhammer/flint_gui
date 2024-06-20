@@ -34,7 +34,7 @@ App::App(Vec2I primary_window_size) {
     primary_swap_chain_ = primary_window_.lock()->get_swap_chain(render_server->device_);
 
     auto vector_server = VectorServer::get_singleton();
-    vector_server->init(primary_window_.lock()->get_size(),
+    vector_server->init(primary_window_.lock()->get_physical_size(),
                         render_server->device_,
                         render_server->queue_,
                         Pathfinder::RenderLevel::D3d9);
@@ -47,7 +47,7 @@ App::App(Vec2I primary_window_size) {
             render_server->device_, render_server->queue_, primary_swap_chain_.lock()->get_surface_format());
 
         vector_target_ = render_server->device_->create_texture(
-            {primary_window_size, Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
+            {primary_window_.lock()->get_physical_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
     }
 }
 
@@ -80,8 +80,8 @@ void App::main_loop() {
 
         if (primary_window_.lock()->get_resize_flag()) {
             vector_target_ = RenderServer::get_singleton()->device_->create_texture(
-                {primary_window_.lock()->get_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
-            VectorServer::get_singleton()->get_canvas()->set_size(primary_window_.lock()->get_size());
+                {primary_window_.lock()->get_physical_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
+            VectorServer::get_singleton()->get_canvas()->set_size(primary_window_.lock()->get_physical_size());
         }
 
         // Engine processing.
@@ -115,7 +115,7 @@ void App::main_loop() {
                 encoder->begin_render_pass(
                     primary_swap_chain_.lock()->get_render_pass(), surface_texture, ColorF(0.2, 0.2, 0.2, 1.0));
 
-                encoder->set_viewport({{0, 0}, primary_window_.lock()->get_size()});
+                encoder->set_viewport({{0, 0}, primary_window_.lock()->get_physical_size()});
 
                 render_server->blit_->set_texture(vector_target_);
 

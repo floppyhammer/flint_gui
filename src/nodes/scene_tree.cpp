@@ -176,6 +176,8 @@ void draw_system(Node* root) {
         w->post_draw_children();
     }
 
+    VectorServer::get_singleton()->set_global_scale(
+        RenderServer::get_singleton()->window_builder_->get_primary_window()->get_dpi_scaling_factor());
     propagate_draw(root);
 }
 
@@ -197,8 +199,8 @@ void SceneTree::process(double dt) {
         return;
     }
 
-    if (primary_window.lock() && old_primary_window_size != primary_window.lock()->get_size()) {
-        old_primary_window_size = primary_window.lock()->get_size();
+    if (primary_window.lock() && old_primary_window_size != primary_window.lock()->get_logical_size()) {
+        old_primary_window_size = primary_window.lock()->get_logical_size();
         when_primary_window_size_changed(old_primary_window_size);
     }
 

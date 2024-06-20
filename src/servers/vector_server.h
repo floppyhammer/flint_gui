@@ -67,11 +67,17 @@ public:
 
     std::shared_ptr<Pathfinder::Canvas> get_canvas() const;
 
+    float get_global_scale() const;
+
+    void set_global_scale(float new_scale);
+
     Transform2 global_transform_offset;
 
 private:
     // Never expose this.
     std::shared_ptr<Pathfinder::Canvas> canvas;
+
+    float global_scale_ = 1.0f;
 };
 
 } // namespace Flint

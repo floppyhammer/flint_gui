@@ -28,6 +28,14 @@ std::shared_ptr<Pathfinder::Canvas> VectorServer::get_canvas() const {
     return canvas;
 }
 
+float VectorServer::get_global_scale() const {
+    return global_scale_;
+}
+
+void VectorServer::set_global_scale(float new_scale) {
+    global_scale_ = new_scale;
+}
+
 void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) {
     canvas->save_state();
 
@@ -47,6 +55,8 @@ void VectorServer::draw_rectangle(const RectF &rect, float line_width, ColorU co
 
     Pathfinder::Path2d path;
     path.add_rect(rect);
+
+    canvas->set_transform(Pathfinder::Transform2::from_scale(Vec2F(global_scale_, global_scale_)));
 
     if (fill) {
         canvas->set_fill_paint(Pathfinder::Paint::from_color(color));
@@ -81,7 +91,9 @@ void VectorServer::draw_circle(Vec2F center, float radius, float line_width, boo
 void VectorServer::draw_path(VectorPath &vector_path, Transform2 transform) {
     canvas->save_state();
 
-    canvas->set_transform(global_transform_offset * transform);
+    auto dpi_scaling_xform = Pathfinder::Transform2::from_scale(Vec2F(global_scale_, global_scale_));
+
+    canvas->set_transform(dpi_scaling_xform * global_transform_offset * transform);
 
     if (vector_path.fill_color.is_opaque()) {
         canvas->set_fill_paint(Pathfinder::Paint::from_color(vector_path.fill_color));
@@ -100,7 +112,9 @@ void VectorServer::draw_path(VectorPath &vector_path, Transform2 transform) {
 void VectorServer::draw_raster_image(RasterImage &image, Transform2 transform) {
     canvas->save_state();
 
-    canvas->set_transform(global_transform_offset * transform);
+    auto dpi_scaling_xform = Pathfinder::Transform2::from_scale(Vec2F(global_scale_, global_scale_));
+
+    canvas->set_transform(dpi_scaling_xform * global_transform_offset * transform);
 
     auto image_data = image.image_data;
 
@@ -110,12 +124,15 @@ void VectorServer::draw_raster_image(RasterImage &image, Transform2 transform) {
 }
 
 void VectorServer::draw_vector_image(VectorImage &image, Transform2 transform) {
+    auto dpi_scaling_xform = Pathfinder::Transform2::from_scale(Vec2F(global_scale_, global_scale_));
+
     for (auto &path : image.get_paths()) {
-        draw_path(path, transform);
+        draw_path(path, dpi_scaling_xform * transform);
     }
 
     if (image.get_svg_scene()) {
-        canvas->get_scene()->append_scene(*image.get_svg_scene()->get_scene(), global_transform_offset * transform);
+        canvas->get_scene()->append_scene(*image.get_svg_scene()->get_scene(),
+                                          dpi_scaling_xform * global_transform_offset * transform);
     }
 }
 
@@ -130,8 +147,10 @@ void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &positi
     canvas->set_shadow_color(style_box.shadow_color);
     canvas->set_shadow_blur(style_box.shadow_size);
 
+    auto dpi_scaling_xform = Pathfinder::Transform2::from_scale(Vec2F(global_scale_, global_scale_));
+
     auto transform = Pathfinder::Transform2::from_translation(position);
-    canvas->set_transform(global_transform_offset * transform);
+    canvas->set_transform(dpi_scaling_xform * global_transform_offset * transform);
 
     canvas->set_fill_paint(Pathfinder::Paint::from_color(style_box.bg_color));
     canvas->fill_path(path, Pathfinder::FillRule::Winding);
@@ -151,7 +170,9 @@ void VectorServer::draw_style_line(const StyleLine &style_line, const Vec2F &sta
 
     canvas->save_state();
 
-    canvas->set_transform(global_transform_offset);
+    auto dpi_scaling_xform = Pathfinder::Transform2::from_scale(Vec2F(global_scale_, global_scale_));
+
+    canvas->set_transform(dpi_scaling_xform * global_transform_offset);
     canvas->set_stroke_paint(Pathfinder::Paint::from_color(style_line.color));
     canvas->set_line_width(style_line.width);
     canvas->stroke_path(path);
@@ -171,11 +192,13 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
 
     canvas->save_state();
 
+    auto dpi_scaling_xform = Pathfinder::Transform2::from_scale(Vec2F(global_scale_, global_scale_));
+
     // Text clip.
     if (clip_box.is_valid()) {
         auto clip_path = Pathfinder::Path2d();
         clip_path.add_rect(clip_box, 0);
-        canvas->set_transform(global_transform_offset * transform);
+        canvas->set_transform(dpi_scaling_xform * global_transform_offset * transform);
         canvas->clip_path(clip_path, Pathfinder::FillRule::Winding);
     }
 
@@ -196,7 +219,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
         auto baseline_xform = Transform2::from_translation({0, g.ascent});
 
         auto glyph_global_transform =
-            global_transform_offset * Transform2::from_translation(p) * transform * baseline_xform;
+            dpi_scaling_xform * global_transform_offset * Transform2::from_translation(p) * transform * baseline_xform;
 
         canvas->set_transform(glyph_global_transform * skew_xform);
 
@@ -224,7 +247,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
 
         // No italic for emojis and debug boxes.
         auto glyph_global_transform =
-            global_transform_offset * Transform2::from_translation(p) * transform * baseline_xform;
+            dpi_scaling_xform * global_transform_offset * Transform2::from_translation(p) * transform * baseline_xform;
 
         if (!g.emoji) {
             canvas->set_transform(glyph_global_transform * skew_xform);
