@@ -92,7 +92,7 @@ public:
     void calc_minimum_size() override;
 
 private:
-    float item_height = 48;
+    float item_height = 32;
 
     std::shared_ptr<TreeItem> root;
     std::optional<StyleBox> theme_bg;

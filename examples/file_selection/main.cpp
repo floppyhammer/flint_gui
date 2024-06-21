@@ -5,13 +5,9 @@
 
 using namespace Flint;
 
-const uint32_t WINDOW_WIDTH = 640;
-const uint32_t WINDOW_HEIGHT = 480;
-
 class MyNode : public Node {
     void custom_ready() override {
         auto panel = std::make_shared<Panel>();
-        panel->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         panel->set_anchor_flag(AnchorFlag::FullRect);
         add_child(panel);
         {
@@ -22,14 +18,12 @@ class MyNode : public Node {
         }
 
         auto margin_container = std::make_shared<MarginContainer>();
-        margin_container->set_position({0, 0});
-        margin_container->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
-        margin_container->set_margin_all(32);
+        margin_container->set_margin_all(8);
         margin_container->set_anchor_flag(AnchorFlag::FullRect);
         panel->add_child(margin_container);
 
         auto vbox_container = std::make_shared<VBoxContainer>();
-        vbox_container->set_separation(16);
+        vbox_container->set_separation(8);
         margin_container->add_child(vbox_container);
 
         auto label = std::make_shared<Label>();
@@ -69,7 +63,7 @@ class MyNode : public Node {
 };
 
 int main() {
-    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
+    App app({480, 320});
 
     app.get_tree()->replace_root(std::make_shared<MyNode>());
 

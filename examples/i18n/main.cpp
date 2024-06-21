@@ -10,14 +10,9 @@ using namespace Flint;
 using Pathfinder::Vec2;
 using Pathfinder::Vec3;
 
-const uint32_t WINDOW_WIDTH = 1280;
-const uint32_t WINDOW_HEIGHT = 720;
-
 class MyNode : public Node {
     void custom_ready() override {
         auto margin_container = std::make_shared<MarginContainer>();
-        margin_container->set_position({0, 0});
-        margin_container->set_size({WINDOW_WIDTH, WINDOW_HEIGHT});
         margin_container->set_margin_all(32);
         margin_container->set_anchor_flag(AnchorFlag::FullRect);
         add_child(margin_container);
@@ -60,7 +55,7 @@ class MyNode : public Node {
             label->container_sizing.expand_h = true;
             label->container_sizing.flag_h = ContainerSizingFlag::Fill;
             label->set_font(font);
-            label->set_font_size(48);
+            label->set_font_size(32);
 
             box_container->add_child(label);
         }
@@ -89,7 +84,7 @@ class MyNode : public Node {
 };
 
 int main() {
-    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
+    App app({1280, 720});
 
     app.get_tree()->replace_root(std::make_shared<MyNode>());
 

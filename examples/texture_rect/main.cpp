@@ -5,9 +5,6 @@ using namespace Flint;
 using Pathfinder::Vec2;
 using Pathfinder::Vec3;
 
-const uint32_t WINDOW_WIDTH = 1280;
-const uint32_t WINDOW_HEIGHT = 720;
-
 class MyNode : public Node {
     void custom_ready() override {
         auto raste_image = ResourceManager::get_singleton()->load<RasterImage>("../assets/duck.png");
@@ -55,7 +52,7 @@ class MyNode : public Node {
 };
 
 int main() {
-    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
+    App app({720, 720});
 
     app.get_tree()->replace_root(std::make_shared<MyNode>());
 

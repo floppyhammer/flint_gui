@@ -8,9 +8,6 @@ using namespace Flint;
 using Pathfinder::Vec2;
 using Pathfinder::Vec3;
 
-const uint32_t WINDOW_WIDTH = 1280;
-const uint32_t WINDOW_HEIGHT = 720;
-
 class MyNode : public Node {
     void custom_ready() override {
         auto vbox_container = std::make_shared<VBoxContainer>();
@@ -26,7 +23,8 @@ class MyNode : public Node {
 
         {
             auto button = std::make_shared<Button>();
-            button->set_icon_normal(ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Button.svg"));
+            button->set_icon_normal(
+                ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Button.svg"));
             button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
             vbox_container->add_child(button);
         }
@@ -36,13 +34,11 @@ class MyNode : public Node {
             check_button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
             vbox_container->add_child(check_button);
         }
-
-        vbox_container->set_size({800, 100});
     }
 };
 
 int main() {
-    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
+    App app({960, 480});
 
     app.get_tree()->replace_root(std::make_shared<MyNode>());
 

@@ -37,7 +37,7 @@ private:
 
     std::shared_ptr<Button> collapse_button_;
 
-    float title_bar_height_ = 48;
+    float title_bar_height_ = 32;
     float margin_ = 8;
 
     Vec2F size_before_collapse_;

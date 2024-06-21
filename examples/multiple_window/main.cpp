@@ -6,9 +6,6 @@
 
 using namespace Flint;
 
-const uint32_t WINDOW_WIDTH = 1280;
-const uint32_t WINDOW_HEIGHT = 720;
-
 class MyNode : public Node {
     void custom_ready() override {
         auto open_window_button = std::make_shared<Button>();
@@ -21,7 +18,7 @@ class MyNode : public Node {
 
         add_child(container);
 
-        auto sub_window = std::make_shared<SubWindow>(Vec2I{400, 300});
+        auto sub_window = std::make_shared<SubWindow>(Vec2I{480, 320});
         add_child(sub_window);
 
         auto label = std::make_shared<Label>();
@@ -37,7 +34,7 @@ class MyNode : public Node {
 };
 
 int main() {
-    App app({WINDOW_WIDTH, WINDOW_HEIGHT});
+    App app({640, 480});
 
     app.get_tree()->replace_root(std::make_shared<MyNode>());
 
