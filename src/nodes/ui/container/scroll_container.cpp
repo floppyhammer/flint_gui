@@ -200,7 +200,7 @@ int32_t ScrollContainer::get_vscroll() const {
 
 void ScrollContainer::pre_draw_children() {
     auto global_pos = get_global_position();
-    auto size = get_size();
+    auto size = get_size() * get_window()->get_dpi_scaling_factor();
 
     auto vector_server = VectorServer::get_singleton();
 
@@ -230,7 +230,9 @@ void ScrollContainer::post_draw_children() {
 
     canvas->get_scene()->pop_render_target();
 
-    auto dst_rect = RectF(global_pos, global_pos + size);
+    float dpi_scale = get_window()->get_dpi_scaling_factor();
+
+    auto dst_rect = RectF(global_pos * dpi_scale, (global_pos + size) * dpi_scale);
     vector_server->get_canvas()->draw_render_target(temp_draw_data.render_target_id, dst_rect);
 }
 
