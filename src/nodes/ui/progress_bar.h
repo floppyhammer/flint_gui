@@ -40,7 +40,7 @@ public:
 
     void value_changed();
 
-    void connect_signal(const std::string& signal, const std::function<void()>& callback);
+    void connect_signal(const std::string &signal, const AnyCallable<void> &callback) override;
 
 protected:
     float value = 50;
@@ -53,7 +53,7 @@ protected:
 
     std::shared_ptr<Label> label;
 
-    std::vector<std::function<void()>> on_value_changed;
+    std::vector<AnyCallable<void>> on_value_changed;
 };
 
 } // namespace Flint

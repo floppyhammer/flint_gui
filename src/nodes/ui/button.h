@@ -35,8 +35,7 @@ public:
 
     void calc_minimum_size() override;
 
-    void connect_signal(const std::string &signal, const std::function<void()> &callback);
-    void connect_signal_toggled(const std::function<void(bool)> &callback);
+    void connect_signal(const std::string &signal, const AnyCallable<void> &callback) override;
 
     void set_text(const std::string &text);
 
@@ -77,11 +76,11 @@ protected:
     std::shared_ptr<Image> icon_pressed_;
 
     // Callbacks.
-    std::vector<std::function<void()>> pressed_callbacks;
-    std::vector<std::function<void(bool pressed)>> toggled_callbacks;
-    std::vector<std::function<void()>> hovered_callbacks;
-    std::vector<std::function<void()>> down_callbacks;
-    std::vector<std::function<void()>> up_callbacks;
+    std::vector<AnyCallable<void>> pressed_callbacks;
+    std::vector<AnyCallable<void>> toggled_callbacks;
+    std::vector<AnyCallable<void>> hovered_callbacks;
+    std::vector<AnyCallable<void>> down_callbacks;
+    std::vector<AnyCallable<void>> up_callbacks;
 
     void when_pressed();
 
@@ -97,7 +96,7 @@ public:
     std::vector<std::weak_ptr<Button>> buttons;
     std::weak_ptr<Button> pressed_button;
 
-    std::vector<std::function<void()>> pressed_callbacks;
+    std::vector<AnyCallable<void>> pressed_callbacks;
 };
 
 } // namespace Flint

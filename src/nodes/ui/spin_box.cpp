@@ -158,7 +158,7 @@ void SpinBox::when_value_changed() {
     }
 }
 
-void SpinBox::connect_signal(const std::string &signal, std::function<void()> callback) {
+void SpinBox::connect_signal(const std::string &signal, const AnyCallable<void> &callback) {
     if (signal == "focused") {
         focused_callbacks.push_back(callback);
     }

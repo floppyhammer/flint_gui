@@ -7,6 +7,10 @@
 
 namespace Flint {
 
+void cc(bool p) {
+    int a = 1;
+}
+
 CollapseContainer::CollapseContainer() {
     type = NodeType::CollapseContainer;
 
@@ -23,7 +27,7 @@ CollapseContainer::CollapseContainer() {
     collapse_button_->set_text("Collasping Container");
     collapse_button_->set_flat(true);
     collapse_button_->set_toggle_mode(true);
-    collapse_button_->connect_signal_toggled([this](bool p_pressed) {
+    collapse_button_->connect_signal("toggled", [this](bool p_pressed = true) {
         if (!this->collapsed_ && p_pressed) {
             this->size_before_collapse_ = this->size;
         }

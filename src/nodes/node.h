@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 
+#include "../common/any_callable.h"
 #include "../common/utils.h"
 #include "../servers/engine.h"
 #include "../servers/input_server.h"
@@ -127,11 +128,11 @@ public:
     virtual void when_parent_size_changed(Vec2F new_size);
 
     /**
-     * Called when the sub-tree structure of this node changed.
+     * Called when the subtree structure of this node changed.
      */
     void when_subtree_changed();
 
-    virtual void connect_signal(const std::string &signal, const std::function<void()> &callback);
+    virtual void connect_signal(const std::string &signal, const AnyCallable<void> &callback);
 
     SceneTree *get_tree() const;
 
@@ -153,7 +154,7 @@ protected:
     SceneTree *tree_;
 
     // Called when subtree structure changes.
-    std::vector<std::function<void()>> subtree_changed_callbacks;
+    std::vector<AnyCallable<void>> subtree_changed_callbacks;
 };
 
 /// Perform a depth-first-search preorder traversal from left-to-right.

@@ -181,8 +181,8 @@ protected:
 
     MouseFilter mouse_filter = MouseFilter::Stop;
 
-    std::vector<std::function<void()>> callbacks_cursor_entered;
-    std::vector<std::function<void()>> callbacks_cursor_exited;
+    std::vector<AnyCallable<void>> callbacks_cursor_entered;
+    std::vector<AnyCallable<void>> callbacks_cursor_exited;
     std::vector<std::function<void(Vec2F size)>> callbacks_parent_size_changed;
 };
 

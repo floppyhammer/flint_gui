@@ -224,7 +224,7 @@ void Node::when_subtree_changed() {
     }
 }
 
-void Node::connect_signal(const std::string &signal, const std::function<void()> &callback) {
+void Node::connect_signal(const std::string &signal, const AnyCallable<void> &callback) {
     if (signal == "subtree_changed") {
         subtree_changed_callbacks.push_back(callback);
     }

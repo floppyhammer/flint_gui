@@ -37,7 +37,7 @@ public:
 
     void calc_minimum_size() override;
 
-    void connect_signal(const std::string& signal, std::function<void()> callback);
+    void connect_signal(const std::string& signal, const AnyCallable<void>& callback) override;
 
     void set_value(float new_value);
 
@@ -65,8 +65,8 @@ protected:
     std::shared_ptr<Button> increase_button, decrease_button;
     std::shared_ptr<Label> label;
 
-    std::vector<std::function<void()>> focused_callbacks;
-    std::vector<std::function<void()>> value_changed_callbacks;
+    std::vector<AnyCallable<void>> focused_callbacks;
+    std::vector<AnyCallable<void>> value_changed_callbacks;
 
     std::optional<StyleBox> theme_normal, theme_focused;
 

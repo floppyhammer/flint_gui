@@ -101,7 +101,7 @@ void ProgressBar::value_changed() {
     }
 }
 
-void ProgressBar::connect_signal(const std::string &signal, const std::function<void()> &callback) {
+void ProgressBar::connect_signal(const std::string &signal, const AnyCallable<void> &callback) {
     if (signal == "on_value_changed") {
         on_value_changed.push_back(callback);
     }

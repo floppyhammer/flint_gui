@@ -217,20 +217,23 @@ void Button::when_pressed() {
 
 void Button::when_toggled(bool pressed) {
     for (auto &callback : toggled_callbacks) {
-        callback(pressed);
+        try {
+            callback.operator()<bool>(std::move(pressed));
+        } catch (std::bad_any_cast &) {
+            Logger::error("Mismatched signal argument types!");
+        }
     }
 }
 
-void Button::connect_signal(const std::string &signal, const std::function<void()> &callback) {
+void Button::connect_signal(const std::string &signal, const AnyCallable<void> &callback) {
     NodeUi::connect_signal(signal, callback);
 
     if (signal == "pressed") {
         pressed_callbacks.push_back(callback);
     }
-}
-
-void Button::connect_signal_toggled(const std::function<void(bool)> &callback) {
-    toggled_callbacks.push_back(callback);
+    if (signal == "toggled") {
+        toggled_callbacks.push_back(callback);
+    }
 }
 
 void Button::set_text(const std::string &text) {
