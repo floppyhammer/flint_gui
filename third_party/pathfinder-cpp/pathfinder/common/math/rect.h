@@ -21,12 +21,15 @@ struct Rect {
     Rect() = default;
 
     // Valid if initialized.
-    Rect(T left, T top, T right, T bottom) : left(left), top(top), right(right), bottom(bottom) {}
+    Rect(T left, T top, T right, T bottom) : left(left), top(top), right(right), bottom(bottom) {
+    }
 
     Rect(Vec2<T> left_top, Vec2<T> right_bottom)
-        : left(left_top.x), top(left_top.y), right(right_bottom.x), bottom(right_bottom.y) {}
+        : left(left_top.x), top(left_top.y), right(right_bottom.x), bottom(right_bottom.y) {
+    }
 
-    explicit Rect(T values[4]) : left(values[0]), top(values[1]), right(values[2]), bottom(values[3]) {}
+    explicit Rect(T values[4]) : left(values[0]), top(values[1]), right(values[2]), bottom(values[3]) {
+    }
 
     template <typename U>
     explicit Rect(const Rect<U> &other) {
@@ -49,6 +52,11 @@ struct Rect {
     template <typename U>
     Rect operator*(const Vec2<U> &v) const {
         return {left * v.x, top * v.y, right * v.x, bottom * v.y};
+    }
+
+    template <typename U>
+    Rect operator*(U v) const {
+        return {left * v, top * v, right * v, bottom * v};
     }
 
     template <typename U>

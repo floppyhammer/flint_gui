@@ -17,7 +17,7 @@ CollapseContainer::CollapseContainer() {
     auto default_theme = DefaultResource::get_singleton()->get_default_theme();
 
     theme_title_bar_ = std::make_optional(default_theme->collapsing_panel.styles["title_bar"]);
-    theme_title_bar_->corner_radiuses = {8, 8, 8, 8};
+    theme_title_bar_->advanced_corner_radius = {8, 8, 0, 0};
     theme_panel_ = std::make_optional(default_theme->collapsing_panel.styles["background"]);
 
     collapse_button_ = std::make_shared<Button>();
@@ -37,6 +37,12 @@ CollapseContainer::CollapseContainer() {
         }
 
         this->collapsed_ = p_pressed;
+
+        if (p_pressed) {
+            theme_title_bar_->advanced_corner_radius = {8, 8, 8, 8};
+        } else {
+            theme_title_bar_->advanced_corner_radius = {8, 8, 0, 0};
+        }
     });
 
     add_embedded_child(collapse_button_);

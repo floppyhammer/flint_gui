@@ -138,9 +138,11 @@ void VectorServer::draw_vector_image(VectorImage &image, Transform2 transform) {
 
 void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size) {
     auto path = Pathfinder::Path2d();
-    if (style_box.corner_radiuses.has_value()) {
+    if (style_box.advanced_corner_radius.has_value()) {
+        path.add_rect_with_corners({{}, size}, style_box.advanced_corner_radius.value());
+    } else {
+        path.add_rect({{}, size}, style_box.corner_radius);
     }
-    path.add_rect({{}, size}, style_box.corner_radius);
 
     canvas->save_state();
 
