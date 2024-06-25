@@ -111,6 +111,9 @@ struct Glyph {
 
     std::string text;
 
+    int start = 0;
+    int end = 0;
+
     bool emoji = false;
 
     Script script = Script::Common;
@@ -148,6 +151,7 @@ struct Line {
     Pathfinder::Range glyph_ranges;
     bool rtl = false;
     float width = 0;
+    std::vector<Pathfinder::Range> clusters;
 };
 
 struct HarfBuzzData;
