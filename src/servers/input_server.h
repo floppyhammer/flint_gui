@@ -36,6 +36,7 @@ enum class KeyCode {
     Right,
     Up,
     Down,
+    Delete,
 };
 
 class InputEvent {

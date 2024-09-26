@@ -110,6 +110,9 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
             case GLFW_KEY_BACKSPACE: {
                 key_args.key = KeyCode::Backspace;
             } break;
+            case GLFW_KEY_DELETE: {
+                key_args.key = KeyCode::Delete;
+            } break;
             case GLFW_KEY_LEFT: {
                 key_args.key = KeyCode::Left;
             } break;

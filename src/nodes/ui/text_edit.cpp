@@ -144,6 +144,21 @@ void TextEdit::input(InputEvent &event) {
                 }
             }
 
+            if (key_args.key == KeyCode::Delete) {
+                if (key_args.pressed || key_args.repeated) {
+                    if (selection_start_index != current_caret_index) {
+                        delete_selection();
+                    } else {
+                        if (editable) {
+                            if (current_caret_index < codepoint_count) {
+                                label->remove_text(current_caret_index, 1);
+                            }
+                        }
+                    }
+                    caret_blink_timer = 0;
+                }
+            }
+
             if (key_args.pressed || key_args.repeated) {
                 if (key_args.key == KeyCode::Left) {
                     if (current_caret_index != selection_start_index) {
@@ -175,6 +190,9 @@ void TextEdit::input(InputEvent &event) {
                 }
 
                 if (key_args.key == KeyCode::V && input_server->is_key_pressed(KeyCode::LeftControl)) {
+                    if (selection_start_index != current_caret_index) {
+                        delete_selection();
+                    }
                     auto clipboard_text = input_server->get_clipboard(get_window());
                     std::u32string clipboard_text_u32;
                     utf8_to_utf16(clipboard_text, clipboard_text_u32);
