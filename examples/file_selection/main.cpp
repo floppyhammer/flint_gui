@@ -2,6 +2,7 @@
 #include <random>
 
 #include "app.h"
+#include "resources/default_resource.h"
 
 using namespace Flint;
 
@@ -16,6 +17,9 @@ class MyNode : public Node {
             new_theme.corner_radius = 0;
             panel->set_theme_panel(new_theme);
         }
+
+        DefaultResource::get_singleton()->set_default_font(
+                std::make_shared<Font>("assets/fonts/Arial Unicode MS Font.ttf"));
 
         auto margin_container = std::make_shared<MarginContainer>();
         margin_container->set_margin_all(8);

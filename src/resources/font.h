@@ -101,7 +101,7 @@ enum class Script {
     Thai,
 };
 
-// Text-context-independent glyph data.
+// Text-context-dependent glyph data.
 struct Glyph {
     // Glyph index (font specific). Zero for invalid glyphs.
     // A particular glyph ID within the font does not necessarily correlate to a predictable Unicode codepoint.
@@ -110,6 +110,12 @@ struct Glyph {
     std::u32string codepoints;
 
     std::string text;
+
+    // Start codepoint index in the text.
+    int start = 0;
+
+    // End codepoint index in the text.
+    int end = 0;
 
     bool emoji = false;
 
@@ -148,6 +154,7 @@ struct Line {
     Pathfinder::Range glyph_ranges;
     bool rtl = false;
     float width = 0;
+    std::vector<Pathfinder::Range> clusters;
 };
 
 struct HarfBuzzData;

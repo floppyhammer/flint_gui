@@ -59,6 +59,7 @@ private:
 
     void delete_selection();
 
+    /// Get the closest codepoint to a mouse click.
     /// We have to pass the cursor position local to the label (the label is a child of a margin container).
     uint32_t calculate_caret_index(Vec2F local_cursor_position_to_label);
 

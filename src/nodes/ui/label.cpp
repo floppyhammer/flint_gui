@@ -15,7 +15,7 @@ enum class Bidi {
     RightToLeft,
 };
 
-std::vector<Pathfinder::Range> get_line_breakable_groups(const std::vector<InContextGlyph> &glyphs, int offset) {
+std::vector<Pathfinder::Range> get_line_breakable_groups(const std::vector<LayoutGlyph> &glyphs, int offset) {
     std::vector<Pathfinder::Range> groups;
 
     bool rtl = false;
@@ -62,7 +62,7 @@ std::vector<Pathfinder::Range> get_line_breakable_groups(const std::vector<InCon
 /// PARAs -> LINEs
 std::vector<Line> get_lines_with_word_wrap(float limited_width,
                                            const std::vector<Line> &original_paras,
-                                           const std::vector<InContextGlyph> &glyphs,
+                                           const std::vector<LayoutGlyph> &glyphs,
                                            Vec2F &out_text_size) {
     float tracking = 0;
 
@@ -74,7 +74,7 @@ std::vector<Line> get_lines_with_word_wrap(float limited_width,
         const auto &para_range = para.glyph_ranges;
 
         // Get glyphs in this paragraph.
-        std::vector<InContextGlyph> para_glyphs;
+        std::vector<LayoutGlyph> para_glyphs;
         for (int glyph_idx = para_range.start; glyph_idx < para_range.end; glyph_idx++) {
             para_glyphs.push_back(glyphs[glyph_idx]);
         }
@@ -289,9 +289,9 @@ void Label::set_size(Vec2F new_size) {
 }
 
 /// A very crude way for line-breaking.
-std::vector<InContextGlyph> convert_to_in_context_glyphs(const std::vector<Glyph> &glyphs,
-                                                         const std::vector<Line> &paragraphs) {
-    std::vector<InContextGlyph> in_context_glyphs;
+std::vector<LayoutGlyph> convert_to_in_context_glyphs(const std::vector<Glyph> &glyphs,
+                                                      const std::vector<Line> &paragraphs) {
+    std::vector<LayoutGlyph> in_context_glyphs;
     in_context_glyphs.resize(glyphs.size());
 
     // Add line-breaking info.
@@ -299,7 +299,7 @@ std::vector<InContextGlyph> convert_to_in_context_glyphs(const std::vector<Glyph
         for (int glyph_idx = para.glyph_ranges.start; glyph_idx < para.glyph_ranges.end; glyph_idx++) {
             const auto &glyph = glyphs[glyph_idx];
 
-            InContextGlyph in_context_glyph;
+            LayoutGlyph in_context_glyph;
             in_context_glyph.glyph_ = glyph;
             in_context_glyph.line_breakable_ = false;
 
@@ -351,7 +351,7 @@ void Label::measure() {
         }
     }
 
-    in_context_glyphs_ = convert_to_in_context_glyphs(glyphs_, paragraphs_);
+    layout_glyphs_ = convert_to_in_context_glyphs(glyphs_, paragraphs_);
 }
 
 void Label::make_layout() {
@@ -370,7 +370,7 @@ void Label::make_layout() {
 
     if (word_wrap_) {
         Vec2F text_size{};
-        lines_ = get_lines_with_word_wrap(size.x, paragraphs_, in_context_glyphs_, text_size);
+        lines_ = get_lines_with_word_wrap(size.x, paragraphs_, layout_glyphs_, text_size);
     }
 
     const auto &effective_line_ranges = word_wrap_ ? lines_ : paragraphs_;
@@ -594,65 +594,33 @@ float Label::get_glyph_left_edge_position(int32_t glyph_index) {
     return pos;
 }
 
-float Label::get_codepoint_left_edge_position(int32_t codepoint_index) {
-    assert(codepoint_index >= 0 && "Invalid codepoint index!");
-
-    float pos = 0;
-
-    int32_t current_codepoint = 0;
-
-    for (int i = 0; i < glyphs_.size(); i++) {
-        if (current_codepoint == codepoint_index) {
-            return pos;
-        }
-        const auto &glyph = glyphs_[i];
-        int32_t glyph_codepoint_count = glyph.codepoints.size();
-
-        for (int j = 0; j < glyph_codepoint_count; j++) {
-            pos += glyph.x_advance / glyph_codepoint_count;
-
-            current_codepoint++;
-        }
-    }
-
-    return 0;
-}
-
 float Label::get_codepoint_right_edge_position(int32_t codepoint_index) {
     assert(codepoint_index >= 0 && "Invalid codepoint index!");
 
     float pos = 0;
 
-    int32_t current_codepoint = 0;
+    int32_t glyph_group_start = 0;
+    int32_t glyph_group_size = 0;
 
     for (int i = 0; i < glyphs_.size(); i++) {
         const auto &glyph = glyphs_[i];
-        int32_t glyph_codepoint_count = glyph.codepoints.size();
 
-        for (int j = 0; j < glyph_codepoint_count; j++) {
-            pos += glyph.x_advance / (float)glyph_codepoint_count;
-
-            if (current_codepoint == codepoint_index) {
-                return pos;
-            }
-
-            current_codepoint++;
+        if (codepoint_index >= glyph.start && codepoint_index < glyph.end) {
+            glyph_group_start = i;
+            glyph_group_size = codepoint_index - glyph.start + 1;
+            break;
         }
     }
 
-    return 0;
-}
+    for (int i = 0; i < glyphs_.size(); i++) {
+        const auto &glyph = glyphs_[i];
 
-float Label::get_position_by_codepoint(uint32_t codepoint_index) {
-    float pos = 0;
-
-    // TODO
+        if (i < (glyph_group_start + glyph_group_size)) {
+            pos += glyph.x_advance;
+        }
+    }
 
     return pos;
-}
-
-uint32_t Label::get_codepoint_by_position(Vec2F position) {
-    return 0;
 }
 
 } // namespace Flint

@@ -145,13 +145,25 @@ void TextEdit::input(InputEvent &event) {
             }
 
             if (key_args.pressed || key_args.repeated) {
-                if (key_args.key == KeyCode::Left && current_caret_index > 0) {
-                    current_caret_index--;
-                    selection_start_index--;
+                if (key_args.key == KeyCode::Left) {
+                    if (current_caret_index != selection_start_index) {
+                        current_caret_index = std::min(selection_start_index, current_caret_index);
+                        selection_start_index = current_caret_index;
+                    } else if (current_caret_index > 0) {
+                        current_caret_index--;
+                        selection_start_index--;
+                    }
+
                     caret_blink_timer = 0;
-                } else if (key_args.key == KeyCode::Right && current_caret_index < codepoint_count) {
-                    current_caret_index++;
-                    selection_start_index++;
+                } else if (key_args.key == KeyCode::Right) {
+                    if (current_caret_index != selection_start_index) {
+                        current_caret_index = std::max(selection_start_index, current_caret_index);
+                        selection_start_index = current_caret_index;
+                    } else if (current_caret_index < codepoint_count) {
+                        current_caret_index++;
+                        selection_start_index++;
+                    }
+
                     caret_blink_timer = 0;
                 }
 
@@ -238,7 +250,7 @@ void TextEdit::draw() {
         if (current_caret_index > 0) {
             current_codepoint_right_edge = label->get_codepoint_right_edge_position(current_caret_index - 1);
         } else {
-            current_codepoint_right_edge = label->get_codepoint_left_edge_position(0);
+            current_codepoint_right_edge = 0;
         }
 
         auto start = label->get_global_position() + Vec2F(current_codepoint_right_edge, 3);

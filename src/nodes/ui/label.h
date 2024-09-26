@@ -27,7 +27,7 @@ enum class Alignment {
     End,
 };
 
-struct InContextGlyph {
+struct LayoutGlyph {
     Glyph glyph_;
     bool line_breakable_ = false;
 };
@@ -85,15 +85,8 @@ public:
 
     float get_glyph_right_edge_position(int32_t glyph_index);
 
-    float get_codepoint_left_edge_position(int32_t codepoint_index);
-
-    float get_codepoint_right_edge_position(int32_t codepoint_index);
-
     /// Get the caret position of a given codepoint index.
-    float get_position_by_codepoint(uint32_t codepoint_index);
-
-    /// Get the closest codepoint to a mouse click.
-    uint32_t get_codepoint_by_position(Vec2F position);
+    float get_codepoint_right_edge_position(int32_t codepoint_index);
 
     bool get_word_wrap() const {
         return word_wrap_;
@@ -142,8 +135,7 @@ private:
     // Layout-independent. Glyph count will not necessarily be the same as the character count.
     std::vector<Glyph> glyphs_;
 
-    // Context-independent.
-    std::vector<InContextGlyph> in_context_glyphs_;
+    std::vector<LayoutGlyph> layout_glyphs_;
 
     // Layout-dependent. Ranges for glyphs, not for characters.
     std::vector<Line> paragraphs_;

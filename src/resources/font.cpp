@@ -461,12 +461,6 @@ void Font::get_glyphs(const std::string &text,
                     // Codepoint property is replaced with glyph ID after shaping.
                     glyph.index = info.codepoint;
 
-                    // Check if the glyph has already been cached.
-                    if (glyph_cache.find(glyph.index) != glyph_cache.end()) {
-                        glyphs.push_back(glyph_cache[glyph.index]);
-                        continue;
-                    }
-
                     glyph.script = run_script;
 
                     // Mark line breaks, so they're not drawn.
@@ -679,6 +673,8 @@ void Font::get_glyphs(const std::string &text,
             para_is_rtl |= run_is_rtl;
         }
 
+        std::vector<Pathfinder::Range> para_clusters;
+
         // Go through runs.
         for (int32_t run_index = 0; run_index < run_count; run_index++) {
             signed char level = para_levels[run_index];
@@ -781,6 +777,8 @@ void Font::get_glyphs(const std::string &text,
                         }
                     }
 
+                    para_clusters.push_back(*current_cluster);
+
                     std::u32string glyph_text_u32 =
                         para_text_u32.substr(current_cluster->start, current_cluster->length());
 
@@ -788,6 +786,9 @@ void Font::get_glyphs(const std::string &text,
                     //                    std::cout << "Glyph text: " << glyph_text << std::endl;
 
                     Glyph glyph;
+
+                    glyph.start = current_cluster->start;
+                    glyph.end = current_cluster->end;
 
                     glyph.ascent = ascent;
                     glyph.descent = descent;
@@ -800,12 +801,6 @@ void Font::get_glyphs(const std::string &text,
 
                     // Codepoint property is replaced with glyph ID after shaping.
                     glyph.index = info.codepoint;
-
-                    // Check if the glyph has already been cached.
-                    // if (glyph_cache.find(glyph.index) != glyph_cache.end()) {
-                    //     glyphs.push_back(glyph_cache[glyph.index]);
-                    //     continue;
-                    // }
 
                     glyph.script = script;
 
@@ -851,7 +846,7 @@ void Font::get_glyphs(const std::string &text,
 
                         // The glyph's layout box in the glyph's local coordinates.
                         // The origin is the baseline. The Y axis is downward.
-                        glyph.box = RectF(0, (float)-ascent, glyph.x_advance, (float)-descent);
+                        glyph.box = RectF(0, -ascent, glyph.x_advance, -descent);
 
                         // Get the glyph path's bounding box. The Y axis points down.
                         RectI bounding_box = font_to_use->get_glyph_bounds(glyph.index, scale);
@@ -872,6 +867,7 @@ void Font::get_glyphs(const std::string &text,
         para.glyph_ranges = {para_glyph_start, glyphs.size()};
         para.rtl = para_is_rtl;
         para.width = para_width;
+        para.clusters = para_clusters;
         paragraphs.push_back(para);
     }
 }

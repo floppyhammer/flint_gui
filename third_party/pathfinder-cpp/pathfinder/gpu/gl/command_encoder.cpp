@@ -32,7 +32,7 @@ bool CommandEncoderGl::finish() {
                 auto &args = cmd.args.begin_render_pass;
                 auto render_pass_gl = static_cast<RenderPassGl *>(args.render_pass);
                 auto framebuffer_gl = static_cast<FramebufferGl *>(args.framebuffer);
-                int aa = framebuffer_gl->get_gl_handle();
+
                 glBindFramebuffer(GL_FRAMEBUFFER, framebuffer_gl->get_gl_handle());
 
                 if (render_pass_gl->get_attachment_load_op() == AttachmentLoadOp::Clear) {

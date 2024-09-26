@@ -15,7 +15,7 @@ struct StyleBox {
     float corner_radius = 8;
 
     // Top-left, top-eight, bottom-left, bottom-right.
-    std::optional<RectF> advanced_corner_radius;
+    std::optional<RectF> corner_radii;
 
     ColorU shadow_color;
     float shadow_size = 0;
