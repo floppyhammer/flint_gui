@@ -19,6 +19,8 @@ enum class DataType {
 
 /// Texture format in GPU memory.
 enum class TextureFormat {
+    R8,
+    Rg8,
     Rgba8Unorm,
     Bgra8Unorm,
     Rgba8Srgb,
