@@ -5,6 +5,7 @@
 #include "../../common/utils.h"
 #include "../../resources/default_resource.h"
 #include "../../servers/engine.h"
+#include "src/resources/render_image.h"
 
 namespace Flint {
 
@@ -84,9 +85,14 @@ void TextureRect::draw() {
         if (texture->get_type() == ImageType::Raster) {
             auto raster_image = static_cast<RasterImage *>(texture.get());
             vector_server->draw_raster_image(*raster_image, transform);
-        } else {
+        } else if (texture->get_type() == ImageType::Vector) {
             auto vector_image = static_cast<VectorImage *>(texture.get());
             vector_server->draw_vector_image(*vector_image, transform);
+        } else if (texture->get_type() == ImageType::Render) {
+            auto render_image = static_cast<RenderImage *>(texture.get());
+            vector_server->draw_render_image(*render_image, transform);
+        } else {
+            Logger::error("Unsupported texture type!", "TextureRect");
         }
     }
 

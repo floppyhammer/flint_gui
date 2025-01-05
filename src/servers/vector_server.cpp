@@ -136,6 +136,22 @@ void VectorServer::draw_vector_image(VectorImage &image, Transform2 transform) {
     }
 }
 
+void VectorServer::draw_render_image(RenderImage &render_image, Transform2 transform) {
+    canvas->save_state();
+
+    auto dpi_scaling_xform = Pathfinder::Transform2::from_scale(Vec2F(global_scale_, global_scale_));
+
+    canvas->set_transform(dpi_scaling_xform * global_transform_offset * transform);
+
+    canvas->draw_render_target(render_image.get_render_target(), RectF({}, render_image.get_size().to_f32()));
+
+    canvas->restore_state();
+}
+
+std::shared_ptr<Pathfinder::Texture> VectorServer::get_texture_by_render_target_id(Pathfinder::RenderTargetId id) {
+    return canvas->get_texture_by_render_target_id(id);
+}
+
 void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size) {
     auto path = Pathfinder::Path2d();
     if (style_box.corner_radii.has_value()) {

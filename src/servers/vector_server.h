@@ -8,6 +8,7 @@
 #include "../resources/raster_image.h"
 #include "../resources/style_box.h"
 #include "../resources/vector_image.h"
+#include "src/resources/render_image.h"
 
 namespace Flint {
 
@@ -45,6 +46,10 @@ public:
     void draw_raster_image(RasterImage &image, Transform2 transform);
 
     void draw_vector_image(VectorImage &image, Transform2 transform);
+
+    void draw_render_image(RenderImage &image, Transform2 transform);
+
+    std::shared_ptr<Pathfinder::Texture> get_texture_by_render_target_id(Pathfinder::RenderTargetId id);
 
     void draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size);
 

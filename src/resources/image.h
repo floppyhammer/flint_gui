@@ -9,6 +9,7 @@ namespace Flint {
 enum class ImageType {
     Raster,
     Vector,
+    Render,
     Max,
 };
 

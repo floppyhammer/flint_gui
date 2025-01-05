@@ -102,6 +102,7 @@ void Node::notify(Signal signal) {
 }
 
 void Node::draw() {
+    custom_draw();
 }
 
 Node *Node::get_parent() const {

@@ -333,7 +333,7 @@ void Label::measure() {
     font->get_glyphs(text_, font_size_, glyphs_, paragraphs_);
 
     // Add emoji data.
-    if (emoji_font->is_valid()) {
+    if (emoji_font && emoji_font->is_valid()) {
         for (auto &glyph : glyphs_) {
             if (glyph.codepoints.size() == 1 && glyph.index == 0) {
                 uint16_t glyph_index = emoji_font->find_glyph_index_by_codepoint(glyph.codepoints.front());
