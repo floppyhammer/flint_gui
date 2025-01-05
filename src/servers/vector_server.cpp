@@ -143,17 +143,9 @@ void VectorServer::draw_render_image(RenderImage &render_image, Transform2 trans
 
     canvas->set_transform(dpi_scaling_xform * global_transform_offset * transform);
 
-    canvas->draw_render_target(render_image.get_render_target(), RectF({}, render_image.get_size().to_f32()));
+    canvas->draw_raw_texture(render_image.get_texture(), RectF(), RectF({}, render_image.get_size().to_f32()));
 
     canvas->restore_state();
-}
-
-std::shared_ptr<Pathfinder::Texture> VectorServer::create_render_target(Vec2I size, std::string label) {
-    auto render_target_id = canvas->get_scene()->palette.push_render_target({size, label});
-}
-
-std::shared_ptr<Pathfinder::Texture> VectorServer::get_texture_by_render_target_id(Pathfinder::RenderTargetId id) {
-    return canvas->get_texture_by_render_target_id(id);
 }
 
 void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size) {

@@ -173,6 +173,7 @@ struct Pattern {
         PatternSource source;
         source.type = PatternSource::Type::Texture;
         source.size = texture->get_size();
+        source.texture = texture;
 
         return from_source(source);
     }
