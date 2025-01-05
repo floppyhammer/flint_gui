@@ -86,6 +86,8 @@ public:
 
     std::shared_ptr<Sampler> get_default_sampler();
 
+    std::shared_ptr<Texture> get_texture_by_id(RenderTargetId render_target_id);
+
     std::shared_ptr<Device> device;
 
     std::shared_ptr<Queue> queue;

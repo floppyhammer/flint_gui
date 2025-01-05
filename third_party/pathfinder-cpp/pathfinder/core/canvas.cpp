@@ -451,6 +451,10 @@ void Canvas::draw_sub_render_target(const RenderTargetId &render_target_id,
     current_state.fill_paint = old_fill_paint;
 }
 
+std::shared_ptr<Texture> Canvas::get_texture_by_render_target_id(RenderTargetId id) {
+    return renderer->get_texture_by_id(id);
+}
+
 std::shared_ptr<Scene> Canvas::get_scene() const {
     return scene;
 }

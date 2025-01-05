@@ -157,6 +157,10 @@ std::shared_ptr<Sampler> Renderer::get_default_sampler() {
     return get_or_create_sampler(TextureSamplingFlags{});
 }
 
+std::shared_ptr<Texture> Renderer::get_texture_by_id(RenderTargetId render_target_id) {
+    return allocator->get_texture(render_target_id.render_target);
+}
+
 void Renderer::upload_texture_metadata(const std::vector<TextureMetadataEntry> &metadata) {
     if (metadata.empty()) {
         return;
