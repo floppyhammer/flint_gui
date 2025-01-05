@@ -215,7 +215,7 @@ Label::Label() {
     text_ = "Label";
 
     font = DefaultResource::get_singleton()->get_default_font();
-    emoji_font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/EmojiOneColor.otf");
+    // emoji_font = ResourceManager::get_singleton()->load<Font>("../assets/fonts/EmojiOneColor.otf");
 
     text_style.color = {163, 163, 163, 255};
 

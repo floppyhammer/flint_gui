@@ -164,6 +164,10 @@ void PopupMenu::input(InputEvent &event) {
     NodeUi::input(event);
 }
 
+void PopupMenu::clear_items() {
+    items_.clear();
+}
+
 std::shared_ptr<MenuItem> PopupMenu::create_item(const std::string &text) {
     auto new_item = std::make_shared<MenuItem>();
     new_item->set_text(text);

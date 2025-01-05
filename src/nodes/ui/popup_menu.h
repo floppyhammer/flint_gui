@@ -69,6 +69,8 @@ public:
 
     void draw() override;
 
+    void clear_items();
+
     std::shared_ptr<MenuItem> create_item(const std::string &text = "item");
 
     void set_item_height(float new_item_height);
