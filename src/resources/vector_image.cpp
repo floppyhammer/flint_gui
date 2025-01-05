@@ -10,10 +10,8 @@
 
 namespace Flint {
 
-VectorImage::VectorImage(Vec2I _size) {
-    type = ImageType::Vector;
-
-    size = _size;
+VectorImage::VectorImage(Vec2I size_) : Image(size_) {
+    type = ImageType::Vector;;
 }
 
 std::shared_ptr<VectorImage> VectorImage::from_empty(Vec2I _size) {

@@ -2,9 +2,7 @@
 #define FLINT_RENDER_IMAGE_H
 
 #include <pathfinder/prelude.h>
-#include <src/servers/vector_server.h>
-
-#include <memory>
+#include <src/servers/render_server.h>
 
 #include "../common/geometry.h"
 #include "image.h"
@@ -13,21 +11,23 @@ namespace Flint {
 
 class RenderImage : public Image {
 public:
-    explicit RenderImage(Vec2I _size) {
+    explicit RenderImage(Vec2I _size) : Image(_size) {
         size = _size;
+
+        Pathfinder::TextureDescriptor desc = {
+            size,
+            Pathfinder::TextureFormat::Rgba8Unorm,
+        };
+
+        texture_ = RenderServer::get_singleton()->device_->create_texture(desc, "render image");
     }
 
-    // Should run before other logic during a frame.
-    void reclaim_render_target() {
-        render_target_id = VectorServer::get_singleton()->create_render_target(size, "render image");
-    }
-
-    Pathfinder::RenderTargetId get_render_target() const {
-        return render_target_id;
+    std::shared_ptr<Pathfinder::Texture> get_texture() const {
+        return texture_;
     }
 
 protected:
-    Pathfinder::RenderTargetId render_target_id;
+    std::shared_ptr<Pathfinder::Texture> texture_;
 };
 
 } // namespace Flint

@@ -148,6 +148,10 @@ void VectorServer::draw_render_image(RenderImage &render_image, Transform2 trans
     canvas->restore_state();
 }
 
+std::shared_ptr<Pathfinder::Texture> VectorServer::create_render_target(Vec2I size, std::string label) {
+    auto render_target_id = canvas->get_scene()->palette.push_render_target({size, label});
+}
+
 std::shared_ptr<Pathfinder::Texture> VectorServer::get_texture_by_render_target_id(Pathfinder::RenderTargetId id) {
     return canvas->get_texture_by_render_target_id(id);
 }

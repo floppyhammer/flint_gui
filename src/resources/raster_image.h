@@ -10,7 +10,7 @@ namespace Flint {
 
 class RasterImage final : public Image {
 public:
-    RasterImage();
+    RasterImage(Vec2I size_);
 
     explicit RasterImage(const std::string &path);
 

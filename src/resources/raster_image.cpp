@@ -11,7 +11,7 @@
 
 namespace Flint {
 
-RasterImage::RasterImage() {
+RasterImage::RasterImage(Vec2I size_) : Image(size_) {
     type = ImageType::Raster;
 }
 

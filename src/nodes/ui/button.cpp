@@ -240,6 +240,10 @@ void Button::set_text(const std::string &text) {
     label->set_text(text);
 }
 
+std::string Button::get_text() const {
+    return label->get_text();
+}
+
 void Button::set_icon_normal(const std::shared_ptr<Image> &icon) {
     icon_normal_ = icon;
 }

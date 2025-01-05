@@ -74,7 +74,8 @@ FilterParams compute_filter_params(const PaintFilter &filter,
     return filter_params;
 }
 
-Palette::Palette(uint32_t _scene_id) : scene_id(_scene_id) {}
+Palette::Palette(uint32_t _scene_id) : scene_id(_scene_id) {
+}
 
 uint32_t Palette::push_paint(const Paint &paint) {
     // Check if this paint already exists.
@@ -111,6 +112,15 @@ RenderTargetId Palette::push_render_target(const RenderTargetDesc &render_target
 RenderTargetDesc Palette::get_render_target(RenderTargetId render_target_id) const {
     return render_targets_desc[render_target_id.render_target];
 }
+
+// RenderTargetId Palette::push_raw_texture(RawTexture raw_texture) {
+//     RenderTargetDesc desc = {raw_texture.size, raw_texture.name, true};
+//
+//     uint32_t id = render_targets_desc.size();
+//     render_targets_desc.push_back(desc);
+//
+//     return {scene_id, id, std::make_shared<uint64_t>(raw_texture.texture_id)};
+// }
 
 std::vector<PaintMetadata> Palette::build_paint_info(Renderer *renderer) {
     auto paint_texture_manager = std::make_shared<PaintTextureManager>();
@@ -275,7 +285,7 @@ PaintLocationsInfo Palette::assign_paint_locations(const std::shared_ptr<PaintTe
                     location = render_target_metadata[index];
                 }
                 // Image
-                else {
+                else if (pattern.source.type == PatternSource::Type::Image) {
                     auto image = pattern.source.image;
 
                     // TODO(pcwalton): We should be able to use tile cleverness to
@@ -304,6 +314,10 @@ PaintLocationsInfo Palette::assign_paint_locations(const std::shared_ptr<PaintTe
                         },
                         std::make_shared<std::vector<ColorU>>(image->pixels),
                     });
+                }
+                // Texture
+                else {
+                    color_texture_metadata->raw_texture = pattern.source.texture;
                 }
 
                 TextureSamplingFlags sampling_flags;

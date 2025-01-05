@@ -15,7 +15,9 @@ enum class ImageType {
 
 class Image : public Resource {
 public:
-    Image() = default;
+    Image(Vec2I size_) {
+        size = size_;
+    }
 
     explicit Image(const std::string &path);
 

@@ -6,9 +6,9 @@
 #include "../common/geometry.h"
 #include "../resources/font.h"
 #include "../resources/raster_image.h"
+#include "../resources/render_image.h"
 #include "../resources/style_box.h"
 #include "../resources/vector_image.h"
-#include "src/resources/render_image.h"
 
 namespace Flint {
 

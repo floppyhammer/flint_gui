@@ -39,6 +39,8 @@ public:
 
     void set_text(const std::string &text);
 
+    std::string get_text() const;
+
     void set_icon_normal(const std::shared_ptr<Image> &icon);
 
     void set_icon_pressed(const std::shared_ptr<Image> &icon);

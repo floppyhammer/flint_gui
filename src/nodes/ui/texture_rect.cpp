@@ -27,6 +27,8 @@ void TextureRect::update(double dt) {
 }
 
 void TextureRect::draw() {
+    custom_draw();
+
     if (texture) {
         auto global_position = get_global_position();
 
