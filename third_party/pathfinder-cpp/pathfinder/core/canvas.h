@@ -148,7 +148,7 @@ public:
 
     void draw_sub_render_target(const RenderTargetId &render_target_id, const RectF &src_rect, const RectF &dst_rect);
 
-    void draw_raw_texture(std::shared_ptr<Texture> texture, const RectF &src_rect, const RectF &dst_rect);
+    void draw_raw_texture(std::shared_ptr<Texture> texture, const RectF &dst_rect);
 
     std::shared_ptr<Texture> get_texture_by_render_target_id(RenderTargetId id);
 

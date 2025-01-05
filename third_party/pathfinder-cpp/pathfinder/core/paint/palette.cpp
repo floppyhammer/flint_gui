@@ -113,15 +113,6 @@ RenderTargetDesc Palette::get_render_target(RenderTargetId render_target_id) con
     return render_targets_desc[render_target_id.render_target];
 }
 
-// RenderTargetId Palette::push_raw_texture(RawTexture raw_texture) {
-//     RenderTargetDesc desc = {raw_texture.size, raw_texture.name, true};
-//
-//     uint32_t id = render_targets_desc.size();
-//     render_targets_desc.push_back(desc);
-//
-//     return {scene_id, id, std::make_shared<uint64_t>(raw_texture.texture_id)};
-// }
-
 std::vector<PaintMetadata> Palette::build_paint_info(Renderer *renderer) {
     auto paint_texture_manager = std::make_shared<PaintTextureManager>();
 
@@ -315,10 +306,6 @@ PaintLocationsInfo Palette::assign_paint_locations(const std::shared_ptr<PaintTe
                         std::make_shared<std::vector<ColorU>>(image->pixels),
                     });
                 }
-                // Texture
-                else {
-                    color_texture_metadata->raw_texture = pattern.source.texture;
-                }
 
                 TextureSamplingFlags sampling_flags;
                 if (pattern.repeat_x()) {
@@ -340,11 +327,16 @@ PaintLocationsInfo Palette::assign_paint_locations(const std::shared_ptr<PaintTe
                     paint_filter.pattern_filter = *pattern.filter;
                 }
 
-                if (pattern.source.type != PatternSource::Type::Texture) {
-                    color_texture_metadata->location = location;
+                // Texture
+                if (pattern.source.type == PatternSource::Type::Texture) {
+                    color_texture_metadata->raw_texture = pattern.source.texture;
+                    location.rect = RectI({}, pattern.source.texture.lock()->get_size());
+                    // No page info for raw textures.
+                } else {
                     color_texture_metadata->page_scale = allocator.page_scale(location.page);
                 }
 
+                color_texture_metadata->location = location;
                 color_texture_metadata->sampling_flags = sampling_flags;
                 color_texture_metadata->filter = paint_filter;
                 color_texture_metadata->transform = Transform2::from_translation(border.to_f32());

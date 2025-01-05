@@ -451,7 +451,9 @@ void Canvas::draw_sub_render_target(const RenderTargetId &render_target_id,
     current_state.fill_paint = old_fill_paint;
 }
 
-void Canvas::draw_raw_texture(std::shared_ptr<Texture> texture, const RectF &src_rect, const RectF &dst_rect) {
+void Canvas::draw_raw_texture(std::shared_ptr<Texture> texture, const RectF &dst_rect) {
+    auto src_rect = RectF({}, texture->get_size().to_f32());
+
     auto dst_size = dst_rect.size();
     auto scale = dst_size / src_rect.size();
     auto offset = dst_rect.origin() - src_rect.origin() * scale;

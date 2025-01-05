@@ -143,7 +143,7 @@ void VectorServer::draw_render_image(RenderImage &render_image, Transform2 trans
 
     canvas->set_transform(dpi_scaling_xform * global_transform_offset * transform);
 
-    canvas->draw_raw_texture(render_image.get_texture(), RectF(), RectF({}, render_image.get_size().to_f32()));
+    canvas->draw_raw_texture(render_image.get_texture(), RectF({}, render_image.get_size().to_f32()));
 
     canvas->restore_state();
 }
