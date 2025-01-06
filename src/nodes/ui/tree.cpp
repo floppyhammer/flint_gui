@@ -35,8 +35,6 @@ void Tree::draw() {
 
     float offset_y = 0;
     root->propagate_draw(folding_width, 0, offset_y, get_global_position());
-
-    vector_server->draw_style_box(debug_size_box, get_global_position(), size);
 }
 
 void Tree::input(InputEvent &event) {

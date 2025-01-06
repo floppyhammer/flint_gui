@@ -11,7 +11,7 @@
 namespace Flint {
 
 VectorImage::VectorImage(Vec2I size_) : Image(size_) {
-    type = ImageType::Vector;;
+    type = ImageType::Vector;
 }
 
 std::shared_ptr<VectorImage> VectorImage::from_empty(Vec2I _size) {
@@ -23,6 +23,8 @@ std::shared_ptr<VectorImage> VectorImage::from_empty(Vec2I _size) {
 }
 
 VectorImage::VectorImage(const std::string &path) : Image(path) {
+    type = ImageType::Vector;
+
     svg_scene = VectorServer::get_singleton()->load_svg(path);
 
     size = svg_scene->get_size().to_i32();

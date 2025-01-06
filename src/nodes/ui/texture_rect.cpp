@@ -102,7 +102,12 @@ void TextureRect::draw() {
 }
 
 void TextureRect::calc_minimum_size() {
-    calculated_minimum_size = texture ? texture->get_size().to_f32() : Vec2F(0);
+    calculated_minimum_size = Vec2F(0);
+    if (texture) {
+        if (StretchMode::KeepCentered == stretch_mode || StretchMode::Keep == stretch_mode) {
+            calculated_minimum_size = texture->get_size().to_f32();
+        }
+    }
 }
 
 void TextureRect::set_stretch_mode(TextureRect::StretchMode new_stretch_mode) {
