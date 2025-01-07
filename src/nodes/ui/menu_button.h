@@ -18,6 +18,8 @@ public:
     /// Manually select an item.
     void select_item(uint32_t item_index);
 
+    uint32_t get_selected_item_index() const;
+
     std::string get_selected_item_text() const;
 
 protected:

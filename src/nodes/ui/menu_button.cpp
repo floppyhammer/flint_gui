@@ -50,6 +50,10 @@ std::string MenuButton::get_selected_item_text() const {
     return "";
 }
 
+uint32_t MenuButton::get_selected_item_index() const {
+    return selected_item_index;
+}
+
 void MenuButton::when_item_selected(uint32_t item_index) {
     set_text(menu->get_item_text(item_index));
     selected_item_index = item_index;
