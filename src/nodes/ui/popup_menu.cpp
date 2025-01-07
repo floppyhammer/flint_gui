@@ -93,6 +93,8 @@ PopupMenu::PopupMenu() {
     theme_bg_ = std::make_optional(panel);
 
     debug_size_box.border_color = ColorU(100, 40, 122, 255);
+
+    render_layer = 1;
 }
 
 void PopupMenu::update(double delta) {
@@ -150,10 +152,22 @@ void PopupMenu::input(InputEvent &event) {
         }
 
         if (RectF(global_position, global_position + size).contains_point(args.position)) {
+            if (items_.empty()) {
+                return;
+            }
             int item_index = int(local_mouse_position.y / item_height_);
             item_index = std::clamp(item_index, 0, (int)items_.size() - 1);
             items_[item_index]->hovered = true;
-        } else {
+        }
+    }
+
+    if (event.type == InputEventType::MouseButton) {
+        auto args = event.args.mouse_motion;
+
+        // Hide menu.
+        if (!RectF(global_position, global_position + size).contains_point(args.position)) {
+            consume_flag = true;
+            set_visibility(false);
         }
     }
 

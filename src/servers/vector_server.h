@@ -12,6 +12,8 @@
 
 namespace Flint {
 
+constexpr int MAX_RENDER_LAYER = 8;
+
 /**
  * All visible shapes will be collected by the vector server and drawn at once.
  */
@@ -76,11 +78,17 @@ public:
 
     void set_global_scale(float new_scale);
 
+    void set_render_layer(uint8_t layer_id);
+
     Transform2 global_transform_offset;
 
 private:
+    void reset_render_layers();
+
     // Never expose this.
     std::shared_ptr<Pathfinder::Canvas> canvas;
+
+    std::array<std::shared_ptr<Pathfinder::Scene>, MAX_RENDER_LAYER> render_layers;
 
     float global_scale_ = 1.0f;
 };

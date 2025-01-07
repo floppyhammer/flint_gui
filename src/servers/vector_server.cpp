@@ -9,6 +9,8 @@ void VectorServer::init(Pathfinder::Vec2I size,
                         const std::shared_ptr<Pathfinder::Queue> &queue,
                         Pathfinder::RenderLevel level) {
     canvas = std::make_shared<Pathfinder::Canvas>(size, device, queue, level);
+
+    reset_render_layers();
 }
 
 void VectorServer::cleanup() {
@@ -20,8 +22,12 @@ void VectorServer::set_dst_texture(const std::shared_ptr<Pathfinder::Texture> &t
 }
 
 void VectorServer::submit_and_clear() {
-    canvas->draw(true);
-    canvas->take_scene();
+    for (uint8_t i = 0; i < MAX_RENDER_LAYER; i++) {
+        canvas->set_scene(render_layers[i]);
+        canvas->draw(i == 0);
+    }
+
+    reset_render_layers();
 }
 
 std::shared_ptr<Pathfinder::Canvas> VectorServer::get_canvas() const {
@@ -34,6 +40,22 @@ float VectorServer::get_global_scale() const {
 
 void VectorServer::set_global_scale(float new_scale) {
     global_scale_ = new_scale;
+}
+
+void VectorServer::set_render_layer(uint8_t layer_id) {
+    assert(layer_id <= MAX_RENDER_LAYER);
+    if (layer_id >= MAX_RENDER_LAYER) {
+        return;
+    }
+
+    canvas->set_scene(render_layers[layer_id]);
+}
+
+void VectorServer::reset_render_layers() {
+    for (uint8_t i = 0; i < MAX_RENDER_LAYER; i++) {
+        render_layers[i] = std::make_shared<Pathfinder::Scene>(0, RectF({}, canvas->get_size().to_f32()));
+    }
+    canvas->set_scene(render_layers[0]);
 }
 
 void VectorServer::draw_line(Vec2F start, Vec2F end, float width, ColorU color) {
