@@ -77,12 +77,19 @@ public:
 
     float get_item_height() const;
 
+    std::string get_item_text(uint32_t item_index) const;
+
+    void connect_signal(const std::string &signal, const AnyCallable<void> &callback) override;
+
 private:
+    void when_item_selected(uint32_t item_index);
     std::vector<std::shared_ptr<MenuItem>> items_;
 
     float item_height_ = 48;
 
     std::optional<StyleBox> theme_bg_;
+
+    std::vector<AnyCallable<void>> item_selected_callbacks;
 };
 
 } // namespace Flint

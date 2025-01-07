@@ -13,8 +13,21 @@ public:
 
     std::weak_ptr<PopupMenu> get_popup_menu() const;
 
+    void connect_signal(const std::string &signal, const AnyCallable<void> &callback) override;
+
+    /// Manually select an item.
+    void select_item(uint32_t item_index);
+
+    std::string get_selected_item_text() const;
+
 protected:
+    int32_t selected_item_index = -1;
+
     std::shared_ptr<PopupMenu> menu;
+
+    std::vector<AnyCallable<void>> selected_callbacks;
+
+    void when_item_selected(uint32_t item_index);
 };
 
 } // namespace Flint

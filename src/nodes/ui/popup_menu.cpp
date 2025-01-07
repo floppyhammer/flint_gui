@@ -29,7 +29,7 @@ MenuItem::MenuItem() {
     theme_hovered.bg_color = ColorU(100, 100, 100, 150);
 }
 
-void MenuItem:: draw(Vec2F global_position) {
+void MenuItem::draw(Vec2F global_position) {
     auto vector_server = VectorServer::get_singleton();
 
     if (hovered) {
@@ -170,7 +170,18 @@ void PopupMenu::input(InputEvent &event) {
         auto args = event.args.mouse_button;
 
         // Hide menu.
-        if (!RectF(global_position, global_position + size).contains_point(args.position)) {
+        if (RectF(global_position, global_position + size).contains_point(args.position)) {
+            consume_flag = true;
+            set_visibility(false);
+
+            if (items_.empty()) {
+                return;
+            }
+            int item_index = int(local_mouse_position.y / item_height_);
+            item_index = std::clamp(item_index, 0, (int)items_.size() - 1);
+
+            when_item_selected(item_index);
+        } else {
             consume_flag = true;
             set_visibility(false);
         }
@@ -200,6 +211,28 @@ void PopupMenu::set_item_height(float new_item_height) {
 
 float PopupMenu::get_item_height() const {
     return item_height_;
+}
+
+std::string PopupMenu::get_item_text(uint32_t item_index) const {
+    return items_[item_index]->label->get_text();
+}
+
+void PopupMenu::connect_signal(const std::string &signal, const AnyCallable<void> &callback) {
+    NodeUi::connect_signal(signal, callback);
+
+    if (signal == "item_selected") {
+        item_selected_callbacks.push_back(callback);
+    }
+}
+
+void PopupMenu::when_item_selected(uint32_t item_index) {
+    for (auto &callback : item_selected_callbacks) {
+        try {
+            callback.operator()<uint32_t>(std::move(item_index));
+        } catch (std::bad_any_cast &) {
+            Logger::error("Mismatched signal argument types!");
+        }
+    }
 }
 
 } // namespace Flint
