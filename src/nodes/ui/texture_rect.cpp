@@ -5,7 +5,7 @@
 #include "../../common/utils.h"
 #include "../../resources/default_resource.h"
 #include "../../servers/engine.h"
-#include "src/resources/render_image.h"
+#include "../../resources/render_image.h"
 
 namespace Flint {
 

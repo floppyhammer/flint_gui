@@ -132,6 +132,10 @@ void ScrollContainer::draw_scroll_bar() {
         return;
     }
 
+    if (!visible_) {
+        return;
+    }
+
     // Scroll container can only have one effective control child.
     auto content = (NodeUi *)children.front().get();
     auto content_size = content->get_size();

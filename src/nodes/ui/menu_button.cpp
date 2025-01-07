@@ -1,6 +1,7 @@
 #include "menu_button.h"
 
 #include "../../resources/default_resource.h"
+#include "container/scroll_container.h"
 #include "popup_menu.h"
 
 namespace Flint {
@@ -10,21 +11,33 @@ MenuButton::MenuButton() {
 
     toggle_mode = true;
 
-    label->set_text("Check Button");
+    label->set_text("Menu Button");
 
     theme_pressed = theme_normal;
 
+    menu_container_ = std::make_shared<ScrollContainer>();
+    menu_container_->set_visibility(false);
+    add_embedded_child(menu_container_);
+
     menu = std::make_shared<PopupMenu>();
-    add_embedded_child(menu);
+    menu_container_->add_child(menu);
+    menu_container_->render_layer = 1;
+
     menu->set_visibility(false);
 
     pressed_callbacks.emplace_back([this] {
         menu->set_visibility(true);
-        menu->set_position({0, position.y});
+        menu_container_->set_visibility(true);
+        menu_container_->set_position({0, position.y});
+        float menu_height = std::min(menu->get_effective_minimum_size().y, get_window()->get_logical_size().y - position.y);
+        menu_container_->set_size({menu->get_effective_minimum_size().x, menu_height});
     });
 
     auto callback = [this](uint32_t item_index) { when_item_selected(item_index); };
     menu->connect_signal("item_selected", callback);
+
+    auto hide_callback = [this] { menu_container_->set_visibility(false); };
+    menu->connect_signal("popup_hide", hide_callback);
 }
 
 std::weak_ptr<PopupMenu> MenuButton::get_popup_menu() const {

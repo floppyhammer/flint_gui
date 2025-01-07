@@ -143,7 +143,7 @@ void Node::add_child(const std::shared_ptr<Node> &new_child) {
 
 void Node::add_embedded_child(const std::shared_ptr<Node> &new_child) {
     if (std::find(embedded_children.begin(), embedded_children.end(), new_child) != embedded_children.end()) {
-        std::cout << "Attempted to add a repated embedded child!" << std::endl;
+        std::cout << "Attempted to add a repeated embedded child!" << std::endl;
         return;
     }
 

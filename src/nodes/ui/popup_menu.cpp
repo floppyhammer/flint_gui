@@ -130,8 +130,9 @@ void PopupMenu::draw() {
         vector_server->draw_style_box(theme_bg_.value(), get_global_position(), size);
     }
 
+    auto global_position = get_global_position();
     for (auto &item : items_) {
-        item->draw(get_global_position());
+        item->draw(global_position);
     }
 
     vector_server->set_render_layer(0);
@@ -223,12 +224,25 @@ void PopupMenu::connect_signal(const std::string &signal, const AnyCallable<void
     if (signal == "item_selected") {
         item_selected_callbacks.push_back(callback);
     }
+    if (signal == "popup_hide") {
+        popup_hide_callbacks.push_back(callback);
+    }
 }
 
 void PopupMenu::when_item_selected(uint32_t item_index) {
     for (auto &callback : item_selected_callbacks) {
         try {
             callback.operator()<uint32_t>(std::move(item_index));
+        } catch (std::bad_any_cast &) {
+            Logger::error("Mismatched signal argument types!");
+        }
+    }
+}
+
+void PopupMenu::when_popup_hide() {
+    for (auto &callback : popup_hide_callbacks) {
+        try {
+            callback();
         } catch (std::bad_any_cast &) {
             Logger::error("Mismatched signal argument types!");
         }

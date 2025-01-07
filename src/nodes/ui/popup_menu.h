@@ -83,6 +83,8 @@ public:
 
 private:
     void when_item_selected(uint32_t item_index);
+    void when_popup_hide();
+
     std::vector<std::shared_ptr<MenuItem>> items_;
 
     float item_height_ = 48;
@@ -90,6 +92,8 @@ private:
     std::optional<StyleBox> theme_bg_;
 
     std::vector<AnyCallable<void>> item_selected_callbacks;
+
+    std::vector<AnyCallable<void>> popup_hide_callbacks;
 };
 
 } // namespace Flint
