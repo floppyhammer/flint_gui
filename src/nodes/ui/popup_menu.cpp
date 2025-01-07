@@ -29,7 +29,7 @@ MenuItem::MenuItem() {
     theme_hovered.bg_color = ColorU(100, 100, 100, 150);
 }
 
-void MenuItem::draw(Vec2F global_position) {
+void MenuItem:: draw(Vec2F global_position) {
     auto vector_server = VectorServer::get_singleton();
 
     if (hovered) {
@@ -121,9 +121,10 @@ void PopupMenu::draw() {
         return;
     }
 
-    NodeUi::draw();
-
     auto vector_server = VectorServer::get_singleton();
+    vector_server->set_render_layer(render_layer);
+
+    NodeUi::draw();
 
     if (theme_bg_.has_value()) {
         vector_server->draw_style_box(theme_bg_.value(), get_global_position(), size);
@@ -132,6 +133,8 @@ void PopupMenu::draw() {
     for (auto &item : items_) {
         item->draw(get_global_position());
     }
+
+    vector_server->set_render_layer(0);
 }
 
 void PopupMenu::input(InputEvent &event) {
@@ -152,6 +155,8 @@ void PopupMenu::input(InputEvent &event) {
         }
 
         if (RectF(global_position, global_position + size).contains_point(args.position)) {
+            consume_flag = true;
+
             if (items_.empty()) {
                 return;
             }
@@ -162,7 +167,7 @@ void PopupMenu::input(InputEvent &event) {
     }
 
     if (event.type == InputEventType::MouseButton) {
-        auto args = event.args.mouse_motion;
+        auto args = event.args.mouse_button;
 
         // Hide menu.
         if (!RectF(global_position, global_position + size).contains_point(args.position)) {

@@ -47,9 +47,6 @@ Vec2F NodeUi::get_effective_minimum_size() const {
 }
 
 void NodeUi::draw() {
-    auto vector_server = VectorServer::get_singleton();
-    vector_server->set_render_layer(render_layer);
-
 #ifdef FLINT_GUI_VISUAL_DEBUG
     if (size.x > 0 && size.y > 0) {
         auto vector_server = VectorServer::get_singleton();

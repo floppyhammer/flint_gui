@@ -24,4 +24,8 @@ MenuButton::MenuButton() {
     });
 }
 
+std::weak_ptr<PopupMenu> MenuButton::get_popup_menu() const {
+    return menu;
+}
+
 } // namespace Flint

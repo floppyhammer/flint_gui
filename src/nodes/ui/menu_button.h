@@ -11,6 +11,8 @@ class MenuButton : public Button {
 public:
     MenuButton();
 
+    std::weak_ptr<PopupMenu> get_popup_menu() const;
+
 protected:
     std::shared_ptr<PopupMenu> menu;
 };
