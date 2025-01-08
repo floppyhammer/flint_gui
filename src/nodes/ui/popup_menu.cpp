@@ -11,12 +11,12 @@ MenuItem::MenuItem() {
     label = std::make_shared<Label>();
 
     label->container_sizing.expand_v = true;
-    label->container_sizing.flag_v = ContainerSizingFlag::ShrinkCenter;
+    label->container_sizing.flag_v = ContainerSizingFlag::Fill;
     label->set_vertical_alignment(Alignment::Center);
 
     icon = std::make_shared<TextureRect>();
-    icon->set_custom_minimum_size({24, 24});
-    icon->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
+    // icon->set_custom_minimum_size({24, 24});
+    // icon->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
 
     // auto img = std::make_shared<VectorImage>("../assets/icons/ArrowRight.svg");
     // icon->set_texture(img);
