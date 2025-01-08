@@ -62,6 +62,10 @@ void Window::set_dpi_scaling_factor(float scale) {
     dpi_scaling_factor_ = scale;
 }
 
+void Window::set_window_title(const std::string& title) const {
+    glfwSetWindowTitle(glfw_window_, title.c_str());
+}
+
 bool Window::should_close() {
     return glfwWindowShouldClose(glfw_window_);
 }

@@ -72,6 +72,10 @@ std::shared_ptr<Node> App::get_tree_root() const {
     return tree->get_root();
 }
 
+void App::set_window_title(const std::string& title) {
+    primary_window_.lock()->set_window_title(title);
+}
+
 void App::main_loop() {
     while (!primary_window_.lock()->should_close()) {
         InputServer::get_singleton()->clear_events();
