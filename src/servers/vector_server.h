@@ -17,7 +17,7 @@ constexpr int MAX_RENDER_LAYER = 8;
 /**
  * All visible shapes will be collected by the vector server and drawn at once.
  */
-class VectorServer {
+class VectorServer final {
 public:
     static VectorServer *get_singleton() {
         static VectorServer singleton;
@@ -80,6 +80,7 @@ public:
 
     void set_render_layer(uint8_t layer_id);
 
+    // Only used with ScrollContainer.
     Transform2 global_transform_offset;
 
 private:

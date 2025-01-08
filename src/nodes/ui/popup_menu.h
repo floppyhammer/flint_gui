@@ -24,7 +24,7 @@ class MenuItem {
 public:
     MenuItem();
 
-    void update(Vec2F global_position, Vec2F size);
+    void update(Vec2F global_position, Vec2F p_size);
 
     void input(InputEvent &event, Vec2F global_position);
 
@@ -42,6 +42,7 @@ public:
 
     // Local position in the menu.
     Vec2F position;
+
     Vec2F size;
 
     std::shared_ptr<TextureRect> icon;
@@ -80,6 +81,8 @@ public:
     std::string get_item_text(uint32_t item_index) const;
 
     void connect_signal(const std::string &signal, const AnyCallable<void> &callback) override;
+
+    void calc_minimum_size() override;
 
 private:
     void when_item_selected(uint32_t item_index);

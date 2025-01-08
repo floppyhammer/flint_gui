@@ -203,10 +203,15 @@ int32_t ScrollContainer::get_vscroll() const {
 }
 
 void ScrollContainer::pre_draw_children() {
+    if (!visible_) {
+        return;
+    }
+
     auto global_pos = get_global_position();
     auto size = get_size() * get_window()->get_dpi_scaling_factor();
 
     auto vector_server = VectorServer::get_singleton();
+    vector_server->set_render_layer(render_layer);
 
     auto canvas = vector_server->get_canvas();
 
@@ -215,12 +220,18 @@ void ScrollContainer::pre_draw_children() {
         render_target_desc = {size.to_i32(), "ScrollContainer render target"};
     }
 
+    // Draw all children onto the temporary render target.
     temp_draw_data.render_target_id = canvas->get_scene()->push_render_target(render_target_desc);
 
+    // For the temporary render target, we need to offset all child nodes back to the origin.
     vector_server->global_transform_offset = Transform2::from_translation(-global_pos);
 }
 
 void ScrollContainer::post_draw_children() {
+    if (!visible_) {
+        return;
+    }
+
     auto global_pos = get_global_position();
     auto size = get_size();
 
@@ -232,12 +243,15 @@ void ScrollContainer::post_draw_children() {
 
     vector_server->global_transform_offset = Transform2();
 
+    // Don't draw on the temporary render target anymore.
     canvas->get_scene()->pop_render_target();
 
     float dpi_scale = get_window()->get_dpi_scaling_factor();
 
     auto dst_rect = RectF(global_pos * dpi_scale, (global_pos + size) * dpi_scale);
     vector_server->get_canvas()->draw_render_target(temp_draw_data.render_target_id, dst_rect);
+
+    vector_server->set_render_layer(0);
 }
 
 } // namespace Flint

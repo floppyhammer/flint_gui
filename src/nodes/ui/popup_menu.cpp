@@ -41,7 +41,9 @@ void MenuItem::draw(Vec2F global_position) {
     draw_system(container.get());
 }
 
-void MenuItem::update(Vec2F global_position, Vec2F size) {
+void MenuItem::update(Vec2F global_position, Vec2F p_size) {
+    size = p_size;
+
     size = size.max(container->get_effective_minimum_size());
 
     container->set_position(global_position + position);
@@ -93,15 +95,9 @@ PopupMenu::PopupMenu() {
     theme_bg_ = std::make_optional(panel);
 
     debug_size_box.border_color = ColorU(100, 40, 122, 255);
-
-    render_layer = 1;
 }
 
 void PopupMenu::update(double delta) {
-    if (!visible_) {
-        return;
-    }
-
     auto global_position = get_global_position();
 
     float offset_y = 0;
@@ -122,7 +118,6 @@ void PopupMenu::draw() {
     }
 
     auto vector_server = VectorServer::get_singleton();
-    vector_server->set_render_layer(render_layer);
 
     NodeUi::draw();
 
@@ -134,8 +129,6 @@ void PopupMenu::draw() {
     for (auto &item : items_) {
         item->draw(global_position);
     }
-
-    vector_server->set_render_layer(0);
 }
 
 void PopupMenu::input(InputEvent &event) {
@@ -197,6 +190,19 @@ void PopupMenu::input(InputEvent &event) {
 
 void PopupMenu::clear_items() {
     items_.clear();
+}
+
+void PopupMenu::calc_minimum_size() {
+    Vec2F min_size = {};
+
+    // Label has a minimal height even when the text is empty.
+    min_size.y = item_height_ * items_.size();
+
+    for (auto &item : items_) {
+        min_size.x = std::max(min_size.x, item->size.x);
+    }
+
+    calculated_minimum_size = min_size;
 }
 
 std::shared_ptr<MenuItem> PopupMenu::create_item(const std::string &text) {

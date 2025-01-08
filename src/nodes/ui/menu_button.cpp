@@ -1,6 +1,7 @@
 #include "menu_button.h"
 
 #include "../../resources/default_resource.h"
+#include "../../servers/debug_server.h"
 #include "container/scroll_container.h"
 #include "popup_menu.h"
 
@@ -17,19 +18,24 @@ MenuButton::MenuButton() {
 
     menu_container_ = std::make_shared<ScrollContainer>();
     menu_container_->set_visibility(false);
+    menu_container_->render_layer = 1;
     add_embedded_child(menu_container_);
 
     menu = std::make_shared<PopupMenu>();
     menu_container_->add_child(menu);
-    menu_container_->render_layer = 1;
+    menu->render_layer = 1;
 
     menu->set_visibility(false);
 
     pressed_callbacks.emplace_back([this] {
+        DebugServer::get_singleton()->debug_flags["xx"] = true;
         menu->set_visibility(true);
+
         menu_container_->set_visibility(true);
         menu_container_->set_position({0, position.y});
-        float menu_height = std::min(menu->get_effective_minimum_size().y, get_window()->get_logical_size().y - position.y);
+
+        float menu_height =
+            std::min(menu->get_effective_minimum_size().y, get_window()->get_logical_size().y - position.y);
         menu_container_->set_size({menu->get_effective_minimum_size().x, menu_height});
     });
 
