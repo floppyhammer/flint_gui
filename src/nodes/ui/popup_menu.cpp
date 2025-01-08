@@ -138,7 +138,8 @@ void PopupMenu::input(InputEvent &event) {
 
     auto global_position = get_global_position();
 
-    bool consume_flag = false;
+    // If a popup menu is shown, it captures mouse events anyway.
+    bool consume_flag = true;
 
     if (event.type == InputEventType::MouseMotion) {
         auto args = event.args.mouse_motion;
@@ -185,7 +186,16 @@ void PopupMenu::input(InputEvent &event) {
         item->input(event, global_position);
     }
 
+    event.consume();
+
     NodeUi::input(event);
+}
+
+void PopupMenu::set_visibility(bool visible) {
+    visible_ = visible;
+    if (!visible_) {
+        when_popup_hide();
+    }
 }
 
 void PopupMenu::clear_items() {

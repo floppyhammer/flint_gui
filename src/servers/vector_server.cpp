@@ -23,9 +23,6 @@ void VectorServer::set_dst_texture(const std::shared_ptr<Pathfinder::Texture> &t
 }
 
 void VectorServer::submit_and_clear() {
-    if (DebugServer::get_singleton()->debug_flags["xx"]) {
-        int a = 1;
-    }
     for (uint8_t i = 0; i < MAX_RENDER_LAYER; i++) {
         canvas->set_scene(render_layers[i]);
         canvas->draw(i == 0);

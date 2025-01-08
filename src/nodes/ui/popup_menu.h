@@ -72,6 +72,8 @@ public:
 
     void clear_items();
 
+    void set_visibility(bool visible) override;
+
     std::shared_ptr<MenuItem> create_item(const std::string &text = "item");
 
     void set_item_height(float new_item_height);

@@ -28,7 +28,6 @@ MenuButton::MenuButton() {
     menu->set_visibility(false);
 
     pressed_callbacks.emplace_back([this] {
-        DebugServer::get_singleton()->debug_flags["xx"] = true;
         menu->set_visibility(true);
 
         menu_container_->set_visibility(true);
