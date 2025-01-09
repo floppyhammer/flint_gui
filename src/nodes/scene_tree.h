@@ -3,6 +3,7 @@
 
 #include "file_dialog.h"
 #include "node.h"
+#include "timer.h"
 #include "ui/button.h"
 #include "ui/check_button.h"
 #include "ui/container/box_container.h"
