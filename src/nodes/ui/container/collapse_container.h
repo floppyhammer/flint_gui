@@ -34,6 +34,8 @@ public:
         }
     }
 
+    void set_collapse(bool collapse);
+
 private:
     bool collapsed_ = false;
 

@@ -44,6 +44,7 @@ void MenuItem::draw(Vec2F global_position) {
 void MenuItem::update(Vec2F global_position, Vec2F p_size) {
     size = p_size;
 
+    container->calc_minimum_size_recursively();
     size = size.max(container->get_effective_minimum_size());
 
     container->set_position(global_position + position);
@@ -107,7 +108,7 @@ void PopupMenu::update(double delta) {
         item->update(global_position, {size.x, item_height_});
     }
 
-    size = size.max(custom_minimum_size.max(Vec2F{0, offset_y}));
+    size = size.max(calculated_minimum_size.max(Vec2F{0, offset_y}));
 
     NodeUi::update(delta);
 }

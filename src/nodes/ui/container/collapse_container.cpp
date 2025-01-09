@@ -28,21 +28,7 @@ CollapseContainer::CollapseContainer() {
     collapse_button_->set_flat(true);
     collapse_button_->set_toggle_mode(true);
     collapse_button_->connect_signal("toggled", [this](bool p_pressed = true) {
-        if (!this->collapsed_ && p_pressed) {
-            this->size_before_collapse_ = this->size;
-        }
-
-        if (this->collapsed_ && !p_pressed) {
-            this->size = this->size_before_collapse_;
-        }
-
-        this->collapsed_ = p_pressed;
-
-        if (p_pressed) {
-            theme_title_bar_->corner_radii = {8, 8, 8, 8};
-        } else {
-            theme_title_bar_->corner_radii = {8, 8, 0, 0};
-        }
+        set_collapse(!p_pressed);
     });
 
     add_embedded_child(collapse_button_);
@@ -74,6 +60,26 @@ void CollapseContainer::adjust_layout() {
         }
 
         child->set_visibility(!collapsed_);
+    }
+}
+void CollapseContainer::set_collapse(bool collapse) {
+    if (collapsed_ == collapse) {
+        return;
+    }
+    collapsed_ = collapse;
+
+    if (!collapse) {
+        this->size_before_collapse_ = this->size;
+    }
+
+    if (collapse) {
+        this->size = this->size_before_collapse_;
+    }
+
+    if (collapse) {
+        theme_title_bar_->corner_radii = {8, 8, 8, 8};
+    } else {
+        theme_title_bar_->corner_radii = {8, 8, 0, 0};
     }
 }
 
