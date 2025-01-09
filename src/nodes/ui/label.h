@@ -157,8 +157,8 @@ private:
     TextStyle text_style;
 
     // Controls how to align the text box to the label area.
-    Alignment horizontal_alignment = Alignment::Begin;
-    Alignment vertical_alignment = Alignment::Begin;
+    Alignment horizontal_alignment = Alignment::Center;
+    Alignment vertical_alignment = Alignment::Center;
     Vec2F alignment_shift{0};
 
     BidiAlignment bidi_alignment_ = BidiAlignment::Auto;

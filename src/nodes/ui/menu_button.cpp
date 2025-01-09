@@ -31,7 +31,7 @@ MenuButton::MenuButton() {
         menu->set_visibility(true);
 
         menu_container_->set_visibility(true);
-        menu_container_->set_position({0, position.y});
+        menu_container_->set_position({0, size.y});
 
         float menu_height =
             std::min(menu->get_effective_minimum_size().y, get_window()->get_logical_size().y - position.y);

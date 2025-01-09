@@ -12,6 +12,7 @@ TextEdit::TextEdit() {
     type = NodeType::TextEdit;
 
     label = std::make_shared<Label>();
+    label->set_horizontal_alignment(Alignment::Begin);
     label->set_vertical_alignment(Alignment::Center);
     label->set_mouse_filter(MouseFilter::Ignore);
 
