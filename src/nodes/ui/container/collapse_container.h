@@ -21,6 +21,8 @@ public:
 
     void calc_minimum_size() override;
 
+    void set_title(std::string title);
+
     void adjust_layout() override;
 
     void set_color(ColorU color) {

@@ -19,6 +19,8 @@ public:
 
     void connect_signal(const std::string& signal, const AnyCallable<void>& callback) override;
 
+    float get_remaing_time() const;
+
 protected:
     void emit_timeout();
 

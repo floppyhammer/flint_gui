@@ -17,13 +17,14 @@ void Timer::start_timer(float time) {
 void Timer::update(double dt) {
     Node::update(dt);
 
-    if (is_timer_stopped && remaining_time_ > 0) {
+    if (!is_timer_stopped && remaining_time_ > 0) {
         remaining_time_ -= dt;
     }
 
     if (!is_timer_stopped && remaining_time_ <= 0) {
         is_timer_stopped = true;
         remaining_time_ = 0;
+        emit_timeout();
     }
 }
 
@@ -35,8 +36,12 @@ void Timer::connect_signal(const std::string& signal, const AnyCallable<void>& c
     }
 }
 
+float Timer::get_remaing_time() const {
+    return remaining_time_;
+}
+
 void Timer::emit_timeout() {
-    for (auto c : timeout_callbacks) {
+    for (auto& c : timeout_callbacks) {
         c();
     }
 }
