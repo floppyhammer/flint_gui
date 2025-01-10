@@ -20,6 +20,10 @@ void Panel::set_theme_panel(StyleBox style_box) {
 }
 
 void Panel::draw() {
+    if (!visible_) {
+        return;
+    }
+
     auto vector_server = VectorServer::get_singleton();
 
     auto global_position = get_global_position();

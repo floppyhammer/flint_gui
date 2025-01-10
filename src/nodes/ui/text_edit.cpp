@@ -15,6 +15,7 @@ TextEdit::TextEdit() {
     label->set_horizontal_alignment(Alignment::Begin);
     label->set_vertical_alignment(Alignment::Center);
     label->set_mouse_filter(MouseFilter::Ignore);
+    label->set_word_wrap(true);
 
     margin_container = std::make_shared<MarginContainer>();
     margin_container->set_margin_all(4);

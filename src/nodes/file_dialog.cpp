@@ -10,9 +10,9 @@ std::optional<std::string> FileDialog::show() {
 
     // In case of multiple files, the separator is `|`.
     // Returns NULL on cancel.
-    auto path = tinyfd_openFileDialog("",      // NULL or ""
-                                      "",      // NULL or ""
-                                      0,       // 0 (2 in the following example)
+    auto path = tinyfd_openFileDialog("",                    // NULL or ""
+                                      default_path_.c_str(), // NULL or ""
+                                      0,                     // 0 (2 in the following example)
                                       nullptr, // NULL or char const * lFilterPatterns[2]={"*.png","*.jpg"};
                                       nullptr, // NULL or "image files"
                                       0);      // 0
@@ -23,6 +23,10 @@ std::optional<std::string> FileDialog::show() {
     }
 
     return {};
+}
+
+void FileDialog::set_default_path(const std::string& default_path) {
+    default_path_ = default_path;
 }
 
 } // namespace Flint
