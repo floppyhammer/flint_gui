@@ -74,8 +74,7 @@ FilterParams compute_filter_params(const PaintFilter &filter,
     return filter_params;
 }
 
-Palette::Palette(uint32_t _scene_id) : scene_id(_scene_id) {
-}
+Palette::Palette(uint32_t _scene_id) : scene_id(_scene_id) {}
 
 uint32_t Palette::push_paint(const Paint &paint) {
     // Check if this paint already exists.

@@ -66,8 +66,7 @@ bool SwapChainVk::acquire_image() {
         return false;
     }
     if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-        Logger::warn("Failed to acquire swap chain image!");
-        return false;
+        throw std::runtime_error("Failed to acquire swap chain image!");
     }
 
     return true;

@@ -150,8 +150,6 @@ public:
 
     void draw_raw_texture(std::shared_ptr<Texture> texture, const RectF &dst_rect);
 
-    std::shared_ptr<Texture> get_texture_by_render_target_id(RenderTargetId id);
-
     /// Set the inner scene's view box.
     void set_size(const Vec2I &size);
 
