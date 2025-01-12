@@ -12,14 +12,14 @@
 namespace Pathfinder {
 
 bool is_extension_supported(const char *name) {
-    Logger::debug("Supported extensions:", "OpenGL");
+    Logger::debug("Supported extensions:");
 
     GLint num_extensions = 0;
     glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
 
     for (GLint i = 0; i < num_extensions; i++) {
         const auto extension = (const char *)glGetStringi(GL_EXTENSIONS, i);
-        Logger::debug(std::string(extension), "OpenGL");
+        Logger::debug(std::string(extension));
         if (!strcmp(name, extension)) {
             return true;
         }
@@ -66,10 +66,9 @@ WindowBuilderGl::WindowBuilderGl(const Vec2I &size) {
     }
 
     if (GLAD_GL_EXT_debug_label) {
-        Logger::info("Debug markers enabled.", "WindowBuilderGl");
+        Logger::info("Debug markers enabled.");
     } else {
-        Logger::info("Debug markers disabled. Try running from inside a OpenGL graphics debugger (e.g. RenderDoc).",
-                     "WindowBuilderGl");
+        Logger::info("Debug markers disabled. Try running from inside a OpenGL graphics debugger (e.g. RenderDoc).");
     }
     #endif
 #else
@@ -83,7 +82,7 @@ WindowBuilderGl::WindowBuilderGl(const Vec2I &size) {
 
     std::ostringstream string_stream;
     string_stream << "Version: " << gl_major_version << '.' << gl_minor_version;
-    Logger::info(string_stream.str(), "OpenGL");
+    Logger::info(string_stream.str());
 }
 
 WindowBuilderGl::~WindowBuilderGl() {

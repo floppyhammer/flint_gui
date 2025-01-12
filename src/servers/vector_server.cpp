@@ -10,6 +10,8 @@ void VectorServer::init(Pathfinder::Vec2I size,
                         const std::shared_ptr<Pathfinder::Device> &device,
                         const std::shared_ptr<Pathfinder::Queue> &queue,
                         Pathfinder::RenderLevel level) {
+    Logger::set_default_level(Logger::Level::Warn);
+
     canvas = std::make_shared<Pathfinder::Canvas>(size, device, queue, level);
 
     reset_render_layers();
@@ -225,7 +227,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
                                const RectF &clip_box,
                                float alpha) {
     if (glyphs.size() != glyph_positions.size()) {
-        Logger::error("Glyph count mismatches glyph position count!", "VectorServer");
+        Logger::error("Glyph count mismatches glyph position count!", "Flint");
         return;
     }
 

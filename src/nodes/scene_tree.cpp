@@ -226,6 +226,9 @@ void SceneTree::process(double dt) {
         std::vector<Node*> nodes;
         dfs_preorder_ltr_traversal(root.get(), nodes);
         for (auto& node : nodes) {
+            if (!node->ready_) {
+                continue;
+            }
             node->update(dt);
         }
     }

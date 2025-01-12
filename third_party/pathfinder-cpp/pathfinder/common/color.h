@@ -5,8 +5,10 @@
 #include <cstdint>
 
 #include "color.h"
+#include "math/basic.h"
 
 namespace Pathfinder {
+
 /// Color(0~1, 0~1, 0~1, 0~1).
 struct ColorF {
     float r_ = 0;
@@ -45,7 +47,7 @@ struct ColorF {
     }
 
     ColorF operator*(float alpha) const {
-        alpha = std::clamp(alpha, 0.0f, 1.0f);
+        alpha = clamp(alpha, 0.0f, 1.0f);
         return {r_ * alpha, g_ * alpha, b_ * alpha, a_ * alpha};
     }
 };

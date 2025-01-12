@@ -87,12 +87,12 @@ std::shared_ptr<ImageBuffer> ImageBuffer::from_memory(const std::vector<char> &b
                                                     STBI_rgb_alpha);
 
     if (channels != 4) {
-        Logger::info("Converted non-RGBA pixels to RGBA ones", "ImageBuffer");
+        Logger::info("Converted non-RGBA pixels to RGBA ones");
     }
 
     // Generate a texture using the previously loaded image data.
     if (!img_data) {
-        Logger::error("Failed to load image from memory!", "ImageBuffer");
+        Logger::error("Failed to load image from memory!");
         return nullptr;
     }
 
@@ -124,7 +124,7 @@ Vec2I ImageBuffer::get_size() const {
 
 unsigned char *ImageBuffer::get_data() const {
     if (data == nullptr) {
-        Logger::error("Try to get data from an invalid image buffer!", "ImageBuffer");
+        Logger::error("Try to get data from an invalid image buffer!");
     }
     return data;
 }

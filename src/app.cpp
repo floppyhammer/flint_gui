@@ -15,7 +15,7 @@ namespace Flint {
 
 App::App(Vec2I primary_window_size) {
     // Set logger level.
-    Logger::set_level(Logger::Level::Warn);
+    Logger::set_module_level("Flint", Logger::Level::Warn);
 
     auto render_server = RenderServer::get_singleton();
 
@@ -58,10 +58,10 @@ App::~App() {
     vector_target_.reset();
 
     VectorServer::get_singleton()->cleanup();
-    Logger::verbose("Cleaned up VectorServer.", "App");
+    Logger::verbose("Cleaned up VectorServer.", "Flint");
 
     RenderServer::get_singleton()->destroy();
-    Logger::verbose("Cleaned up RenderServer.", "App");
+    Logger::verbose("Cleaned up RenderServer.", "Flint");
 }
 
 SceneTree* App::get_tree() const {

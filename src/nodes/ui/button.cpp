@@ -220,7 +220,7 @@ void Button::when_toggled(bool pressed) {
         try {
             callback.operator()<bool>(std::move(pressed));
         } catch (std::bad_any_cast &) {
-            Logger::error("Mismatched signal argument types!");
+            Logger::error("Mismatched signal argument types!", "Flint");
         }
     }
 }

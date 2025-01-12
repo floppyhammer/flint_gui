@@ -128,7 +128,7 @@ std::shared_ptr<TreeItem> TreeItem::get_child(uint32_t idx) {
     if (idx < children.size()) {
         return children[idx];
     }
-    Logger::error("Invalid child index!", "TreeItem");
+    Logger::error("Invalid child index!", "Flint");
     return nullptr;
 }
 
@@ -249,7 +249,7 @@ void TreeItem::input(InputEvent &event, Vec2F global_position) {
             if (item_global_rect.contains_point(button_event.position)) {
                 selected = true;
                 tree->selected_item = this;
-                Logger::verbose("Item selected: " + label->get_text(), "Tree");
+                Logger::verbose("Item selected: " + label->get_text(), "Flint");
             }
         }
     }

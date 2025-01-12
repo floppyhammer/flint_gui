@@ -79,7 +79,7 @@ RenderTarget Renderer::get_render_target(RenderTargetId render_target_id) {
 
     auto texture_page = pattern_texture_pages[texture_page_id];
     if (texture_page == nullptr) {
-        Logger::error("Texture page not allocated!", "Renderer");
+        Logger::error("Texture page not allocated!");
         return {nullptr};
     }
 
@@ -88,13 +88,13 @@ RenderTarget Renderer::get_render_target(RenderTargetId render_target_id) {
 
 void Renderer::upload_texel_data(std::vector<ColorU> &texels, TextureLocation location) {
     if (location.page >= pattern_texture_pages.size()) {
-        Logger::error("Texture page ID is invalid!", "Renderer");
+        Logger::error("Texture page ID is invalid!");
         return;
     }
 
     auto texture_page = pattern_texture_pages[location.page];
     if (texture_page == nullptr) {
-        Logger::error("Texture page not allocated!", "Renderer");
+        Logger::error("Texture page not allocated!");
         return;
     }
 

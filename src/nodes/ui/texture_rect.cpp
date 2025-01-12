@@ -44,7 +44,7 @@ void TextureRect::draw() {
             } break;
             case StretchMode::Scale: {
                 if (texture_size.area() == 0) {
-                    Logger::error("Vector texture size is invalid!", "TextureRect");
+                    Logger::error("Vector texture size is invalid!", "Flint");
                     return;
                 }
                 auto scale = size / texture_size;
@@ -54,7 +54,7 @@ void TextureRect::draw() {
             case StretchMode::KeepAspect:
             case StretchMode::KeepAspectCentered: {
                 if (texture_size.area() == 0) {
-                    Logger::error("Vector texture size is invalid!", "TextureRect");
+                    Logger::error("Vector texture size is invalid!", "Flint");
                     return;
                 }
 
@@ -94,7 +94,7 @@ void TextureRect::draw() {
             auto render_image = static_cast<RenderImage *>(texture.get());
             vector_server->draw_render_image(*render_image, transform);
         } else {
-            Logger::error("Unsupported texture type!", "TextureRect");
+            Logger::error("Unsupported texture type!", "Flint");
         }
     }
 

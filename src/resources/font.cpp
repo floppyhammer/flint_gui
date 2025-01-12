@@ -167,7 +167,7 @@ Font::Font(const std::string &path) : Resource(path) {
     // Prepare font info.
     stbtt_info = new stbtt_fontinfo;
     if (!stbtt_InitFont(stbtt_info, stbtt_buffer, 0)) {
-        Logger::error("Failed to prepare font info!", "Font");
+        Logger::error("Failed to prepare font info!", "Flint");
     }
 
     harfbuzz_data = std::make_shared<HarfBuzzData>(font_data);
@@ -184,7 +184,7 @@ Font::Font(const std::vector<char> &bytes) {
     // Prepare font info.
     stbtt_info = new stbtt_fontinfo;
     if (!stbtt_InitFont(stbtt_info, stbtt_buffer, 0)) {
-        Logger::error("Failed to prepare font info!", "Font");
+        Logger::error("Failed to prepare font info!", "Flint");
     }
 
     harfbuzz_data = std::make_shared<HarfBuzzData>(font_data);
@@ -318,7 +318,7 @@ void Font::get_glyphs(const std::string &text,
         // Set paragraphs.
         ubidi_setPara(para_bidi, uchar_data, uchar_count, UBIDI_DEFAULT_LTR, nullptr, &error_code);
         if (!U_SUCCESS(error_code)) {
-            Logger::error("ubidi_setPara() failed!", "TextServer");
+            Logger::error("ubidi_setPara() failed!", "Flint");
             break;
         }
 
@@ -332,7 +332,7 @@ void Font::get_glyphs(const std::string &text,
             ubidi_getParagraphByIndex(para_bidi, para_index, &para_start, &para_end, &para_level, &error_code);
 
             if (!U_SUCCESS(error_code)) {
-                Logger::error("ubidi_getParagraphByIndex() failed!", "TextServer");
+                Logger::error("ubidi_getParagraphByIndex() failed!", "Flint");
                 break;
             }
 
@@ -343,7 +343,7 @@ void Font::get_glyphs(const std::string &text,
             // Set a paragraph (lines).
             ubidi_setLine(para_bidi, para_start, para_end, line_bidi, &error_code);
             if (!U_SUCCESS(error_code)) {
-                Logger::error("ubidi_setLine failed!", "TextServer");
+                Logger::error("ubidi_setLine failed!", "Flint");
                 break;
             }
 

@@ -2,17 +2,19 @@
 #define PATHFINDER_LOGGER_H
 
 #include <iostream>
+#include <unordered_map>
 #include <memory>
 
-#define PATHFINDER_LOG_TAG "Pathfinder"
+#define PATHFINDER_DEFAULT_LOG_TAG "Pathfinder Default Logger"
+
 #ifdef __ANDROID__
     #include <android/log.h>
 
-    #define PATHFINDER_LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, PATHFINDER_LOG_TAG, __VA_ARGS__)
-    #define PATHFINDER_LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, PATHFINDER_LOG_TAG, __VA_ARGS__)
-    #define PATHFINDER_LOGI(...) __android_log_print(ANDROID_LOG_INFO, PATHFINDER_LOG_TAG, __VA_ARGS__)
-    #define PATHFINDER_LOGW(...) __android_log_print(ANDROID_LOG_WARN, PATHFINDER_LOG_TAG, __VA_ARGS__)
-    #define PATHFINDER_LOGE(...) __android_log_print(ANDROID_LOG_ERROR, PATHFINDER_LOG_TAG, __VA_ARGS__)
+    #define PATHFINDER_LOGV(tag, ...) __android_log_print(ANDROID_LOG_VERBOSE, tag, __VA_ARGS__)
+    #define PATHFINDER_LOGD(tag, ...) __android_log_print(ANDROID_LOG_DEBUG, tag, __VA_ARGS__)
+    #define PATHFINDER_LOGI(tag, ...) __android_log_print(ANDROID_LOG_INFO, tag, __VA_ARGS__)
+    #define PATHFINDER_LOGW(tag, ...) __android_log_print(ANDROID_LOG_WARN, tag, __VA_ARGS__)
+    #define PATHFINDER_LOGE(tag, ...) __android_log_print(ANDROID_LOG_ERROR, tag, __VA_ARGS__)
 #else
     #include <cstdio>
 
@@ -21,25 +23,25 @@
     #define GREEN "\033[32m"
     #define YELLOW "\033[33m"
 
-    #define PATHFINDER_LOGV(...)            \
-        printf("<%s>", PATHFINDER_LOG_TAG); \
-        printf(__VA_ARGS__);                \
+    #define PATHFINDER_LOGV(tag, ...) \
+        printf("<%s>", tag);          \
+        printf(__VA_ARGS__);          \
         printf("\n")
-    #define PATHFINDER_LOGD(...)            \
-        printf("<%s>", PATHFINDER_LOG_TAG); \
-        printf(__VA_ARGS__);                \
+    #define PATHFINDER_LOGD(tag, ...) \
+        printf("<%s>", tag);          \
+        printf(__VA_ARGS__);          \
         printf("\n")
-    #define PATHFINDER_LOGI(...)            \
-        printf("<%s>", PATHFINDER_LOG_TAG); \
-        printf(__VA_ARGS__);                \
+    #define PATHFINDER_LOGI(tag, ...) \
+        printf("<%s>", tag);          \
+        printf(__VA_ARGS__);          \
         printf("\n")
-    #define PATHFINDER_LOGW(...)                   \
-        printf(YELLOW "<%s>", PATHFINDER_LOG_TAG); \
-        printf(__VA_ARGS__);                       \
+    #define PATHFINDER_LOGW(tag, ...) \
+        printf(YELLOW "<%s>", tag);   \
+        printf(__VA_ARGS__);          \
         printf("\n" RESET)
-    #define PATHFINDER_LOGE(...)                \
-        printf(RED "<%s>", PATHFINDER_LOG_TAG); \
-        printf(__VA_ARGS__);                    \
+    #define PATHFINDER_LOGE(tag, ...) \
+        printf(RED "<%s>", tag);      \
+        printf(__VA_ARGS__);          \
         printf("\n" RESET)
 #endif
 
@@ -53,45 +55,74 @@ public:
     }
 
     enum class Level {
-        Verbose,
+        Verbose = 0,
         Debug,
         Info,
         Warn,
         Error,
         Silence,
-    } level;
+    } default_level_;
 
-    static void set_level(Level _level) {
-        get_singleton()->level = _level;
+    std::unordered_map<std::string, Level> module_levels;
+
+    static void set_default_level(Level level) {
+        get_singleton()->default_level_ = level;
+    }
+
+    static void set_module_level(const std::string &module, Level level) {
+        if (module.empty()) {
+            return;
+        }
+        get_singleton()->module_levels[module] = level;
+    }
+
+    static Level get_module_level(const std::string &module) {
+        if (module.empty()) {
+            return get_singleton()->default_level_;
+        }
+        if (get_singleton()->module_levels.find(module) == get_singleton()->module_levels.end()) {
+            return get_singleton()->default_level_;
+        }
+        return get_singleton()->module_levels.at(module);
     }
 
     static void verbose(const std::string &label, const std::string &module = "") {
-        if (get_singleton()->level <= Level::Verbose) {
-            PATHFINDER_LOGV("[VERBOSE][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
+        auto level = get_module_level(module);
+        if (level <= Level::Verbose) {
+            auto tag = (module.empty() ? PATHFINDER_DEFAULT_LOG_TAG : module).c_str();
+            PATHFINDER_LOGV(tag, "[VERBOSE] %s", label.c_str());
         }
     }
 
     static void debug(const std::string &label, const std::string &module = "") {
-        if (get_singleton()->level <= Level::Debug) {
-            PATHFINDER_LOGD("[DEBUG][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
+        auto level = get_module_level(module);
+        if (level <= Level::Debug) {
+            auto tag = module.empty() ? PATHFINDER_DEFAULT_LOG_TAG : module.c_str();
+            PATHFINDER_LOGD(tag, "[DEBUG] %s", label.c_str());
         }
     }
 
     static void info(const std::string &label, const std::string &module = "") {
-        if (get_singleton()->level <= Level::Info) {
-            PATHFINDER_LOGI("[INFO][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
+        auto level = get_module_level(module);
+        if (level <= Level::Info) {
+            auto tag = module.empty() ? PATHFINDER_DEFAULT_LOG_TAG : module.c_str();
+            PATHFINDER_LOGI(tag, "[INFO] %s", label.c_str());
         }
     }
 
     static void warn(const std::string &label, const std::string &module = "") {
-        if (get_singleton()->level <= Level::Warn) {
-            PATHFINDER_LOGW("[WARN][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
+        auto level = get_module_level(module);
+        if (level <= Level::Warn) {
+            auto tag = module.empty() ? PATHFINDER_DEFAULT_LOG_TAG : module.c_str();
+            PATHFINDER_LOGI(tag, "[WARN] %s", label.c_str());
         }
     }
 
     static void error(const std::string &label, const std::string &module = "") {
-        if (get_singleton()->level <= Level::Error) {
-            PATHFINDER_LOGE("[ERROR][%s] %s", (module.empty() ? "default" : module).c_str(), label.c_str());
+        auto level = get_module_level(module);
+        if (level <= Level::Error) {
+            auto tag = module.empty() ? PATHFINDER_DEFAULT_LOG_TAG : module.c_str();
+            PATHFINDER_LOGI(tag, "[ERROR] %s", label.c_str());
         }
     }
 

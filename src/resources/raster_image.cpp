@@ -24,7 +24,7 @@ RasterImage::RasterImage(const std::string &path) : Image(path) {
     stbi_uc *pixels = stbi_load(path.c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
 
     if (!pixels) {
-        Logger::warn("Failed to load image file " + path, "Texture");
+        Logger::warn("Failed to load image file " + path, "Flint");
         throw std::runtime_error("Failed to load texture image!");
     }
 
