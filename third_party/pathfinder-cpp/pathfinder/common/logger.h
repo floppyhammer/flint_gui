@@ -61,7 +61,7 @@ public:
         Warn,
         Error,
         Silence,
-    } default_level_;
+    } default_level_ = Level::Warn;
 
     std::unordered_map<std::string, Level> module_levels;
 

@@ -10,8 +10,6 @@ void VectorServer::init(Pathfinder::Vec2I size,
                         const std::shared_ptr<Pathfinder::Device> &device,
                         const std::shared_ptr<Pathfinder::Queue> &queue,
                         Pathfinder::RenderLevel level) {
-    Logger::set_default_level(Logger::Level::Warn);
-
     canvas = std::make_shared<Pathfinder::Canvas>(size, device, queue, level);
 
     reset_render_layers();
