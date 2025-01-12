@@ -19,6 +19,14 @@ void VectorServer::cleanup() {
     canvas.reset();
 }
 
+void VectorServer::set_canvas_size(Vec2I new_size) {
+    for (uint8_t i = 0; i < MAX_RENDER_LAYER; i++) {
+        auto new_view_box = RectI({}, new_size).to_f32();
+        render_layers[i]->set_bounds(new_view_box);
+        render_layers[i]->set_view_box(new_view_box);
+    }
+}
+
 void VectorServer::set_dst_texture(const std::shared_ptr<Pathfinder::Texture> &texture) {
     canvas->set_dst_texture(texture);
 }

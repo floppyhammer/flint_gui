@@ -141,6 +141,7 @@ public:
     void when_cursor_entered();
 
     void when_cursor_exited();
+
     void connect_signal(const std::string &signal, const AnyCallable<void> &callback) override;
 
 protected:

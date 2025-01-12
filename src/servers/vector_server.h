@@ -35,6 +35,8 @@ public:
 
     void cleanup();
 
+    void set_canvas_size(Vec2I new_size);
+
     void submit_and_clear();
 
     void draw_line(Vec2F start, Vec2F end, float width, ColorU color);

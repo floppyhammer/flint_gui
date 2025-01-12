@@ -86,7 +86,7 @@ void App::main_loop() {
         if (primary_window_.lock()->get_resize_flag()) {
             vector_target_ = RenderServer::get_singleton()->device_->create_texture(
                 {primary_window_.lock()->get_physical_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
-            VectorServer::get_singleton()->get_canvas()->set_size(primary_window_.lock()->get_physical_size());
+            VectorServer::get_singleton()->set_canvas_size(primary_window_.lock()->get_physical_size());
         }
 
         // Engine processing.
