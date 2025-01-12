@@ -24,7 +24,7 @@ class MyNode : public Node {
         {
             auto button = std::make_shared<Button>();
             button->set_icon_normal(
-                ResourceManager::get_singleton()->load<VectorImage>("../assets/icons/Node_Button.svg"));
+                ResourceManager::get_singleton()->load<VectorImage>("assets/icons/Node_Button.svg"));
             button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
             vbox_container->add_child(button);
         }

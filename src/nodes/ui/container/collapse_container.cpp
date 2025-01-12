@@ -22,8 +22,8 @@ CollapseContainer::CollapseContainer() {
 
     collapse_button_ = std::make_shared<Button>();
     collapse_button_->set_custom_minimum_size({0, title_bar_height_});
-    // collapse_button_->set_icon_normal(std::make_shared<VectorImage>("../assets/icons/ArrowDown.svg"));
-    // collapse_button_->set_icon_pressed(std::make_shared<VectorImage>("../assets/icons/ArrowRight.svg"));
+    // collapse_button_->set_icon_normal(std::make_shared<VectorImage>("assets/icons/ArrowDown.svg"));
+    // collapse_button_->set_icon_pressed(std::make_shared<VectorImage>("assets/icons/ArrowRight.svg"));
     collapse_button_->set_text("Collapsing Container");
     collapse_button_->set_flat(true);
     collapse_button_->set_toggle_mode(true);

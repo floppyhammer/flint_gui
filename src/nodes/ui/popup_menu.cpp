@@ -18,7 +18,7 @@ MenuItem::MenuItem() {
     // icon->set_custom_minimum_size({24, 24});
     // icon->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
 
-    // auto img = std::make_shared<VectorImage>("../assets/icons/ArrowRight.svg");
+    // auto img = std::make_shared<VectorImage>("assets/icons/ArrowRight.svg");
     // icon->set_texture(img);
 
     container = std::make_shared<HBoxContainer>();

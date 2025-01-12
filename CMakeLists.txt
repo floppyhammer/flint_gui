@@ -28,6 +28,8 @@ add_library(flint_gui STATIC ${FLINT_GUI_SOURCE_FILES}
         src/resources/render_image.h
         src/servers/debug_server.h)
 
+file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
+
 # Has to be 17 or above.
 target_compile_features(flint_gui PUBLIC cxx_std_17)
 

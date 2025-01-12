@@ -86,8 +86,8 @@ TreeItem::TreeItem() {
     icon->set_custom_minimum_size({24, 24});
     icon->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
 
-    collapsed_tex = std::make_shared<VectorImage>("../assets/icons/ArrowRight.svg");
-    expanded_tex = std::make_shared<VectorImage>("../assets/icons/ArrowDown.svg");
+    collapsed_tex = std::make_shared<VectorImage>("assets/icons/ArrowRight.svg");
+    expanded_tex = std::make_shared<VectorImage>("assets/icons/ArrowDown.svg");
 
     collapse_button = std::make_shared<Button>();
     collapse_button->set_icon_normal(expanded_tex);

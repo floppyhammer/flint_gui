@@ -28,17 +28,17 @@ class MyNode : public Node {
             auto resource_mgr = ResourceManager::get_singleton();
 
             auto tree_root = tree->create_item(nullptr, "Node");
-            tree_root->set_icon(resource_mgr->load<VectorImage>("../assets/icons/Node_Node.svg"));
+            tree_root->set_icon(resource_mgr->load<VectorImage>("assets/icons/Node_Node.svg"));
             auto child_ui = tree->create_item(tree_root, "NodeUi");
-            child_ui->set_icon(resource_mgr->load<VectorImage>("../assets/icons/Node_Control.svg"));
+            child_ui->set_icon(resource_mgr->load<VectorImage>("assets/icons/Node_Control.svg"));
             auto child_label = tree->create_item(child_ui, "Label");
-            child_label->set_icon(resource_mgr->load<VectorImage>("../assets/icons/Node_Label.svg"));
+            child_label->set_icon(resource_mgr->load<VectorImage>("assets/icons/Node_Label.svg"));
             auto child_text_edit = tree->create_item(child_ui, "TextEdit");
-            child_text_edit->set_icon(resource_mgr->load<VectorImage>("../assets/icons/Node_LineEdit.svg"));
+            child_text_edit->set_icon(resource_mgr->load<VectorImage>("assets/icons/Node_LineEdit.svg"));
             auto child_node_2d = tree->create_item(tree_root, "Node2d");
-            child_node_2d->set_icon(resource_mgr->load<VectorImage>("../assets/icons/Node_Node2D.svg"));
+            child_node_2d->set_icon(resource_mgr->load<VectorImage>("assets/icons/Node_Node2D.svg"));
             auto child_node_3d = tree->create_item(tree_root, "Node3d");
-            child_node_3d->set_icon(resource_mgr->load<VectorImage>("../assets/icons/Node_Node3D.svg"));
+            child_node_3d->set_icon(resource_mgr->load<VectorImage>("assets/icons/Node_Node3D.svg"));
         }
     }
 };
