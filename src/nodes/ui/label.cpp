@@ -501,7 +501,7 @@ void Label::draw() {
 
     auto vector_server = VectorServer::get_singleton();
 
-    vector_server->draw_style_box(theme_background, global_position, size);
+    vector_server->draw_style_box(theme_background, global_position, size, alpha);
 
     auto translation = Transform2::from_translation(global_position + alignment_shift);
 
@@ -512,7 +512,7 @@ void Label::draw() {
     //        clip_box = {{}, calc_minimum_size()};
     //    }
 
-    vector_server->draw_glyphs(glyphs_, glyph_positions, text_style, translation, clip_box);
+    vector_server->draw_glyphs(glyphs_, glyph_positions, text_style, translation, clip_box, alpha);
 
     NodeUi::draw();
 }
