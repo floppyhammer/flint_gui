@@ -147,15 +147,17 @@ void ScrollContainer::draw_scroll_bar() {
 
     // Vertical.
     if (content_size.y > size.y) {
-        auto scroll_bar_pos = Vec2F(size.x - 8, 0) + global_pos;
-        auto scroll_bar_size = Vec2F(8, size.y);
+        float bar_width = 4.0;
+
+        auto scroll_bar_pos = Vec2F(size.x - bar_width, 0) + global_pos;
+        auto scroll_bar_size = Vec2F(bar_width, size.y);
 
         vector_server->draw_style_box(theme_scroll_bar, scroll_bar_pos, scroll_bar_size);
 
         auto grabber_length = size.y / content_size.y * size.y;
 
-        auto grabber_pos = Vec2F(size.x - 8, size.y / content_size.y * vscroll) + global_pos;
-        auto grabber_size = Vec2F(8, grabber_length);
+        auto grabber_pos = Vec2F(size.x - bar_width, size.y / content_size.y * vscroll) + global_pos;
+        auto grabber_size = Vec2F(bar_width, grabber_length);
 
         vector_server->draw_style_box(theme_scroll_grabber, grabber_pos, grabber_size);
     }
@@ -174,8 +176,6 @@ void ScrollContainer::draw_scroll_bar() {
 
         vector_server->draw_style_box(theme_scroll_grabber, grabber_pos, grabber_size);
     }
-
-    NodeUi::draw();
 }
 
 void ScrollContainer::set_hscroll(int32_t value) {
@@ -202,8 +202,17 @@ int32_t ScrollContainer::get_vscroll() const {
     return vscroll;
 }
 
+void ScrollContainer::set_size(Vec2F new_size) {
+    size = new_size;
+}
+
 void ScrollContainer::pre_draw_children() {
     if (!visible_) {
+        return;
+    }
+
+    if (get_size().is_any_zero()) {
+        visible_ = false;
         return;
     }
 
@@ -216,9 +225,7 @@ void ScrollContainer::pre_draw_children() {
     auto canvas = vector_server->get_canvas();
 
     // Use a RenderTarget to achieve content clip, instead of using clip path.
-    if (render_target_desc.size == Vec2I()) {
-        render_target_desc = {size.to_i32(), "ScrollContainer render target"};
-    }
+    Pathfinder::RenderTargetDesc render_target_desc = {size.to_i32(), "ScrollContainer render target"};
 
     // Draw all children onto the temporary render target.
     temp_draw_data.render_target_id = canvas->get_scene()->push_render_target(render_target_desc);

@@ -169,6 +169,10 @@ void Node::remove_child(size_t index) {
     children.erase(children.begin() + index);
 }
 
+void Node::remove_all_children() {
+    children.clear();
+}
+
 void Node::set_visibility(bool visible) {
     visible_ = visible;
 }

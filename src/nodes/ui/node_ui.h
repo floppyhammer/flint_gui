@@ -141,6 +141,7 @@ public:
     void when_cursor_entered();
 
     void when_cursor_exited();
+    void connect_signal(const std::string &signal, const AnyCallable<void> &callback) override;
 
 protected:
     Vec2F position{0};
@@ -185,7 +186,8 @@ protected:
 
     std::vector<AnyCallable<void>> callbacks_cursor_entered;
     std::vector<AnyCallable<void>> callbacks_cursor_exited;
-    std::vector<std::function<void(Vec2F size)>> callbacks_parent_size_changed;
+    std::vector<AnyCallable<void>> callbacks_focus_released;
+    std::vector<AnyCallable<void>> callbacks_parent_size_changed;
 };
 
 } // namespace Flint

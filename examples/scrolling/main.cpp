@@ -17,7 +17,6 @@ class MyNode : public Node {
         panel->add_child(scroll_container);
 
         auto vbox_container = std::make_shared<VBoxContainer>();
-        vbox_container->set_custom_minimum_size({400, 0});
         vbox_container->set_separation(8);
         scroll_container->add_child(vbox_container);
 

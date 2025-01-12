@@ -23,6 +23,8 @@ public:
 
     bool is_stopped() const;
 
+    void stop();
+
 protected:
     void emit_timeout();
 

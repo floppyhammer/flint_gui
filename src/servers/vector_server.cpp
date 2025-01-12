@@ -187,9 +187,6 @@ void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &positi
 
     auto dpi_scaling_xform = Pathfinder::Transform2::from_scale(Vec2F(global_scale_, global_scale_));
 
-    if (alpha < 1) {
-        int a = 1;
-    }
     auto transform = Pathfinder::Transform2::from_translation(position);
     canvas->set_transform(dpi_scaling_xform * global_transform_offset * transform);
 

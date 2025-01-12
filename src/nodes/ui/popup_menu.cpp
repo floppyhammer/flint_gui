@@ -3,87 +3,10 @@
 #include <string>
 
 #include "../../common/utils.h"
+#include "../../resources/default_resource.h"
 #include "../scene_tree.h"
 
 namespace Flint {
-
-MenuItem::MenuItem() {
-    label = std::make_shared<Label>();
-
-    label->container_sizing.expand_v = true;
-    label->container_sizing.flag_v = ContainerSizingFlag::Fill;
-    label->set_vertical_alignment(Alignment::Center);
-
-    icon = std::make_shared<TextureRect>();
-    // icon->set_custom_minimum_size({24, 24});
-    // icon->set_stretch_mode(TextureRect::StretchMode::KeepAspectCentered);
-
-    // auto img = std::make_shared<VectorImage>("assets/icons/ArrowRight.svg");
-    // icon->set_texture(img);
-
-    container = std::make_shared<HBoxContainer>();
-    container->set_separation(0);
-    container->add_child(icon);
-    container->add_child(label);
-
-    theme_hovered.bg_color = ColorU(100, 100, 100, 150);
-}
-
-void MenuItem::draw(Vec2F global_position) {
-    auto vector_server = VectorServer::get_singleton();
-
-    if (hovered) {
-        vector_server->draw_style_box(theme_hovered, global_position + position, container->get_size());
-    }
-
-    container->set_position(global_position + position);
-
-    draw_system(container.get());
-}
-
-void MenuItem::update(Vec2F global_position, Vec2F p_size) {
-    size = p_size;
-
-    container->calc_minimum_size_recursively();
-    size = size.max(container->get_effective_minimum_size());
-
-    container->set_position(global_position + position);
-    container->set_size(size);
-
-    transform_system(container.get());
-
-    std::vector<Node *> descendants;
-    dfs_preorder_ltr_traversal(container.get(), descendants);
-    for (auto &node : descendants) {
-        node->update(0);
-    }
-}
-
-void MenuItem::input(InputEvent &event, Vec2F global_position) {
-    float item_height = label->get_effective_minimum_size().y;
-    auto item_global_rect = (RectF(0, position.y, container->get_size().x, position.y + item_height) + global_position);
-
-    // if (event.type == InputEventType::MouseMotion) {
-    //     auto button_event = event.args.mouse_motion;
-    //
-    //     if (!event.is_consumed()) {
-    //         if (item_global_rect.contains_point(button_event.position)) {
-    //             hovered = true;
-    //             event.consume();
-    //         } else {
-    //             hovered = false;
-    //         }
-    //     }
-    // }
-}
-
-void MenuItem::set_text(const std::string &text) {
-    label->set_text(text);
-}
-
-void MenuItem::set_icon(const std::shared_ptr<Image> &texture) {
-    icon->set_texture(texture);
-}
 
 PopupMenu::PopupMenu() {
     type = NodeType::PopupMenu;
@@ -93,6 +16,24 @@ PopupMenu::PopupMenu() {
     panel.corner_radius = 8;
     panel.border_width = 2;
 
+    scroll_container_ = std::make_shared<ScrollContainer>();
+    scroll_container_->render_layer = 1;
+    scroll_container_->set_anchor_flag(AnchorFlag::FullRect);
+    add_embedded_child(scroll_container_);
+
+    margin_container_ = std::make_shared<MarginContainer>();
+    scroll_container_->add_child(margin_container_);
+    auto default_theme = DefaultResource::get_singleton()->get_default_theme();
+    theme_bg_ = std::make_optional(default_theme->panel.styles["background"]);
+
+    vbox_container_ = std::make_shared<VBoxContainer>();
+    margin_container_->add_child(vbox_container_);
+
+    auto callback = [this] {
+        set_visibility(false);
+    };
+    connect_signal("focus_released", callback);
+
     theme_bg_ = std::make_optional(panel);
 
     debug_size_box.border_color = ColorU(100, 40, 122, 255);
@@ -101,14 +42,14 @@ PopupMenu::PopupMenu() {
 void PopupMenu::update(double delta) {
     auto global_position = get_global_position();
 
-    float offset_y = 0;
-    for (auto &item : items_) {
-        item->position = {0, offset_y};
-        offset_y += item_height_;
-        item->update(global_position, {size.x, item_height_});
-    }
+    // float offset_y = 0;
+    // for (auto &item : items_) {
+    //     item->position = {0, offset_y};
+    //     offset_y += item_height_;
+    //     item->update(global_position, {size.x, item_height_});
+    // }
 
-    size = size.max(calculated_minimum_size.max(Vec2F{0, offset_y}));
+    size = size.max(calculated_minimum_size);
 
     NodeUi::update(delta);
 }
@@ -123,13 +64,15 @@ void PopupMenu::draw() {
     NodeUi::draw();
 
     if (theme_bg_.has_value()) {
+        vector_server->set_render_layer(render_layer);
         vector_server->draw_style_box(theme_bg_.value(), get_global_position(), size);
+        vector_server->set_render_layer(0);
     }
 
-    auto global_position = get_global_position();
-    for (auto &item : items_) {
-        item->draw(global_position);
-    }
+    // auto global_position = get_global_position();
+    // for (auto &item : items_) {
+    //     item->draw(global_position);
+    // }
 }
 
 void PopupMenu::input(InputEvent &event) {
@@ -137,102 +80,116 @@ void PopupMenu::input(InputEvent &event) {
         return;
     }
 
-    auto global_position = get_global_position();
-
-    // If a popup menu is shown, it captures mouse events anyway.
-    bool consume_flag = true;
-
-    if (event.type == InputEventType::MouseMotion) {
-        auto args = event.args.mouse_motion;
-        auto local_mouse_position = args.position - global_position;
-
-        for (auto &item : items_) {
-            item->hovered = false;
-        }
-
-        if (RectF(global_position, global_position + size).contains_point(args.position)) {
-            consume_flag = true;
-
-            if (items_.empty()) {
-                return;
-            }
-            int item_index = int(local_mouse_position.y / item_height_);
-            item_index = std::clamp(item_index, 0, (int)items_.size() - 1);
-            items_[item_index]->hovered = true;
-        }
-    }
-
-    if (event.type == InputEventType::MouseButton) {
-        auto args = event.args.mouse_button;
-
-        // Hide menu.
-        if (RectF(global_position, global_position + size).contains_point(args.position)) {
-            consume_flag = true;
-            set_visibility(false);
-
-            if (items_.empty()) {
-                return;
-            }
-            int item_index = int(local_mouse_position.y / item_height_);
-            item_index = std::clamp(item_index, 0, (int)items_.size() - 1);
-
-            when_item_selected(item_index);
-        } else {
-            consume_flag = true;
-            set_visibility(false);
-        }
-    }
-
-    for (auto &item : items_) {
-        item->input(event, global_position);
-    }
-
-    event.consume();
+    // auto global_position = get_global_position();
+    //
+    // // If a popup menu is shown, it captures mouse events anyway.
+    // bool consume_flag = true;
+    //
+    // if (event.type == InputEventType::MouseMotion) {
+    //     auto args = event.args.mouse_motion;
+    //     auto local_mouse_position = args.position - global_position;
+    //
+    //     for (auto &item : items_) {
+    //         item->hovered = false;
+    //     }
+    //
+    //     if (RectF(global_position, global_position + size).contains_point(args.position)) {
+    //         consume_flag = true;
+    //
+    //         if (items_.empty()) {
+    //             return;
+    //         }
+    //         int item_index = int(local_mouse_position.y / item_height_);
+    //         item_index = std::clamp(item_index, 0, (int)items_.size() - 1);
+    //         items_[item_index]->hovered = true;
+    //     }
+    // }
+    //
+    // if (event.type == InputEventType::MouseButton) {
+    //     auto args = event.args.mouse_button;
+    //
+    //     // Hide menu.
+    //     if (RectF(global_position, global_position + size).contains_point(args.position)) {
+    //         consume_flag = true;
+    //         set_visibility(false);
+    //
+    //         if (items_.empty()) {
+    //             return;
+    //         }
+    //         int item_index = int(local_mouse_position.y / item_height_);
+    //         item_index = std::clamp(item_index, 0, (int)items_.size() - 1);
+    //
+    //         when_item_selected(item_index);
+    //     } else {
+    //         consume_flag = true;
+    //         set_visibility(false);
+    //     }
+    // }
+    //
+    // for (auto &item : items_) {
+    //     item->input(event, global_position);
+    // }
+    //
+    // event.consume();
 
     NodeUi::input(event);
 }
 
 void PopupMenu::set_visibility(bool visible) {
     visible_ = visible;
-    if (!visible_) {
+    if (visible_) {
+        // TODO: we should not do this manually in here.
+        margin_container_->calc_minimum_size_recursively();
+
+        float menu_width = std::max(size.x, margin_container_->get_effective_minimum_size().x);
+        float menu_height = std::min(margin_container_->get_effective_minimum_size().y,
+                                     get_window()->get_logical_size().y - position.y);
+        set_size({menu_width, menu_height});
+    } else {
         when_popup_hide();
     }
 }
 
 void PopupMenu::clear_items() {
+    vbox_container_->remove_all_children();
     items_.clear();
 }
 
 void PopupMenu::calc_minimum_size() {
-    Vec2F min_size = {};
-
-    // Label has a minimal height even when the text is empty.
-    min_size.y = item_height_ * items_.size();
-
-    for (auto &item : items_) {
-        min_size.x = std::max(min_size.x, item->size.x);
-    }
-
-    calculated_minimum_size = min_size;
+    calculated_minimum_size = {};
 }
 
-std::shared_ptr<MenuItem> PopupMenu::create_item(const std::string &text) {
-    auto new_item = std::make_shared<MenuItem>();
+void PopupMenu::create_item(const std::string &text) {
+    auto new_item = std::make_shared<Button>();
     new_item->set_text(text);
+    vbox_container_->add_child(new_item);
+
+    int item_index = vbox_container_->get_children().size() - 1;
+
+    auto callback = [item_index, this] {
+        set_visibility(false);
+        when_item_selected(item_index);
+    };
+    new_item->connect_signal("pressed", callback);
+
     items_.push_back(new_item);
-    return new_item;
 }
 
 void PopupMenu::set_item_height(float new_item_height) {
     item_height_ = new_item_height;
+    // TODO
 }
 
 float PopupMenu::get_item_height() const {
     return item_height_;
 }
 
+int PopupMenu::get_item_count() const {
+    return items_.size();
+}
+
 std::string PopupMenu::get_item_text(uint32_t item_index) const {
-    return items_[item_index]->label->get_text();
+    return items_[item_index]->get_text();
 }
 
 void PopupMenu::connect_signal(const std::string &signal, const AnyCallable<void> &callback) {

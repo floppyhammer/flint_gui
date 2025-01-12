@@ -44,6 +44,11 @@ bool Timer::is_stopped() const {
     return is_stopped_;
 }
 
+void Timer::stop() {
+    remaining_time_ = 0;
+    is_stopped_ = true;
+}
+
 void Timer::emit_timeout() {
     for (auto& c : timeout_callbacks) {
         c();

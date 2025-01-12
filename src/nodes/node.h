@@ -114,6 +114,8 @@ public:
 
     void remove_child(size_t index);
 
+    void remove_all_children();
+
     virtual bool is_ui_node() const {
         return false;
     }

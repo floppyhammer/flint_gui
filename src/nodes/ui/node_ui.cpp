@@ -47,6 +47,7 @@ Vec2F NodeUi::get_effective_minimum_size() const {
 }
 
 void NodeUi::draw() {
+    Node::draw();
 #ifdef FLINT_GUI_VISUAL_DEBUG
     if (size.x > 0 && size.y > 0) {
         auto vector_server = VectorServer::get_singleton();
@@ -167,6 +168,14 @@ void NodeUi::grab_focus() {
 }
 
 void NodeUi::release_focus() {
+    for (auto &callback : callbacks_focus_released) {
+        try {
+            callback();
+        } catch (std::bad_any_cast &) {
+            Logger::error("Mismatched signal argument types!");
+        }
+    }
+
     focused = false;
 }
 
@@ -329,6 +338,14 @@ void NodeUi::when_parent_size_changed(Vec2F new_size) {
             auto cast_child = dynamic_cast<NodeUi *>(child.get());
             cast_child->when_parent_size_changed(size);
         }
+    }
+}
+
+void NodeUi::connect_signal(const std::string &signal, const AnyCallable<void> &callback) {
+    Node::connect_signal(signal, callback);
+
+    if (signal == "focus_released") {
+        callbacks_focus_released.push_back(callback);
     }
 }
 

@@ -34,6 +34,8 @@ public:
         return true;
     }
 
+    void set_size(Vec2F new_size) override;
+
 protected:
     bool hscroll_enabled = true;
     bool vscroll_enabled = true;
@@ -43,8 +45,6 @@ protected:
     float vscroll = 0;
 
     float scroll_speed = 15.0;
-
-    Pathfinder::RenderTargetDesc render_target_desc;
 
     StyleBox theme_scroll_bar;
     StyleBox theme_scroll_grabber;

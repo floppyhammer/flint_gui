@@ -26,8 +26,6 @@ public:
 protected:
     int32_t selected_item_index = -1;
 
-    std::shared_ptr<ScrollContainer> menu_container_;
-
     std::shared_ptr<PopupMenu> menu;
 
     std::vector<AnyCallable<void>> selected_callbacks;

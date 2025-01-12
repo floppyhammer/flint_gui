@@ -16,7 +16,7 @@ public:
         // add_child(std::make_shared<Label>());
 
         auto menu = std::make_shared<PopupMenu>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 20; i++) {
             menu->create_item("Item " + std::to_string(i));
         }
         menu->set_position({400, 400});
@@ -44,7 +44,15 @@ public:
 int main() {
     App app({640, 480});
 
-    app.get_tree()->replace_root(std::make_shared<MyNodeUi>());
+    // Menu of a menu button.
+    auto menu_button = std::make_shared<MenuButton>();
+    menu_button->get_popup_menu().lock()->create_item("Item 1");
+    menu_button->get_popup_menu().lock()->create_item("Item 2");
+    menu_button->get_popup_menu().lock()->create_item("Item 3");
+    app.get_tree()->get_root()->add_child(menu_button);
+
+    // Free menu.
+    app.get_tree()->get_root()->add_child(std::make_shared<MyNodeUi>());
 
     app.main_loop();
 
