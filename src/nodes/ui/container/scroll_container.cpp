@@ -118,7 +118,7 @@ void ScrollContainer::update(double dt) {
     if (max_child_min_size.y > size.y) {
         vscroll = std::min(vscroll, max_child_min_size.y - size.y);
     } else {
-        hscroll = 0;
+        vscroll = 0;
     }
 
     // Scroll container can only have one effective control child.
