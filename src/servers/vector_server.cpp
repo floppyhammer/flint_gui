@@ -1,4 +1,5 @@
 #include "vector_server.h"
+
 #include "debug_server.h"
 
 namespace Flint {
@@ -171,7 +172,7 @@ void VectorServer::draw_render_image(RenderImage &render_image, Transform2 trans
     canvas->restore_state();
 }
 
-void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size) {
+void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size, float alpha) {
     auto path = Pathfinder::Path2d();
     if (style_box.corner_radii.has_value()) {
         path.add_rect_with_corners({{}, size}, style_box.corner_radii.value());
@@ -189,11 +190,11 @@ void VectorServer::draw_style_box(const StyleBox &style_box, const Vec2F &positi
     auto transform = Pathfinder::Transform2::from_translation(position);
     canvas->set_transform(dpi_scaling_xform * global_transform_offset * transform);
 
-    canvas->set_fill_paint(Pathfinder::Paint::from_color(style_box.bg_color));
+    canvas->set_fill_paint(Pathfinder::Paint::from_color(style_box.bg_color.apply_alpha(alpha)));
     canvas->fill_path(path, Pathfinder::FillRule::Winding);
 
     if (style_box.border_width > 0) {
-        canvas->set_stroke_paint(Pathfinder::Paint::from_color(style_box.border_color));
+        canvas->set_stroke_paint(Pathfinder::Paint::from_color(style_box.border_color.apply_alpha(alpha)));
         canvas->set_line_width(style_box.border_width);
         canvas->stroke_path(path);
     }
@@ -221,11 +222,15 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
                                std::vector<Vec2F> &glyph_positions,
                                TextStyle text_style,
                                const Transform2 &transform,
-                               const RectF &clip_box) {
+                               const RectF &clip_box,
+                               float alpha) {
     if (glyphs.size() != glyph_positions.size()) {
         Logger::error("Glyph count mismatches glyph position count!", "VectorServer");
         return;
     }
+
+    text_style.color = text_style.color.apply_alpha(alpha);
+    text_style.stroke_color = text_style.stroke_color.apply_alpha(alpha);
 
     canvas->save_state();
 

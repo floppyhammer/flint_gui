@@ -19,12 +19,14 @@ public:
 
     void connect_signal(const std::string& signal, const AnyCallable<void>& callback) override;
 
-    float get_remaing_time() const;
+    float get_remaining_time() const;
+
+    bool is_stopped() const;
 
 protected:
     void emit_timeout();
 
-    bool is_timer_stopped = true;
+    bool is_stopped_ = true;
     double remaining_time_ = 0;
     std::vector<AnyCallable<void>> timeout_callbacks;
 };

@@ -100,7 +100,6 @@ public:
         multi_line_ = enabled;
     }
 
-public:
     StyleBox theme_background;
 
 private:

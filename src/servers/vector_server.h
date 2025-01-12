@@ -53,7 +53,7 @@ public:
 
     std::shared_ptr<Pathfinder::Texture> get_texture_by_render_target_id(Pathfinder::RenderTargetId id);
 
-    void draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size);
+    void draw_style_box(const StyleBox &style_box, const Vec2F &position, const Vec2F &size, float alpha = 1.0f);
 
     void draw_style_line(const StyleLine &style_line, const Vec2F &start, const Vec2F &end);
 
@@ -68,7 +68,8 @@ public:
                      std::vector<Vec2F> &glyph_positions,
                      TextStyle text_style,
                      const Transform2 &transform,
-                     const RectF &clip_box);
+                     const RectF &clip_box,
+                     float alpha = 1.0f);
 
     std::shared_ptr<Pathfinder::SvgScene> load_svg(const std::string &path);
 

@@ -176,6 +176,8 @@ protected:
 
     void cursor_exited();
 
+    float alpha = 1.0;
+
     /// Visualize the node's size.
     StyleBox debug_size_box;
 

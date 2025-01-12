@@ -11,18 +11,18 @@ void Timer::start_timer(float time) {
         return;
     }
     remaining_time_ = time;
-    is_timer_stopped = false;
+    is_stopped_ = false;
 }
 
 void Timer::update(double dt) {
     Node::update(dt);
 
-    if (!is_timer_stopped && remaining_time_ > 0) {
+    if (!is_stopped_ && remaining_time_ > 0) {
         remaining_time_ -= dt;
     }
 
-    if (!is_timer_stopped && remaining_time_ <= 0) {
-        is_timer_stopped = true;
+    if (!is_stopped_ && remaining_time_ <= 0) {
+        is_stopped_ = true;
         remaining_time_ = 0;
         emit_timeout();
     }
@@ -36,8 +36,12 @@ void Timer::connect_signal(const std::string& signal, const AnyCallable<void>& c
     }
 }
 
-float Timer::get_remaing_time() const {
+float Timer::get_remaining_time() const {
     return remaining_time_;
+}
+
+bool Timer::is_stopped() const {
+    return is_stopped_;
 }
 
 void Timer::emit_timeout() {

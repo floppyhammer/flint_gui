@@ -1,6 +1,7 @@
 #ifndef PATHFINDER_COLOR_H
 #define PATHFINDER_COLOR_H
 
+#include <algorithm>
 #include <cstdint>
 
 #include "color.h"
@@ -42,6 +43,11 @@ struct ColorF {
     ColorF operator*(ColorF other) const {
         return {r_ * other.r_, g_ * other.g_, b_ * other.b_, a_ * other.a_};
     }
+
+    ColorF operator*(float alpha) const {
+        alpha = std::clamp(alpha, 0.0f, 1.0f);
+        return {r_ * alpha, g_ * alpha, b_ * alpha, a_ * alpha};
+    }
 };
 
 /// Color(0~255, 0~255, 0~255, 0~255).
@@ -64,6 +70,10 @@ struct ColorU {
     uint32_t to_u32() const;
 
     ColorF to_f32() const;
+
+    ColorU apply_alpha(float alpha) const {
+        return ColorU(to_f32() * alpha);
+    }
 
     /// Check for transparency.
     bool is_opaque() const;
