@@ -1,51 +1,64 @@
 #ifndef PATHFINDER_LOGGER_H
 #define PATHFINDER_LOGGER_H
 
+#include <format>
 #include <iostream>
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
 
 #define PATHFINDER_DEFAULT_LOG_TAG "Pathfinder Default Logger"
 
-#ifdef __ANDROID__
-    #include <android/log.h>
-
-    #define PATHFINDER_LOGV(tag, ...) __android_log_print(ANDROID_LOG_VERBOSE, tag, __VA_ARGS__)
-    #define PATHFINDER_LOGD(tag, ...) __android_log_print(ANDROID_LOG_DEBUG, tag, __VA_ARGS__)
-    #define PATHFINDER_LOGI(tag, ...) __android_log_print(ANDROID_LOG_INFO, tag, __VA_ARGS__)
-    #define PATHFINDER_LOGW(tag, ...) __android_log_print(ANDROID_LOG_WARN, tag, __VA_ARGS__)
-    #define PATHFINDER_LOGE(tag, ...) __android_log_print(ANDROID_LOG_ERROR, tag, __VA_ARGS__)
-#else
-    #include <cstdio>
-
-    #define RESET "\033[0m"
-    #define RED "\033[31m"
-    #define GREEN "\033[32m"
-    #define YELLOW "\033[33m"
-
-    #define PATHFINDER_LOGV(tag, ...) \
-        printf("<%s>", tag);          \
-        printf(__VA_ARGS__);          \
-        printf("\n")
-    #define PATHFINDER_LOGD(tag, ...) \
-        printf("<%s>", tag);          \
-        printf(__VA_ARGS__);          \
-        printf("\n")
-    #define PATHFINDER_LOGI(tag, ...) \
-        printf("<%s>", tag);          \
-        printf(__VA_ARGS__);          \
-        printf("\n")
-    #define PATHFINDER_LOGW(tag, ...) \
-        printf(YELLOW "<%s>", tag);   \
-        printf(__VA_ARGS__);          \
-        printf("\n" RESET)
-    #define PATHFINDER_LOGE(tag, ...) \
-        printf(RED "<%s>", tag);      \
-        printf(__VA_ARGS__);          \
-        printf("\n" RESET)
-#endif
-
 namespace Pathfinder {
+
+template <class... Args>
+decltype(auto) LOGV(std::string tag, const std::string_view message, Args... format_items) {
+    std::string output = std::vformat(message, std::make_format_args(format_items...));
+#ifdef __ANDROID__
+    __android_log_write(ANDROID_LOG_VERBOSE, tag, output.c_str());
+#else
+    std::cout << std::format("<{}>", tag) << output << std::endl;
+#endif
+}
+
+template <class... Args>
+decltype(auto) LOGD(std::string tag, const std::string_view message, Args... format_items) {
+    std::string output = std::vformat(message, std::make_format_args(format_items...));
+#ifdef __ANDROID__
+    __android_log_write(ANDROID_LOG_DEBUG, tag, output.c_str());
+#else
+    std::cout << std::format("<{}>", tag) << output << std::endl;
+#endif
+}
+
+template <class... Args>
+decltype(auto) LOGI(std::string tag, const std::string_view message, Args... format_items) {
+    std::string output = std::vformat(message, std::make_format_args(format_items...));
+#ifdef __ANDROID__
+    __android_log_write(ANDROID_LOG_INFO, tag, output.c_str());
+#else
+    std::cout << std::format("<{}>", tag) << output << std::endl;
+#endif
+}
+
+template <class... Args>
+decltype(auto) LOGW(std::string tag, const std::string_view message, Args... format_items) {
+    std::string output = std::vformat(message, std::make_format_args(format_items...));
+#ifdef __ANDROID__
+    __android_log_write(ANDROID_LOG_WARN, tag, output.c_str());
+#else
+    std::cout << std::format("<{}>", tag) << output << std::endl;
+#endif
+}
+
+template <class... Args>
+decltype(auto) LOGE(std::string tag, const std::string_view message, Args... format_items) {
+    std::string output = std::vformat(message, std::make_format_args(format_items...));
+#ifdef __ANDROID__
+    __android_log_write(ANDROID_LOG_WARN, tag, output.c_str());
+#else
+    std::cerr << std::format("<{}>", tag) << output << std::endl;
+#endif
+}
 
 class Logger {
 public:
@@ -90,7 +103,7 @@ public:
         auto level = get_module_level(module);
         if (level <= Level::Verbose) {
             auto tag = (module.empty() ? PATHFINDER_DEFAULT_LOG_TAG : module).c_str();
-            PATHFINDER_LOGV(tag, "[VERBOSE] %s", label.c_str());
+            LOGV(tag, "[VERBOSE] {%s}{}", label.c_str());
         }
     }
 
@@ -98,7 +111,7 @@ public:
         auto level = get_module_level(module);
         if (level <= Level::Debug) {
             auto tag = module.empty() ? PATHFINDER_DEFAULT_LOG_TAG : module.c_str();
-            PATHFINDER_LOGD(tag, "[DEBUG] %s", label.c_str());
+            LOGD(tag, "[DEBUG] {}", label.c_str());
         }
     }
 
@@ -106,7 +119,7 @@ public:
         auto level = get_module_level(module);
         if (level <= Level::Info) {
             auto tag = module.empty() ? PATHFINDER_DEFAULT_LOG_TAG : module.c_str();
-            PATHFINDER_LOGI(tag, "[INFO] %s", label.c_str());
+            LOGI(tag, "[INFO] {}", label.c_str());
         }
     }
 
@@ -114,7 +127,7 @@ public:
         auto level = get_module_level(module);
         if (level <= Level::Warn) {
             auto tag = module.empty() ? PATHFINDER_DEFAULT_LOG_TAG : module.c_str();
-            PATHFINDER_LOGI(tag, "[WARN] %s", label.c_str());
+            LOGI(tag, "[WARN] {}", label.c_str());
         }
     }
 
@@ -122,7 +135,7 @@ public:
         auto level = get_module_level(module);
         if (level <= Level::Error) {
             auto tag = module.empty() ? PATHFINDER_DEFAULT_LOG_TAG : module.c_str();
-            PATHFINDER_LOGI(tag, "[ERROR] %s", label.c_str());
+            LOGE(tag, "[ERROR] {}", label.c_str());
         }
     }
 

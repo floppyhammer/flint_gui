@@ -49,13 +49,13 @@ void MenuButton::select_item(uint32_t item_index) {
 }
 
 std::string MenuButton::get_selected_item_text() const {
-    if (selected_item_index > -1) {
-        return menu->get_item_text(selected_item_index);
+    if (selected_item_index.has_value()) {
+        return menu->get_item_text(selected_item_index.value());
     }
     return "";
 }
 
-uint32_t MenuButton::get_selected_item_index() const {
+std::optional<uint32_t> MenuButton::get_selected_item_index() const {
     return selected_item_index;
 }
 

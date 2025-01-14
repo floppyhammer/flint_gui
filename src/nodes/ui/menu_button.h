@@ -19,12 +19,12 @@ public:
     /// Manually select an item.
     void select_item(uint32_t item_index);
 
-    uint32_t get_selected_item_index() const;
+    std::optional<uint32_t> get_selected_item_index() const;
 
     std::string get_selected_item_text() const;
 
 protected:
-    int32_t selected_item_index = -1;
+    std::optional<uint32_t> selected_item_index;
 
     std::shared_ptr<PopupMenu> menu;
 
