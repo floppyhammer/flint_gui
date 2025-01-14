@@ -6,6 +6,10 @@
 #include <memory>
 #include <unordered_map>
 
+#ifdef __ANDROID__
+    #include <android/log.h>
+#endif
+
 #define PATHFINDER_DEFAULT_LOG_TAG "Pathfinder Default Logger"
 
 namespace Pathfinder {
