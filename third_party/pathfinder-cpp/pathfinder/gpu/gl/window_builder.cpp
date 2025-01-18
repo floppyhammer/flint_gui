@@ -27,11 +27,11 @@ bool is_extension_supported(const char *name) {
     return false;
 }
 
-std::shared_ptr<WindowBuilder> WindowBuilder::new_impl(const Vec2I &size) {
-    return std::make_shared<WindowBuilderGl>(size);
+std::shared_ptr<WindowBuilder> WindowBuilder::new_impl(const Vec2I &size, bool fullscreen) {
+    return std::make_shared<WindowBuilderGl>(size, fullscreen);
 }
 
-WindowBuilderGl::WindowBuilderGl(const Vec2I &size) {
+WindowBuilderGl::WindowBuilderGl(const Vec2I &size, bool fullscreen) {
 #ifndef __ANDROID__
     glfwInit();
 
@@ -52,9 +52,17 @@ WindowBuilderGl::WindowBuilderGl(const Vec2I &size) {
     #endif
 
     float dpi_scaling_factor;
-    auto glfw_window = glfw_window_init(size, PRIMARY_WINDOW_TITLE, dpi_scaling_factor);
+    auto glfw_window = glfw_window_init(size, PRIMARY_WINDOW_TITLE, dpi_scaling_factor, false, nullptr);
+
     primary_window_ = std::make_shared<WindowGl>(size, glfw_window);
     primary_window_->set_dpi_scaling_factor(dpi_scaling_factor);
+
+    // Set user data.
+    primary_window_->window_index = 0;
+
+    std::ostringstream ss;
+    ss << "Window created:\n  Size: " << size << "\n  DPI Scaling: " << dpi_scaling_factor;
+    Logger::info(ss.str());
 
     // Have to make the window context current before calling gladLoadGL().
     glfwMakeContextCurrent(glfw_window);
@@ -88,10 +96,8 @@ WindowBuilderGl::WindowBuilderGl(const Vec2I &size) {
 WindowBuilderGl::~WindowBuilderGl() {
     // Destroy windows.
     for (auto &w : sub_windows_) {
-        if (!w.expired()) {
-            // We need to destroy a window explicitly in case its smart pointer is held elsewhere.
-            w.lock()->destroy();
-        }
+        // We need to destroy a window explicitly in case its smart pointer is held elsewhere.
+        w->destroy();
     }
     sub_windows_.clear();
 
@@ -104,21 +110,29 @@ WindowBuilderGl::~WindowBuilderGl() {
 #endif
 }
 
-std::shared_ptr<Window> WindowBuilderGl::create_window(const Vec2I &size, const std::string &title) {
+void WindowBuilderGl::create_primary_window(const Vec2I &size, const std::string &title) {
+
+}
+
+uint8_t WindowBuilderGl::create_window(const Vec2I &size, const std::string &title) {
 #ifndef __ANDROID__
     auto window_gl = (WindowGl *)primary_window_.get();
 
     float dpi_scaling_factor;
-    auto glfw_window = glfw_window_init(size, title, dpi_scaling_factor, (GLFWwindow *)window_gl->get_glfw_handle());
+    auto glfw_window =
+        glfw_window_init(size, title, dpi_scaling_factor, false, (GLFWwindow *)window_gl->get_glfw_handle());
 
     auto new_window = std::make_shared<WindowGl>(size, glfw_window);
     new_window->set_dpi_scaling_factor(dpi_scaling_factor);
 
     sub_windows_.push_back(new_window);
 
-    return new_window;
+    // Set user data.
+    new_window->window_index = sub_windows_.size();
+
+    return sub_windows_.size();
 #else
-    return nullptr;
+    return 0;
 #endif
 }
 

@@ -75,7 +75,7 @@ void input_system(Node* root, std::vector<InputEvent>& input_queue) {
         }
 
         for (auto& event : input_queue) {
-            if (event.window != w->get_raw_window()->get_glfw_handle()) {
+            if (event.window_index != w->get_window_index()) {
                 continue;
             }
 
@@ -177,7 +177,7 @@ void draw_system(Node* root) {
     }
 
     VectorServer::get_singleton()->set_global_scale(
-        RenderServer::get_singleton()->window_builder_->get_primary_window()->get_dpi_scaling_factor());
+        RenderServer::get_singleton()->window_builder_->get_window(0).lock()->get_dpi_scaling_factor());
     propagate_draw(root);
 }
 
@@ -199,9 +199,9 @@ void SceneTree::process(double dt) {
         return;
     }
 
-    if (primary_window.lock() && old_primary_window_size != primary_window.lock()->get_logical_size()) {
-        old_primary_window_size = primary_window.lock()->get_logical_size();
-        when_primary_window_size_changed(old_primary_window_size);
+    if (get_primary_window().lock()->get_resize_flag()) {
+        Logger::info("Notify window resizing", "Flint");
+        notify_primary_window_size_changed(get_primary_window().lock()->get_logical_size());
     }
 
     // Get ready from-back-to-front.
@@ -237,7 +237,7 @@ void SceneTree::process(double dt) {
     draw_system(root.get());
 }
 
-void SceneTree::when_primary_window_size_changed(Vec2I new_size) const {
+void SceneTree::notify_primary_window_size_changed(Vec2I new_size) const {
     root->when_parent_size_changed(new_size.to_f32());
 }
 
@@ -261,6 +261,10 @@ void SceneTree::quit() {
 
 bool SceneTree::has_quited() const {
     return quited;
+}
+
+std::weak_ptr<Pathfinder::Window> SceneTree::get_primary_window() const {
+    return RenderServer::get_singleton()->window_builder_->get_window(0);
 }
 
 } // namespace Flint

@@ -15,7 +15,7 @@ static const char *PRIMARY_WINDOW_TITLE = "Primary Window";
 /// Window management.
 class WindowBuilder {
 public:
-    static std::shared_ptr<WindowBuilder> new_impl(const Vec2I &size);
+    static std::shared_ptr<WindowBuilder> new_impl(const Vec2I &size, bool fullscreen);
 
     virtual ~WindowBuilder() = default;
 
@@ -24,10 +24,14 @@ public:
     virtual void stop_and_destroy_swapchains() {
     }
 
-    /// Create a new sub-window.
-    virtual std::shared_ptr<Window> create_window(const Vec2I &size, const std::string &title) = 0;
+    virtual void create_primary_window(const Vec2I &size, const std::string &title) = 0;
 
-    std::shared_ptr<Window> get_primary_window() const;
+    /// Create a new sub-window.
+    virtual uint8_t create_window(const Vec2I &size, const std::string &title) = 0;
+
+    [[nodiscard]] std::weak_ptr<Window> get_window(uint8_t window_index) const;
+
+    float get_dpi_scaling_factor(uint8_t window_index) const;
 
     virtual std::shared_ptr<Device> request_device() = 0;
 
@@ -35,16 +39,26 @@ public:
 
     void poll_events();
 
+    void set_fullscreen(bool fullscreen);
+
 protected:
 #ifndef __ANDROID__
     static GLFWwindow *glfw_window_init(const Vec2I &logical_size,
                                         const std::string &title,
                                         float &dpi_scaling_factor,
-                                        GLFWwindow *shared_window = nullptr);
+                                        bool fullscreen,
+                                        GLFWwindow *shared_window);
 #endif
 
     std::shared_ptr<Window> primary_window_;
-    std::vector<std::weak_ptr<Window>> sub_windows_;
+    std::vector<std::shared_ptr<Window>> sub_windows_;
+
+    bool primary_window_fullscreen_ = false;
+
+    // Size before going fullscreen or being minimized.
+    Vec2I reserved_window_logical_size_;
+
+    Vec2I reserved_window_position_;
 };
 
 } // namespace Pathfinder

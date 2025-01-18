@@ -40,10 +40,10 @@ TextEdit::TextEdit() {
     set_text("Enter text");
 
     callbacks_cursor_entered.emplace_back(
-        [this] { InputServer::get_singleton()->set_cursor(this->get_window(), CursorShape::IBeam); });
+        [this] { InputServer::get_singleton()->set_cursor(get_window_index(), CursorShape::IBeam); });
 
     callbacks_cursor_exited.emplace_back(
-        [this] { InputServer::get_singleton()->set_cursor(this->get_window(), CursorShape::Arrow); });
+        [this] { InputServer::get_singleton()->set_cursor(get_window_index(), CursorShape::Arrow); });
 }
 
 void TextEdit::set_text(const std::string &new_text) {
@@ -56,8 +56,6 @@ std::string TextEdit::get_text() const {
 
 void TextEdit::input(InputEvent &event) {
     auto input_server = InputServer::get_singleton();
-
-    auto window = get_window();
 
     // Handle mouse input propagation.
     bool consume_flag = false;
@@ -188,14 +186,14 @@ void TextEdit::input(InputEvent &event) {
                     auto start_index = std::min(selection_start_index, current_caret_index);
                     auto count = std::abs((int)selection_start_index - (int)current_caret_index);
                     std::string selected_text = label->get_sub_text(start_index, count);
-                    input_server->set_clipboard(get_window(), selected_text.c_str());
+                    input_server->set_clipboard(get_window_index(), selected_text.c_str());
                 }
 
                 if (key_args.key == KeyCode::V && input_server->is_key_pressed(KeyCode::LeftControl)) {
                     if (selection_start_index != current_caret_index) {
                         delete_selection();
                     }
-                    auto clipboard_text = input_server->get_clipboard(get_window());
+                    auto clipboard_text = input_server->get_clipboard(get_window_index());
                     std::u32string clipboard_text_u32;
                     utf8_to_utf16(clipboard_text, clipboard_text_u32);
                     label->insert_text(current_caret_index, clipboard_text);
@@ -207,7 +205,7 @@ void TextEdit::input(InputEvent &event) {
                     auto start_index = std::min(selection_start_index, current_caret_index);
                     auto count = std::abs((int)selection_start_index - (int)current_caret_index);
                     std::string selected_text = label->get_sub_text(start_index, count);
-                    input_server->set_clipboard(get_window(), selected_text.c_str());
+                    input_server->set_clipboard(get_window_index(), selected_text.c_str());
                     delete_selection();
                 }
             }

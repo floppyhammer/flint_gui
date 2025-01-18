@@ -47,16 +47,15 @@ public:
 
     std::shared_ptr<Node> get_root() const;
 
-    void when_primary_window_size_changed(Vec2I new_size) const;
+    void notify_primary_window_size_changed(Vec2I new_size) const;
 
     void quit();
 
     bool has_quited() const;
 
-private:
-    std::weak_ptr<Pathfinder::Window> primary_window;
-    Vec2I old_primary_window_size;
+    std::weak_ptr<Pathfinder::Window> get_primary_window() const;
 
+private:
     std::shared_ptr<Node> root;
 
     bool quited = false;

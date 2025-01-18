@@ -49,10 +49,10 @@ Button::Button() {
     add_embedded_child(margin_container);
 
     callbacks_cursor_entered.emplace_back(
-        [this] { InputServer::get_singleton()->set_cursor(this->get_window(), CursorShape::Hand); });
+        [this] { InputServer::get_singleton()->set_cursor(get_window_index(), CursorShape::Hand); });
 
     callbacks_cursor_exited.emplace_back(
-        [this] { InputServer::get_singleton()->set_cursor(this->get_window(), CursorShape::Arrow); });
+        [this] { InputServer::get_singleton()->set_cursor(get_window_index(), CursorShape::Arrow); });
 }
 
 void Button::calc_minimum_size() {
@@ -263,6 +263,15 @@ void Button::set_icon_expand(bool enable) {
 
 void Button::set_toggle_mode(bool enable) {
     toggle_mode = enable;
+}
+
+void Button::press() {
+    if (toggle_mode) {
+        pressed = !pressed;
+        when_toggled(pressed);
+    } else {
+        when_pressed();
+    }
 }
 
 void ButtonGroup::update() {

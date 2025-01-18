@@ -217,7 +217,8 @@ void ScrollContainer::pre_draw_children() {
     }
 
     auto global_pos = get_global_position();
-    auto size = get_size() * get_window()->get_dpi_scaling_factor();
+    float dpi_scale = RenderServer::get_singleton()->window_builder_->get_dpi_scaling_factor(get_window_index());
+    auto size = get_size() * dpi_scale;
 
     auto vector_server = VectorServer::get_singleton();
     vector_server->set_render_layer(render_layer);
@@ -253,7 +254,7 @@ void ScrollContainer::post_draw_children() {
     // Don't draw on the temporary render target anymore.
     canvas->get_scene()->pop_render_target();
 
-    float dpi_scale = get_window()->get_dpi_scaling_factor();
+    float dpi_scale = RenderServer::get_singleton()->window_builder_->get_dpi_scaling_factor(get_window_index());
 
     auto dst_rect = RectF(global_pos * dpi_scale, (global_pos + size) * dpi_scale);
     vector_server->get_canvas()->draw_render_target(temp_draw_data.render_target_id, dst_rect);

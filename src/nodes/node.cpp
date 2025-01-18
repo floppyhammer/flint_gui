@@ -189,17 +189,17 @@ bool Node::get_global_visibility() const {
     return get_visibility();
 }
 
-Pathfinder::Window *Node::get_window() const {
+uint8_t Node::get_window_index() const {
     if (type == NodeType::Window) {
         auto sub_window_node = (SubWindow *)this;
-        return sub_window_node->get_raw_window().get();
+        return sub_window_node->get_window_index();
     }
 
     if (parent) {
-        return parent->get_window();
+        return parent->get_window_index();
     }
 
-    return RenderServer::get_singleton()->window_builder_->get_primary_window().get();
+    return 0;
 }
 
 std::string Node::get_node_path() const {

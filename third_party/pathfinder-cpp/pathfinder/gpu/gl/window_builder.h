@@ -11,11 +11,13 @@ class Window;
 
 class WindowBuilderGl : public WindowBuilder {
 public:
-    explicit WindowBuilderGl(const Vec2I &size);
+    explicit WindowBuilderGl(const Vec2I &size, bool fullscreen);
 
     ~WindowBuilderGl() override;
 
-    std::shared_ptr<Window> create_window(const Vec2I &size, const std::string &title) override;
+    void create_primary_window(const Vec2I &size, const std::string &title) override;
+
+    uint8_t create_window(const Vec2I &size, const std::string &title) override;
 
     std::shared_ptr<Device> request_device() override;
 

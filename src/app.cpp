@@ -21,34 +21,33 @@ App::App(Vec2I primary_window_size) {
     auto render_server = RenderServer::get_singleton();
 
     // Create the main window.
-    render_server->window_builder_ = Pathfinder::WindowBuilder::new_impl(primary_window_size);
-    primary_window_ = render_server->window_builder_->get_primary_window();
+    render_server->window_builder_ = Pathfinder::WindowBuilder::new_impl(primary_window_size, false);
+    auto primary_window = render_server->window_builder_->get_window(0);
 
     auto input_server = InputServer::get_singleton();
-    input_server->initialize_window_callbacks((GLFWwindow*)primary_window_.lock()->get_glfw_handle());
+    input_server->initialize_window_callbacks(0);
 
     // Create device and queue.
     render_server->device_ = render_server->window_builder_->request_device();
     render_server->queue_ = render_server->window_builder_->create_queue();
 
     // Create swap chains for windows.
-    primary_swap_chain_ = primary_window_.lock()->get_swap_chain(render_server->device_);
+    auto primary_swap_chain = primary_window.lock()->get_swap_chain(render_server->device_);
 
     auto vector_server = VectorServer::get_singleton();
-    vector_server->init(primary_window_.lock()->get_physical_size(),
+    vector_server->init(primary_window.lock()->get_physical_size(),
                         render_server->device_,
                         render_server->queue_,
                         Pathfinder::RenderLevel::D3d9);
 
     tree = std::make_unique<SceneTree>();
-    tree->primary_window = primary_window_;
 
     {
         render_server->blit_ = std::make_shared<Blit>(
-            render_server->device_, render_server->queue_, primary_swap_chain_.lock()->get_surface_format());
+            render_server->device_, render_server->queue_, primary_swap_chain->get_surface_format());
 
         vector_target_ = render_server->device_->create_texture(
-            {primary_window_.lock()->get_physical_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
+            {primary_window.lock()->get_physical_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
     }
 }
 
@@ -74,19 +73,42 @@ std::shared_ptr<Node> App::get_tree_root() const {
 }
 
 void App::set_window_title(const std::string& title) {
-    primary_window_.lock()->set_window_title(title);
+    auto render_server = RenderServer::get_singleton();
+    auto primary_window = render_server->window_builder_->get_window(0);
+    primary_window.lock()->set_window_title(title);
+}
+
+void App::set_fullscreen(bool fullscreen) {
+    auto render_server = RenderServer::get_singleton();
+
+    render_server->window_builder_->set_fullscreen(fullscreen);
+}
+
+std::shared_ptr<Pathfinder::Window> get_primary_window() {
+    auto render_server = RenderServer::get_singleton();
+
+    return render_server->window_builder_->get_window(0).lock();
 }
 
 void App::main_loop() {
-    while (!primary_window_.lock()->should_close()) {
-        InputServer::get_singleton()->clear_events();
+    auto render_server = RenderServer::get_singleton();
 
+    while (!get_primary_window()->should_close()) {
+        InputServer::get_singleton()->clear_events();
         RenderServer::get_singleton()->window_builder_->poll_events();
 
-        if (primary_window_.lock()->get_resize_flag()) {
-            vector_target_ = RenderServer::get_singleton()->device_->create_texture(
-                {primary_window_.lock()->get_physical_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
-            VectorServer::get_singleton()->set_canvas_size(primary_window_.lock()->get_physical_size());
+        auto primary_window = get_primary_window();
+
+        if (primary_window->get_physical_size() != vector_target_->get_size()) {
+            if (!primary_window->get_physical_size().is_any_zero()) {
+                std::ostringstream ss;
+                ss << "Vector target of the primary window resized to " << vector_target_->get_size();
+                Logger::info(ss.str(), "Flint");
+
+                vector_target_ = RenderServer::get_singleton()->device_->create_texture(
+                    {primary_window->get_physical_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
+                VectorServer::get_singleton()->set_canvas_size(primary_window->get_physical_size());
+            }
         }
 
         // Engine processing.
@@ -98,10 +120,12 @@ void App::main_loop() {
         // Update the scene tree.
         tree->process(dt);
 
+        auto primary_swap_chain = primary_window->get_swap_chain(render_server->device_);
+
         // Drawing process for the primary window;
         {
             // Acquire next swap chain image.
-            if (!primary_swap_chain_.lock()->acquire_image()) {
+            if (!primary_swap_chain->acquire_image()) {
                 continue;
             }
 
@@ -113,14 +137,14 @@ void App::main_loop() {
 
             auto encoder = render_server->device_->create_command_encoder("Main encoder");
 
-            auto surface_texture = primary_swap_chain_.lock()->get_surface_texture();
+            auto surface_texture = primary_swap_chain->get_surface_texture();
 
             // Swap chain render pass.
             {
                 encoder->begin_render_pass(
-                    primary_swap_chain_.lock()->get_render_pass(), surface_texture, ColorF(0.2, 0.2, 0.2, 1.0));
+                    primary_swap_chain->get_render_pass(), surface_texture, ColorF(0.2, 0.2, 0.2, 1.0));
 
-                encoder->set_viewport({{0, 0}, primary_window_.lock()->get_physical_size()});
+                encoder->set_viewport({{0, 0}, primary_window->get_physical_size()});
 
                 render_server->blit_->set_texture(vector_target_);
 
@@ -130,9 +154,9 @@ void App::main_loop() {
                 encoder->end_render_pass();
             }
 
-            render_server->queue_->submit(encoder, primary_swap_chain_.lock());
+            render_server->queue_->submit(encoder, primary_swap_chain);
 
-            primary_swap_chain_.lock()->present();
+            primary_swap_chain->present();
         }
     }
 

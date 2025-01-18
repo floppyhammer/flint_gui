@@ -42,7 +42,7 @@ enum class KeyCode {
 class InputEvent {
 public:
     InputEventType type = InputEventType::Max;
-    GLFWwindow *window{};
+    uint8_t window_index = 0;
 
     union Args {
         struct {
@@ -111,25 +111,25 @@ public:
 
     InputServer();
 
-    void initialize_window_callbacks(GLFWwindow *window);
+    void initialize_window_callbacks(uint8_t window_index);
 
     void clear_events();
 
-    std::string get_clipboard(Pathfinder::Window *window);
-    void set_clipboard(Pathfinder::Window *window, std::string text);
+    std::string get_clipboard(uint8_t window_index);
+    void set_clipboard(uint8_t window_index, std::string text);
 
     Vec2F cursor_position;
     Vec2F last_cursor_position;
 
     std::vector<InputEvent> input_queue;
 
-    void set_cursor_captured(Pathfinder::Window *window, bool captured);
+    void set_cursor_captured(uint8_t window_index, bool captured);
 
-    void hide_cursor(Pathfinder::Window *window);
+    void hide_cursor(uint8_t window_index);
 
-    void restore_cursor(Pathfinder::Window *window);
+    void restore_cursor(uint8_t window_index);
 
-    void set_cursor(Pathfinder::Window *window, CursorShape shape);
+    void set_cursor(uint8_t window_index, CursorShape shape);
 
     bool is_key_pressed(KeyCode code) const;
 

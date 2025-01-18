@@ -29,9 +29,7 @@ PopupMenu::PopupMenu() {
     vbox_container_ = std::make_shared<VBoxContainer>();
     margin_container_->add_child(vbox_container_);
 
-    auto callback = [this] {
-        set_visibility(false);
-    };
+    auto callback = [this] { set_visibility(false); };
     connect_signal("focus_released", callback);
 
     theme_bg_ = std::make_optional(panel);
@@ -141,9 +139,12 @@ void PopupMenu::set_visibility(bool visible) {
         // TODO: we should not do this manually in here.
         margin_container_->calc_minimum_size_recursively();
 
+        auto render_server = RenderServer::get_singleton();
+        auto window = render_server->window_builder_->get_window(get_window_index());
+
         float menu_width = std::max(size.x, margin_container_->get_effective_minimum_size().x);
         float menu_height = std::min(margin_container_->get_effective_minimum_size().y,
-                                     get_window()->get_logical_size().y - position.y);
+                                     window.lock()->get_logical_size().y - position.y);
         set_size({menu_width, menu_height});
     } else {
         when_popup_hide();

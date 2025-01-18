@@ -23,13 +23,11 @@ public:
 
     void set_visibility(bool visible) override;
 
-    std::shared_ptr<Pathfinder::Window> get_raw_window() const {
-        return window_;
-    }
+    std::shared_ptr<Pathfinder::Window> get_raw_window() const;
 
-    std::shared_ptr<Pathfinder::SwapChain> get_swap_chain() const {
-        return swap_chain_;
-    }
+    // std::shared_ptr<Pathfinder::SwapChain> get_swap_chain() const {
+    //     return swap_chain_;
+    // }
 
     std::shared_ptr<Pathfinder::Texture> get_vector_target() const {
         return vector_target_;
@@ -42,8 +40,8 @@ public:
 protected:
     Vec2I size_;
 
-    std::shared_ptr<Pathfinder::Window> window_;
-    std::shared_ptr<Pathfinder::SwapChain> swap_chain_;
+    uint8_t window_index_;
+    // std::shared_ptr<Pathfinder::SwapChain> swap_chain_;
     std::shared_ptr<Pathfinder::Texture> vector_target_;
 
     void record_commands() const;

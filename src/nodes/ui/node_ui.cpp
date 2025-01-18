@@ -233,7 +233,10 @@ void NodeUi::apply_anchor() {
         auto ui_parent = dynamic_cast<NodeUi *>(parent);
         parent_size = ui_parent->get_size();
     } else {
-        parent_size = get_window()->get_logical_size().to_f32();
+        auto render_server = RenderServer::get_singleton();
+        auto window = render_server->window_builder_->get_window(get_window_index());
+
+        parent_size = window.lock()->get_logical_size().to_f32();
     }
 
     auto actual_size = get_effective_minimum_size().max(size);

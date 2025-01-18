@@ -28,11 +28,11 @@ public:
 
     void set_window_title(const std::string& title);
 
+    void set_fullscreen(bool fullscreen);
+
 private:
     std::unique_ptr<SceneTree> tree;
 
-    std::weak_ptr<Pathfinder::Window> primary_window_;
-    std::weak_ptr<Pathfinder::SwapChain> primary_swap_chain_;
     std::shared_ptr<Pathfinder::Texture> vector_target_;
 };
 

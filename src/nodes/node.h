@@ -128,7 +128,7 @@ public:
 
     bool get_global_visibility() const;
 
-    Pathfinder::Window *get_window() const;
+    uint8_t get_window_index() const;
 
     virtual void when_parent_size_changed(Vec2F new_size);
 

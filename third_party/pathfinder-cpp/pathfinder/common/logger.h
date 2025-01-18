@@ -5,6 +5,11 @@
 #include <iostream>
 #include <memory>
 #include <unordered_map>
+#include <string_view>
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <stdexcept>
 
 #ifdef __ANDROID__
     #include <android/log.h>

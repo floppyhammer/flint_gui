@@ -13,15 +13,10 @@
 namespace Flint {
 
 class Button : public NodeUi {
+    friend class ButtonGroup;
+
 public:
     Button();
-
-    /**
-     * Pressed == ture && hovered == true: Normal buttons
-     * Pressed == ture && hovered == false: Toggled buttons
-     */
-    bool pressed = false;
-    bool hovered = false;
 
     void input(InputEvent &event) override;
 
@@ -54,12 +49,25 @@ public:
 
     void set_toggle_mode(bool enable);
 
+    bool get_pressed() const {
+        return pressed;
+    }
+
+    void press();
+
     // Styles.
     StyleBox theme_normal;
     StyleBox theme_hovered;
     StyleBox theme_pressed;
 
 protected:
+    /**
+     * Pressed == ture && hovered == true: Normal buttons
+     * Pressed == ture && hovered == false: Toggled buttons
+     */
+    bool pressed = false;
+    bool hovered = false;
+
     bool pressed_inside = false;
 
     bool toggle_mode = false;

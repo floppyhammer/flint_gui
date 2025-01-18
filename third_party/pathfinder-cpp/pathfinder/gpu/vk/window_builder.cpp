@@ -49,7 +49,7 @@ WindowBuilderVk::WindowBuilderVk(const Vec2I &size) {
     setup_debug_messenger();
 
     float dpi_scaling_factor;
-    auto glfw_window = glfw_window_init(size, PRIMARY_WINDOW_TITLE, dpi_scaling_factor);
+    auto glfw_window = glfw_window_init(size, PRIMARY_WINDOW_TITLE, dpi_scaling_factor, false, nullptr);
 
     VkSurfaceKHR surface{};
     VK_CHECK_RESULT(glfwCreateWindowSurface(instance_, glfw_window, nullptr, &surface))
@@ -128,7 +128,7 @@ void WindowBuilderVk::stop_and_destroy_swapchains() {
 std::shared_ptr<Window> WindowBuilderVk::create_window(const Vec2I &size, const std::string &title) {
 #ifndef __ANDROID__
     float dpi_scaling_factor;
-    auto glfw_window = glfw_window_init(size, title, dpi_scaling_factor);
+    auto glfw_window = glfw_window_init(size, title, dpi_scaling_factor, false, nullptr);
 
     VkSurfaceKHR surface{};
     VK_CHECK_RESULT(glfwCreateWindowSurface(instance_, glfw_window, nullptr, &surface))

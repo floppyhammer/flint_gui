@@ -6,6 +6,7 @@
 #include <locale>
 
 #include "../nodes/sub_window.h"
+#include "render_server.h"
 
 namespace Flint {
 
@@ -45,10 +46,15 @@ InputServer::InputServer() {
     resize_trbl_cursor = glfwCreateStandardCursor(GLFW_RESIZE_NESW_CURSOR);
 }
 
-void InputServer::initialize_window_callbacks(GLFWwindow *window) {
+void InputServer::initialize_window_callbacks(uint8_t window_index) {
+    auto render_server = RenderServer::get_singleton();
+    auto window = (GLFWwindow *)render_server->window_builder_->get_window(window_index).lock()->get_glfw_handle();
+
     // A lambda function that doesn't capture anything can be implicitly converted to a regular function pointer.
     auto cursor_position_callback = [](GLFWwindow *window, double x_pos, double y_pos) {
-    // Mouse position are under the logical coordinates instead of the physical ones.
+        // Mouse position are under the logical coordinates instead of the physical ones.
+
+        auto pf_window = reinterpret_cast<Pathfinder::Window *>(glfwGetWindowUserPointer(window));
 
 #if defined(__linux__) || defined(_WIN32)
         // Get DPI scale.
@@ -61,7 +67,7 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
 
         InputEvent input_event{};
         input_event.type = InputEventType::MouseMotion;
-        input_event.window = window;
+        input_event.window_index = pf_window->window_index;
         input_event.args.mouse_motion.position = {(float)x_pos, (float)y_pos};
         auto input_server = get_singleton();
         input_server->last_cursor_position = input_server->cursor_position;
@@ -72,9 +78,11 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
     glfwSetCursorPosCallback(window, cursor_position_callback);
 
     auto cursor_button_callback = [](GLFWwindow *window, int button, int action, int mods) {
+        auto pf_window = reinterpret_cast<Pathfinder::Window *>(glfwGetWindowUserPointer(window));
+
         InputEvent input_event{};
         input_event.type = InputEventType::MouseButton;
-        input_event.window = window;
+        input_event.window_index = pf_window->window_index;
         input_event.args.mouse_button.button = button;
         input_event.args.mouse_button.pressed = action == GLFW_PRESS;
         auto input_server = get_singleton();
@@ -84,9 +92,11 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
     glfwSetMouseButtonCallback(window, cursor_button_callback);
 
     auto cursor_scroll_callback = [](GLFWwindow *window, double x_offset, double y_offset) {
+        auto pf_window = reinterpret_cast<Pathfinder::Window *>(glfwGetWindowUserPointer(window));
+
         InputEvent input_event{};
         input_event.type = InputEventType::MouseScroll;
-        input_event.window = window;
+        input_event.window_index = pf_window->window_index;
         input_event.args.mouse_scroll.x_delta = x_offset;
         input_event.args.mouse_scroll.y_delta = y_offset;
 
@@ -98,9 +108,11 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
     auto key_callback = [](GLFWwindow *window, int key, int scancode, int action, int mods) {
         auto input_server = get_singleton();
 
+        auto pf_window = reinterpret_cast<Pathfinder::Window *>(glfwGetWindowUserPointer(window));
+
         InputEvent input_event{};
         input_event.type = InputEventType::Key;
-        input_event.window = window;
+        input_event.window_index = pf_window->window_index;
 
         auto &key_args = input_event.args.key;
         key_args.pressed = action == GLFW_PRESS;
@@ -157,9 +169,11 @@ void InputServer::initialize_window_callbacks(GLFWwindow *window) {
     glfwSetKeyCallback(window, key_callback);
 
     auto character_callback = [](GLFWwindow *window, unsigned int codepoint) {
+        auto pf_window = reinterpret_cast<Pathfinder::Window *>(glfwGetWindowUserPointer(window));
+
         InputEvent input_event{};
         input_event.type = InputEventType::Text;
-        input_event.window = window;
+        input_event.window_index = pf_window->window_index;
         input_event.args.text.codepoint = codepoint;
         auto input_server = get_singleton();
         input_server->input_queue.push_back(input_event);
@@ -172,16 +186,25 @@ void InputServer::clear_events() {
     input_queue.clear();
 }
 
-std::string InputServer::get_clipboard(Pathfinder::Window *window) {
-    auto chars = glfwGetClipboardString((GLFWwindow *)window->get_glfw_handle());
+std::string InputServer::get_clipboard(uint8_t window_index) {
+    auto render_server = RenderServer::get_singleton();
+    auto window = (GLFWwindow *)render_server->window_builder_->get_window(window_index).lock()->get_glfw_handle();
+
+    auto chars = glfwGetClipboardString(window);
     return std::string(chars);
 }
 
-void InputServer::set_clipboard(Pathfinder::Window *window, std::string text) {
-    glfwSetClipboardString((GLFWwindow *)window->get_glfw_handle(), text.c_str());
+void InputServer::set_clipboard(uint8_t window_index, std::string text) {
+    auto render_server = RenderServer::get_singleton();
+    auto window = (GLFWwindow *)render_server->window_builder_->get_window(window_index).lock()->get_glfw_handle();
+
+    glfwSetClipboardString(window, text.c_str());
 }
 
-void InputServer::set_cursor(Pathfinder::Window *window, CursorShape shape) {
+void InputServer::set_cursor(uint8_t window_index, CursorShape shape) {
+    auto render_server = RenderServer::get_singleton();
+    auto window = (GLFWwindow *)render_server->window_builder_->get_window(window_index).lock()->get_glfw_handle();
+
     GLFWcursor *current_cursor{};
 
     switch (shape) {
@@ -211,24 +234,32 @@ void InputServer::set_cursor(Pathfinder::Window *window, CursorShape shape) {
         } break;
     }
 
-    glfwSetCursor((GLFWwindow *)window->get_glfw_handle(), current_cursor);
+    glfwSetCursor(window, current_cursor);
 }
 
 bool InputServer::is_key_pressed(KeyCode code) const {
     return keys_pressed.find(code) != keys_pressed.end();
 }
 
-void InputServer::set_cursor_captured(Pathfinder::Window *window, bool captured) {
-    glfwSetInputMode(
-        (GLFWwindow *)window->get_glfw_handle(), GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+void InputServer::set_cursor_captured(uint8_t window_index, bool captured) {
+    auto render_server = RenderServer::get_singleton();
+    auto window = (GLFWwindow *)render_server->window_builder_->get_window(window_index).lock()->get_glfw_handle();
+
+    glfwSetInputMode(window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 }
 
-void InputServer::hide_cursor(Pathfinder::Window *window) {
-    glfwSetInputMode((GLFWwindow *)window->get_glfw_handle(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+void InputServer::hide_cursor(uint8_t window_index) {
+    auto render_server = RenderServer::get_singleton();
+    auto window = (GLFWwindow *)render_server->window_builder_->get_window(window_index).lock()->get_glfw_handle();
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
-void InputServer::restore_cursor(Pathfinder::Window *window) {
-    glfwSetInputMode((GLFWwindow *)window->get_glfw_handle(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+void InputServer::restore_cursor(uint8_t window_index) {
+    auto render_server = RenderServer::get_singleton();
+    auto window = (GLFWwindow *)render_server->window_builder_->get_window(window_index).lock()->get_glfw_handle();
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
 } // namespace Flint
