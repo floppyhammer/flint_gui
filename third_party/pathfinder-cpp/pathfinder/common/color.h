@@ -74,7 +74,7 @@ struct ColorU {
     ColorF to_f32() const;
 
     ColorU apply_alpha(float alpha) const {
-        return ColorU(to_f32() * alpha);
+        return ColorU(r_, g_, b_, a_ * alpha);
     }
 
     /// Check for transparency.
