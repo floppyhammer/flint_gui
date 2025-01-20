@@ -142,9 +142,12 @@ void PopupMenu::set_visibility(bool visible) {
         auto render_server = RenderServer::get_singleton();
         auto window = render_server->window_builder_->get_window(get_window_index());
 
+        // We updated its global position in MenuButton before calling set_visibility.
+        auto global_position = get_global_position();
+
         float menu_width = std::max(size.x, margin_container_->get_effective_minimum_size().x);
         float menu_height = std::min(margin_container_->get_effective_minimum_size().y,
-                                     window.lock()->get_logical_size().y - position.y);
+                                     window.lock()->get_logical_size().y - global_position.y);
         set_size({menu_width, menu_height});
     } else {
         when_popup_hide();
@@ -163,7 +166,10 @@ void PopupMenu::calc_minimum_size() {
 void PopupMenu::create_item(const std::string &text) {
     auto new_item = std::make_shared<Button>();
     new_item->set_text(text);
+    new_item->theme_normal.bg_color = ColorU::transparent_black();
+    new_item->theme_normal.border_width = 0;
     vbox_container_->add_child(new_item);
+    vbox_container_->set_separation(0);
 
     int item_index = vbox_container_->get_children().size() - 1;
 

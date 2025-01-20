@@ -44,7 +44,7 @@ protected:
     float hscroll = 0;
     float vscroll = 0;
 
-    float scroll_speed = 15.0;
+    float scroll_speed = 20.0;
 
     StyleBox theme_scroll_bar;
     StyleBox theme_scroll_grabber;

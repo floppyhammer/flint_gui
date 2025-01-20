@@ -29,6 +29,8 @@ Button::Button() {
     label->set_vertical_alignment(Alignment::Center);
     label->set_text_style(TextStyle{default_theme->button.colors["text"]});
     label->theme_background = StyleBox::from_empty();
+    label->container_sizing.expand_h = true;
+    label->container_sizing.flag_h = ContainerSizingFlag::Fill;
 
     icon_rect = std::make_shared<TextureRect>();
     icon_rect->set_stretch_mode(TextureRect::StretchMode::KeepCentered);

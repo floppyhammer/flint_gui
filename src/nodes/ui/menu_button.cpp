@@ -25,6 +25,8 @@ MenuButton::MenuButton() {
             return;
         }
         menu->set_position(Vec2F{0, size.y});
+        auto global_pos = get_global_position();
+        menu->calc_global_position(global_pos);
         menu->set_visibility(true);
     });
 
