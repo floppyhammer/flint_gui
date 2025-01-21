@@ -21,7 +21,7 @@ App::App(Vec2I primary_window_size) {
     auto render_server = RenderServer::get_singleton();
 
     // Create the main window.
-    render_server->window_builder_ = Pathfinder::WindowBuilder::new_impl(primary_window_size, false);
+    render_server->window_builder_ = Pathfinder::WindowBuilder::new_impl(primary_window_size);
     auto primary_window = render_server->window_builder_->get_window(0);
 
     auto input_server = InputServer::get_singleton();

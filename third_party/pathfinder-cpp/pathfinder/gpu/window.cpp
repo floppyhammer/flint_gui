@@ -50,7 +50,7 @@ void Window::framebuffer_resize_callback(GLFWwindow* glfw_window, int width, int
         window->logical_size_ = (Vec2F(width, height) / window->get_dpi_scaling_factor()).to_i32();
         window->minimized_ = window->logical_size_.area() == 0;
 
-        Logger::info("Window physical resized to " + Vec2(width, height).to_string());
+        Logger::info("Window physical resized to " + Vec2I(width, height).to_string());
         Logger::info("Window logical resized to " + window->logical_size_.to_string());
     } else {
         Logger::error("glfwGetWindowUserPointer is NULL!");

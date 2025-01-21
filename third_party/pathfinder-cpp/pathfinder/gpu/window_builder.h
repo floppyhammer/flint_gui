@@ -15,7 +15,7 @@ static const char *PRIMARY_WINDOW_TITLE = "Primary Window";
 /// Window management.
 class WindowBuilder {
 public:
-    static std::shared_ptr<WindowBuilder> new_impl(const Vec2I &size, bool fullscreen);
+    static std::shared_ptr<WindowBuilder> new_impl(const Vec2I &size);
 
     virtual ~WindowBuilder() = default;
 
@@ -23,8 +23,6 @@ public:
     /// Call this right after the render loop is stopped.
     virtual void stop_and_destroy_swapchains() {
     }
-
-    virtual void create_primary_window(const Vec2I &size, const std::string &title) = 0;
 
     /// Create a new sub-window.
     virtual uint8_t create_window(const Vec2I &size, const std::string &title) = 0;

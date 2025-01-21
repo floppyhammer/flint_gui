@@ -27,11 +27,11 @@ bool is_extension_supported(const char *name) {
     return false;
 }
 
-std::shared_ptr<WindowBuilder> WindowBuilder::new_impl(const Vec2I &size, bool fullscreen) {
-    return std::make_shared<WindowBuilderGl>(size, fullscreen);
+std::shared_ptr<WindowBuilder> WindowBuilder::new_impl(const Vec2I &size) {
+    return std::make_shared<WindowBuilderGl>(size);
 }
 
-WindowBuilderGl::WindowBuilderGl(const Vec2I &size, bool fullscreen) {
+WindowBuilderGl::WindowBuilderGl(const Vec2I &size) {
 #ifndef __ANDROID__
     glfwInit();
 
@@ -110,10 +110,6 @@ WindowBuilderGl::~WindowBuilderGl() {
 #endif
 }
 
-void WindowBuilderGl::create_primary_window(const Vec2I &size, const std::string &title) {
-
-}
-
 uint8_t WindowBuilderGl::create_window(const Vec2I &size, const std::string &title) {
 #ifndef __ANDROID__
     auto window_gl = (WindowGl *)primary_window_.get();
@@ -127,7 +123,6 @@ uint8_t WindowBuilderGl::create_window(const Vec2I &size, const std::string &tit
 
     sub_windows_.push_back(new_window);
 
-    // Set user data.
     new_window->window_index = sub_windows_.size();
 
     return sub_windows_.size();

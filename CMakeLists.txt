@@ -31,7 +31,7 @@ add_library(flint_gui STATIC ${FLINT_GUI_SOURCE_FILES}
 file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
 
 # Has to be 17 or above.
-target_compile_features(flint_gui PUBLIC cxx_std_20)
+target_compile_features(flint_gui PUBLIC cxx_std_17)
 
 # Include external and third-party headers.
 target_include_directories(flint_gui PUBLIC "third_party")

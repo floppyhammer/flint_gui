@@ -84,18 +84,7 @@ WindowBuilderVk::WindowBuilderVk(ANativeWindow *native_window, const Vec2I &wind
 WindowBuilderVk::~WindowBuilderVk() {
 #ifndef __ANDROID__
     // Destroy windows.
-    {
-        for (auto &w : sub_windows_) {
-            if (!w.expired()) {
-                // We need to destroy a window explicitly in case its smart pointer is held elsewhere.
-                w.lock()->destroy();
-            }
-        }
-        sub_windows_.clear();
-
-        primary_window_->destroy();
-        primary_window_.reset();
-    }
+    WindowBuilderVk::stop_and_destroy_swapchains();
 #endif
 
     vkDestroyCommandPool(device_, command_pool_, nullptr);
@@ -116,16 +105,14 @@ WindowBuilderVk::~WindowBuilderVk() {
 
 void WindowBuilderVk::stop_and_destroy_swapchains() {
     for (auto &w : sub_windows_) {
-        if (!w.expired()) {
-            // We need to destroy a window explicitly in case its smart pointer is held elsewhere.
-            w.lock()->swapchain_->destroy();
-        }
+        // We need to destroy a window explicitly in case its smart pointer is held elsewhere.
+        w->destroy();
     }
 
     primary_window_->swapchain_->destroy();
 }
 
-std::shared_ptr<Window> WindowBuilderVk::create_window(const Vec2I &size, const std::string &title) {
+uint8_t WindowBuilderVk::create_window(const Vec2I &size, const std::string &title) {
 #ifndef __ANDROID__
     float dpi_scaling_factor;
     auto glfw_window = glfw_window_init(size, title, dpi_scaling_factor, false, nullptr);
@@ -138,9 +125,11 @@ std::shared_ptr<Window> WindowBuilderVk::create_window(const Vec2I &size, const 
 
     sub_windows_.push_back(new_window);
 
-    return new_window;
+    new_window->window_index = sub_windows_.size();
+
+    return sub_windows_.size();
 #else
-    return nullptr;
+    return 0;
 #endif
 }
 

@@ -18,6 +18,8 @@ std::weak_ptr<Window> WindowBuilder::get_window(uint8_t window_index) const {
     if (window_index <= sub_windows_.size()) {
         return sub_windows_[window_index - 1];
     }
+
+    return primary_window_;
 }
 
 float WindowBuilder::get_dpi_scaling_factor(uint8_t window_index) const {

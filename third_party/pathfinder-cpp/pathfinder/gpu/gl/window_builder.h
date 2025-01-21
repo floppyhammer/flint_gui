@@ -11,11 +11,9 @@ class Window;
 
 class WindowBuilderGl : public WindowBuilder {
 public:
-    explicit WindowBuilderGl(const Vec2I &size, bool fullscreen);
+    explicit WindowBuilderGl(const Vec2I &size);
 
     ~WindowBuilderGl() override;
-
-    void create_primary_window(const Vec2I &size, const std::string &title) override;
 
     uint8_t create_window(const Vec2I &size, const std::string &title) override;
 
