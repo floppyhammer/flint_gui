@@ -151,7 +151,7 @@ protected:
     Vec2F pivot_offset{0}; // Top-left as the default pivot.
     float rotation = 0;
 
-    Vec2F calculated_glocal_position{0};
+    Vec2F calculated_global_position{0};
 
     bool layout_is_dirty = true;
 

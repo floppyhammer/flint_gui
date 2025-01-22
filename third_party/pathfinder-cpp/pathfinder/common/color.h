@@ -74,7 +74,15 @@ struct ColorU {
     ColorF to_f32() const;
 
     ColorU apply_alpha(float alpha) const {
-        return ColorU(r_, g_, b_, a_ * alpha);
+        alpha = clamp(alpha, 0.0f, 1.0f);
+        auto new_color = *this;
+        new_color.a_ *= alpha;
+        return ColorU(new_color);
+    }
+
+    ColorU apply_value(float value) const {
+        auto new_color = this->to_f32() * value;
+        return ColorU(new_color);
     }
 
     /// Check for transparency.

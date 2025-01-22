@@ -46,4 +46,8 @@ float Engine::get_fps() const {
     return fps;
 }
 
+int Engine::get_fps_int() const {
+    return int(round(fps));
+}
+
 } // namespace Flint

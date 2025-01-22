@@ -120,11 +120,11 @@ void NodeUi::input(InputEvent &event) {
 }
 
 Vec2F NodeUi::get_global_position() const {
-    return calculated_glocal_position;
+    return calculated_global_position;
 }
 
 void NodeUi::calc_global_position(Vec2F parent_global_position) {
-    calculated_glocal_position = parent_global_position + position;
+    calculated_global_position = parent_global_position + position;
 }
 
 void NodeUi::set_mouse_filter(MouseFilter filter) {
