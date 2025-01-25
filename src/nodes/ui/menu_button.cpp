@@ -39,7 +39,7 @@ std::weak_ptr<PopupMenu> MenuButton::get_popup_menu() const {
 }
 
 void MenuButton::connect_signal(const std::string& signal, const AnyCallable<void>& callback) {
-    NodeUi::connect_signal(signal, callback);
+    Button::connect_signal(signal, callback);
 
     if (signal == "item_selected") {
         selected_callbacks.push_back(callback);
