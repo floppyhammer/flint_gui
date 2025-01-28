@@ -31,12 +31,14 @@ enum class KeyCode {
     C,
     V,
     X,
+    R,
     Backspace,
     Left,
     Right,
     Up,
     Down,
     Delete,
+    F11,
 };
 
 class InputEvent {

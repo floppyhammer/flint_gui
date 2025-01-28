@@ -152,6 +152,12 @@ void InputServer::initialize_window_callbacks(uint8_t window_index) {
             case GLFW_KEY_X: {
                 key_args.key = KeyCode::X;
             } break;
+            case GLFW_KEY_R: {
+                key_args.key = KeyCode::R;
+            } break;
+            case GLFW_KEY_F11: {
+                key_args.key = KeyCode::F11;
+            } break;
             default: {
                 key_args.key = KeyCode::Unknown;
             }
