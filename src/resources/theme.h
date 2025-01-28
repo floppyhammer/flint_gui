@@ -11,6 +11,8 @@ public:
     Theme() {
         button.colors["text"] = ColorU(229, 229, 229, 255);
 
+        button.colors["text_disabled"] = ColorU(229, 229, 229, 100);
+
         {
             auto style_box = StyleBox();
             style_box.bg_color = ColorU(32, 32, 32, 255);
@@ -30,6 +32,13 @@ public:
             style_box.bg_color = ColorU(45, 45, 45, 255);
             style_box.border_width = 2;
             button.styles["pressed"] = style_box;
+        }
+
+        {
+            auto style_box = StyleBox();
+            style_box.bg_color = ColorU(32, 32, 32, 255);
+            style_box.border_width = 2;
+            button.styles["disabled"] = style_box;
         }
 
         label.styles["background"] = StyleBox::from_empty();

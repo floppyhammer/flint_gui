@@ -19,6 +19,8 @@ Button::Button() {
 
     theme_pressed = default_theme->button.styles["pressed"];
 
+    theme_disabled = default_theme->button.styles["disabled"];
+
     debug_size_box.border_color = ColorU::green();
 
     // Don't add the label as a child since it's not a normal node but part of the button.
@@ -68,70 +70,72 @@ void Button::input(InputEvent &event) {
 
     bool consume_flag = false;
 
-    if (event.type == InputEventType::MouseMotion) {
-        auto args = event.args.mouse_motion;
+    if (!disabled_) {
+        if (event.type == InputEventType::MouseMotion) {
+            auto args = event.args.mouse_motion;
 
-        if (event.is_consumed()) {
-            hovered = false;
-            if (!toggle_mode) {
-                pressed = false;
-            }
-            pressed_inside = false;
-        } else {
-            if (RectF(global_position, global_position + size).contains_point(args.position)) {
-                hovered = true;
-                consume_flag = true;
-            } else {
+            if (event.is_consumed()) {
                 hovered = false;
                 if (!toggle_mode) {
                     pressed = false;
                 }
                 pressed_inside = false;
-            }
-        }
-    }
-
-    if (event.type == InputEventType::MouseButton) {
-        auto args = event.args.mouse_button;
-
-        if (event.is_consumed()) {
-            if (!args.pressed) {
+            } else {
                 if (RectF(global_position, global_position + size).contains_point(args.position)) {
+                    hovered = true;
+                    consume_flag = true;
+                } else {
+                    hovered = false;
                     if (!toggle_mode) {
                         pressed = false;
-                        pressed_inside = false;
                     }
+                    pressed_inside = false;
                 }
             }
-        } else {
-            if (RectF(global_position, global_position + size).contains_point(args.position)) {
-                if (!toggle_mode) {
-                    pressed = args.pressed;
-                    if (pressed) {
-                        pressed_inside = true;
-                    } else {
-                        if (pressed_inside) {
-                            when_pressed();
-                        }
-                    }
-                } else {
-                    if (args.pressed) {
-                        pressed_inside = true;
-                    } else {
-                        if (pressed_inside) {
-                            if (pressed) {
-                                pressed = false;
-                            } else {
-                                pressed = true;
-                                when_pressed();
-                            }
+        }
 
-                            when_toggled(pressed);
+        if (event.type == InputEventType::MouseButton) {
+            auto args = event.args.mouse_button;
+
+            if (event.is_consumed()) {
+                if (!args.pressed) {
+                    if (RectF(global_position, global_position + size).contains_point(args.position)) {
+                        if (!toggle_mode) {
+                            pressed = false;
+                            pressed_inside = false;
                         }
                     }
                 }
+            } else {
+                if (RectF(global_position, global_position + size).contains_point(args.position)) {
+                    if (!toggle_mode) {
+                        pressed = args.pressed;
+                        if (pressed) {
+                            pressed_inside = true;
+                        } else {
+                            if (pressed_inside) {
+                                when_pressed();
+                            }
+                        }
+                    } else {
+                        if (args.pressed) {
+                            pressed_inside = true;
+                        } else {
+                            if (pressed_inside) {
+                                if (pressed) {
+                                    pressed = false;
+                                } else {
+                                    pressed = true;
+                                    when_pressed();
+                                }
 
-                consume_flag = true;
+                                when_toggled(pressed);
+                            }
+                        }
+                    }
+
+                    consume_flag = true;
+                }
             }
         }
     }
@@ -163,6 +167,14 @@ void Button::draw() {
     auto global_position = get_global_position();
 
     icon_rect->set_texture(icon_normal_);
+
+    auto default_theme = DefaultResource::get_singleton()->get_default_theme();
+
+    if (disabled_) {
+        label->set_text_style(TextStyle{default_theme->button.colors["text_disabled"]});
+    } else {
+        label->set_text_style(TextStyle{default_theme->button.colors["text"]});
+    }
 
     // Draw bg.
     std::optional<StyleBox> active_style_box;
@@ -268,6 +280,10 @@ void Button::set_toggle_mode(bool enable) {
 }
 
 void Button::press() {
+    if (disabled_) {
+        return;
+    }
+
     if (toggle_mode) {
         pressed = !pressed;
         when_toggled(pressed);
@@ -290,7 +306,7 @@ void ButtonGroup::update() {
 void ButtonGroup::add_button(const std::weak_ptr<Button> &new_button) {
     buttons.push_back(new_button);
 
-    auto callback = [this, new_button] { this->pressed_button = new_button; };
+    auto callback = [this, new_button] { pressed_button = new_button; };
     new_button.lock()->connect_signal("pressed", callback);
 }
 

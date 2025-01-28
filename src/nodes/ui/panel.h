@@ -16,7 +16,7 @@ public:
 
     void set_theme_panel(StyleBox style_box);
 
-private:
+protected:
     std::optional<StyleBox> theme_panel_;
 };
 

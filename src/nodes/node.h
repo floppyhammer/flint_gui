@@ -98,7 +98,7 @@ public:
     virtual void custom_draw() {
     }
 
-    void add_child(const std::shared_ptr<Node> &new_child);
+    virtual void add_child(const std::shared_ptr<Node> &new_child);
 
     void add_embedded_child(const std::shared_ptr<Node> &new_child);
 

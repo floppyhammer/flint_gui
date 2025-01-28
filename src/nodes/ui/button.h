@@ -53,12 +53,17 @@ public:
         return pressed;
     }
 
+    void set_disabled(bool disabled) {
+        disabled_ = disabled;
+    }
+
     void press();
 
     // Styles.
     StyleBox theme_normal;
     StyleBox theme_hovered;
     StyleBox theme_pressed;
+    StyleBox theme_disabled;
 
 protected:
     /**
@@ -75,6 +80,8 @@ protected:
     bool icon_expand_ = false;
 
     bool flat_ = false;
+
+    bool disabled_ = false;
 
     /// Button[HBoxContainer[TextureRect, Label]]
     std::shared_ptr<MarginContainer> margin_container;
