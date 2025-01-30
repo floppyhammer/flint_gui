@@ -7,7 +7,7 @@ using Pathfinder::Vec3;
 
 class MyProgressBar : public ProgressBar {
     void custom_update(double dt) override {
-        float new_value = value + Engine::get_singleton()->get_delta() * 10.0f;
+        float new_value = value + Engine::get_singleton()->get_dt() * 10.0f;
         if (new_value > max_value) {
             new_value -= max_value;
         }

@@ -22,7 +22,7 @@ public:
 
     void tick();
 
-    double get_delta() const;
+    double get_dt() const;
 
     double get_elapsed() const;
 
@@ -36,9 +36,10 @@ private:
 #elif __linux__
     std::chrono::time_point<std::chrono::system_clock> last_time_updated_fps;
 #endif
+
     float fps = 0;
     double elapsed = 0;
-    double delta = 0;
+    double dt = 0;
 };
 
 } // namespace Flint

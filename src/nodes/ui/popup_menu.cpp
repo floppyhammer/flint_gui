@@ -37,7 +37,7 @@ PopupMenu::PopupMenu() {
     debug_size_box.border_color = ColorU(100, 40, 122, 255);
 }
 
-void PopupMenu::update(double delta) {
+void PopupMenu::update(double dt) {
     auto global_position = get_global_position();
 
     // float offset_y = 0;
@@ -49,7 +49,7 @@ void PopupMenu::update(double delta) {
 
     size = size.max(calculated_minimum_size);
 
-    NodeUi::update(delta);
+    NodeUi::update(dt);
 }
 
 void PopupMenu::draw() {

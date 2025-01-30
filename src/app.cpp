@@ -115,7 +115,7 @@ void App::main_loop() {
         Engine::get_singleton()->tick();
 
         // Get frame time.
-        auto dt = Engine::get_singleton()->get_delta();
+        auto dt = Engine::get_singleton()->get_dt();
 
         // Update the scene tree.
         tree->process(dt);

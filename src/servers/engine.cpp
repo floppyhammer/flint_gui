@@ -16,7 +16,7 @@ void Engine::tick() {
 
     auto new_elapsed = std::chrono::duration<double, std::chrono::seconds::period>(current_time - start_time).count();
 
-    delta = new_elapsed - elapsed;
+    dt = new_elapsed - elapsed;
 
     elapsed = new_elapsed;
 
@@ -25,7 +25,7 @@ void Engine::tick() {
     if (duration.count() > 5) {
         last_time_updated_fps = current_time;
 
-        fps = (float)(1.0 / delta);
+        fps = (float)(1.0 / dt);
 
         // Set frame time.
         std::ostringstream string_stream;
@@ -34,8 +34,8 @@ void Engine::tick() {
     }
 }
 
-double Engine::get_delta() const {
-    return delta;
+double Engine::get_dt() const {
+    return dt;
 }
 
 double Engine::get_elapsed() const {

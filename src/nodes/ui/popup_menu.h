@@ -72,7 +72,7 @@ public:
 
     void input(InputEvent &event) override;
 
-    void update(double delta) override;
+    void update(double dt) override;
 
     void draw() override;
 

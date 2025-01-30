@@ -36,7 +36,7 @@ public:
     void draw() override;
 
 protected:
-    void update(double delta) override;
+    void update(double dt) override;
 
     StretchMode stretch_mode = StretchMode::Scale;
 
