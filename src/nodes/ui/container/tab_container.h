@@ -18,7 +18,9 @@ public:
 
     void calc_minimum_size() override;
 
-    void set_current_tab(int32_t index);
+    std::optional<uint32_t> get_current_tab() const;
+
+    void set_current_tab(uint32_t index);
 
     void set_tab_title(uint32_t tab_idx, const std::string& title);
 
@@ -26,7 +28,7 @@ public:
 
     void draw() override;
 
-    void add_child(const std::shared_ptr<Node> &new_child) override;
+    void add_child(const std::shared_ptr<Node>& new_child) override;
 
 protected:
     void add_tab_button();

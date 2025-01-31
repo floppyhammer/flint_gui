@@ -38,6 +38,8 @@ enum class KeyCode {
     Up,
     Down,
     Delete,
+    F5,
+    F10,
     F11,
 };
 

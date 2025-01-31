@@ -70,7 +70,11 @@ void TabContainer::calc_minimum_size() {
     calculated_minimum_size = min_size;
 }
 
-void TabContainer::set_current_tab(int32_t index) {
+std::optional<uint32_t> TabContainer::get_current_tab() const {
+    return current_tab;
+}
+
+void TabContainer::set_current_tab(uint32_t index) {
     current_tab = index;
     tab_buttons[index]->press();
     tab_button_group.pressed_button = tab_buttons[index];
