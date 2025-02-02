@@ -7,7 +7,7 @@ using Pathfinder::Rect;
 
 namespace Flint {
 
-class MarginContainer final : public Container {
+class MarginContainer : public Container {
 public:
     MarginContainer() {
         type = NodeType::MarginContainer;

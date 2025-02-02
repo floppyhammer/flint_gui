@@ -23,10 +23,7 @@ file(GLOB_RECURSE FLINT_GUI_SOURCE_FILES CONFIGURE_DEPENDS
         src/*.cpp
         third_party/tinyfiledialogs/tinyfiledialogs.c)
 
-add_library(flint_gui STATIC ${FLINT_GUI_SOURCE_FILES}
-        src/resources/render_image.cpp
-        src/resources/render_image.h
-        src/servers/debug_server.h)
+add_library(flint_gui STATIC ${FLINT_GUI_SOURCE_FILES})
 
 file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
 
@@ -49,6 +46,9 @@ add_subdirectory("third_party/harfbuzz-8.4.0")
 
 target_include_directories(flint_gui PUBLIC "third_party/GSL-4.0.0/include")
 add_subdirectory("third_party/GSL-4.0.0")
+
+target_include_directories(flint_gui PUBLIC "third_party/rapidcsv-8.84/src")
+add_subdirectory("third_party/rapidcsv-8.84")
 
 target_include_directories(flint_gui PUBLIC "third_party/stduuid-1.2.3")
 
