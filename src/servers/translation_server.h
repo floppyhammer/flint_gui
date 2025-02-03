@@ -21,7 +21,7 @@ public:
 
     std::string get_translation(std::string tag);
 
-    void load_translations(std::string filename);
+    void load_translations(const std::string& filename);
 
 private:
     std::map<std::string, std::map<std::string, std::string>> db_;

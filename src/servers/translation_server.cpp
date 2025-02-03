@@ -23,14 +23,14 @@ std::string TranslationServer::get_translation(std::string tag) {
     const auto& locale_map = db_[current_locale_];
 
     // Fallback
-    if (!locale_map.contains(tag)) {
+    if (locale_map.find(tag) == locale_map.end()) {
         return tag;
     }
 
     return locale_map.at(tag);
 }
 
-void TranslationServer::load_translations(std::string filename) {
+void TranslationServer::load_translations(const std::string& filename) {
     std::ifstream file(filename);
 
     rapidcsv::Document doc(filename);
@@ -42,7 +42,7 @@ void TranslationServer::load_translations(std::string filename) {
         auto row = doc.GetRow<std::string>(row_idx);
 
         for (int i = 0; i < locale_count; i++) {
-            auto locale = locale_names[i];
+            const auto& locale = locale_names[i];
             db_[locale][row[0]] = row[i];
         }
     }
