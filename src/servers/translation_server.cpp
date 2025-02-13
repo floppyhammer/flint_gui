@@ -12,8 +12,7 @@
 
 namespace Flint {
 
-TranslationServer::TranslationServer() {
-}
+TranslationServer::TranslationServer() = default;
 
 void TranslationServer::set_locale(const std::string& locale) {
     current_locale_ = locale;
@@ -42,8 +41,10 @@ void TranslationServer::load_translations(const std::string& filename) {
         auto row = doc.GetRow<std::string>(row_idx);
 
         for (int i = 0; i < locale_count; i++) {
-            auto locale = locale_names[1 + i];
-            db_[locale][row[0]] = row[1 + i];
+            const auto& locale = locale_names[1 + i];
+            const auto& tag = row[0];
+
+            db_[locale][tag] = row[1 + i];
         }
     }
 }
