@@ -52,9 +52,8 @@ void TabContainer::calc_minimum_size() {
 
     // Find the largest child size.
     for (auto &child : children) {
-        // Skip invisible/non-ui child.
-        // We only care about visible UI nodes in a container.
-        if (!child->get_visibility() || !child->is_ui_node()) {
+        // We should take account of invisible UI nodes.
+        if (!child->is_ui_node()) {
             continue;
         }
 
