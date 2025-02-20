@@ -40,6 +40,7 @@ PopupMenu::PopupMenu() {
 void PopupMenu::update(double dt) {
     auto global_position = get_global_position();
 
+    margin_container_->set_custom_minimum_size(custom_minimum_size);
     // float offset_y = 0;
     // for (auto &item : items_) {
     //     item->position = {0, offset_y};

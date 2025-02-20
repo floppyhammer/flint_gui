@@ -21,12 +21,13 @@ MenuButton::MenuButton() {
     menu->set_visibility(false);
 
     pressed_callbacks.emplace_back([this] {
-        if (menu->get_item_count() ==0 ) {
+        if (menu->get_item_count() == 0) {
             return;
         }
         menu->set_position(Vec2F{0, size.y});
         auto global_pos = get_global_position();
         menu->calc_global_position(global_pos);
+        menu->set_custom_minimum_size({size.x, 0});
         menu->set_visibility(true);
     });
 
