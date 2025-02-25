@@ -12,6 +12,7 @@
 #include "common/geometry.h"
 #include "nodes/scene_tree.h"
 #include "render/blit.h"
+#include "servers/input_server.h"
 #include "servers/translation_server.h"
 
 namespace Flint {
