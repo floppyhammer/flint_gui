@@ -15,7 +15,7 @@ namespace Pathfinder {
 
 #ifndef __ANDROID__
 std::string load_file_as_string(const std::string &file_path) {
-    Timestamp timer;
+    auto timer = Timestamp("");
 
     std::string output;
     std::ifstream file;
@@ -47,7 +47,7 @@ std::string load_file_as_string(const std::string &file_path) {
 }
 
 std::vector<char> load_file_as_bytes(const std::string &file_path) {
-    Timestamp timer;
+    auto timer = Timestamp("");
 
     FILE *file = fopen(file_path.c_str(), "rb");
     if (!file) {
