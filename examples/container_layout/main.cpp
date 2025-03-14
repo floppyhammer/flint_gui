@@ -63,6 +63,34 @@ class MyNode : public Node {
             }
         }
         vbox_container->set_size({200, 300});
+
+        auto grid_container = std::make_shared<GridContainer>();
+        grid_container->set_separation(8);
+        grid_container->set_position({600, 400});
+        grid_container->set_column_number(2);
+        add_child(grid_container);
+
+        for (int _ = 0; _ < 4; _++) {
+            auto button = std::make_shared<Button>();
+            grid_container->add_child(button);
+
+            if (_ == 0) {
+                button->container_sizing.expand_v = true;
+                button->container_sizing.flag_v = ContainerSizingFlag::ShrinkCenter;
+
+                button->container_sizing.flag_h = ContainerSizingFlag::Fill;
+            }
+            if (_ == 1) {
+                button->container_sizing.flag_h = ContainerSizingFlag::ShrinkStart;
+            }
+            if (_ == 2) {
+                button->container_sizing.flag_h = ContainerSizingFlag::ShrinkCenter;
+            }
+            if (_ == 3) {
+                button->container_sizing.flag_h = ContainerSizingFlag::ShrinkEnd;
+            }
+        }
+        grid_container->set_size({200, 300});
     }
 };
 
