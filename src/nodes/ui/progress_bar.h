@@ -42,12 +42,23 @@ public:
 
     void connect_signal(const std::string &signal, const AnyCallable<void> &callback) override;
 
+    void set_label_visibility(bool new_visibility);
+
+    void set_label_font_size(float new_font_size);
+
+    void set_lerp_enabled(bool new_lerp_enabled);
+
 protected:
     float value = 50;
+    float target_value = 50;
     float min_value = 0;
     float max_value = 100;
     float step = 1;
     float ratio;
+
+    bool label_visible = true;
+
+    bool lerp_enabled = false;
 
     std::optional<StyleBox> theme_progress, theme_bg, theme_fg;
 

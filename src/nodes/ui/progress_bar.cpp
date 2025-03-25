@@ -19,7 +19,7 @@ ProgressBar::ProgressBar() {
 
     // Don't add the label as a child since it's not a normal node but part of the button.
     label = std::make_shared<Label>();
-    label->set_text("%");
+    label->set_text("");
     label->set_mouse_filter(MouseFilter::Ignore);
     label->set_horizontal_alignment(Alignment::Center);
     label->set_vertical_alignment(Alignment::Center);
@@ -29,11 +29,22 @@ ProgressBar::ProgressBar() {
 }
 
 void ProgressBar::calc_minimum_size() {
-    calculated_minimum_size = label->get_effective_minimum_size();
+    if (label_visible) {
+        calculated_minimum_size = label->get_effective_minimum_size();
+    }
 }
 
 void ProgressBar::update(double dt) {
     NodeUi::update(dt);
+
+    if (lerp_enabled) {
+        value = Pathfinder::lerp(value, target_value, dt * (max_value - min_value) * 0.1);
+        ratio = (value - min_value) / (max_value - min_value);
+
+        if (label_visible) {
+            label->set_text(std::to_string((int)round(ratio * 100)) + "%");
+        }
+    }
 }
 
 void ProgressBar::draw() {
@@ -64,11 +75,17 @@ void ProgressBar::set_size(Vec2F new_size) {
 }
 
 void ProgressBar::set_value(float new_value) {
-    value = std::clamp(new_value, min_value, max_value);
+    if (lerp_enabled) {
+        target_value = std::clamp(new_value, min_value, max_value);
+    } else {
+        value = std::clamp(new_value, min_value, max_value);
 
-    ratio = (value - min_value) / (max_value - min_value);
+        ratio = (value - min_value) / (max_value - min_value);
 
-    label->set_text(std::to_string((int)round(ratio * 100)) + "%");
+        if (label_visible) {
+            label->set_text(std::to_string((int)round(ratio * 100)) + "%");
+        }
+    }
 }
 
 float ProgressBar::get_value() const {
@@ -105,6 +122,18 @@ void ProgressBar::connect_signal(const std::string &signal, const AnyCallable<vo
     if (signal == "on_value_changed") {
         on_value_changed.push_back(callback);
     }
+}
+
+void ProgressBar::set_label_visibility(bool new_visibility) {
+    label_visible = new_visibility;
+}
+
+void ProgressBar::set_label_font_size(float new_font_size) {
+    label->set_font_size(new_font_size);
+}
+
+void ProgressBar::set_lerp_enabled(bool new_lerp_enabled) {
+    lerp_enabled = new_lerp_enabled;
 }
 
 } // namespace Flint

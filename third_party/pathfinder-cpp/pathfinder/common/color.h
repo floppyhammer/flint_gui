@@ -104,6 +104,10 @@ struct ColorU {
         return {0, 0, 255, 255};
     }
 
+    static ColorU yellow() {
+        return {255, 255, 0, 255};
+    }
+
     static ColorU white() {
         return {255, 255, 255, 255};
     }
