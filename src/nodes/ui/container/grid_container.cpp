@@ -9,104 +9,76 @@ void GridContainer::adjust_layout() {
 
     auto path = get_node_path();
 
+    std::vector<NodeUi *> ui_children = get_ui_children();
+
+    int row_num = ui_children.size() / col_limit;
+    int col_num = std::min((uint32_t)ui_children.size(), col_limit);
+
+    float average_col_width = (size.x - separation * static_cast<float>(col_num - 1)) / static_cast<float>(col_num);
+    float average_row_height = (size.y - separation * static_cast<float>(row_num - 1)) / static_cast<float>(row_num);
+
+    float actual_col_width = std::max(average_col_width, min_col_width);
+    float actual_row_height = std::max(average_row_height, min_row_height);
+
     // In the first loop, we need do some calculation.
-    for (int child_idx = 0; child_idx < children.size(); child_idx++) {
-        auto &child = children[child_idx];
+    for (int child_idx = 0; child_idx < ui_children.size(); child_idx++) {
+        auto &child = ui_children[child_idx];
 
         // We only care about visible GUI nodes in a container.
         if (!child->get_visibility() || !child->is_ui_node()) {
             continue;
         }
 
-        auto cast_child = dynamic_cast<NodeUi *>(child.get());
-
         int row_idx = child_idx / col_num;
         int col_idx = child_idx % col_num;
 
         float pos_x = col_idx * separation;
         for (int col = 0; col < col_idx; col++) {
-            pos_x += max_col_widths[col];
+            pos_x += actual_col_width;
         }
         float pos_y = row_idx * separation;
         for (int row = 0; row < row_idx; row++) {
-            pos_y += max_row_heights[row];
+            pos_y += actual_row_height;
         }
 
-        cast_child->set_position({pos_x, pos_y});
-        cast_child->set_size({max_col_widths[col_idx], max_row_heights[row_idx]});
+        if (shrinking) {
+            // Add position offset if the child shrinks.
+            auto child_min_size = child->get_effective_minimum_size();
+            pos_x += (actual_col_width - child_min_size.x) * 0.5;
+            pos_y += (actual_row_height - child_min_size.y) * 0.5;
+
+            child->set_position({pos_x, pos_y});
+            child->set_size({child_min_size.x, child_min_size.y});
+        } else {
+            child->set_position({pos_x, pos_y});
+            child->set_size({actual_col_width, actual_row_height});
+        }
     }
+
+    // Set self size.
+    set_size({actual_col_width * col_num + separation * (col_num - 1),
+              actual_row_height * row_num + separation * (row_num - 1)});
 }
 
 void GridContainer::calc_minimum_size() {
-    int row_num = children.size() / col_num;
+    std::vector<NodeUi *> ui_children = get_ui_children();
 
-    float max_row_width = 0;
-    max_row_heights.resize(row_num);
+    int row_num = ui_children.size() / col_limit;
+    int col_num = std::min((uint32_t)ui_children.size(), col_limit);
 
-    for (int i = 0; i < row_num; i++) {
-        float cur_row_width = 0;
+    min_col_width = 0;
+    min_row_height = 0;
 
-        max_row_heights[i] = 0;
+    for (int child_idx = 0; child_idx < ui_children.size(); child_idx++) {
+        auto ui_child = ui_children[child_idx];
 
-        for (int j = 0; j < col_num; j++) {
-            int child_index = i * col_num + j;
-            if (child_index >= children.size()) {
-                break;
-            }
+        auto child_min_size = ui_child->get_effective_minimum_size();
 
-            auto child = children[child_index];
-
-            // We only care about visible GUI nodes in a container.
-            if (!child->get_visibility() || !child->is_ui_node()) {
-                continue;
-            }
-
-            auto cast_child = dynamic_cast<NodeUi *>(child.get());
-
-            auto child_min_size = cast_child->get_effective_minimum_size();
-
-            cur_row_width += child_min_size.x;
-            max_row_heights[i] = std::max(max_row_heights[i], child_min_size.y);
-        }
-
-        cur_row_width += (col_num - 1) * separation;
-
-        max_row_width = std::max(max_row_width, cur_row_width);
+        min_col_width = std::max(min_col_width, child_min_size.x);
+        min_row_height = std::max(min_row_height, child_min_size.y);
     }
 
-    float max_col_height = 0;
-    max_col_widths.resize(col_num);
-
-    for (int j = 0; j < col_num; j++) {
-        float cur_col_height = 0;
-
-        for (int i = 0; i < row_num; i++) {
-            int child_index = i * col_num + j;
-            if (child_index >= children.size()) {
-                break;
-            }
-
-            auto child = children[child_index];
-
-            // We only care about visible GUI nodes in a container.
-            if (!child->get_visibility() || !child->is_ui_node()) {
-                continue;
-            }
-
-            auto cast_child = dynamic_cast<NodeUi *>(child.get());
-
-            auto child_min_size = cast_child->get_effective_minimum_size();
-
-            cur_col_height += child_min_size.y;
-            max_col_widths[i] = std::max(max_col_widths[i], child_min_size.x);
-        }
-
-        cur_col_height += (col_num - 1) * separation;
-
-        max_col_height = std::max(max_col_height, cur_col_height);
-    }
-
-    calculated_minimum_size = {max_row_width, max_col_height};
+    calculated_minimum_size = {min_col_width * col_num, min_row_height * row_num};
 }
 
 void GridContainer::set_separation(float new_separation) {
@@ -117,8 +89,31 @@ void GridContainer::set_separation(float new_separation) {
     separation = new_separation;
 }
 
-void GridContainer::set_column_number(uint32_t new_column_number) {
-    col_num = new_column_number;
+void GridContainer::set_column_limit(uint32_t new_limit) {
+    col_limit = new_limit;
+}
+
+void GridContainer::set_item_shrinking(bool new_shrinking) {
+    shrinking = new_shrinking;
+}
+
+std::vector<NodeUi *> GridContainer::get_ui_children() const {
+    // Get UI children.
+    std::vector<NodeUi *> ui_children;
+    ui_children.reserve(children.size());
+
+    for (auto child : children) {
+        // We only care about visible GUI nodes in a container.
+        if (!child->get_visibility() || !child->is_ui_node()) {
+            continue;
+        }
+
+        auto cast_child = dynamic_cast<NodeUi *>(child.get());
+
+        ui_children.push_back(cast_child);
+    }
+
+    return ui_children;
 }
 
 } // namespace revector

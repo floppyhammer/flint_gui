@@ -12,16 +12,22 @@ public:
 
     void set_separation(float new_separation);
 
-    void set_column_number(uint32_t new_column_number);
+    void set_column_limit(uint32_t new_limit);
+
+    void set_item_shrinking(bool new_shrinking);
 
 protected:
-    uint32_t col_num = 1;
+    uint32_t col_limit = 2;
 
     /// Separation between UI children.
     float separation = 8;
 
-    std::vector<float> max_row_heights;
-    std::vector<float> max_col_widths;
+    float min_row_height;
+    float min_col_width;
+
+    std::vector<NodeUi *> get_ui_children() const;
+
+    bool shrinking = false;
 };
 
 } // namespace revector
