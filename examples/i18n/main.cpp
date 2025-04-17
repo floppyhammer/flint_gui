@@ -38,7 +38,7 @@ class MyNode : public Node {
 
         auto font = std::make_shared<Font>("assets/fonts/test.ttf");
         DefaultResource::get_singleton()->set_default_font(
-            std::make_shared<Font>("assets/fonts/Arial Unicode MS Font.ttf"));
+            std::make_shared<Font>("assets/fonts/unifont-16.0.02.otf"));
 
         // No word wrapping.
         {

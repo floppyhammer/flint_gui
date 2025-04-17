@@ -19,7 +19,7 @@ class MyNode : public Node {
         }
 
         DefaultResource::get_singleton()->set_default_font(
-                std::make_shared<Font>("assets/fonts/Arial Unicode MS Font.ttf"));
+                std::make_shared<Font>("assets/fonts/unifont-16.0.02.otf"));
 
         auto margin_container = std::make_shared<MarginContainer>();
         margin_container->set_margin_all(8);
