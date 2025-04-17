@@ -7,7 +7,7 @@
 
 using Pathfinder::Transform2;
 
-namespace Flint {
+namespace revector {
 
 enum class Bidi {
     Auto,
@@ -623,4 +623,4 @@ float Label::get_codepoint_right_edge_position(int32_t codepoint_index) {
     return pos;
 }
 
-} // namespace Flint
+} // namespace revector

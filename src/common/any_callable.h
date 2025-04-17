@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 
-namespace Flint {
+namespace revector {
 
 template <typename Ret>
 struct AnyCallable {

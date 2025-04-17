@@ -1,6 +1,6 @@
 #include "margin_container.h"
 
-namespace Flint {
+namespace revector {
 
 void MarginContainer::calc_minimum_size() {
     Vec2F margin_size = {margin_.left + margin_.right, margin_.top + margin_.bottom};
@@ -46,4 +46,4 @@ void MarginContainer::set_margin(const RectF &margin) {
     margin_ = margin;
 }
 
-} // namespace Flint
+} // namespace revector

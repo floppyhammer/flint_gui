@@ -1,12 +1,11 @@
-#ifndef FLINT_RASTER_IMAGE_H
-#define FLINT_RASTER_IMAGE_H
+#pragma once
 
 #include <memory>
 
 #include "../render/base.h"
 #include "image.h"
 
-namespace Flint {
+namespace revector {
 
 class RasterImage final : public Image {
 public:
@@ -17,6 +16,4 @@ public:
     std::shared_ptr<Pathfinder::Image> image_data;
 };
 
-} // namespace Flint
-
-#endif // FLINT_RASTER_IMAGE_H
+} // namespace revector

@@ -1,10 +1,9 @@
-#ifndef FLINT_RENDER_SERVER_H
-#define FLINT_RENDER_SERVER_H
+#pragma once
 
 #include <pathfinder/prelude.h>
 #include "../render/blit.h"
 
-namespace Flint {
+namespace revector {
 
 class RenderServer {
 public:
@@ -27,6 +26,4 @@ public:
     std::shared_ptr<Blit> blit_;
 };
 
-} // namespace Flint
-
-#endif // FLINT_RENDER_SERVER_H
+} // namespace revector

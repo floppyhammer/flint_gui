@@ -1,5 +1,4 @@
-#ifndef FLINT_BUTTON_H
-#define FLINT_BUTTON_H
+#pragma once
 
 #include <functional>
 
@@ -10,7 +9,7 @@
 #include "node_ui.h"
 #include "texture_rect.h"
 
-namespace Flint {
+namespace revector {
 
 class Button : public NodeUi {
     friend class ButtonGroup;
@@ -116,6 +115,4 @@ public:
     std::vector<AnyCallable<void>> pressed_callbacks;
 };
 
-} // namespace Flint
-
-#endif // FLINT_BUTTON_H
+} // namespace revector

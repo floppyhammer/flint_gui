@@ -6,7 +6,7 @@
 #include "../../common/geometry.h"
 #include "../../resources/vector_image.h"
 
-namespace Flint {
+namespace revector {
 
 SpinBox::SpinBox() {
     type = NodeType::SpinBox;
@@ -191,4 +191,4 @@ float SpinBox::get_value() const {
     return value;
 }
 
-} // namespace Flint
+} // namespace revector

@@ -1,13 +1,10 @@
-#ifndef FLINT_UTILS_H
-#define FLINT_UTILS_H
+#pragma once
 
 #include <pathfinder/prelude.h>
 
-namespace Flint {
+namespace revector {
 
 typedef Pathfinder::Logger Logger;
 typedef Pathfinder::Timestamp Timestamp;
 
-} // namespace Flint
-
-#endif // FLINT_UTILS_H
+} // namespace revector

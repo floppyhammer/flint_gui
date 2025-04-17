@@ -5,7 +5,7 @@
 
 #include <memory>
 
-namespace Flint {
+namespace revector {
 
 /**
  * Simple class to blit a texture to screen.
@@ -36,6 +36,6 @@ private:
     std::shared_ptr<Pathfinder::Sampler> sampler;
 };
 
-} // namespace Flint
+} // namespace revector
 
 #endif

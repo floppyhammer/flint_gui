@@ -6,7 +6,7 @@
 
 using Pathfinder::Rect;
 
-namespace Flint {
+namespace revector {
 
 NodeUi::NodeUi() {
     type = NodeType::NodeUi;
@@ -352,4 +352,4 @@ void NodeUi::connect_signal(const std::string &signal, const AnyCallable<void> &
     }
 }
 
-} // namespace Flint
+} // namespace revector

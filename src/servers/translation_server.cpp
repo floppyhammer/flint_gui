@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace Flint {
+namespace revector {
 
 TranslationServer::TranslationServer() = default;
 
@@ -49,4 +49,4 @@ void TranslationServer::load_translations(const std::string& filename) {
     }
 }
 
-} // namespace Flint
+} // namespace revector

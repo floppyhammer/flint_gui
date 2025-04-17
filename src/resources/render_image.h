@@ -1,5 +1,4 @@
-#ifndef FLINT_RENDER_IMAGE_H
-#define FLINT_RENDER_IMAGE_H
+#pragma once
 
 #include <pathfinder/prelude.h>
 
@@ -7,7 +6,7 @@
 #include "../servers/render_server.h"
 #include "image.h"
 
-namespace Flint {
+namespace revector {
 
 class RenderImage : public Image {
 public:
@@ -32,6 +31,4 @@ protected:
     std::shared_ptr<Pathfinder::Texture> texture_;
 };
 
-} // namespace Flint
-
-#endif // FLINT_RENDER_IMAGE_H
+} // namespace revector

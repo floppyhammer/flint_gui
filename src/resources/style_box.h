@@ -1,11 +1,10 @@
-#ifndef FLINT_RESOURCE_STYLE_BOX_H
-#define FLINT_RESOURCE_STYLE_BOX_H
+#pragma once
 
 #include <optional>
 
 #include "../common/geometry.h"
 
-namespace Flint {
+namespace revector {
 
 struct StyleBox {
     ColorU bg_color = ColorU(27, 27, 27, 255);
@@ -43,6 +42,4 @@ struct StyleLine {
     float width = 2;
 };
 
-} // namespace Flint
-
-#endif // FLINT_RESOURCE_STYLE_BOX_H
+} // namespace revector

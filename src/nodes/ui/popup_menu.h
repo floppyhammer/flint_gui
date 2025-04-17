@@ -1,5 +1,4 @@
-#ifndef FLINT_NODE_POPUPMENU_H
-#define FLINT_NODE_POPUPMENU_H
+#pragma once
 
 #include <cstdint>
 #include <memory>
@@ -14,7 +13,7 @@
 #include "node_ui.h"
 #include "texture_rect.h"
 
-namespace Flint {
+namespace revector {
 
 class PopupMenu;
 
@@ -114,6 +113,4 @@ private:
     std::vector<AnyCallable<void>> popup_hide_callbacks;
 };
 
-} // namespace Flint
-
-#endif // FLINT_NODE_POPUPMENU_H
+} // namespace revector

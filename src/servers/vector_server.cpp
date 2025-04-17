@@ -2,7 +2,7 @@
 
 #include "debug_server.h"
 
-namespace Flint {
+namespace revector {
 
 constexpr float STROKE_WIDTH_FOR_PSEUDO_BOLD_TEXT = 1.0;
 
@@ -233,7 +233,7 @@ void VectorServer::draw_glyphs(std::vector<Glyph> &glyphs,
                                const RectF &clip_box,
                                float alpha) {
     if (glyphs.size() != glyph_positions.size()) {
-        Logger::error("Glyph count mismatches glyph position count!", "Flint");
+        Logger::error("Glyph count mismatches glyph position count!", "revector");
         return;
     }
 
@@ -360,4 +360,4 @@ std::shared_ptr<Pathfinder::SvgScene> VectorServer::load_svg(const std::string &
     return svg_scene;
 }
 
-} // namespace Flint
+} // namespace revector

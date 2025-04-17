@@ -1,11 +1,10 @@
-#ifndef FLINT_MARGIN_CONTAINER_H
-#define FLINT_MARGIN_CONTAINER_H
+#pragma once
 
 #include "container.h"
 
 using Pathfinder::Rect;
 
-namespace Flint {
+namespace revector {
 
 class MarginContainer : public Container {
 public:
@@ -25,6 +24,4 @@ private:
     RectF margin_ = {8, 8, 8, 8};
 };
 
-} // namespace Flint
-
-#endif // FLINT_MARGIN_CONTAINER_H
+} // namespace revector

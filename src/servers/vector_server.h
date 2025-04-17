@@ -1,5 +1,4 @@
-#ifndef FLINT_VECTOR_SERVER_H
-#define FLINT_VECTOR_SERVER_H
+#pragma once
 
 #include <pathfinder/prelude.h>
 
@@ -10,7 +9,7 @@
 #include "../resources/style_box.h"
 #include "../resources/vector_image.h"
 
-namespace Flint {
+namespace revector {
 
 constexpr int MAX_RENDER_LAYER = 8;
 
@@ -97,6 +96,4 @@ private:
     float global_scale_ = 1.0f;
 };
 
-} // namespace Flint
-
-#endif // FLINT_VECTOR_SERVER_H
+} // namespace revector

@@ -2,7 +2,7 @@
 
 #include "../../../resources/default_resource.h"
 
-namespace Flint {
+namespace revector {
 
 TabContainer::TabContainer() {
     type = NodeType::TabContainer;
@@ -142,4 +142,4 @@ void TabContainer::set_tab_disabled(bool disabled) {
     }
 }
 
-} // namespace Flint
+} // namespace revector

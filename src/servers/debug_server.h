@@ -1,10 +1,9 @@
-#ifndef FLINT_DEBUG_SERVER_H
-#define FLINT_DEBUG_SERVER_H
+#pragma once
 
 #include <map>
 #include <string>
 
-namespace Flint {
+namespace revector {
 class DebugServer final {
 public:
     static DebugServer *get_singleton() {
@@ -16,5 +15,3 @@ public:
 };
 
 }
-
-#endif //FLINT_DEBUG_SERVER_H

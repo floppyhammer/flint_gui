@@ -1,6 +1,6 @@
 #include "image.h"
 
-namespace Flint {
+namespace revector {
 
 Image::Image(const std::string &path) : Resource(path) {
 }
@@ -13,4 +13,4 @@ ImageType Image::get_type() {
     return type;
 }
 
-} // namespace Flint
+} // namespace revector

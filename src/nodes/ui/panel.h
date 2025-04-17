@@ -1,12 +1,11 @@
-#ifndef FLINT_NODE_PANEL_H
-#define FLINT_NODE_PANEL_H
+#pragma once
 
 #include <optional>
 
 #include "../../resources/style_box.h"
 #include "node_ui.h"
 
-namespace Flint {
+namespace revector {
 
 class Panel : public NodeUi {
 public:
@@ -20,6 +19,4 @@ protected:
     std::optional<StyleBox> theme_panel_;
 };
 
-} // namespace Flint
-
-#endif // FLINT_NODE_PANEL_H
+} // namespace revector

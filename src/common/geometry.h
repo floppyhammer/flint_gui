@@ -1,9 +1,8 @@
-#ifndef FLINT_GEOMETRY_H
-#define FLINT_GEOMETRY_H
+#pragma once
 
 #include <pathfinder/prelude.h>
 
-namespace Flint {
+namespace revector {
 
 typedef Pathfinder::ColorU ColorU;
 typedef Pathfinder::ColorF ColorF;
@@ -14,6 +13,4 @@ typedef Pathfinder::Vec2F Vec2F;
 typedef Pathfinder::Vec2I Vec2I;
 typedef Pathfinder::Mat3 Mat3;
 
-} // namespace Flint
-
-#endif // FLINT_GEOMETRY_H
+} // namespace revector

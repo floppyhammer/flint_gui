@@ -76,7 +76,7 @@ if (REVECTOR_FRIBIDI)
     add_subdirectory("third_party/fribidi")
     target_link_libraries(revector PUBLIC fribidi)
 
-    target_compile_definitions(revector PUBLIC FLINT_USE_FRIBIDI)
+    target_compile_definitions(revector PUBLIC REVECTOR_USE_FRIBIDI)
 endif ()
 
 if (REVECTOR_VISUAL_DEBUG)

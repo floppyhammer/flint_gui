@@ -1,12 +1,11 @@
-#ifndef FLINT_TAB_CONTAINER_H
-#define FLINT_TAB_CONTAINER_H
+#pragma once
 
 #include <optional>
 
 #include "../button.h"
 #include "container.h"
 
-namespace Flint {
+namespace revector {
 
 class TabContainer : public Container {
 public:
@@ -44,6 +43,4 @@ protected:
     std::optional<StyleBox> theme_button_panel;
 };
 
-} // namespace Flint
-
-#endif // FLINT_TAB_CONTAINER_H
+} // namespace revector

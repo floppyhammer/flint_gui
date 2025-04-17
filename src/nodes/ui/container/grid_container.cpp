@@ -1,6 +1,6 @@
 #include "grid_container.h"
 
-namespace Flint {
+namespace revector {
 
 void GridContainer::adjust_layout() {
     if (children.empty()) {
@@ -121,4 +121,4 @@ void GridContainer::set_column_number(uint32_t new_column_number) {
     col_num = new_column_number;
 }
 
-} // namespace Flint
+} // namespace revector

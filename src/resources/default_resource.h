@@ -1,10 +1,9 @@
-#ifndef FLINT_DEFAULT_RESOURCE_H
-#define FLINT_DEFAULT_RESOURCE_H
+#pragma once
 
 #include "opensans_regular_ttf.h"
 #include "theme.h"
 
-namespace Flint {
+namespace revector {
 
 class Font;
 
@@ -38,6 +37,4 @@ private:
     std::shared_ptr<Font> default_font;
 };
 
-} // namespace Flint
-
-#endif // FLINT_DEFAULT_RESOURCE_H
+} // namespace revector

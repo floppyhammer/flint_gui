@@ -1,5 +1,4 @@
-#ifndef FLINT_FONT_H
-#define FLINT_FONT_H
+#pragma once
 
 #include <pathfinder/prelude.h>
 
@@ -14,7 +13,7 @@
 
 struct stbtt_fontinfo;
 
-namespace Flint {
+namespace revector {
 
 template <typename T>
 void utf8_to_utf16(const std::string &source, std::basic_string<T> &result) {
@@ -208,6 +207,4 @@ private:
     float update_metrics(uint32_t size, float &ascent, float &descent);
 };
 
-} // namespace Flint
-
-#endif // FLINT_FONT_H
+} // namespace revector

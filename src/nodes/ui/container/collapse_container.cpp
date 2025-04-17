@@ -5,7 +5,7 @@
 #include "../../../common/utils.h"
 #include "../../../resources/default_resource.h"
 
-namespace Flint {
+namespace revector {
 
 void cc(bool p) {
     int a = 1;
@@ -140,4 +140,4 @@ void CollapseContainer::draw() {
     }
 }
 
-} // namespace Flint
+} // namespace revector

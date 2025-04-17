@@ -6,7 +6,7 @@
 #include "../../servers/input_server.h"
 #include "container/margin_container.h"
 
-namespace Flint {
+namespace revector {
 
 TextEdit::TextEdit() {
     type = NodeType::TextEdit;
@@ -101,7 +101,7 @@ void TextEdit::input(InputEvent &event) {
 
                 Logger::verbose("Caret position: current " + std::to_string(current_caret_index) + ", selected " +
                                     std::to_string(selection_start_index),
-                                "Flint");
+                                "revector");
             }
         } break;
         case InputEventType::Text: {
@@ -343,4 +343,4 @@ void TextEdit::delete_selection() {
     current_caret_index = selection_start_index = start_index;
 }
 
-} // namespace Flint
+} // namespace revector

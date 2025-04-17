@@ -2,7 +2,7 @@
 
 #include "../../common/geometry.h"
 
-namespace Flint {
+namespace revector {
 
 ProgressBar::ProgressBar() {
     type = NodeType::ProgressBar;
@@ -136,4 +136,4 @@ void ProgressBar::set_lerp_enabled(bool new_lerp_enabled) {
     lerp_enabled = new_lerp_enabled;
 }
 
-} // namespace Flint
+} // namespace revector

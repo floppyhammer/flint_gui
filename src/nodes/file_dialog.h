@@ -1,11 +1,10 @@
-#ifndef FLINT_NODE_FILE_DIALOG_H
-#define FLINT_NODE_FILE_DIALOG_H
+#pragma once
 
 #include <optional>
 
 #include "node.h"
 
-namespace Flint {
+namespace revector {
 
 class FileDialog final : public Node {
 public:
@@ -17,6 +16,4 @@ protected:
     std::string default_path_;
 };
 
-} // namespace Flint
-
-#endif // FLINT_NODE_FILE_DIALOG_H
+} // namespace revector

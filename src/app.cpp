@@ -11,12 +11,12 @@
 #include "servers/render_server.h"
 #include "servers/vector_server.h"
 
-namespace Flint {
+namespace revector {
 
 App::App(Vec2I primary_window_size) {
     // Set logger level.
     Logger::set_default_level(Logger::Level::Silence);
-    Logger::set_module_level("Flint", Logger::Level::Warn);
+    Logger::set_module_level("revector", Logger::Level::Warn);
 
     auto render_server = RenderServer::get_singleton();
 
@@ -58,10 +58,10 @@ App::~App() {
     vector_target_.reset();
 
     VectorServer::get_singleton()->cleanup();
-    Logger::verbose("Cleaned up VectorServer.", "Flint");
+    Logger::verbose("Cleaned up VectorServer.", "revector");
 
     RenderServer::get_singleton()->destroy();
-    Logger::verbose("Cleaned up RenderServer.", "Flint");
+    Logger::verbose("Cleaned up RenderServer.", "revector");
 }
 
 SceneTree* App::get_tree() const {
@@ -103,7 +103,7 @@ void App::main_loop() {
             if (!primary_window->get_physical_size().is_any_zero()) {
                 std::ostringstream ss;
                 ss << "Vector target of the primary window resized to " << vector_target_->get_size();
-                Logger::info(ss.str(), "Flint");
+                Logger::info(ss.str(), "revector");
 
                 vector_target_ = RenderServer::get_singleton()->device_->create_texture(
                     {primary_window->get_physical_size(), Pathfinder::TextureFormat::Rgba8Unorm}, "dst texture");
@@ -163,4 +163,4 @@ void App::main_loop() {
     RenderServer::get_singleton()->window_builder_->stop_and_destroy_swapchains();
 }
 
-} // namespace Flint
+} // namespace revector

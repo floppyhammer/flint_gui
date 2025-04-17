@@ -6,7 +6,7 @@
 #include "../../resources/default_resource.h"
 #include "../scene_tree.h"
 
-namespace Flint {
+namespace revector {
 
 PopupMenu::PopupMenu() {
     type = NodeType::PopupMenu;
@@ -216,7 +216,7 @@ void PopupMenu::when_item_selected(uint32_t item_index) {
         try {
             callback.operator()<uint32_t>(std::move(item_index));
         } catch (std::bad_any_cast &) {
-            Logger::error("Mismatched signal argument types!", "Flint");
+            Logger::error("Mismatched signal argument types!", "revector");
         }
     }
 }
@@ -226,9 +226,9 @@ void PopupMenu::when_popup_hide() {
         try {
             callback();
         } catch (std::bad_any_cast &) {
-            Logger::error("Mismatched signal argument types!", "Flint");
+            Logger::error("Mismatched signal argument types!", "revector");
         }
     }
 }
 
-} // namespace Flint
+} // namespace revector

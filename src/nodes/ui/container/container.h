@@ -1,9 +1,8 @@
-#ifndef FLINT_CONTAINER_H
-#define FLINT_CONTAINER_H
+#pragma once
 
 #include "../node_ui.h"
 
-namespace Flint {
+namespace revector {
 
 /**
  * Containers adjust their container children's layouts automatically.
@@ -31,6 +30,4 @@ protected:
     std::optional<StyleBox> theme_bg_;
 };
 
-} // namespace Flint
-
-#endif // FLINT_CONTAINER_H
+} // namespace revector

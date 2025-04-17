@@ -1,5 +1,4 @@
-#ifndef FLINT_SPIN_BOX_H
-#define FLINT_SPIN_BOX_H
+#pragma once
 
 #include <functional>
 #include <optional>
@@ -11,7 +10,7 @@
 #include "node_ui.h"
 #include "texture_rect.h"
 
-namespace Flint {
+namespace revector {
 
 /**
  * Numerical input field.
@@ -76,6 +75,4 @@ protected:
     void when_value_changed();
 };
 
-} // namespace Flint
-
-#endif // FLINT_SPIN_BOX_H
+} // namespace revector

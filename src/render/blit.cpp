@@ -10,7 +10,7 @@
 
 using namespace Pathfinder;
 
-namespace Flint {
+namespace revector {
 
 Blit::Blit(const std::shared_ptr<Device> &_device, const std::shared_ptr<Queue> &_queue, TextureFormat target_format) {
     device = _device;
@@ -89,4 +89,4 @@ void Blit::draw(const std::shared_ptr<CommandEncoder> &encoder) {
     encoder->draw(0, 6);
 }
 
-} // namespace Flint
+} // namespace revector

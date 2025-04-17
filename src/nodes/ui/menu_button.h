@@ -1,9 +1,8 @@
-#ifndef FLINT_MENU_BUTTON_H
-#define FLINT_MENU_BUTTON_H
+#pragma once
 
 #include "button.h"
 
-namespace Flint {
+namespace revector {
 
 class PopupMenu;
 class ScrollContainer;
@@ -33,6 +32,4 @@ protected:
     void when_item_selected(uint32_t item_index);
 };
 
-} // namespace Flint
-
-#endif // FLINT_MENU_BUTTON_H
+} // namespace revector

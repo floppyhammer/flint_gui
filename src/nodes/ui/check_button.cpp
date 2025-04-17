@@ -2,7 +2,7 @@
 
 #include "../../resources/default_resource.h"
 
-namespace Flint {
+namespace revector {
 
 CheckButton::CheckButton() {
     type = NodeType::CheckButton;
@@ -17,4 +17,4 @@ CheckButton::CheckButton() {
     icon_pressed_ = ResourceManager::get_singleton()->load<VectorImage>("assets/icons/CheckBox_Checked.svg");
 }
 
-} // namespace Flint
+} // namespace revector

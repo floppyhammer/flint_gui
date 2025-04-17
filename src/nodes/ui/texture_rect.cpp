@@ -7,7 +7,7 @@
 #include "../../servers/engine.h"
 #include "../../resources/render_image.h"
 
-namespace Flint {
+namespace revector {
 
 TextureRect::TextureRect() {
     type = NodeType::TextureRect;
@@ -44,7 +44,7 @@ void TextureRect::draw() {
             } break;
             case StretchMode::Scale: {
                 if (texture_size.area() == 0) {
-                    Logger::error("Vector texture size is invalid!", "Flint");
+                    Logger::error("Vector texture size is invalid!", "revector");
                     return;
                 }
                 auto scale = size / texture_size;
@@ -54,7 +54,7 @@ void TextureRect::draw() {
             case StretchMode::KeepAspect:
             case StretchMode::KeepAspectCentered: {
                 if (texture_size.area() == 0) {
-                    Logger::error("Vector texture size is invalid!", "Flint");
+                    Logger::error("Vector texture size is invalid!", "revector");
                     return;
                 }
 
@@ -94,7 +94,7 @@ void TextureRect::draw() {
             auto render_image = static_cast<RenderImage *>(texture.get());
             vector_server->draw_render_image(*render_image, transform);
         } else {
-            Logger::error("Unsupported texture type!", "Flint");
+            Logger::error("Unsupported texture type!", "revector");
         }
     }
 
@@ -114,4 +114,4 @@ void TextureRect::set_stretch_mode(TextureRect::StretchMode new_stretch_mode) {
     stretch_mode = new_stretch_mode;
 }
 
-} // namespace Flint
+} // namespace revector

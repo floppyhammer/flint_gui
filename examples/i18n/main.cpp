@@ -5,7 +5,7 @@
 
 #include "app.h"
 
-using namespace Flint;
+using namespace revector;
 
 using Pathfinder::Vec2;
 using Pathfinder::Vec3;

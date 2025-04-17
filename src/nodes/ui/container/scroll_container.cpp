@@ -2,7 +2,7 @@
 
 using Pathfinder::clamp;
 
-namespace Flint {
+namespace revector {
 
 ScrollContainer::ScrollContainer() {
     type = NodeType::ScrollContainer;
@@ -262,4 +262,4 @@ void ScrollContainer::post_draw_children() {
     vector_server->set_render_layer(0);
 }
 
-} // namespace Flint
+} // namespace revector

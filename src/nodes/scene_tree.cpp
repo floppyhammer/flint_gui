@@ -3,7 +3,7 @@
 #include "../servers/render_server.h"
 #include "sub_window.h"
 
-namespace Flint {
+namespace revector {
 
 SceneTree::SceneTree() {
     // A default root.
@@ -200,7 +200,7 @@ void SceneTree::process(double dt) {
     }
 
     if (get_primary_window().lock()->get_resize_flag()) {
-        Logger::info("Notify window resizing", "Flint");
+        Logger::info("Notify window resizing", "revector");
         notify_primary_window_size_changed(get_primary_window().lock()->get_logical_size());
     }
 
@@ -267,4 +267,4 @@ std::weak_ptr<Pathfinder::Window> SceneTree::get_primary_window() const {
     return RenderServer::get_singleton()->window_builder_->get_window(0);
 }
 
-} // namespace Flint
+} // namespace revector

@@ -4,7 +4,7 @@
 #include "app.h"
 #include "nodes/sub_window.h"
 
-using namespace Flint;
+using namespace revector;
 
 class MyNode : public Node {
     void custom_ready() override {

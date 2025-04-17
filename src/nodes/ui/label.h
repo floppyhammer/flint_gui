@@ -1,5 +1,4 @@
-#ifndef FLINT_LABEL_H
-#define FLINT_LABEL_H
+#pragma once
 
 #include <cstdint>
 #include <memory>
@@ -12,7 +11,7 @@
 
 using Pathfinder::Rect;
 
-namespace Flint {
+namespace revector {
 
 enum class BidiAlignment {
     Auto,
@@ -163,6 +162,4 @@ private:
     BidiAlignment bidi_alignment_ = BidiAlignment::Auto;
 };
 
-} // namespace Flint
-
-#endif // FLINT_LABEL_H
+} // namespace revector

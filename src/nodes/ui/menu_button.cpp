@@ -5,7 +5,7 @@
 #include "container/scroll_container.h"
 #include "popup_menu.h"
 
-namespace Flint {
+namespace revector {
 
 MenuButton::MenuButton() {
     type = NodeType::MenuButton;
@@ -75,4 +75,4 @@ void MenuButton::when_item_selected(uint32_t item_index) {
     }
 }
 
-} // namespace Flint
+} // namespace revector

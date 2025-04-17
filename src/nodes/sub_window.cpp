@@ -4,7 +4,7 @@
 #include "../servers/render_server.h"
 #include "../servers/vector_server.h"
 
-namespace Flint {
+namespace revector {
 
 SubWindow::SubWindow(Vec2I size) {
     type = NodeType::Window;
@@ -125,4 +125,4 @@ std::shared_ptr<Pathfinder::Window> SubWindow::get_raw_window() const {
     return window;
 }
 
-} // namespace Flint
+} // namespace revector

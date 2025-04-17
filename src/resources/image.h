@@ -1,10 +1,9 @@
-#ifndef FLINT_IMAGE_H
-#define FLINT_IMAGE_H
+#pragma once
 
 #include "../common/geometry.h"
 #include "resource.h"
 
-namespace Flint {
+namespace revector {
 
 enum class ImageType {
     Raster,
@@ -31,6 +30,4 @@ protected:
     Vec2I size;
 };
 
-} // namespace Flint
-
-#endif // FLINT_IMAGE_H
+} // namespace revector

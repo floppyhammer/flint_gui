@@ -1,5 +1,4 @@
-#ifndef FLINT_NODE_TREE_H
-#define FLINT_NODE_TREE_H
+#pragma once
 
 #include <cstdint>
 #include <memory>
@@ -13,7 +12,7 @@
 #include "container/box_container.h"
 #include "node_ui.h"
 
-namespace Flint {
+namespace revector {
 
 class Tree;
 
@@ -99,6 +98,4 @@ private:
     std::optional<StyleBox> theme_bg_focused;
 };
 
-} // namespace Flint
-
-#endif // FLINT_NODE_TREE_H
+} // namespace revector

@@ -1,9 +1,8 @@
-#ifndef FLINT_ENGINE_H
-#define FLINT_ENGINE_H
+#pragma once
 
 #include <chrono>
 
-namespace Flint {
+namespace revector {
 
 enum class Signal {
     SwapChainChanged,
@@ -42,6 +41,4 @@ private:
     double dt = 0;
 };
 
-} // namespace Flint
-
-#endif // FLINT_ENGINE_H
+} // namespace revector

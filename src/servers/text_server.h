@@ -1,12 +1,11 @@
-#ifndef FLINT_TEXT_SERVER_H
-#define FLINT_TEXT_SERVER_H
+#pragma once
 
 #include <string>
 #include <unordered_map>
 
 #include "../resources/font.h"
 
-namespace Flint {
+namespace revector {
 
 class TextServer {
 public:
@@ -27,6 +26,4 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Font>> font_cache;
 };
 
-} // namespace Flint
-
-#endif // FLINT_TEXT_SERVER_H
+} // namespace revector

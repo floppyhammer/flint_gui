@@ -4,7 +4,7 @@
 
 #include "sub_window.h"
 
-namespace Flint {
+namespace revector {
 
 void Timer::start_timer(float time) {
     if (time <= 0) {
@@ -55,4 +55,4 @@ void Timer::emit_timeout() {
     }
 }
 
-} // namespace Flint
+} // namespace revector

@@ -4,7 +4,7 @@
 
 #include "../common/utils.h"
 
-namespace Flint {
+namespace revector {
 
 Engine::Engine() {
     last_time_updated_fps = std::chrono::high_resolution_clock::now();
@@ -30,7 +30,7 @@ void Engine::tick() {
         // Set frame time.
         std::ostringstream string_stream;
         string_stream << "FPS " << round(fps * 10.f) * 0.1f;
-        Logger::verbose(string_stream.str(), "Flint");
+        Logger::verbose(string_stream.str(), "revector");
     }
 }
 
@@ -50,4 +50,4 @@ int Engine::get_fps_int() const {
     return int(round(fps));
 }
 
-} // namespace Flint
+} // namespace revector

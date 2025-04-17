@@ -1,6 +1,6 @@
 #include "box_container.h"
 
-namespace Flint {
+namespace revector {
 
 void BoxContainer::adjust_layout() {
     if (children.empty()) {
@@ -224,4 +224,4 @@ void BoxContainer::set_separation(float new_separation) {
     separation = new_separation;
 }
 
-} // namespace Flint
+} // namespace revector

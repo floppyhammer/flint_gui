@@ -1,9 +1,8 @@
-#ifndef FLINT_GRID_CONTAINER_H
-#define FLINT_GRID_CONTAINER_H
+#pragma once
 
 #include "container.h"
 
-namespace Flint {
+namespace revector {
 
 class GridContainer : public Container {
 public:
@@ -25,6 +24,4 @@ protected:
     std::vector<float> max_col_widths;
 };
 
-} // namespace Flint
-
-#endif // FLINT_GRID_CONTAINER_H
+} // namespace revector

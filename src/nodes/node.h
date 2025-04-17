@@ -1,5 +1,4 @@
-#ifndef FLINT_NODE_H
-#define FLINT_NODE_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -9,7 +8,7 @@
 #include "../servers/engine.h"
 #include "../servers/input_server.h"
 
-namespace Flint {
+namespace revector {
 
 enum class NodeType {
     // General.
@@ -179,6 +178,4 @@ void dfs_postorder_ltr_traversal(Node *node, std::vector<Node *> &ordered_nodes)
 /// See: https://faculty.cs.niu.edu/~mcmahon/CS241/Notes/Data_Structures/binary_tree_traversals.html
 void dfs_postorder_rtl_traversal(Node *node, std::vector<Node *> &ordered_nodes);
 
-} // namespace Flint
-
-#endif // FLINT_NODE_H
+} // namespace revector

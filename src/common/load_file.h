@@ -1,5 +1,4 @@
-#ifndef FLINT_LOAD_FILE_H
-#define FLINT_LOAD_FILE_H
+#pragma once
 
 #include <pathfinder/prelude.h>
 
@@ -10,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace Flint {
+namespace revector {
 
 inline void split_path(const std::string &str, std::string &file_directory) {
     size_t found = str.find_last_of("/\\");
@@ -22,6 +21,4 @@ inline void split_path(const std::string &str, std::string &file_directory) {
     file_directory = str.substr(0, found);
 }
 
-} // namespace Flint
-
-#endif // FLINT_LOAD_FILE_H
+} // namespace revector

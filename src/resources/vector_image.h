@@ -1,5 +1,4 @@
-#ifndef FLINT_VECTOR_IMAGE_H
-#define FLINT_VECTOR_IMAGE_H
+#pragma once
 
 #include <pathfinder/prelude.h>
 
@@ -8,7 +7,7 @@
 #include "../common/geometry.h"
 #include "image.h"
 
-namespace Flint {
+namespace revector {
 
 // TODO: Merge this with VectorTexture.
 /// A thin wrapper over Pathfinder::Path2d.
@@ -43,6 +42,4 @@ protected:
     std::shared_ptr<Pathfinder::SvgScene> svg_scene;
 };
 
-} // namespace Flint
-
-#endif
+} // namespace revector

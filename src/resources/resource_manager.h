@@ -1,5 +1,4 @@
-#ifndef FLINT_RESOURCE_MANAGER_H
-#define FLINT_RESOURCE_MANAGER_H
+#pragma once
 
 #include <memory>
 #include <stdexcept>
@@ -7,7 +6,7 @@
 
 #include "resource.h"
 
-namespace Flint {
+namespace revector {
 
 struct ResId {
     uint64_t unique_id;
@@ -42,6 +41,4 @@ private:
     std::unordered_map<std::string, std::weak_ptr<Resource>> resources;
 };
 
-} // namespace Flint
-
-#endif // FLINT_RESOURCE_MANAGER_H
+} // namespace revector

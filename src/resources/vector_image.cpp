@@ -8,7 +8,7 @@
 #include "../common/utils.h"
 #include "../servers/vector_server.h"
 
-namespace Flint {
+namespace revector {
 
 VectorImage::VectorImage(Vec2I size_) : Image(size_) {
     type = ImageType::Vector;
@@ -42,4 +42,4 @@ std::shared_ptr<Pathfinder::SvgScene> VectorImage::get_svg_scene() {
     return svg_scene;
 }
 
-} // namespace Flint
+} // namespace revector

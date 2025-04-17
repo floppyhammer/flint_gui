@@ -5,7 +5,7 @@
 #include "../../common/utils.h"
 #include "../scene_tree.h"
 
-namespace Flint {
+namespace revector {
 
 Tree::Tree() {
     type = NodeType::Tree;
@@ -128,7 +128,7 @@ std::shared_ptr<TreeItem> TreeItem::get_child(uint32_t idx) {
     if (idx < children.size()) {
         return children[idx];
     }
-    Logger::error("Invalid child index!", "Flint");
+    Logger::error("Invalid child index!", "revector");
     return nullptr;
 }
 
@@ -249,7 +249,7 @@ void TreeItem::input(InputEvent &event, Vec2F global_position) {
             if (item_global_rect.contains_point(button_event.position)) {
                 selected = true;
                 tree->selected_item = this;
-                Logger::verbose("Item selected: " + label->get_text(), "Flint");
+                Logger::verbose("Item selected: " + label->get_text(), "revector");
             }
         }
     }
@@ -263,4 +263,4 @@ void TreeItem::set_icon(const std::shared_ptr<Image> &texture) {
     icon->set_texture(texture);
 }
 
-} // namespace Flint
+} // namespace revector

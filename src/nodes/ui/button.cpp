@@ -6,7 +6,7 @@
 #include "../../resources/default_resource.h"
 #include "../../resources/vector_image.h"
 
-namespace Flint {
+namespace revector {
 
 Button::Button() {
     type = NodeType::Button;
@@ -234,7 +234,7 @@ void Button::when_toggled(bool pressed) {
         try {
             callback.operator()<bool>(std::move(pressed));
         } catch (std::bad_any_cast &) {
-            Logger::error("Mismatched signal argument types!", "Flint");
+            Logger::error("Mismatched signal argument types!", "revector");
         }
     }
 }
@@ -310,4 +310,4 @@ void ButtonGroup::add_button(const std::weak_ptr<Button> &new_button) {
     new_button.lock()->connect_signal("pressed", callback);
 }
 
-} // namespace Flint
+} // namespace revector

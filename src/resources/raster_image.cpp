@@ -9,7 +9,7 @@
 #include <cstring>
 #include <stdexcept>
 
-namespace Flint {
+namespace revector {
 
 RasterImage::RasterImage(Vec2I size_) : Image(size_) {
     type = ImageType::Raster;
@@ -24,7 +24,7 @@ RasterImage::RasterImage(const std::string &path) : Image(path) {
     stbi_uc *pixels = stbi_load(path.c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha);
 
     if (!pixels) {
-        Logger::warn("Failed to load image file " + path, "Flint");
+        Logger::warn("Failed to load image file " + path, "revector");
         throw std::runtime_error("Failed to load texture image!");
     }
 
@@ -38,4 +38,4 @@ RasterImage::RasterImage(const std::string &path) : Image(path) {
     stbi_image_free(pixels);
 }
 
-} // namespace Flint
+} // namespace revector

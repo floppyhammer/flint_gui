@@ -4,7 +4,7 @@
 
 #include "style_box.h"
 
-namespace Flint {
+namespace revector {
 
 class Theme {
 public:
@@ -97,4 +97,4 @@ public:
     } collapsing_panel;
 };
 
-} // namespace Flint
+} // namespace revector

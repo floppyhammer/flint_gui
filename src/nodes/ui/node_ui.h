@@ -1,5 +1,4 @@
-#ifndef FLINT_NODE_UI_H
-#define FLINT_NODE_UI_H
+#pragma once
 
 #include <vector>
 
@@ -11,7 +10,7 @@
 
 using Pathfinder::ColorF;
 
-namespace Flint {
+namespace revector {
 
 /// How a UI node handles mouse input propagation.
 enum class MouseFilter {
@@ -191,6 +190,4 @@ protected:
     std::vector<AnyCallable<void>> callbacks_parent_size_changed;
 };
 
-} // namespace Flint
-
-#endif // FLINT_NODE_UI_H
+} // namespace revector

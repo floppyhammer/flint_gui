@@ -8,7 +8,7 @@
 #include "../nodes/sub_window.h"
 #include "render_server.h"
 
-namespace Flint {
+namespace revector {
 
 std::string cpp11_codepoint_to_utf8(char32_t codepoint) {
     char utf8[4];
@@ -274,4 +274,4 @@ void InputServer::restore_cursor(uint8_t window_index) {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 
-} // namespace Flint
+} // namespace revector

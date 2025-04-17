@@ -1,10 +1,9 @@
-#ifndef FLINT_NODE_SUB_WINDOW_PROXY_H
-#define FLINT_NODE_SUB_WINDOW_PROXY_H
+#pragma once
 
 #include "../common/geometry.h"
 #include "node.h"
 
-namespace Flint {
+namespace revector {
 
 /// A sub-window besides the primary window.
 class SubWindow : public Node {
@@ -54,6 +53,4 @@ private:
     float scale_factor = 1.0;
 };
 
-} // namespace Flint
-
-#endif // FLINT_NODE_SUB_WINDOW_PROXY_H
+} // namespace revector

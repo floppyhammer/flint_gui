@@ -5,7 +5,7 @@
 #include "../../common/utils.h"
 #include "../../resources/default_resource.h"
 
-namespace Flint {
+namespace revector {
 
 Panel::Panel() {
     type = NodeType::Panel;
@@ -33,4 +33,4 @@ void Panel::draw() {
     }
 }
 
-} // namespace Flint
+} // namespace revector

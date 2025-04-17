@@ -1,5 +1,4 @@
-#ifndef FLINT_TEXT_EDIT_H
-#define FLINT_TEXT_EDIT_H
+#pragma once
 
 #include <cstdint>
 #include <memory>
@@ -9,7 +8,7 @@
 #include "../../resources/style_box.h"
 #include "label.h"
 
-namespace Flint {
+namespace revector {
 
 class MarginContainer;
 
@@ -70,6 +69,4 @@ private:
     std::optional<StyleBox> theme_uneditable;
 };
 
-} // namespace Flint
-
-#endif // FLINT_TEXT_EDIT_H
+} // namespace revector

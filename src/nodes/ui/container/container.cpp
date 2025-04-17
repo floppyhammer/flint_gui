@@ -1,6 +1,6 @@
 #include "container.h"
 
-namespace Flint {
+namespace revector {
 
 Container::Container() {
     type = NodeType::NotInstantiable;
@@ -63,4 +63,4 @@ void Container::set_theme_bg(StyleBox style_box) {
     theme_bg_ = std::make_optional(style_box);
 }
 
-} // namespace Flint
+} // namespace revector

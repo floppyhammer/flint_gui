@@ -13,7 +13,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb/stb_image_write.h>
 
-#ifndef FLINT_USE_FRIBIDI
+#ifndef REVECTOR_USE_FRIBIDI
     #ifdef _WIN32
         // With Windows 10 Fall Creators Update and later, you can just include the single header <icu.h>.
         // See https://learn.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-
@@ -38,7 +38,7 @@
 
 #include "default_resource.h"
 
-namespace Flint {
+namespace revector {
 
 hb_script_t to_harfbuzz_script(Script script) {
     switch (script) {
@@ -167,7 +167,7 @@ Font::Font(const std::string &path) : Resource(path) {
     // Prepare font info.
     stbtt_info = new stbtt_fontinfo;
     if (!stbtt_InitFont(stbtt_info, stbtt_buffer, 0)) {
-        Logger::error("Failed to prepare font info!", "Flint");
+        Logger::error("Failed to prepare font info!", "revector");
     }
 
     harfbuzz_data = std::make_shared<HarfBuzzData>(font_data);
@@ -184,7 +184,7 @@ Font::Font(const std::vector<char> &bytes) {
     // Prepare font info.
     stbtt_info = new stbtt_fontinfo;
     if (!stbtt_InitFont(stbtt_info, stbtt_buffer, 0)) {
-        Logger::error("Failed to prepare font info!", "Flint");
+        Logger::error("Failed to prepare font info!", "revector");
     }
 
     harfbuzz_data = std::make_shared<HarfBuzzData>(font_data);
@@ -271,7 +271,7 @@ Pathfinder::Path2d Font::get_glyph_path(uint16_t glyph_index, float scale) const
     return path;
 }
 
-#ifndef FLINT_USE_FRIBIDI
+#ifndef REVECTOR_USE_FRIBIDI
 
 // Not font fallback when using ICU.
 
@@ -318,7 +318,7 @@ void Font::get_glyphs(const std::string &text,
         // Set paragraphs.
         ubidi_setPara(para_bidi, uchar_data, uchar_count, UBIDI_DEFAULT_LTR, nullptr, &error_code);
         if (!U_SUCCESS(error_code)) {
-            Logger::error("ubidi_setPara() failed!", "Flint");
+            Logger::error("ubidi_setPara() failed!", "revector");
             break;
         }
 
@@ -332,7 +332,7 @@ void Font::get_glyphs(const std::string &text,
             ubidi_getParagraphByIndex(para_bidi, para_index, &para_start, &para_end, &para_level, &error_code);
 
             if (!U_SUCCESS(error_code)) {
-                Logger::error("ubidi_getParagraphByIndex() failed!", "Flint");
+                Logger::error("ubidi_getParagraphByIndex() failed!", "revector");
                 break;
             }
 
@@ -343,7 +343,7 @@ void Font::get_glyphs(const std::string &text,
             // Set a paragraph (lines).
             ubidi_setLine(para_bidi, para_start, para_end, line_bidi, &error_code);
             if (!U_SUCCESS(error_code)) {
-                Logger::error("ubidi_setLine failed!", "Flint");
+                Logger::error("ubidi_setLine failed!", "revector");
                 break;
             }
 
@@ -912,4 +912,4 @@ bool Font::is_valid() const {
     return !font_data.empty();
 }
 
-} // namespace Flint
+} // namespace revector

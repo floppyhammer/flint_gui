@@ -1,5 +1,4 @@
-#ifndef FLINT_SCENE_TREE_H
-#define FLINT_SCENE_TREE_H
+#pragma once
 
 #include "file_dialog.h"
 #include "node.h"
@@ -26,7 +25,7 @@ namespace Pathfinder {
 class Window;
 }
 
-namespace Flint {
+namespace revector {
 
 void transform_system(Node* root);
 
@@ -62,6 +61,4 @@ private:
     bool quited = false;
 };
 
-} // namespace Flint
-
-#endif // FLINT_SCENE_TREE_H
+} // namespace revector

@@ -1,9 +1,8 @@
-#ifndef FLINT_BOX_CONTAINER_H
-#define FLINT_BOX_CONTAINER_H
+#pragma once
 
 #include "container.h"
 
-namespace Flint {
+namespace revector {
 
 /// BoxContainer is not meant for direct use as a node.
 /// Instead, use HBoxContainer/VBoxContainer.
@@ -44,6 +43,4 @@ public:
     }
 };
 
-} // namespace Flint
-
-#endif // FLINT_BOX_CONTAINER_H
+} // namespace revector

@@ -1,6 +1,6 @@
 #include "text_server.h"
 
-namespace Flint {
+namespace revector {
 
 void TextServer::load_font_from_file(const std::string& file_path) {
 }
@@ -21,4 +21,4 @@ void TextServer::cleanup() {
     raw_font_cache.clear();
 }
 
-} // namespace Flint
+} // namespace revector

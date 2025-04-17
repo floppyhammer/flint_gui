@@ -1,5 +1,4 @@
-#ifndef FLINT_PROGRESS_BAR_H
-#define FLINT_PROGRESS_BAR_H
+#pragma once
 
 #include <functional>
 #include <optional>
@@ -8,7 +7,7 @@
 #include "label.h"
 #include "node_ui.h"
 
-namespace Flint {
+namespace revector {
 
 class ProgressBar : public NodeUi {
 public:
@@ -67,6 +66,4 @@ protected:
     std::vector<AnyCallable<void>> on_value_changed;
 };
 
-} // namespace Flint
-
-#endif // FLINT_PROGRESS_BAR_H
+} // namespace revector

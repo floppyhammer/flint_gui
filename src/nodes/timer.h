@@ -1,5 +1,4 @@
-#ifndef FLINT_TIMER_H
-#define FLINT_TIMER_H
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -9,7 +8,7 @@
 #include "../servers/engine.h"
 #include "node.h"
 
-namespace Flint {
+namespace revector {
 
 class Timer final : public Node {
 public:
@@ -33,6 +32,4 @@ protected:
     std::vector<AnyCallable<void>> timeout_callbacks;
 };
 
-} // namespace Flint
-
-#endif // FLINT_TIMER_H
+} // namespace revector

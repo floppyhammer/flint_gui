@@ -3,10 +3,10 @@
 #include "../common/utils.h"
 #include "tinyfiledialogs/tinyfiledialogs.h"
 
-namespace Flint {
+namespace revector {
 
 std::optional<std::string> FileDialog::show() {
-    Logger::info("Show file dialog", "Flint");
+    Logger::info("Show file dialog", "revector");
 
     // In case of multiple files, the separator is `|`.
     // Returns NULL on cancel.
@@ -18,7 +18,7 @@ std::optional<std::string> FileDialog::show() {
                                       0);      // 0
 
     if (path) {
-        Logger::info("Selected path: " + std::string(path), "Flint");
+        Logger::info("Selected path: " + std::string(path), "revector");
         return path;
     }
 
@@ -29,4 +29,4 @@ void FileDialog::set_default_path(const std::string& default_path) {
     default_path_ = default_path;
 }
 
-} // namespace Flint
+} // namespace revector

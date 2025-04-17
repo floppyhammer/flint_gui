@@ -1,9 +1,8 @@
-#ifndef FLINT_SCROLL_CONTAINER_H
-#define FLINT_SCROLL_CONTAINER_H
+#pragma once
 
 #include "container.h"
 
-namespace Flint {
+namespace revector {
 
 class ScrollContainer : public Container {
 public:
@@ -54,6 +53,4 @@ protected:
     } temp_draw_data;
 };
 
-} // namespace Flint
-
-#endif // FLINT_SCROLL_CONTAINER_H
+} // namespace revector

@@ -1,5 +1,4 @@
-#ifndef FLINT_APP_H
-#define FLINT_APP_H
+#pragma once
 
 #include <array>
 #include <cstring>
@@ -15,7 +14,7 @@
 #include "servers/input_server.h"
 #include "servers/translation_server.h"
 
-namespace Flint {
+namespace revector {
 class App {
 public:
     explicit App(Vec2I primary_window_size);
@@ -38,6 +37,4 @@ private:
     std::shared_ptr<Pathfinder::Texture> vector_target_;
 };
 
-} // namespace Flint
-
-#endif // FLINT_APP_H
+} // namespace revector

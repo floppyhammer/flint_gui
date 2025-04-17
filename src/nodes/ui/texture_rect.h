@@ -1,11 +1,10 @@
-#ifndef FLINT_TEXTURE_RECT_H
-#define FLINT_TEXTURE_RECT_H
+#pragma once
 
 #include <memory>
 
 #include "node_ui.h"
 
-namespace Flint {
+namespace revector {
 
 /**
  * Used to display an ImageTexture or a VectorTexture.
@@ -43,6 +42,4 @@ protected:
     std::shared_ptr<Image> texture;
 };
 
-} // namespace Flint
-
-#endif // FLINT_TEXTURE_RECT_H
+} // namespace revector

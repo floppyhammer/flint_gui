@@ -4,9 +4,9 @@
 
 #include <vector>
 
-#define FTR(TAG) Flint::TranslationServer::get_singleton()->get_translation(TAG)
+#define FTR(TAG) revector::TranslationServer::get_singleton()->get_translation(TAG)
 
-namespace Flint {
+namespace revector {
 
 class TranslationServer {
 public:
@@ -29,4 +29,4 @@ private:
     std::string current_locale_ = "en";
 };
 
-} // namespace Flint
+} // namespace revector

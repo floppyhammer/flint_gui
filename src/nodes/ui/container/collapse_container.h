@@ -7,7 +7,7 @@
 #include "../label.h"
 #include "box_container.h"
 
-namespace Flint {
+namespace revector {
 
 class CollapseContainer : public Container {
 public:
@@ -50,4 +50,4 @@ private:
     std::optional<StyleBox> theme_panel_;
 };
 
-} // namespace Flint
+} // namespace revector

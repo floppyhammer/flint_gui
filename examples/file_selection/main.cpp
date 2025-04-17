@@ -4,7 +4,7 @@
 #include "app.h"
 #include "resources/default_resource.h"
 
-using namespace Flint;
+using namespace revector;
 
 class MyNode : public Node {
     void custom_ready() override {

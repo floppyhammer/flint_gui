@@ -1,15 +1,12 @@
-#ifndef FLINT_CHECK_BUTTON_H
-#define FLINT_CHECK_BUTTON_H
+#pragma once
 
 #include "button.h"
 
-namespace Flint {
+namespace revector {
 
 class CheckButton : public Button {
 public:
     CheckButton();
 };
 
-} // namespace Flint
-
-#endif // FLINT_CHECK_BUTTON_H
+} // namespace revector

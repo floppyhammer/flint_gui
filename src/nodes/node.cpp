@@ -5,7 +5,7 @@
 #include "../servers/render_server.h"
 #include "sub_window.h"
 
-namespace Flint {
+namespace revector {
 
 const char *NodeNames[] = {
     "Node",
@@ -243,4 +243,4 @@ SceneTree *Node::get_tree() const {
     return tree_;
 }
 
-} // namespace Flint
+} // namespace revector

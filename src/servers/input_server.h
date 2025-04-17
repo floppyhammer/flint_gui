@@ -1,5 +1,4 @@
-#ifndef FLINT_INPUT_SERVER_H
-#define FLINT_INPUT_SERVER_H
+#pragma once
 
 #include <pathfinder/prelude.h>
 
@@ -13,7 +12,7 @@ namespace Pathfinder {
 class Window;
 }
 
-namespace Flint {
+namespace revector {
 
 enum class InputEventType {
     MouseButton = 0,
@@ -144,6 +143,4 @@ private:
     std::set<KeyCode> keys_pressed;
 };
 
-} // namespace Flint
-
-#endif // FLINT_INPUT_SERVER_H
+} // namespace revector
