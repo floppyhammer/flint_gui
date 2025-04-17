@@ -1,4 +1,4 @@
-# flint_gui
+# revector
 
 This is an experimental vector-based GUI framework.
 

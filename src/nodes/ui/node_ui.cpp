@@ -48,7 +48,7 @@ Vec2F NodeUi::get_effective_minimum_size() const {
 
 void NodeUi::draw() {
     Node::draw();
-#ifdef FLINT_GUI_VISUAL_DEBUG
+#ifdef REVECTOR_VISUAL_DEBUG
     if (size.x > 0 && size.y > 0) {
         auto vector_server = VectorServer::get_singleton();
         vector_server->draw_style_box(debug_size_box, get_global_position(), size);
