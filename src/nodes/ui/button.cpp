@@ -230,7 +230,7 @@ void Button::when_pressed() {
 void Button::when_toggled(bool pressed) {
     for (auto &callback : toggled_callbacks) {
         try {
-            callback.operator()<bool>(!pressed);
+            callback.operator()<bool>(std::move(pressed));
         } catch (std::bad_any_cast &) {
             Logger::error("Mismatched signal argument types!", "revector");
         }

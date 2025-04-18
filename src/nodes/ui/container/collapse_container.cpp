@@ -27,7 +27,7 @@ CollapseContainer::CollapseContainer() {
     collapse_button_->set_text("Collapsing Container");
     collapse_button_->set_flat(true);
     collapse_button_->set_toggle_mode(true);
-    collapse_button_->connect_signal("toggled", [this](bool p_pressed = true) { set_collapse(!p_pressed); });
+    collapse_button_->connect_signal("toggled", [this](bool p_pressed) { set_collapse(p_pressed); });
 
     add_embedded_child(collapse_button_);
 
