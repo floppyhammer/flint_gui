@@ -4,13 +4,10 @@
 
 namespace revector {
 
-/// BoxContainer is not meant for direct use as a node.
-/// Instead, use HBoxContainer/VBoxContainer.
 class BoxContainer : public Container {
 public:
     void adjust_layout() override;
 
-    // TODO: merge this into adjust_layout to avoid duplicated calculation.
     void calc_minimum_size() override;
 
     void set_separation(float new_separation);
@@ -23,7 +20,7 @@ protected:
     /// Separation between UI children.
     float separation = 8;
 
-    /// Organizing direction for UI children.
+    /// Direction for organizing UI children.
     bool horizontal = true;
 };
 

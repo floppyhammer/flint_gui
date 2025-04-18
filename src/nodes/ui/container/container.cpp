@@ -63,4 +63,23 @@ void Container::set_theme_bg(StyleBox style_box) {
     theme_bg_ = std::make_optional(style_box);
 }
 
+std::vector<NodeUi *> Container::get_visible_ui_children() const {
+    // Get UI children.
+    std::vector<NodeUi *> ui_children;
+    ui_children.reserve(children.size());
+
+    for (const auto &child : children) {
+        // We only care about visible GUI nodes in a container.
+        if (!child->get_visibility() || !child->is_ui_node()) {
+            continue;
+        }
+
+        auto cast_child = dynamic_cast<NodeUi *>(child.get());
+
+        ui_children.push_back(cast_child);
+    }
+
+    return ui_children;
+}
+
 } // namespace revector

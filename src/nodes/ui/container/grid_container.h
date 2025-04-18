@@ -25,8 +25,6 @@ protected:
     float min_row_height;
     float min_col_width;
 
-    std::vector<NodeUi *> get_ui_children() const;
-
     bool shrinking = false;
 };
 

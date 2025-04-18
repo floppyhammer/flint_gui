@@ -9,75 +9,52 @@ void BoxContainer::adjust_layout() {
 
     auto path = get_node_path();
 
-    Vec2F total_size;
     std::vector<NodeUi *> expanding_children;
 
-    std::vector<std::pair<NodeUi *, Vec2F>> child_cache;
+    std::vector<NodeUi *> ui_children = get_visible_ui_children();
 
-    // In the first loop, we need do some calculation.
-    for (auto &child : children) {
-        // We only care about visible GUI nodes in a container.
-        if (!child->get_visibility() || !child->is_ui_node()) {
-            continue;
-        }
-
-        auto cast_child = dynamic_cast<NodeUi *>(child.get());
-
-        auto child_min_size = cast_child->get_effective_minimum_size();
-
-        child_cache.push_back(std::pair(cast_child, child_min_size));
-
+    // In the first loop, we need to do some calculation.
+    for (auto &ui_child : ui_children) {
         if (horizontal) {
-            total_size.x += child_min_size.x + separation;
-            total_size.y = std::max(total_size.y, child_min_size.y);
-
-            if (cast_child->container_sizing.expand_h) {
-                expanding_children.push_back(cast_child);
+            if (ui_child->container_sizing.expand_h) {
+                expanding_children.push_back(ui_child);
             }
         } else {
-            total_size.y += child_min_size.y + separation;
-            total_size.x = std::max(total_size.x, child_min_size.x);
-
-            if (cast_child->container_sizing.expand_v) {
-                expanding_children.push_back(cast_child);
+            if (ui_child->container_sizing.expand_v) {
+                expanding_children.push_back(ui_child);
             }
         }
     }
 
+    auto effective_min_size = get_effective_minimum_size();
+
+    // Space available for child expanding.
     float available_space_for_expanding;
     if (horizontal) {
-        // Subtract redundant separation.
-        total_size.x -= separation;
-
-        available_space_for_expanding = size.x - total_size.x;
+        available_space_for_expanding = size.x - effective_min_size.x;
     } else {
-        // Subtract redundant separation.
-        total_size.y -= separation;
-
-        available_space_for_expanding = size.y - total_size.y;
+        available_space_for_expanding = size.y - effective_min_size.y;
     }
 
     // If the container is not large enough, readjust it to contain all its children.
-    size = size.max(custom_minimum_size.max(total_size));
+    size = size.max(effective_min_size);
 
     uint32_t expanding_child_count = expanding_children.size();
 
+    // FIXME: same expanding space is not optimal.
     float extra_space_for_each_expanding_child = available_space_for_expanding / (float)expanding_child_count;
 
     float pos_shift = 0;
 
     // In the second loop, we set child sizes and positions.
-    for (auto &pair : child_cache) {
-        auto cast_child = pair.first;
-
-        auto child_min_size = pair.second;
+    for (auto &ui_child : ui_children) {
+        auto child_min_size = ui_child->get_effective_minimum_size();
 
         float real_space = horizontal ? child_min_size.x : child_min_size.y;
         float occupied_space = real_space;
 
         if (extra_space_for_each_expanding_child > 0) {
-            if (std::find(expanding_children.begin(), expanding_children.end(), cast_child) !=
-                expanding_children.end()) {
+            if (std::find(expanding_children.begin(), expanding_children.end(), ui_child) != expanding_children.end()) {
                 occupied_space += extra_space_for_each_expanding_child;
             }
         }
@@ -88,7 +65,7 @@ void BoxContainer::adjust_layout() {
             float height = 0;
 
             // Handle horizontal sizing.
-            switch (cast_child->container_sizing.flag_h) {
+            switch (ui_child->container_sizing.flag_h) {
                 case ContainerSizingFlag::Fill: {
                     real_space = occupied_space;
                     pos_x = pos_shift;
@@ -105,7 +82,7 @@ void BoxContainer::adjust_layout() {
             }
 
             // Handle vertical sizing.
-            switch (cast_child->container_sizing.flag_v) {
+            switch (ui_child->container_sizing.flag_v) {
                 case ContainerSizingFlag::Fill: {
                     height = size.y;
                     pos_y = 0;
@@ -124,15 +101,15 @@ void BoxContainer::adjust_layout() {
                 } break;
             }
 
-            cast_child->set_position({pos_x, pos_y});
-            cast_child->set_size({real_space, height});
+            ui_child->set_position({pos_x, pos_y});
+            ui_child->set_size({real_space, height});
         } else {
             float pos_x = 0;
             float pos_y = 0;
             float width = 0;
 
             // Handle vertical sizing.
-            switch (cast_child->container_sizing.flag_v) {
+            switch (ui_child->container_sizing.flag_v) {
                 case ContainerSizingFlag::Fill: {
                     real_space = occupied_space;
                     pos_y = pos_shift;
@@ -149,7 +126,7 @@ void BoxContainer::adjust_layout() {
             }
 
             // Handle horizontal sizing.
-            switch (cast_child->container_sizing.flag_h) {
+            switch (ui_child->container_sizing.flag_h) {
                 case ContainerSizingFlag::Fill: {
                     width = size.x;
                     pos_x = 0;
@@ -168,8 +145,8 @@ void BoxContainer::adjust_layout() {
                 } break;
             }
 
-            cast_child->set_position({pos_x, pos_y});
-            cast_child->set_size({width, real_space});
+            ui_child->set_position({pos_x, pos_y});
+            ui_child->set_size({width, real_space});
         }
 
         pos_shift += occupied_space + separation;
@@ -177,19 +154,12 @@ void BoxContainer::adjust_layout() {
 }
 
 void BoxContainer::calc_minimum_size() {
-    Vec2F min_size;
+    Vec2F min_size = {0, 0};
 
-    uint32_t visible_child_count = 0;
+    std::vector<NodeUi *> ui_children = get_visible_ui_children();
 
     // Add every child's minimum size.
-    for (auto &child : children) {
-        // Skip invisible/non-ui child.
-        // We only care about visible GUI nodes in a container.
-        if (!child->get_visibility() || !child->is_ui_node()) {
-            continue;
-        }
-
-        auto ui_child = dynamic_cast<NodeUi *>(child.get());
+    for (auto &ui_child : ui_children) {
         auto child_min_size = ui_child->get_effective_minimum_size();
 
         if (horizontal) {
@@ -199,13 +169,11 @@ void BoxContainer::calc_minimum_size() {
             min_size.x = std::max(min_size.x, child_min_size.x);
             min_size.y += child_min_size.y;
         }
-
-        visible_child_count++;
     }
 
     // Take separation into account.
-    if (visible_child_count > 1) {
-        float total_separation_size = separation * (float)(visible_child_count - 1);
+    if (!ui_children.empty()) {
+        float total_separation_size = separation * (ui_children.size() - 1);
         if (horizontal) {
             min_size.x += total_separation_size;
         } else {
