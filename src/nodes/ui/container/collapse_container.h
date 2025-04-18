@@ -17,8 +17,6 @@ public:
 
     void draw() override;
 
-    void set_theme_panel(StyleBox style_box);
-
     void calc_minimum_size() override;
 
     void set_title(std::string title);

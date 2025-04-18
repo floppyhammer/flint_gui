@@ -10,18 +10,14 @@ using Pathfinder::Vec3;
 
 class MyNode : public Node {
     void custom_ready() override {
-        auto panel = std::make_shared<Panel>();
-        panel->set_position({100, 100});
-        panel->set_size({400, 300});
-        add_child(panel);
-
-        auto a = std::make_shared<CollapseContainer>();
-        a->set_size({400, 300});
-        panel->add_child(a);
+        auto collapse = std::make_shared<CollapseContainer>();
+        collapse->set_position({100, 100});
+        collapse->set_size({400, 300});
+        add_child(collapse);
 
         auto tree = std::make_shared<Tree>();
         tree->set_anchor_flag(AnchorFlag::FullRect);
-        a->add_child(tree);
+        collapse->add_child(tree);
 
         // Set up tree items.
         {
