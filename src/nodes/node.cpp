@@ -192,7 +192,7 @@ bool Node::get_global_visibility() const {
 uint8_t Node::get_window_index() const {
     if (type == NodeType::Window) {
         auto sub_window_node = (SubWindow *)this;
-        return sub_window_node->get_window_index();
+        return sub_window_node->get_raw_window()->window_index;
     }
 
     if (parent) {

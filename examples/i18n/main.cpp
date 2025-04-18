@@ -22,23 +22,22 @@ class MyNode : public Node {
         margin_container->add_child(box_container);
 
         std::string text = "";
-        text += "👍😁😂\n";                   // Emoji
-        text += "你好世界！\n";                    // Chinese
-        text += "こんにちは世界！\n";                 // Japanese
-        text += "안녕 세계\n";                    // Korean
-        text += "مرحبا بالعالم!\n";           // Arabic
-        text += "ওহে বিশ্ব!\n";               // Bengali
-        text += "สวัสดีชาวโลก!\n";            // Thai
-        text += "سلام دنیا!\n";               // Persian
-        text += "नमस्ते दुनिया!\n";           // Hindi
-        text += "Chào thế giới!\n";           // Vietnamese
-        text += "Привет, мир\n";              // Russian
-        text += "שלום עולם!\n\n";             // Hebrew
+        text += "👍😁😂\n";                      // Emoji
+        text += "你好世界！\n";                  // Chinese
+        text += "こんにちは世界！\n";            // Japanese
+        text += "안녕 세계\n";                   // Korean
+        text += "مرحبا بالعالم!\n";              // Arabic
+        text += "ওহে বিশ্ব!\n";                   // Bengali
+        text += "สวัสดีชาวโลก!\n";                 // Thai
+        text += "سلام دنیا!\n";                  // Persian
+        text += "नमस्ते दुनिया!\n";                 // Hindi
+        text += "Chào thế giới!\n";              // Vietnamese
+        text += "Привет, мир\n";                 // Russian
+        text += "שלום עולם!\n\n";                // Hebrew
         text += "Hello123!مرحبا٠١٢!你好123！\n"; // Mixed languages
 
-        auto font = std::make_shared<Font>("assets/fonts/test.ttf");
-        DefaultResource::get_singleton()->set_default_font(
-            std::make_shared<Font>("assets/fonts/unifont-16.0.02.otf"));
+        // auto font = std::make_shared<Font>("assets/fonts/test.ttf");
+        DefaultResource::get_singleton()->set_default_font(std::make_shared<Font>("assets/fonts/unifont-16.0.02.otf"));
 
         // No word wrapping.
         {
@@ -54,7 +53,7 @@ class MyNode : public Node {
             label->set_text(text);
             label->container_sizing.expand_h = true;
             label->container_sizing.flag_h = ContainerSizingFlag::Fill;
-            label->set_font(font);
+            // label->set_font(font);
             label->set_font_size(32);
 
             box_container->add_child(label);
@@ -76,7 +75,7 @@ class MyNode : public Node {
             label->set_text(text);
             label->container_sizing.expand_h = true;
             label->container_sizing.flag_h = ContainerSizingFlag::Fill;
-            label->set_font(font);
+            // label->set_font(font);
 
             box_container->add_child(label);
         }
