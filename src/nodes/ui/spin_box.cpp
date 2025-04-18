@@ -18,8 +18,6 @@ SpinBox::SpinBox() {
     theme_focused->border_color = ColorU(200, 200, 200);
     theme_focused->border_width = 2;
 
-    debug_size_box.border_color = ColorU::green();
-
     // Don't add the label as a child since it's not a normal node but part of the SpinBox.
     label = std::make_shared<Label>();
     label->set_mouse_filter(MouseFilter::Ignore);

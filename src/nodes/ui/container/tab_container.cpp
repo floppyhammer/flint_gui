@@ -9,9 +9,9 @@ TabContainer::TabContainer() {
 
     auto default_theme = DefaultResource::get_singleton()->get_default_theme();
 
-    theme_bg_ = std::make_optional(default_theme->panel.styles["background"]);
-    theme_bg_.value().corner_radius = 0;
-    theme_bg_.value().border_width = 0;
+    theme_bg = std::make_optional(default_theme->panel.styles["background"]);
+    theme_bg.value().corner_radius = 0;
+    theme_bg.value().border_width = 0;
 
     theme_button_panel = std::make_optional<StyleBox>();
     theme_button_panel.value().corner_radius = 0;
@@ -137,7 +137,7 @@ void TabContainer::set_tab_title(uint32_t tab_idx, const std::string &title) {
 }
 
 void TabContainer::set_tab_disabled(bool disabled) {
-    for (auto& b : tab_buttons) {
+    for (auto &b : tab_buttons) {
         b->set_disabled(disabled);
     }
 }

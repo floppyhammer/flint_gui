@@ -15,10 +15,6 @@ public:
     /// Calculates the minimum size of this node, considering all its children's sizing effect.
     void calc_minimum_size() override;
 
-    void draw() override;
-
-    void set_theme_bg(StyleBox style_box);
-
 protected:
     /// Hide the constructor as this class is not meant for direct use as a node.
     Container();
@@ -28,8 +24,6 @@ protected:
     virtual void adjust_layout();
 
     std::vector<NodeUi *> get_visible_ui_children() const;
-
-    std::optional<StyleBox> theme_bg_;
 };
 
 } // namespace revector

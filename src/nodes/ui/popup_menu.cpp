@@ -33,8 +33,6 @@ PopupMenu::PopupMenu() {
     connect_signal("focus_released", callback);
 
     theme_bg_ = std::make_optional(panel);
-
-    debug_size_box.border_color = ColorU(100, 40, 122, 255);
 }
 
 void PopupMenu::update(double dt) {

@@ -4,8 +4,6 @@ namespace revector {
 
 Container::Container() {
     type = NodeType::NotInstantiable;
-
-    debug_size_box.border_color = ColorU::white();
 }
 
 void Container::adjust_layout() {
@@ -43,24 +41,6 @@ void Container::update(double dt) {
     NodeUi::update(dt);
 
     adjust_layout();
-}
-
-void Container::draw() {
-    if (!visible_) {
-        return;
-    }
-
-    if (theme_bg_.has_value()) {
-        auto vector_server = VectorServer::get_singleton();
-
-        auto global_position = get_global_position();
-
-        vector_server->draw_style_box(theme_bg_.value(), global_position, size);
-    }
-}
-
-void Container::set_theme_bg(StyleBox style_box) {
-    theme_bg_ = std::make_optional(style_box);
 }
 
 std::vector<NodeUi *> Container::get_visible_ui_children() const {

@@ -10,11 +10,6 @@ namespace revector {
 
 NodeUi::NodeUi() {
     type = NodeType::NodeUi;
-
-    debug_size_box.bg_color = ColorU();
-    debug_size_box.border_color = ColorU::red();
-    debug_size_box.border_width = 1;
-    debug_size_box.corner_radius = 0;
 }
 
 /// Runs once per frame.
@@ -48,12 +43,14 @@ Vec2F NodeUi::get_effective_minimum_size() const {
 
 void NodeUi::draw() {
     Node::draw();
-#ifdef REVECTOR_VISUAL_DEBUG
-    if (size.x > 0 && size.y > 0) {
+
+    if (theme_bg.has_value()) {
         auto vector_server = VectorServer::get_singleton();
-        vector_server->draw_style_box(debug_size_box, get_global_position(), size);
+
+        auto global_position = get_global_position();
+
+        vector_server->draw_style_box(theme_bg.value(), global_position, size);
     }
-#endif
 }
 
 void NodeUi::update(double dt) {
@@ -186,6 +183,10 @@ ColorU NodeUi::get_global_modulate() {
     } else {
         return ColorU::white();
     }
+}
+
+void NodeUi::set_theme_bg(StyleBox style_box) {
+    theme_bg = std::make_optional(style_box);
 }
 
 bool NodeUi::is_inside_container() const {

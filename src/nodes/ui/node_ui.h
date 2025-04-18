@@ -143,6 +143,8 @@ public:
 
     void connect_signal(const std::string &signal, const AnyCallable<void> &callback) override;
 
+    void set_theme_bg(StyleBox style_box);
+
 protected:
     Vec2F position{0};
     Vec2F size{1};
@@ -179,8 +181,7 @@ protected:
 
     float alpha = 1.0;
 
-    /// Visualize the node's size.
-    StyleBox debug_size_box;
+    std::optional<StyleBox> theme_bg;
 
     MouseFilter mouse_filter = MouseFilter::Stop;
 

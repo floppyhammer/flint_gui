@@ -21,8 +21,6 @@ Button::Button() {
 
     theme_disabled = default_theme->button.styles["disabled"];
 
-    debug_size_box.border_color = ColorU::green();
-
     // Don't add the label as a child since it's not a normal node but part of the button.
     label = std::make_shared<Label>();
     label->set_text("Button");

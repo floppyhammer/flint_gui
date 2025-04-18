@@ -14,7 +14,6 @@ public:
 
 protected:
     BoxContainer() {
-        debug_size_box.border_color = ColorU(100, 234, 123);
     }
 
     /// Separation between UI children.

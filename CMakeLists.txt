@@ -12,7 +12,6 @@ if (UNIX AND NOT APPLE AND NOT ANDROID)
 endif ()
 
 option(REVECTOR_VULKAN "Use Vulkan instead of OpenGL" OFF)
-option(REVECTOR_VISUAL_DEBUG "Enable visual debug" OFF)
 option(REVECTOR_FRIBIDI "Use fribidi instead of icu" ON)
 
 if (APPLE)
@@ -77,10 +76,6 @@ if (REVECTOR_FRIBIDI)
     target_link_libraries(revector PUBLIC fribidi)
 
     target_compile_definitions(revector PUBLIC REVECTOR_USE_FRIBIDI)
-endif ()
-
-if (REVECTOR_VISUAL_DEBUG)
-    add_compile_definitions(REVECTOR_VISUAL_DEBUG)
 endif ()
 
 # Copy the assets to the binary directory.

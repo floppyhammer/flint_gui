@@ -210,8 +210,6 @@ std::vector<Line> get_lines_with_word_wrap(float limited_width,
 Label::Label() {
     type = NodeType::Label;
 
-    debug_size_box.border_color = ColorU::blue();
-
     text_ = "Label";
 
     font = DefaultResource::get_singleton()->get_default_font();
@@ -225,7 +223,7 @@ Label::Label() {
 }
 
 void Label::set_text(const std::string &new_text) {
-    // Only update glyphs when text has changed.
+    // Only update glyphs when the text has been changed.
     if (text_ == new_text || font == nullptr) {
         return;
     }
@@ -497,6 +495,8 @@ void Label::draw() {
         return;
     }
 
+    NodeUi::draw();
+
     auto global_position = get_global_position();
 
     auto vector_server = VectorServer::get_singleton();
@@ -513,8 +513,6 @@ void Label::draw() {
     //    }
 
     vector_server->draw_glyphs(glyphs_, glyph_positions, text_style, translation, clip_box, alpha);
-
-    NodeUi::draw();
 }
 
 void Label::set_horizontal_alignment(Alignment alignment) {
